@@ -1,0 +1,9 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Redirect stdout of the current shell session to a teletypewriter (tty) terminal,
+# otherwise the fancy output of lint-staged will be disabled; see the husky issue
+# https://github.com/typicode/husky/issues/968
+
+exec 1> /dev/tty
+npx lint-staged
