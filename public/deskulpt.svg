@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Created with Vectornator (http://vectornator.io/) -->
+<svg height="100%" stroke-miterlimit="10" style="fill-rule:nonzero;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;" version="1.1" viewBox="0 0 419.58 297.675" width="100%" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:vectornator="http://vectornator.io" xmlns:xlink="http://www.w3.org/1999/xlink">
+<defs>
+<radialGradient cx="0" cy="0" gradientTransform="matrix(84.9057 -0.565043 0.565043 84.9057 216.731 138.396)" gradientUnits="userSpaceOnUse" id="RadialGradient" r="1">
+<stop offset="0" stop-color="#71b4fc"/>
+<stop offset="0.470833" stop-color="#006fe7"/>
+<stop offset="1" stop-color="#000000"/>
+</radialGradient>
+</defs>
+<g id="Layer-1" vectornator:layerName="Layer 1">
+<path d="M216.844 44.3125L209.781 48.375L209.781 94.9375C212.059 94.5865 214.342 94.2443 216.719 94.25C241.467 94.3097 261.497 114.408 261.438 139.156C261.378 163.904 241.248 183.935 216.5 183.875C214.199 183.869 211.988 183.527 209.781 183.188L209.781 230L216.375 233.844L298.531 186.625L298.781 91.875L216.844 44.3125Z" fill="url(#RadialGradient)" fill-rule="nonzero" opacity="1" stroke="none"/>
+<path d="M171.293 44.3125L202.111 44.3125L202.111 201.879L171.293 201.879L171.293 44.3125Z" fill="#000000" fill-rule="nonzero" opacity="1" stroke="none" vectornator:layerName="Rectangle 1"/>
+<path d="M171.281 207.719L183.438 233.844L189.938 233.844L202.125 207.719L171.281 207.719Z" fill="#0052ac" fill-rule="nonzero" opacity="1" stroke="none"/>
+</g>
+</svg>
