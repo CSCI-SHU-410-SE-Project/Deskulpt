@@ -16,6 +16,7 @@ export default defineConfig(() => ({
     rollupOptions: {
       input: {
         main: resolve(__dirname, "views/index.html"),
+        canvas: resolve(__dirname, "views/canvas.html"),
       },
     },
   },

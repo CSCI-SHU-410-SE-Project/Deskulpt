@@ -24,6 +24,13 @@
         "url": "views/index.html",
         "width": 800,
         "height": 600
+      },
+      {
+        "label": "canvas",
+        "title": "Deskulpt Canvas",
+        "url": "views/canvas.html",
+        "width": 800,
+        "height": 600
       }
     ],
     "security": {
