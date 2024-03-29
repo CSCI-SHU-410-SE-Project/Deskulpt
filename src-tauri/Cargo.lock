@@ -693,6 +693,7 @@ dependencies = [
  "path-clean 1.0.1",
  "pretty_assertions",
  "serde",
+ "serde-error",
  "serde_json",
  "swc_atoms",
  "swc_bundler",
@@ -2647,6 +2648,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3fb1c873e1b9b056a4dc4c0c198b24c3ffa059243875552b2bd0933b1aee4ce2"
 dependencies = [
  "serde_derive",
+]
+
+[[package]]
+name = "serde-error"
+version = "0.1.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e988182713aeed6a619a88bca186f6d6407483485ffe44c869ee264f8eabd13f"
+dependencies = [
+ "serde",
 ]
 
 [[package]]

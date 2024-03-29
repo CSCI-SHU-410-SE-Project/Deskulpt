@@ -1,6 +1,6 @@
 use std::{collections::HashMap, fs::read_to_string, path::PathBuf};
 
-use anyhow::{Context, Error, Ok};
+use anyhow::{bail, Context, Error};
 use serde::{Deserialize, Serialize};
 
 // Full configuration of a widget
@@ -8,7 +8,7 @@ use serde::{Deserialize, Serialize};
 pub(crate) struct WidgetConfig {
     pub(crate) deskulpt_conf: DeskulptConf,
     pub(crate) package_json: Option<PackageJson>,
-    pub(crate) directory: PathBuf,
+    pub(crate) directory: PathBuf, // Absolute path to the widget directory
 }
 
 // The structure corresponding to deskulpt.conf.json
@@ -26,9 +26,14 @@ pub(crate) struct PackageJson {
 }
 
 // Read a widget folder into the widget configuration
+// @Charlie-XIAO Error handling should be done with higher granularity
 pub(crate) fn read_widget_config(path: &PathBuf) -> Result<WidgetConfig, Error> {
+    if !path.is_absolute() {
+        bail!("Path must be absolute; got: {:?}", path);
+    }
+
     let deskulpt_conf_path = path.join("deskulpt.conf.json");
-    let deskulpt_conf_str = read_to_string(&deskulpt_conf_path)?;
+    let deskulpt_conf_str = read_to_string(deskulpt_conf_path)?;
     let deskulpt_conf: DeskulptConf = serde_json::from_str(&deskulpt_conf_str)
         .context("Failed to load deskulpt.conf.json")?;
 
@@ -42,9 +47,5 @@ pub(crate) fn read_widget_config(path: &PathBuf) -> Result<WidgetConfig, Error> 
         None
     };
 
-    return Ok(WidgetConfig {
-        directory: path.to_path_buf(),
-        deskulpt_conf,
-        package_json,
-    });
+    Ok(WidgetConfig { directory: path.to_path_buf(), deskulpt_conf, package_json })
 }

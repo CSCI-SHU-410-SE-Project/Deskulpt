@@ -1,8 +1,16 @@
-use std::{collections::HashMap, path::{Component, Path, PathBuf}};
+//! The module implements the Deskulpt bundler based on SWC.
+//!
+//! Note that this is not a general-purpose bundler; it is specifically designed for
+//! the use case of bundling Deskulpt widgets which has a custom set of dependency
+//! rules and are (at least recommended to be) small.
+
+use std::{
+    collections::HashMap,
+    path::{Component, Path, PathBuf},
+};
 
 use anyhow::{bail, Error};
 use path_clean::PathClean;
-use serde::Serialize;
 use swc_atoms::Atom;
 use swc_bundler::{Bundler, Hook, Load, ModuleData, ModuleRecord, Resolve};
 use swc_common::{
@@ -12,7 +20,10 @@ use swc_common::{
     FileName, FilePathMapping, Globals, Mark, SourceMap, Span, GLOBALS,
 };
 use swc_ecma_ast::KeyValueProp;
-use swc_ecma_codegen::{text_writer::{JsWriter, WriteJs}, Emitter};
+use swc_ecma_codegen::{
+    text_writer::{JsWriter, WriteJs},
+    Emitter,
+};
 use swc_ecma_loader::resolve::Resolution;
 use swc_ecma_parser::{parse_file_as_module, EsConfig, Syntax};
 use swc_ecma_transforms_react::jsx;
@@ -21,36 +32,24 @@ use swc_ecma_visit::FoldWith;
 #[cfg(windows)]
 use normpath::BasePath;
 
-// The file extensions that are recognized by the bundler
+/// The file extensions to try when an import is given without an extension
 static EXTENSIONS: &[&str] = &["js", "jsx", "ts", "tsx"];
 
-pub(crate) enum BundlerOutput {
-    Code(String),
-    Error(String),
-}
-
+/// Bundle a widget into a single ESM string given its entry point.
+///
+/// The `dependency_map` argument is an optional mapping with keys being the module
+/// specifiers to ignore. The import statements with these module specifiers will be
+/// left as is in the bundled code without path resolution. This should commonly be the
+/// list of external dependencies, since Deskulpt requires widget developers to bundle
+/// their external dependencies (if any) to be included directly in the Webview.
 pub(crate) fn bundle(
-    target: &PathBuf,
-    dependency_map: Option<&HashMap<String, String>>,
-) -> BundlerOutput {
-    match bundle_internal(target, dependency_map) {
-        Ok(code) => BundlerOutput::Code(code),
-        Err(err) => BundlerOutput::Error(format!("{:#?}", err)),
-    }
-}
-
-// Treat the target file as an entry point and bundle it into a single module that can
-// be recognized by the <script> tag in a browser; `dependency_map` is the mapping that
-// should be read from the configuration file
-fn bundle_internal(
     target: &PathBuf,
     dependency_map: Option<&HashMap<String, String>>,
 ) -> Result<String, Error> {
     let globals = Globals::default();
     let cm = Lrc::new(SourceMap::new(FilePathMapping::empty()));
 
-    // Get the external modules that should not be resolved and bundled, but rather be
-    // left as `import` statements as is
+    // Get the list of external modules not to resolve
     let external_modules = match dependency_map {
         Some(map) => map.keys().map(|k| Atom::from(k.clone())).collect(),
         None => vec![],
@@ -103,7 +102,8 @@ fn bundle_internal(
             Mark::new(),        // unresolved mark
         );
 
-        // TODO: maybe need to chain more transforms, e.g., TypeScript transform
+        // Apply the module transformations
+        // @Charlie-XIAO: chain more transforms e.g. TypeScript
         let module = module.fold_with(&mut jsx_transform);
 
         // Emit the bundled module as string into a buffer
@@ -124,6 +124,11 @@ fn bundle_internal(
     Ok(code)
 }
 
+/// Deskulpt-customized path loader for SWC bundler.
+///
+/// It is in charge of parsing the source file into a module AST. Note that transforms
+/// are not applied here to avoid messing up per-file ASTs that can cause unexpected
+/// bundling results.
 struct PathLoader(Lrc<SourceMap>);
 
 impl Load for PathLoader {
@@ -133,7 +138,7 @@ impl Load for PathLoader {
             _ => unreachable!(),
         };
 
-        // TODO: maybe need to use Syntax::TypeScript based on file extension
+        // @Charlie-XIAO: maybe need to use Syntax::TypeScript based on file extension
         let syntax = Syntax::Es(EsConfig { jsx: true, ..Default::default() });
 
         // Parse the file as a module; note that transformations are not applied here,
@@ -156,12 +161,26 @@ impl Load for PathLoader {
     }
 }
 
-// Based on the implementation of `NodeModulesResolver`; for reference see:
-// https://github.com/swc-project/swc/blob/de09c55ffac8610e7128ced2d4b273d9fba1fdd2/crates/swc_ecma_loader/src/resolvers/node.rs
+/// The Deskulpt-customized path resolver for SWC bundler.
+///
+/// It is in charge of resolving the module specifiers in the import statements. Note
+/// that module specifiers that are ignored in the first place will not go through this
+/// resolver at all.
+///
+/// This path resolver intends to resolve the following types of imports:
+///
+/// - Extension-less relative paths, e.g., `import foo from "./foo"`
+/// - Relative paths, e.g., `import foo from "./foo.js"`
+///
+/// It is not designed to resolve the following types of imports:
+///
+/// - Absolute path imports, e.g., `import foo from "/foo"`
+/// - URL imports, e.g., `import foo from "https://example.com/foo"`
+/// - Node resolution imports, e.g., `import globals from "globals"`
 struct PathResolver;
 
 impl PathResolver {
-    // Wrap a resolved path if possible or else error out directly
+    /// Wrap a resolved module path if specified, otherwise raise an error.
     fn wrap(&self, path: Option<PathBuf>) -> Result<FileName, Error> {
         if let Some(path) = path {
             return Ok(FileName::Real(path.clean()));
@@ -171,6 +190,11 @@ impl PathResolver {
 
     // Resolve a path as a file; if `path` refers to a file then it is directly
     // returned; otherwise, `path` with each extension is tried
+
+    /// Resolve a path as a file.
+    ///
+    /// If `path` refers to a file then it is directly returned. Otherwise, `path` with
+    /// each extension in [`EXTENSIONS`] is tried in order.
     fn resolve_as_file(&self, path: &Path) -> Result<Option<PathBuf>, Error> {
         if path.is_file() {
             // Early return if `path` is directly a file
@@ -192,9 +216,10 @@ impl PathResolver {
         bail!("File resolution failed: {:?}", path)
     }
 
-    // Resolve a path as a directory; normally one should consider using the "main" key
-    // from package.json if it exists, but here we do not support this use case; we only
-    // try to resolve the index file of the directory with trying each extension
+    /// Resolve a path as a directory.
+    ///
+    /// This essentially resolves `${path}/index` as a file. Note that it does not try
+    /// any node resolution, e.g., looking for the `main` field in `package.json`.
     fn resolve_as_directory(&self, path: &Path) -> Result<Option<PathBuf>, Error> {
         for ext in EXTENSIONS {
             let ext_path = path.join(format!("index.{}", ext));
@@ -205,7 +230,7 @@ impl PathResolver {
         Ok(None)
     }
 
-    // Helper function for the Resolve trait
+    /// Helper function for the [`Resolve`] trait.
     fn resolve_filename(
         &self,
         base: &FileName,
@@ -286,6 +311,7 @@ impl Resolve for PathResolver {
     }
 }
 
+/// A no-op hook for SWC bundler.
 struct NoopHook;
 
 impl Hook for NoopHook {

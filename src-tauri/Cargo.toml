@@ -20,6 +20,7 @@ anyhow = "1.0.80"
 normpath = "1.2.0"
 path-clean = "1.0.1"
 serde = { version = "1.0.197", features = ["derive"] }
+serde-error = "0.1.2"
 serde_json = "1.0.1"
 
 # SWC crates and related
