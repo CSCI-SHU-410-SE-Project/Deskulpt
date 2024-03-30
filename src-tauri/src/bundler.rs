@@ -43,7 +43,7 @@ static EXTENSIONS: &[&str] = &["js", "jsx", "ts", "tsx"];
 /// list of external dependencies, since Deskulpt requires widget developers to bundle
 /// their external dependencies (if any) to be included directly in the Webview.
 pub(crate) fn bundle(
-    target: &PathBuf,
+    target: &Path,
     dependency_map: Option<&HashMap<String, String>>,
 ) -> Result<String, Error> {
     let globals = Globals::default();
@@ -66,8 +66,10 @@ pub(crate) fn bundle(
 
     // Bundle the target file into bundles, each containing the merged module
     let mut entries = HashMap::new();
-    entries
-        .insert(target.to_string_lossy().to_string(), FileName::Real(target.clone()));
+    entries.insert(
+        target.to_string_lossy().to_string(),
+        FileName::Real(target.to_path_buf()),
+    );
     let mut bundles = bundler.bundle(entries)?;
 
     // Since we provide a single entry point, there should be only one generated

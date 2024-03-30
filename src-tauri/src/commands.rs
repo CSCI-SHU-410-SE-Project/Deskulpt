@@ -6,11 +6,11 @@
 //! The principles of command output enums are as follows:
 //!
 //! - Each should have two variants: `Success` and `Failure`, where the `Failure`
-//!   variant should contain a string message describing the error in detail.
-//! - Each should be named in pascal case of the corresponding command name, suffixed
-//!   with `Cmdout`.
-//! - Each should have a corresponding declaration in the frontend.
-//!
+//!   variant should contain a string message describing the error in detail and the
+//!   `Success` variant should hold the actual output contents.
+//! - Each should be named in the pascal case of the corresponding command name,
+//!   suffixed with `Cmdout`.
+//! - Each should have a corresponding declaration in the TypeScript frontend.
 
 use serde::Serialize;
 use std::{collections::HashMap, fs::read_dir};
@@ -113,16 +113,12 @@ pub(crate) fn bundle_widget(
 
     if let Some(widget_config) = widget_collection.get(&widget_id) {
         // Obtain the absolute path of the widget entry point
-        let widget_entry =
-            &widget_config.directory.join(&widget_config.deskulpt_conf.entry);
+        let widget_entry = &widget_config.directory.join(&widget_config.deskulpt.entry);
 
         // Wrap the bundled code if success, otherwise let the error propagate
         match bundle(
             widget_entry,
-            widget_config
-                .package_json
-                .as_ref()
-                .map(|package_json| &package_json.dependencies),
+            widget_config.node.as_ref().map(|package_json| &package_json.dependencies),
         )
         .context(format!("Failed to bundle widget (id={})", widget_id))
         {

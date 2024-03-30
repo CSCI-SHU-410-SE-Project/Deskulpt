@@ -1,32 +1,55 @@
+//! The module implements configuration-related utilities and structures.
+
 use std::{collections::HashMap, fs::read_to_string, path::PathBuf};
 
 use anyhow::{bail, Context, Error};
 use serde::{Deserialize, Serialize};
 
-// Full configuration of a widget
+/// Full configuration of a widget.
 #[derive(Clone, Serialize)]
 pub(crate) struct WidgetConfig {
-    pub(crate) deskulpt_conf: DeskulptConf,
-    pub(crate) package_json: Option<PackageJson>,
-    pub(crate) directory: PathBuf, // Absolute path to the widget directory
+    /// Deskulpt configuration [`DeskulptConf`].
+    pub(crate) deskulpt: DeskulptConf,
+
+    /// Node package configuration [`PackageJson`], optional.
+    pub(crate) node: Option<PackageJson>,
+
+    /// Absolute path to the widget directory.
+    ///
+    /// It is absolute so that we do not need to query the widget base directory state
+    /// [`crate::states::WidgetBaseDirectoryState`] and call join to be able to obtain
+    /// the absolute path.
+    pub(crate) directory: PathBuf,
 }
 
-// The structure corresponding to deskulpt.conf.json
+/// Deskulpt configuration of a widget, corresponding to `deskulpt.conf.json`.
 #[derive(Clone, Deserialize, Serialize)]
 pub(crate) struct DeskulptConf {
+    /// The name of the widget.
     pub(crate) name: String,
+
+    /// The entry file of the widget, relative to the widget directory.
     pub(crate) entry: String,
+
+    /// Whether to ignore the widget. Setting this to `true` will exclude the widget
+    /// from the widget collection.
     pub(crate) ignore: bool,
 }
 
-// The structure corresponding to package.json
+/// Node package configuration, corresponding to `package.json`.
 #[derive(Clone, Deserialize, Serialize)]
 pub(crate) struct PackageJson {
+    /// The `dependencies` field of `package.json`, used for implying external
+    /// dependencies of the widget.
     pub(crate) dependencies: HashMap<String, String>,
 }
 
-// Read a widget folder into the widget configuration
-// @Charlie-XIAO Error handling should be done with higher granularity
+/// Read a widget directory into a widget configuration.
+///
+/// This function reads the `deskulpt.conf.json` file and optionally the `package.json`
+/// file in the given widget directory `path`.
+///
+/// @Charlie-XIAO Refine the function to raise better errors and describe here.
 pub(crate) fn read_widget_config(path: &PathBuf) -> Result<WidgetConfig, Error> {
     if !path.is_absolute() {
         bail!("Path must be absolute; got: {:?}", path);
@@ -47,5 +70,9 @@ pub(crate) fn read_widget_config(path: &PathBuf) -> Result<WidgetConfig, Error> 
         None
     };
 
-    Ok(WidgetConfig { directory: path.to_path_buf(), deskulpt_conf, package_json })
+    Ok(WidgetConfig {
+        directory: path.to_path_buf(),
+        deskulpt: deskulpt_conf,
+        node: package_json,
+    })
 }

@@ -12,9 +12,12 @@ window.__DESKULPT__ = {
 const canvas = document.getElementById("canvas")!;
 
 // Listen to the "render-widget" event, emitted by the manager
-// Note: we avoid using top-level await since it is a relatively new ECMAScript feature
-(async () => {
-  await listen("render-widget", (event: TauriEvent<RenderWidgetEventPayload>) => {
-    renderWidget(canvas, event.payload);
+listen("render-widget", (event: TauriEvent<RenderWidgetEventPayload>) => {
+  renderWidget(canvas, event.payload);
+})
+  .then((unlisten) => {
+    window.addEventListener("beforeunload", unlisten);
+  })
+  .catch((err) => {
+    console.error(err);
   });
-})();
