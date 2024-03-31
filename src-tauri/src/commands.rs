@@ -1,16 +1,4 @@
 //! The module provides the commands used internally by Deskulpt.
-//!
-//! This includes the actual commands that are callable from the frontend, as well as
-//! the command output enums that are used to wrap the output of the commands.
-//!
-//! The principles of command output enums are as follows:
-//!
-//! - Each should have two variants: `Success` and `Failure`, where the `Failure`
-//!   variant should contain a string message describing the error in detail and the
-//!   `Success` variant should hold the actual output contents.
-//! - Each should be named in the pascal case of the corresponding command name,
-//!   suffixed with `Cmdout`.
-//! - Each should have a corresponding declaration in the TypeScript frontend.
 
 use serde::Serialize;
 use std::{collections::HashMap, fs::read_dir};
@@ -23,6 +11,17 @@ use crate::{
     config::{read_widget_config, WidgetConfig},
     states::{WidgetBaseDirectoryState, WidgetCollectionState},
 };
+
+/// The output of a Tauri command.
+#[derive(Serialize)]
+pub(crate) enum CommandOut<T> {
+    /// Indicates that the command has succeeded, containing the output.
+    #[serde(rename = "success")]
+    Success(T),
+    /// Indicates that the command has failed, containing the error message.
+    #[serde(rename = "failure")]
+    Failure(String),
+}
 
 /// Command for refreshing the state of the widget collection.
 ///
@@ -39,20 +38,20 @@ use crate::{
 #[command]
 pub(crate) fn refresh_widget_collection(
     app_handle: AppHandle,
-) -> RefreshWidgetCollectionCmdout {
+) -> CommandOut<HashMap<String, WidgetConfig>> {
     let widget_base = &app_handle.state::<WidgetBaseDirectoryState>().0;
     let mut new_widget_collection = HashMap::new();
 
     let entries = match read_dir(widget_base) {
         Ok(entries) => entries,
-        Err(e) => return RefreshWidgetCollectionCmdout::Failure(e.to_string()),
+        Err(e) => return CommandOut::Failure(e.to_string()),
     };
 
     for entry in entries {
         // There could be intermittent IO errors during iteration
         let entry = match entry {
             Ok(entry) => entry,
-            Err(e) => return RefreshWidgetCollectionCmdout::Failure(e.to_string()),
+            Err(e) => return CommandOut::Failure(e.to_string()),
         };
 
         let path = entry.path();
@@ -63,17 +62,13 @@ pub(crate) fn refresh_widget_collection(
         // Load the widget configuration and raise on error
         let widget_config = match read_widget_config(&path) {
             Ok(widget_config) => widget_config,
-            Err(e) => return RefreshWidgetCollectionCmdout::Failure(e.to_string()),
+            Err(e) => return CommandOut::Failure(e.to_string()),
         };
 
         // Imply the widget ID based on the widget path
         let widget_id = match path.file_name() {
             Some(file_name) => file_name.to_string_lossy().to_string(),
-            None => {
-                return RefreshWidgetCollectionCmdout::Failure(
-                    "Failed to get file name".to_string(),
-                )
-            },
+            None => return CommandOut::Failure("Failed to get file name".to_string()),
         };
 
         // All checks passed, insert into the new widget collection
@@ -83,14 +78,7 @@ pub(crate) fn refresh_widget_collection(
     // Update the widget collection state
     let widget_collection = app_handle.state::<WidgetCollectionState>();
     *widget_collection.0.lock().unwrap() = new_widget_collection.clone();
-    RefreshWidgetCollectionCmdout::Success(new_widget_collection)
-}
-
-/// Output struct of the [`refresh_widget_collection`] command.
-#[derive(Serialize)]
-pub(crate) enum RefreshWidgetCollectionCmdout {
-    Success(HashMap<String, WidgetConfig>),
-    Failure(String),
+    CommandOut::Success(new_widget_collection)
 }
 
 /// Command for bundling the specified widget.
@@ -107,7 +95,7 @@ pub(crate) enum RefreshWidgetCollectionCmdout {
 pub(crate) fn bundle_widget(
     app_handle: AppHandle,
     widget_id: String,
-) -> BundleWidgetCmdout {
+) -> CommandOut<String> {
     let widget_collection_state = &app_handle.state::<WidgetCollectionState>();
     let widget_collection = widget_collection_state.0.lock().unwrap();
 
@@ -122,21 +110,14 @@ pub(crate) fn bundle_widget(
         )
         .context(format!("Failed to bundle widget (id={})", widget_id))
         {
-            Ok(bundled_code) => return BundleWidgetCmdout::Success(bundled_code),
-            Err(e) => return BundleWidgetCmdout::Failure(e.to_string()),
+            Ok(bundled_code) => return CommandOut::Success(bundled_code),
+            Err(e) => return CommandOut::Failure(e.to_string()),
         }
     }
 
     // Error out if the widget ID is not found in the collection
-    BundleWidgetCmdout::Failure(format!(
+    CommandOut::Failure(format!(
         "Failed to bundle widget (id={}) because it is not found in the collection",
         widget_id
     ))
-}
-
-/// Output struct of the [`bundle_widget`] command.
-#[derive(Serialize)]
-pub(crate) enum BundleWidgetCmdout {
-    Success(String),
-    Failure(String),
 }

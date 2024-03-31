@@ -10,10 +10,8 @@ use serde::{Deserialize, Serialize};
 pub(crate) struct WidgetConfig {
     /// Deskulpt configuration [`DeskulptConf`].
     pub(crate) deskulpt: DeskulptConf,
-
     /// Node package configuration [`PackageJson`], optional.
     pub(crate) node: Option<PackageJson>,
-
     /// Absolute path to the widget directory.
     ///
     /// It is absolute so that we do not need to query the widget base directory state
@@ -27,10 +25,8 @@ pub(crate) struct WidgetConfig {
 pub(crate) struct DeskulptConf {
     /// The name of the widget.
     pub(crate) name: String,
-
     /// The entry file of the widget, relative to the widget directory.
     pub(crate) entry: String,
-
     /// Whether to ignore the widget. Setting this to `true` will exclude the widget
     /// from the widget collection.
     pub(crate) ignore: bool,
