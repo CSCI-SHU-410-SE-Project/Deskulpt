@@ -1,56 +1,56 @@
 {
-  "build": {
-    "beforeDevCommand": "npm run dev",
-    "beforeBuildCommand": "npm run build",
-    "devPath": "http://localhost:1420",
-    "distDir": "../dist"
+  build: {
+    beforeDevCommand: "npm run dev",
+    beforeBuildCommand: "npm run build",
+    devPath: "http://localhost:1420",
+    distDir: "../dist",
   },
-  "package": {
-    "productName": "deskulpt",
-    "version": "0.0.0"
+  package: {
+    productName: "deskulpt",
+    version: "0.0.0",
   },
-  "tauri": {
-    "allowlist": {
-      "all": false,
-      "shell": {
-        "all": false,
+  tauri: {
+    allowlist: {
+      all: false,
+      shell: {
+        all: false,
         // FIXME: We need to allow opening the wigdet base directory which requires the
         // $APPDATA variable, but it is currently not supported in `ShellAllowlistOpen`;
         // Reference: https://tauri.app/v1/api/config/#shellallowlistopen
         // Discussion: https://discordapp.com/channels/616186924390023171/1224276907215028325
-        "open": ".+"
-      }
+        open: ".+",
+      },
     },
-    "windows": [
+    windows: [
       {
-        "label": "manager",
-        "title": "Deskulpt Manager",
-        "url": "views/index.html",
-        "width": 800,
-        "height": 600
+        label: "manager",
+        title: "Deskulpt Manager",
+        url: "views/index.html",
+        width: 800,
+        height: 600,
       },
       {
-        "label": "canvas",
-        "title": "Deskulpt Canvas",
-        "url": "views/canvas.html",
-        "width": 800,
-        "height": 600
-      }
+        label: "canvas",
+        title: "Deskulpt Canvas",
+        url: "views/canvas.html",
+        width: 800,
+        height: 600,
+      },
     ],
-    "security": {
-      "csp": null
+    security: {
+      csp: null,
     },
-    "bundle": {
-      "active": true,
-      "targets": "all",
-      "identifier": "com.tauri.deskulpt",
-      "icon": [
+    bundle: {
+      active: true,
+      targets: "all",
+      identifier: "com.tauri.deskulpt",
+      icon: [
         "icons/32x32.png",
         "icons/128x128.png",
         "icons/128x128@2x.png",
         "icons/icon.icns",
-        "icons/icon.ico"
-      ]
-    }
-  }
+        "icons/icon.ico",
+      ],
+    },
+  },
 }
