@@ -6,25 +6,6 @@ import { emit } from "@tauri-apps/api/event";
 import { useEffect, useState } from "react";
 import { CommandOut, WidgetConfig } from "./types";
 
-function WidgetInfoTab(props: {
-  widgetConfig: WidgetConfig;
-  renderWidget: () => void;
-}) {
-  const { widgetConfig, renderWidget } = props;
-
-  return (
-    <ListItem
-      secondaryAction={
-        <IconButton onClick={renderWidget}>
-          <RefreshIcon />
-        </IconButton>
-      }
-    >
-      <ListItemText primary={widgetConfig.deskulpt.name} />
-    </ListItem>
-  );
-}
-
 function App() {
   const [widgetConfigs, setWidgetConfigs] = useState<Record<string, WidgetConfig>>({});
 
@@ -34,6 +15,15 @@ function App() {
     );
     if ("success" in output) {
       setWidgetConfigs(output.success);
+    } else {
+      console.error(output.failure);
+    }
+  }
+
+  async function openWidgetBase() {
+    const output: CommandOut<string> = await invoke("open_widget_base");
+    if ("success" in output) {
+      console.log(output.success);
     } else {
       console.error(output.failure);
     }
@@ -60,11 +50,15 @@ function App() {
     <Box>
       <List>
         {Object.entries(widgetConfigs).map(([widgetId, widgetConfig]) => (
-          <WidgetInfoTab
-            key={widgetId}
-            widgetConfig={widgetConfig}
-            renderWidget={() => renderWidget(widgetId)}
-          />
+          <ListItem
+            secondaryAction={
+              <IconButton onClick={() => renderWidget(widgetId)}>
+                <RefreshIcon />
+              </IconButton>
+            }
+          >
+            <ListItemText primary={widgetConfig.deskulpt.name} />
+          </ListItem>
         ))}
       </List>
       <Button variant="outlined" onClick={refreshWidgetCollection}>
@@ -72,6 +66,9 @@ function App() {
       </Button>
       <Button variant="outlined" onClick={renderAllWidgets}>
         Render All
+      </Button>
+      <Button variant="outlined" onClick={openWidgetBase}>
+        Open Widget Base Directory
       </Button>
     </Box>
   );

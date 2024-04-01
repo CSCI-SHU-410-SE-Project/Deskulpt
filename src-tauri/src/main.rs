@@ -28,6 +28,7 @@ fn main() {
         })
         .invoke_handler(generate_handler![
             commands::bundle_widget,
+            commands::open_widget_base,
             commands::refresh_widget_collection,
         ])
         .run(generate_context!())

@@ -14,7 +14,11 @@
       "all": false,
       "shell": {
         "all": false,
-        "open": true
+        // FIXME: We need to allow opening the wigdet base directory which requires the
+        // $APPDATA variable, but it is currently not supported in `ShellAllowlistOpen`;
+        // Reference: https://tauri.app/v1/api/config/#shellallowlistopen
+        // Discussion: https://discordapp.com/channels/616186924390023171/1224276907215028325
+        "open": ".+"
       }
     },
     "windows": [

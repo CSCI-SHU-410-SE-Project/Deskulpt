@@ -1,8 +1,12 @@
 //! The module provides the commands used internally by Deskulpt.
 
 use serde::Serialize;
-use std::{collections::HashMap, fs::read_dir};
-use tauri::{command, AppHandle, Manager};
+use std::{
+    collections::HashMap,
+    fs::read_dir,
+    path::{Path, PathBuf},
+};
+use tauri::{api::shell, command, AppHandle, Manager};
 
 use anyhow::Context;
 
@@ -120,4 +124,18 @@ pub(crate) fn bundle_widget(
         "Failed to bundle widget (id={}) because it is not found in the collection",
         widget_id
     ))
+}
+
+/// Command for opening the widget base directory.
+///
+/// This command will return the `Failure` variant if Tauri fails to open the widget
+/// base directory, most likely because a misconfigured allow list.
+#[command]
+pub(crate) fn open_widget_base(app_handle: AppHandle) -> CommandOut<()> {
+    let widget_base = &app_handle.state::<WidgetBaseDirectoryState>().0;
+
+    match shell::open(&app_handle.shell_scope(), &widget_base.to_string_lossy(), None) {
+        Ok(_) => CommandOut::Success(()),
+        Err(e) => CommandOut::Failure(e.to_string()),
+    }
 }
