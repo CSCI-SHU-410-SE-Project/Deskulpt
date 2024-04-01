@@ -140,7 +140,7 @@ pub(crate) fn bundle_widget(
 pub(crate) fn open_widget_base(app_handle: AppHandle) -> CommandOut<()> {
     let widget_base = &app_handle.state::<WidgetBaseDirectoryState>().0;
 
-    match shell::open(&app_handle.shell_scope(), &widget_base.to_string_lossy(), None) {
+    match shell::open(&app_handle.shell_scope(), widget_base.to_string_lossy(), None) {
         Ok(_) => CommandOut::Success(()),
         Err(e) => CommandOut::fail(e),
     }
