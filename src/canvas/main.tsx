@@ -12,7 +12,7 @@ import { grabErrorInfo } from "../utils";
 
 window.__DESKULPT__ = { defaultDeps: { React } };
 
-const canvas = document.getElementById("canvas")!;
+const canvas = document.getElementById("root")!;
 const widgetRecords: Record<string, WidgetRecord> = {};
 
 // Listen to the "render-widget" event, emitted by the manager

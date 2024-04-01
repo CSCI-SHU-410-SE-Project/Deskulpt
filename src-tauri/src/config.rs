@@ -47,16 +47,33 @@ pub(crate) struct PackageJson {
 /// This function reads the `deskulpt.conf.json` file and optionally the `package.json`
 /// file in the given widget directory `path`.
 ///
-/// @Charlie-XIAO Refine the function to raise better errors and describe here.
-pub(crate) fn read_widget_config(path: &PathBuf) -> Result<WidgetConfig, Error> {
-    if !path.is_absolute() {
-        bail!("Path must be absolute; got: {:?}", path);
+/// If widget configuration is loaded successfully, it will return `Ok(Some(config))`.
+/// Any failure to load the configuration will return an error, except:
+///
+/// - If `deskulpt.conf.json` is not found in the given directory, we do not consider
+///   it a widget and return `Ok(None)` instead of an error.
+pub(crate) fn read_widget_config(
+    path: &PathBuf,
+) -> Result<Option<WidgetConfig>, Error> {
+    if !path.is_absolute() || !path.is_dir() {
+        bail!("Absolute path to a directory is expected; got: {:?}", path);
     }
 
     let deskulpt_conf_path = path.join("deskulpt.conf.json");
-    let deskulpt_conf_str = read_to_string(deskulpt_conf_path)?;
-    let deskulpt_conf: DeskulptConf = serde_json::from_str(&deskulpt_conf_str)
-        .context("Failed to load deskulpt.conf.json")?;
+    let deskulpt_conf_str = match read_to_string(deskulpt_conf_path) {
+        Ok(deskulpt_conf_str) => deskulpt_conf_str,
+        Err(e) => {
+            match e.kind() {
+                // If the configuration file is not found we consider it not a widget
+                // and ignore it without raising an error; in other cases, we do find
+                // the configuration file but failed to read it, thus the error
+                std::io::ErrorKind::NotFound => return Ok(None),
+                _ => return Err(e).context("Failed to read deskulpt.conf.json"),
+            }
+        },
+    };
+    let deskulpt_conf = serde_json::from_str(&deskulpt_conf_str)
+        .context("Failed to parse deskulpt.conf.json")?;
 
     let package_json_path = path.join("package.json");
     let package_json = if package_json_path.is_file() {
@@ -68,9 +85,9 @@ pub(crate) fn read_widget_config(path: &PathBuf) -> Result<WidgetConfig, Error> 
         None
     };
 
-    Ok(WidgetConfig {
+    Ok(Some(WidgetConfig {
         directory: path.to_path_buf(),
         deskulpt: deskulpt_conf,
         node: package_json,
-    })
+    }))
 }

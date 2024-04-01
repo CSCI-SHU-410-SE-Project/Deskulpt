@@ -1,11 +1,7 @@
 //! The module provides the commands used internally by Deskulpt.
 
 use serde::Serialize;
-use std::{
-    collections::HashMap,
-    fs::read_dir,
-    path::{Path, PathBuf},
-};
+use std::{collections::HashMap, fmt::Debug, fs::read_dir};
 use tauri::{api::shell, command, AppHandle, Manager};
 
 use anyhow::Context;
@@ -25,6 +21,12 @@ pub(crate) enum CommandOut<T> {
     /// Indicates that the command has failed, containing the error message.
     #[serde(rename = "failure")]
     Failure(String),
+}
+
+impl<T> CommandOut<T> {
+    pub(crate) fn fail<E: Debug>(err: E) -> Self {
+        CommandOut::Failure(format!("{:#?}", err))
+    }
 }
 
 /// Command for refreshing the state of the widget collection.
@@ -48,14 +50,14 @@ pub(crate) fn refresh_widget_collection(
 
     let entries = match read_dir(widget_base) {
         Ok(entries) => entries,
-        Err(e) => return CommandOut::Failure(e.to_string()),
+        Err(e) => return CommandOut::fail(e),
     };
 
     for entry in entries {
         // There could be intermittent IO errors during iteration
         let entry = match entry {
             Ok(entry) => entry,
-            Err(e) => return CommandOut::Failure(e.to_string()),
+            Err(e) => return CommandOut::fail(e),
         };
 
         let path = entry.path();
@@ -66,17 +68,21 @@ pub(crate) fn refresh_widget_collection(
         // Load the widget configuration and raise on error
         let widget_config = match read_widget_config(&path) {
             Ok(widget_config) => widget_config,
-            Err(e) => return CommandOut::Failure(e.to_string()),
+            Err(e) => return CommandOut::fail(e),
         };
 
-        // Imply the widget ID based on the widget path
-        let widget_id = match path.file_name() {
-            Some(file_name) => file_name.to_string_lossy().to_string(),
-            None => return CommandOut::Failure("Failed to get file name".to_string()),
-        };
+        // Widget configuration being `None` means that the directory is not considered
+        // a widget; thus it should be silently excluded from the collection instead of
+        // returning a failure that blocks other widgets from rendering
+        if let Some(widget_config) = widget_config {
+            let widget_id = match path.file_name() {
+                Some(file_name) => file_name.to_string_lossy().to_string(),
+                None => return CommandOut::fail("Failed to get file name"),
+            };
 
-        // All checks passed, insert into the new widget collection
-        new_widget_collection.insert(widget_id, widget_config);
+            // All checks passed, insert into the new widget collection
+            new_widget_collection.insert(widget_id, widget_config);
+        }
     }
 
     // Update the widget collection state
@@ -115,12 +121,12 @@ pub(crate) fn bundle_widget(
         .context(format!("Failed to bundle widget (id={})", widget_id))
         {
             Ok(bundled_code) => return CommandOut::Success(bundled_code),
-            Err(e) => return CommandOut::Failure(e.to_string()),
+            Err(e) => return CommandOut::fail(e),
         }
     }
 
     // Error out if the widget ID is not found in the collection
-    CommandOut::Failure(format!(
+    CommandOut::fail(format!(
         "Failed to bundle widget (id={}) because it is not found in the collection",
         widget_id
     ))
@@ -136,6 +142,6 @@ pub(crate) fn open_widget_base(app_handle: AppHandle) -> CommandOut<()> {
 
     match shell::open(&app_handle.shell_scope(), &widget_base.to_string_lossy(), None) {
         Ok(_) => CommandOut::Success(()),
-        Err(e) => CommandOut::Failure(e.to_string()),
+        Err(e) => CommandOut::fail(e),
     }
 }
