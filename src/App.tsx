@@ -4,23 +4,23 @@ import RefreshIcon from "@mui/icons-material/Refresh";
 import { invoke } from "@tauri-apps/api";
 import { emit } from "@tauri-apps/api/event";
 import { useEffect, useState } from "react";
-import { BundlerOutputPayload, WidgetConfig } from "./types";
+import { CommandOut, WidgetConfig } from "./types";
 
 function WidgetInfoTab(props: {
   widgetConfig: WidgetConfig;
-  refreshWidget: () => void;
+  renderWidget: () => void;
 }) {
-  const { widgetConfig, refreshWidget } = props;
+  const { widgetConfig, renderWidget } = props;
 
   return (
     <ListItem
       secondaryAction={
-        <IconButton onClick={refreshWidget}>
+        <IconButton onClick={renderWidget}>
           <RefreshIcon />
         </IconButton>
       }
     >
-      <ListItemText primary={widgetConfig.deskulpt_conf.name} />
+      <ListItemText primary={widgetConfig.deskulpt.name} />
     </ListItem>
   );
 }
@@ -28,36 +28,32 @@ function WidgetInfoTab(props: {
 function App() {
   const [widgetConfigs, setWidgetConfigs] = useState<Record<string, WidgetConfig>>({});
 
-  /**
-   * Call backend command to bundle the widget and emit a "render-widget" event.
-   */
-  async function refreshWidget(widgetId: string) {
-    const bundlerOutputPayload: BundlerOutputPayload = await invoke("bundle_widget", {
-      widgetId,
-    });
-    // Emit the render-widget event that will be listened to by the canvas window
-    await emit("render-widget", { widgetId, bundlerOutputPayload });
-  }
-
-  /**
-   * Call backend command to refresh widget collection by re-scanning the widget base
-   * directory, then refresh each widget as in `refreshWidget`.
-   */
-  async function refreshAllWidgets() {
-    // Update widget configurations
-    const widgetConfigs: Record<string, WidgetConfig> = await invoke(
+  async function refreshWidgetCollection() {
+    const output: CommandOut<Record<string, WidgetConfig>> = await invoke(
       "refresh_widget_collection",
     );
-    setWidgetConfigs(widgetConfigs);
+    if ("success" in output) {
+      setWidgetConfigs(output.success);
+    } else {
+      console.error(output.failure);
+    }
+  }
 
-    // Refresh all widgets asynchronously in parallel
+  async function renderWidget(widgetId: string) {
+    const bundlerOutput: CommandOut<string> = await invoke("bundle_widget", {
+      widgetId,
+    });
+    await emit("render-widget", { widgetId, bundlerOutput });
+  }
+
+  async function renderAllWidgets() {
     await Promise.all(
-      Object.keys(widgetConfigs).map((widgetId) => refreshWidget(widgetId)),
+      Object.keys(widgetConfigs).map((widgetId) => renderWidget(widgetId)),
     );
   }
 
   useEffect(() => {
-    refreshAllWidgets().catch(console.error);
+    refreshWidgetCollection().then(renderAllWidgets).catch(console.error);
   }, []);
 
   return (
@@ -67,12 +63,15 @@ function App() {
           <WidgetInfoTab
             key={widgetId}
             widgetConfig={widgetConfig}
-            refreshWidget={() => refreshWidget(widgetId)}
+            renderWidget={() => renderWidget(widgetId)}
           />
         ))}
       </List>
-      <Button variant="outlined" onClick={refreshAllWidgets}>
-        Refresh
+      <Button variant="outlined" onClick={refreshWidgetCollection}>
+        Rescan
+      </Button>
+      <Button variant="outlined" onClick={renderAllWidgets}>
+        Render All
       </Button>
     </Box>
   );

@@ -6,7 +6,7 @@ authors = ["Xinyu Li", "Yao Xiao", "Yuchen Zhou", "David Zhu"]
 edition = "2021"
 
 [build-dependencies]
-tauri-build = "1.5.1"
+tauri-build = { version = "1.5.1", features = [] }
 
 [dev-dependencies]
 pretty_assertions = "1.4.0"

@@ -27,16 +27,18 @@ pub(crate) struct DeskulptConf {
     pub(crate) name: String,
     /// The entry file of the widget, relative to the widget directory.
     pub(crate) entry: String,
-    /// Whether to ignore the widget. Setting this to `true` will exclude the widget
-    /// from the widget collection.
+    /// Whether to ignore the widget.
+    ///
+    /// Setting this to `true` will exclude the widget from the widget collection.
     pub(crate) ignore: bool,
 }
 
 /// Node package configuration, corresponding to `package.json`.
 #[derive(Clone, Deserialize, Serialize)]
 pub(crate) struct PackageJson {
-    /// The `dependencies` field of `package.json`, used for implying external
-    /// dependencies of the widget.
+    /// The `dependencies` field of `package.json`
+    ///
+    /// This is used for inferring the external dependencies of the widget.
     pub(crate) dependencies: HashMap<String, String>,
 }
 
