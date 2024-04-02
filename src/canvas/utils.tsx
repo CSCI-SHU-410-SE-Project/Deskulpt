@@ -12,7 +12,7 @@ import { WidgetDOMRoot, WidgetRecord } from "../types";
  * @param err The unknown error, commonly from `catch`.
  * @returns The error information.
  */
-export function grabErrorInfo(err: unknown): string {
+export function grabErrorInfo(err: unknown) {
   if (typeof err === "string") {
     return err;
   }
@@ -45,7 +45,7 @@ export function handleError(
   widgetRecords: Record<string, WidgetRecord>,
   title: string,
   error: string,
-): boolean {
+) {
   try {
     widgetDOMRoot.react.render(
       <WidgetContainer
@@ -82,7 +82,7 @@ export function getDOMRoot(
   widgetId: string,
   widgetRecords: Record<string, WidgetRecord>,
   canvas: HTMLElement,
-): WidgetDOMRoot | null {
+) {
   try {
     if (widgetId in widgetRecords) {
       // Re-use the existing DOM root
