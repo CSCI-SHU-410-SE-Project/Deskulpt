@@ -19,7 +19,7 @@ export function grabErrorInfo(err: unknown): string {
   if (err instanceof Error) {
     return err.stack ?? err.message;
   }
-  return `Unknown error caught that is neither a string nor an Error`;
+  return "Unknown error caught that is neither a string nor an Error";
 }
 
 /**

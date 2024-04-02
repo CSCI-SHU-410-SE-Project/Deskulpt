@@ -49,17 +49,20 @@ export default function App() {
   return (
     <Box>
       <List>
-        {Object.entries(widgetConfigs).map(([widgetId, widgetConfig]) => (
-          <ListItem
-            secondaryAction={
-              <IconButton onClick={() => renderWidget(widgetId)}>
-                <RefreshIcon />
-              </IconButton>
-            }
-          >
-            <ListItemText primary={widgetConfig.deskulpt.name} />
-          </ListItem>
-        ))}
+        {Object.entries(widgetConfigs)
+          .sort()
+          .map(([widgetId, widgetConfig]) => (
+            <ListItem
+              key={widgetId}
+              secondaryAction={
+                <IconButton onClick={() => renderWidget(widgetId)}>
+                  <RefreshIcon />
+                </IconButton>
+              }
+            >
+              <ListItemText primary={widgetConfig.deskulpt.name} secondary={widgetId} />
+            </ListItem>
+          ))}
       </List>
       <Button variant="outlined" onClick={refreshWidgetCollection}>
         Rescan
