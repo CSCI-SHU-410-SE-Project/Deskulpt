@@ -38,24 +38,17 @@ export interface WidgetDOMRoot {
  */
 export interface WidgetRecord {
   /**
-   * The widget as exported by the user-defined widget.
-   *
-   * This being `null` commonly implies an error importing the bundled widget.
-   */
-  widget: Widget | null;
-  /**
-   * The rendering error.
-   *
-   * If the rendering of a widget encounters an error that can be captured, it will be
-   * stored in this field and rendered in the DOM root of the widget. This being
-   * `undefined` shall imply that the widget has been successfully rendered.
-   */
-  renderError?: string;
-  /**
    * The HTML and React DOM roots in which the widget is rendered.
    *
    * To completely remove a widget from the canvas, one need to call the `unmount`
    * method on `domRoot.react` and the `remove` method on `domRoot.html`, if possible.
    */
   root: WidgetDOMRoot;
+  /**
+   * Whether the widget is being rendered.
+   *
+   * If the widget is not being rendered, the corresponding error should be rendered in
+   * the DOM root instead.
+   */
+  error: boolean;
 }

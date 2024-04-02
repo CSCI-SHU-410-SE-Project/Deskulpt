@@ -2,6 +2,15 @@ import { Box, Tooltip } from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
 import React from "react";
 
+/**
+ * The widget container component.
+ *
+ * It is wrapped in `React.StrictMode` and should be rendered directly under the DOM
+ * root. It requires the following `props`:
+ *
+ * - `id`: The ID of the widget to render.
+ * - `inner`: The JSX element to render inside the container.
+ */
 export default function WidgetContainer(props: {
   id: string;
   inner: React.ReactElement;
@@ -22,8 +31,13 @@ export default function WidgetContainer(props: {
       >
         <Tooltip title={id} placement="left">
           <InfoIcon
-            fontSize="small"
-            sx={{ position: "absolute", top: 5, right: 5, zIndex: 2000 }}
+            sx={{
+              position: "absolute",
+              top: 5,
+              right: 5,
+              zIndex: 2000,
+              fontSize: 15,
+            }}
           />
         </Tooltip>
         {inner}

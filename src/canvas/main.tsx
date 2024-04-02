@@ -1,15 +1,8 @@
 import React from "react";
-import ReactDOM from "react-dom/client";
 
 import { Event as TauriEvent, listen } from "@tauri-apps/api/event";
-import {
-  RenderWidgetPayload,
-  WidgetDOMRoot,
-  WidgetModule,
-  WidgetRecord,
-} from "../types";
-import { grabErrorInfo } from "../utils";
-import ErrorDisplay from "../components/ErrorDisplay";
+import { RenderWidgetPayload, WidgetModule, WidgetRecord } from "../types";
+import { grabErrorInfo, handleError, getDOMRoot } from "./utils";
 import WidgetContainer from "../components/WidgetContainer";
 
 window.__DESKULPT__ = { defaultDeps: { React } };
@@ -31,71 +24,77 @@ listen("render-widget", (event: TauriEvent<RenderWidgetPayload>) => {
 
     import(/* @vite-ignore */ url)
       .then((module: WidgetModule) => {
-        // Re-use an existing DOM root with the same ID or create a new one; the reason
-        // we do it early here is that even when rendering fails (expected or not), we
-        // would need a DOM root to render error messages nicely (except in rare cases
-        // that we are unable to render even just for errors); this also means that we
-        // have to carefully handle all possible cases in the proceeding steps to ensure
-        // that there are no "dead" memory consumers left on the canvas
-        let widgetDOMRoot: WidgetDOMRoot | null = null;
-        try {
-          if (widgetId in widgetRecords) {
-            // Re-use the existing DOM root
-            widgetDOMRoot = widgetRecords[widgetId].root;
-          } else {
-            // Create a new DOM root and append to the canvas
-            const htmlDOMRoot = document.createElement("div");
-            htmlDOMRoot.id = `deskulpt-widget--${widgetId}`;
-            const reactDOMRoot = ReactDOM.createRoot(htmlDOMRoot);
-            canvas.appendChild(htmlDOMRoot);
-            widgetDOMRoot = { html: htmlDOMRoot, react: reactDOMRoot };
-          }
-        } catch (err) {
-          // The most likely reason for the error is that the react DOM root cannot be
-          // successfully created; in that case we must avoid leaving an unused HTML div on
-          // the canvas if it has already been created
-          console.error(err); // @Charlie-XIAO better error handling
-          const unusedDiv = document.getElementById(`deskulpt-widget--${widgetId}`);
-          if (unusedDiv) {
-            unusedDiv.remove();
-          }
+        const widgetDOMRoot = getDOMRoot(widgetId, widgetRecords, canvas);
+        if (widgetDOMRoot === null) {
           return;
         }
 
+        // Early return before rendering if there are known errors in the widget
         const widget = module.default;
-        try {
-          // Render widget element or error message
-          try {
-            widgetDOMRoot.react.render(
-              <WidgetContainer id={widgetId} inner={widget.render()} />,
-            );
-          } catch (err) {
-            widgetDOMRoot.react.render(
-              <WidgetContainer
-                id={widgetId}
-                inner={<ErrorDisplay error={grabErrorInfo(err)} />}
-              />,
-            );
-          }
-        } catch (err) {
-          // Unmount and remove DOM root since we cannot recover from this case; this
-          // can happen if rendering even fails for the error message (e.g., there are
-          // issues with the DOM root)
-          console.error(err); // @Charlie-XIAO better error handling
-          widgetDOMRoot.react.unmount();
-          widgetDOMRoot.html.remove();
+        if (widget === undefined) {
+          handleError(
+            widgetId,
+            widgetDOMRoot,
+            widgetRecords,
+            `Widget (id=${widgetId}) is invalid`,
+            "The widget entry file does not provide a default export.",
+          );
+          return;
+        }
+        if (widget.render === undefined || typeof widget.render !== "function") {
+          handleError(
+            widgetId,
+            widgetDOMRoot,
+            widgetRecords,
+            `Widget (id=${widgetId}) is invalid`,
+            "The object exported by the widget entry file does not have a `render` " +
+              "key, or the the `render` key does not correspond to a function.",
+          );
+          return;
         }
 
-        // The rendering is successful if we reach here, so we specify no error
-        widgetRecords[widgetId] = { root: widgetDOMRoot, widget };
+        // Try rendering the widget, otherwise render the error information
+        try {
+          widgetDOMRoot.react.render(
+            <WidgetContainer id={widgetId} inner={widget.render()} />,
+          );
+        } catch (err) {
+          handleError(
+            widgetId,
+            widgetDOMRoot,
+            widgetRecords,
+            `Widget (id=${widgetId}) fails to be rendered`,
+            grabErrorInfo(err),
+          );
+          return;
+        }
+
+        // Reaching here means that the widget has been successfully rendered
+        widgetRecords[widgetId] = { root: widgetDOMRoot, error: false };
       })
-      .catch((err: Error) => {
-        // FIXME: handle the error
-        console.log({ err });
+      .catch((err) => {
+        const widgetDOMRoot = getDOMRoot(widgetId, widgetRecords, canvas);
+        if (widgetDOMRoot !== null) {
+          handleError(
+            widgetId,
+            widgetDOMRoot,
+            widgetRecords,
+            `Widget (id=${widgetId}) fails to be loaded`,
+            grabErrorInfo(err),
+          );
+        }
       });
   } else {
-    // FIXME: handle the unsuccessful case
-    console.log({ bundlerOutput });
+    const widgetDOMRoot = getDOMRoot(widgetId, widgetRecords, canvas);
+    if (widgetDOMRoot !== null) {
+      handleError(
+        widgetId,
+        widgetDOMRoot,
+        widgetRecords,
+        `[Backend] Widget (id=${widgetId}) fails to be bundled`,
+        bundlerOutput.failure,
+      );
+    }
   }
 })
   .then((unlisten) => {
