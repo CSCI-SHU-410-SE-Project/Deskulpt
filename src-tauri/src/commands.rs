@@ -75,6 +75,9 @@ pub(crate) fn refresh_widget_collection(
         // a widget; thus it should be silently excluded from the collection instead of
         // returning a failure that blocks other widgets from rendering
         if let Some(widget_config) = widget_config {
+            if widget_config.deskulpt.ignore {
+                continue; // Respect the `ignore` flag in configuration
+            }
             let widget_id = match path.file_name() {
                 Some(file_name) => file_name.to_string_lossy().to_string(),
                 None => return CommandOut::fail("Failed to get file name"),
