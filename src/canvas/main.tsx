@@ -9,10 +9,12 @@ import {
   WidgetRecord,
 } from "../types";
 import { grabErrorInfo } from "../utils";
+import ErrorDisplay from "../components/ErrorDisplay";
+import WidgetContainer from "../components/WidgetContainer";
 
 window.__DESKULPT__ = { defaultDeps: { React } };
 
-const canvas = document.getElementById("root")!;
+const canvas = document.getElementById("canvas")!;
 const widgetRecords: Record<string, WidgetRecord> = {};
 
 // Listen to the "render-widget" event, emitted by the manager
@@ -65,13 +67,14 @@ listen("render-widget", (event: TauriEvent<RenderWidgetPayload>) => {
           // Render widget element or error message
           try {
             widgetDOMRoot.react.render(
-              <React.StrictMode>{widget.render()}</React.StrictMode>,
+              <WidgetContainer id={widgetId} inner={widget.render()} />,
             );
           } catch (err) {
             widgetDOMRoot.react.render(
-              <React.StrictMode>
-                <div>{grabErrorInfo(err)}</div>
-              </React.StrictMode>,
+              <WidgetContainer
+                id={widgetId}
+                inner={<ErrorDisplay error={grabErrorInfo(err)} />}
+              />,
             );
           }
         } catch (err) {

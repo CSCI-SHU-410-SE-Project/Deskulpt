@@ -6,7 +6,7 @@ import { emit } from "@tauri-apps/api/event";
 import { useEffect, useState } from "react";
 import { CommandOut, WidgetConfig } from "./types";
 
-function App() {
+export default function App() {
   const [widgetConfigs, setWidgetConfigs] = useState<Record<string, WidgetConfig>>({});
 
   async function refreshWidgetCollection() {
@@ -73,5 +73,3 @@ function App() {
     </Box>
   );
 }
-
-export default App;
