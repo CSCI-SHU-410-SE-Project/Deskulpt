@@ -48,7 +48,7 @@ listen("render-widget", (event: TauriEvent<RenderWidgetPayload>) => {
             widgetRecords,
             `Widget (id=${widgetId}) is invalid`,
             "The object exported by the widget entry file does not have a `render` " +
-              "key, or the the `render` key does not correspond to a function.",
+              "key, or the `render` key does not correspond to a function.",
           );
           return;
         }

@@ -13,10 +13,8 @@ export default function App() {
    * Open the widget base directory in the file explorer of the OS.
    */
   async function openWidgetBase() {
-    const output: CommandOut<string> = await invoke("open_widget_base");
-    if ("success" in output) {
-      console.log(output.success);
-    } else {
+    const output: CommandOut<null> = await invoke("open_widget_base");
+    if ("failure" in output) {
       console.error(output.failure);
     }
   }
