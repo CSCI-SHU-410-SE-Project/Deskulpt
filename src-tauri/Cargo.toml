@@ -1,7 +1,7 @@
 [package]
 name = "deskulpt"
 version = "0.0.0"
-description = "Deskulpt (Desktop + Sculpture), a cross-platform desktop customization tool."
+description = "Deskulpt (Desktop + Sculpt, pronounced /'deskʌlpt/), a cross-platform desktop customization tool."
 authors = ["Xinyu Li", "Yao Xiao", "Yuchen Zhou", "David Zhu"]
 edition = "2021"
 

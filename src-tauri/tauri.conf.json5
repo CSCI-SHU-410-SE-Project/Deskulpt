@@ -6,7 +6,7 @@
     distDir: "../dist",
   },
   package: {
-    productName: "deskulpt",
+    productName: "Deskulpt",
     version: "0.0.0",
   },
   tauri: {
