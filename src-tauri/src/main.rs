@@ -28,6 +28,6 @@ fn main() {
             commands::open_widget_base,
             commands::refresh_widget_collection,
         ])
-        .run(generate_context!())
+        .run(context)
         .expect("FATAL");
 }
