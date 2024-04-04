@@ -2,7 +2,7 @@
 name = "deskulpt"
 version = "0.0.0"
 description = "Deskulpt (Desktop + Sculpt, pronounced /'deskʌlpt/), a cross-platform desktop customization tool."
-authors = ["Xinyu Li", "Yao Xiao", "Yuchen Zhou", "David Zhu"]
+authors = ["Xinyu Li", "Yao Xiao", "Yuchen Zhou", "Frank Zhu"]
 edition = "2021"
 
 [build-dependencies]
