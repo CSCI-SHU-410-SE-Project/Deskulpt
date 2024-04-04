@@ -68,16 +68,16 @@ pub(crate) fn bundle(
         Box::new(NoopHook),
     );
 
-    // Bundle the target file into bundles, each containing the merged module
+    // SWC bundler requires a map of entries to bundle; we provide a single entry point
+    // and expect there to be only one generated bundle, as long as there are no dynamic
+    // or conditional imports; we use the target path as the key for convenience
     let mut entries = HashMap::new();
     entries.insert(
         target.to_string_lossy().to_string(),
         FileName::Real(target.to_path_buf()),
     );
-    let mut bundles = bundler.bundle(entries)?;
 
-    // Since we provide a single entry point, there should be only one generated
-    // bundle (as long as there are no dynamic/conditional imports)
+    let mut bundles = bundler.bundle(entries)?;
     if bundles.len() != 1 {
         bail!("Expected a single bundle; try to remove dynamic/conditional imports");
     }
