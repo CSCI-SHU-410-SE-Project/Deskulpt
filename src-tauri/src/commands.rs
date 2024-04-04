@@ -118,6 +118,7 @@ pub(crate) fn bundle_widget(
 
         // Wrap the bundled code if success, otherwise let the error propagate
         match bundle(
+            &widget_config.directory,
             widget_entry,
             widget_config.node.as_ref().map(|package_json| &package_json.dependencies),
         )

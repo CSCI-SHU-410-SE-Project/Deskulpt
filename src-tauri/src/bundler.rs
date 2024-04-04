@@ -43,6 +43,7 @@ static EXTENSIONS: &[&str] = &["js", "jsx", "ts", "tsx"];
 /// list of external dependencies, since Deskulpt requires widget developers to bundle
 /// their external dependencies (if any) to be included directly in the Webview.
 pub(crate) fn bundle(
+    root: &Path,
     target: &Path,
     dependency_map: Option<&HashMap<String, String>>,
 ) -> Result<String, Error> {
@@ -59,7 +60,7 @@ pub(crate) fn bundle(
         &globals,
         cm.clone(),
         PathLoader(cm.clone()),
-        PathResolver,
+        PathResolver { root: root.to_path_buf() },
         swc_bundler::Config { external_modules, ..Default::default() },
         Box::new(NoopHook),
     );
@@ -179,7 +180,10 @@ impl Load for PathLoader {
 /// - Absolute path imports, e.g., `import foo from "/foo"`
 /// - URL imports, e.g., `import foo from "https://example.com/foo"`
 /// - Node resolution imports, e.g., `import globals from "globals"`
-struct PathResolver;
+/// - Relative imports that go beyond the root
+struct PathResolver {
+    root: PathBuf,
+}
 
 impl PathResolver {
     /// Wrap a resolved module path if specified, otherwise raise an error.
@@ -240,7 +244,7 @@ impl PathResolver {
     ) -> Result<FileName, Error> {
         let base = match base {
             FileName::Real(v) => v,
-            _ => bail!("Invalid base for resolution: {:?}", base),
+            _ => bail!("Invalid base for resolution: {}", base),
         };
 
         // Determine the base directory (or `base` itself if already a directory)
@@ -254,12 +258,7 @@ impl PathResolver {
         let spec_path = Path::new(module_specifier);
         // Absolute paths are not supported
         if spec_path.is_absolute() {
-            bail!(
-                "Invalid module specifier {:?} in base {:?}; absolute imports are not \
-                supported, please use relative imports instead",
-                module_specifier,
-                base,
-            )
+            bail!("Absolute imports are not supported; use relative imports instead");
         }
 
         // If not absolute, then it should be either relative, a node module, or a URL;
@@ -286,18 +285,20 @@ impl PathResolver {
             #[cfg(not(windows))]
             let path = base_dir.join(module_specifier);
 
+            // Reject paths that go beyond the root
+            if !path.starts_with(&self.root) {
+                bail!("Relative imports should not go beyond the root {:?}", self.root);
+            }
+
             return self
                 .resolve_as_file(&path)
                 .or_else(|_| self.resolve_as_directory(&path))
                 .and_then(|p| self.wrap(p));
         }
         bail!(
-            "Invalid module specifier {:?} in base {:?}; node_modules imports should \
-            be explicitly included in package.json to avoid being bundled at runtime;\
-            URL imports are not supported, one should vendor its source to local and \
-            use a relative import instead",
-            module_specifier,
-            base,
+            "node_modules imports should be explicitly included in package.json to \
+            avoid being bundled at runtime; URL imports are not supported, one should \
+            vendor its source to local and use a relative import instead"
         )
     }
 }
