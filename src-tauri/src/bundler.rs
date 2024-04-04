@@ -60,7 +60,10 @@ pub(crate) fn bundle(
         &globals,
         cm.clone(),
         PathLoader(cm.clone()),
-        PathResolver { root: root.to_path_buf() },
+        // The path resolver produces paths with the \\?\ prefix on Windows, and since
+        // we need to compare paths with the root we canonicalize the root path here to
+        // get the same prefix; XXX not sure if there will be symlink issues
+        PathResolver { root: root.canonicalize()?.to_path_buf() },
         swc_bundler::Config { external_modules, ..Default::default() },
         Box::new(NoopHook),
     );
