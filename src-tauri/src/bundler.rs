@@ -170,6 +170,7 @@ impl Load for PathLoader {
                     err.into_diagnostic(&handler).emit();
                     panic!("FATAL: Failed to parse module");
                 });
+
         Ok(ModuleData { fm, module, helpers: Default::default() })
     }
 }
