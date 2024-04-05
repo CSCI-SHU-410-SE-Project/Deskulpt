@@ -9,9 +9,7 @@ import tseslint from "typescript-eslint";
 
 export default tseslint.config(
   {
-    ignores: [
-      "**/fixtures/**", // Fixture files should not be modified
-    ],
+    ignores: ["**/dist/**", "**/fixtures/**", "**/target/**"],
   },
 
   // --- Language Options -------------------------------------------------------------

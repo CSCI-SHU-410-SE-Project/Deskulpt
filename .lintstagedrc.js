@@ -8,7 +8,7 @@ export default {
       `eslint --max-warnings=0 --fix ${fileArgs}`,
     ];
   },
-  "**/*.{json,md,html,css,scss,yml,yaml}": (filenames) => {
+  "**/*.{json,json5,md,html,css,scss,yml,yaml}": (filenames) => {
     const fileArgs = quote(filenames);
     return [`prettier --write ${fileArgs}`];
   },
