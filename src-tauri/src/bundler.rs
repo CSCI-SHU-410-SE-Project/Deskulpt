@@ -16,6 +16,7 @@ use swc_bundler::{Bundler, Hook, Load, ModuleData, ModuleRecord, Resolve};
 use swc_common::{
     comments::SingleThreadedComments,
     errors::{ColorConfig, Handler},
+    pass::Repeat,
     sync::Lrc,
     FileName, FilePathMapping, Globals, Mark, SourceMap, Span, GLOBALS,
 };
@@ -26,6 +27,7 @@ use swc_ecma_codegen::{
 };
 use swc_ecma_loader::resolve::Resolution;
 use swc_ecma_parser::{parse_file_as_module, EsConfig, Syntax};
+use swc_ecma_transforms_optimization::simplify::dce;
 use swc_ecma_transforms_react::jsx;
 use swc_ecma_visit::FoldWith;
 
@@ -64,7 +66,13 @@ pub(crate) fn bundle(
         // we need to compare paths with the root we canonicalize the root path here to
         // get the same prefix; XXX not sure if there will be symlink issues
         PathResolver { root: root.canonicalize()?.to_path_buf() },
-        swc_bundler::Config { external_modules, ..Default::default() },
+        // We must disabled the default tree-shaking by the SWC bundler, otherwise it
+        // will remove unused `React` variables, which is required by the JSX transform
+        swc_bundler::Config {
+            external_modules,
+            disable_dce: true,
+            ..Default::default()
+        },
         Box::new(NoopHook),
     );
 
@@ -84,9 +92,14 @@ pub(crate) fn bundle(
     let module = bundles.pop().unwrap().module;
 
     let code = GLOBALS.set(&globals, || {
-        // Notes on the JSX transform
-        // ==========================
-        //
+        // Tree-shaking optimization in the bundler is disabled, so we need to manually
+        // apply the transform; we need to retain the top level mark `React` because it
+        // is needed by the JSX transform even if not explicitly used in the code
+        let mut tree_shaking = Repeat::new(dce::dce(
+            dce::Config { top_retain: vec![Atom::from("React")], ..Default::default() },
+            Mark::new(),
+        ));
+
         // There are two types of JSX transforms ("classic" and "automatic"), see
         // https://legacy.reactjs.org/blog/2020/09/22/introducing-the-new-jsx-transform.html
         //
@@ -95,11 +108,6 @@ pub(crate) fn bundle(
         // so we have to use the "classic" transform instead. The "classic" transform
         // requires `React` to be in scope, which we can require users to bring into
         // scope by assigning `const React = window.__DESKULPT__.React`.
-        //
-        // Note, however, that this puts constraints on how we can minify the bundled
-        // code, e.g., we cannot mangle the `React` identifier, we cannot remove `React`
-        // even if it is unused, etc.
-
         let mut jsx_transform = jsx::<SingleThreadedComments>(
             cm.clone(),
             None,
@@ -110,7 +118,7 @@ pub(crate) fn bundle(
 
         // Apply the module transformations
         // @Charlie-XIAO: chain more transforms e.g. TypeScript
-        let module = module.fold_with(&mut jsx_transform);
+        let module = module.fold_with(&mut tree_shaking).fold_with(&mut jsx_transform);
 
         // Emit the bundled module as string into a buffer
         let mut buf = vec![];
@@ -162,7 +170,6 @@ impl Load for PathLoader {
                     err.into_diagnostic(&handler).emit();
                     panic!("FATAL: Failed to parse module");
                 });
-
         Ok(ModuleData { fm, module, helpers: Default::default() })
     }
 }
