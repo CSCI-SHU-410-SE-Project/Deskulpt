@@ -1,0 +1,55 @@
+{
+  build: {
+    beforeDevCommand: "npm run dev",
+    beforeBuildCommand: "npm run build",
+    devPath: "http://localhost:1420",
+    distDir: "../dist",
+  },
+  package: {
+    productName: "Deskulpt",
+    version: "0.0.0",
+  },
+  tauri: {
+    allowlist: {
+      all: false,
+      shell: {
+        all: false,
+        // FIXME: This is temporary for opening the widget base directory; we must
+        // implement proper security measures some day; for relevant discussions see
+        // https://discordapp.com/channels/616186924390023171/1224276907215028325
+        open: ".+",
+      },
+    },
+    windows: [
+      {
+        label: "canvas",
+        title: "Deskulpt Canvas",
+        url: "views/canvas.html",
+        width: 800,
+        height: 600,
+      },
+      {
+        label: "manager",
+        title: "Deskulpt Manager",
+        url: "views/index.html",
+        width: 800,
+        height: 600,
+      },
+    ],
+    security: {
+      csp: null,
+    },
+    bundle: {
+      active: true,
+      targets: "all",
+      identifier: "com.tauri.deskulpt",
+      icon: [
+        "icons/32x32.png",
+        "icons/128x128.png",
+        "icons/128x128@2x.png",
+        "icons/icon.icns",
+        "icons/icon.ico",
+      ],
+    },
+  },
+}
