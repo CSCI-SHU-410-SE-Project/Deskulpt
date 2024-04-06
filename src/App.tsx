@@ -66,6 +66,11 @@ export default function App() {
     await Promise.all(Object.keys(configs).map((widgetId) => renderWidget(widgetId)));
   }
 
+  async function getDummyInfo() {
+    const result = await invoke("plugin:widget_api|get_dummy_info");
+    console.log(result);
+  }
+
   useEffect(() => {
     // Fetch the widget collection and render all on mount
     refreshWidgetCollection()
@@ -103,6 +108,9 @@ export default function App() {
       </Button>
       <Button variant="outlined" onClick={openWidgetBase}>
         Open Widget Base Directory
+      </Button>
+      <Button variant="outlined" onClick={getDummyInfo}>
+        Get Dummy Info
       </Button>
     </Box>
   );
