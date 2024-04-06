@@ -708,6 +708,7 @@ dependencies = [
  "swc_ecma_visit",
  "tauri",
  "tauri-build",
+ "tempfile",
 ]
 
 [[package]]

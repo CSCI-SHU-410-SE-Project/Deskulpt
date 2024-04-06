@@ -6,18 +6,17 @@
 
 use std::{
     collections::HashMap,
+    fs::File,
+    io::Read,
     path::{Component, Path, PathBuf},
 };
 
-use anyhow::{bail, Error};
+use anyhow::{bail, Context, Error};
 use path_clean::PathClean;
 use swc_atoms::Atom;
 use swc_bundler::{Bundler, Hook, Load, ModuleData, ModuleRecord, Resolve};
 use swc_common::{
-    comments::SingleThreadedComments,
-    errors::{ColorConfig, Handler},
-    pass::Repeat,
-    sync::Lrc,
+    comments::SingleThreadedComments, errors::Handler, pass::Repeat, sync::Lrc,
     FileName, FilePathMapping, Globals, Mark, SourceMap, Span, GLOBALS,
 };
 use swc_ecma_ast::KeyValueProp;
@@ -30,6 +29,7 @@ use swc_ecma_parser::{parse_file_as_module, EsConfig, Syntax};
 use swc_ecma_transforms_optimization::simplify::dce;
 use swc_ecma_transforms_react::jsx;
 use swc_ecma_visit::FoldWith;
+use tempfile::NamedTempFile;
 
 #[cfg(windows)]
 use normpath::BasePath;
@@ -158,20 +158,38 @@ impl Load for PathLoader {
         // Parse the file as a module; note that transformations are not applied here,
         // because per-file transformations may lead to unexpected results when bundled
         // together; instead, transformations are postponed until the bundling phase
-        let module =
-            parse_file_as_module(&fm, syntax, Default::default(), None, &mut vec![])
-                .unwrap_or_else(|err| {
-                    let handler = Handler::with_tty_emitter(
-                        ColorConfig::Auto,
-                        true,  // allow emitting warnings
-                        false, // do not treat errors as bugs
+        match parse_file_as_module(&fm, syntax, Default::default(), None, &mut vec![]) {
+            Ok(module) => Ok(ModuleData { fm, module, helpers: Default::default() }),
+            Err(err) => {
+                // The error handler requires a destination for the emitter writer that
+                // implements `Write`; a buffer implements `Write` but its borrowed
+                // reference does not, causing the handler to take ownership of the
+                // buffer, making us unable to read from it later (and the buffer is
+                // made private in the handler); the workaround is to use a temporary
+                // file and access its content later by its path (we require the file to
+                // live only for a short time so this is relatively safe)
+                let mut err_msg = String::new();
+                {
+                    let context = format!(
+                        "Parsing error occurred but failed to emit the formatted error \
+                        analysis; falling back to raw version: {:?}",
+                        err
+                    );
+                    let buffer = NamedTempFile::new().context(context.clone())?;
+                    let buffer_path = buffer.path().to_path_buf();
+                    let handler = Handler::with_emitter_writer(
+                        Box::new(buffer),
                         Some(self.0.clone()),
                     );
                     err.into_diagnostic(&handler).emit();
-                    panic!("FATAL: Failed to parse module");
-                });
-
-        Ok(ModuleData { fm, module, helpers: Default::default() })
+                    File::open(buffer_path)
+                        .context(context.clone())?
+                        .read_to_string(&mut err_msg)
+                        .context(context.clone())?;
+                }
+                bail!(err_msg);
+            },
+        }
     }
 }
 
