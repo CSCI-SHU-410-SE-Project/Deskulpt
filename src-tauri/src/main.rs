@@ -8,7 +8,7 @@ mod bundler;
 mod commands;
 mod config;
 mod states;
-mod widget_api_plugin;
+mod widget_api;
 
 /// Main entry point of Deskulpt.
 fn main() {
@@ -30,7 +30,9 @@ fn main() {
             commands::refresh_widget_collection,
             // widget_api::dummy::get_dummy_info,
         ])
-        .plugin(widget_api_plugin::init())
+        // initialize widget apis
+        .plugin(widget_api::dummy::init())
+        .plugin(widget_api::fs::init())
         .run(context)
         .expect("FATAL");
 }

@@ -67,7 +67,7 @@ export default function App() {
   }
 
   async function getDummyInfo() {
-    const result = await invoke("plugin:widget_api|get_dummy_info");
+    const result = await invoke("plugin:widget_api.dummy|get_dummy_info");
     console.log(result);
   }
 
