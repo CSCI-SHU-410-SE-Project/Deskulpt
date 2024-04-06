@@ -5,7 +5,7 @@ export default {
     const fileArgs = quote(filenames);
     return [
       `prettier --write ${fileArgs}`,
-      `eslint --max-warnings=0 --fix ${fileArgs}`,
+      `eslint --max-warnings=0 --no-warn-ignored --fix ${fileArgs}`,
     ];
   },
   "**/*.{json,json5,md,html,css,scss,yml,yaml}": (filenames) => {

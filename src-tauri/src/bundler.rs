@@ -329,3 +329,30 @@ impl Hook for NoopHook {
         unimplemented!();
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use parameterized::parameterized;
+    use pretty_assertions::assert_eq;
+    use std::fs::read_to_string;
+
+    #[parameterized(case = {
+        "no_react",  // Not explicitly using React
+        "with_react_hook",  // Using React hook
+    })]
+    fn test_bundle_basic(case: &str) {
+        // Test the most basic bundler functionalities, with no dependencies and are
+        // expected to succeed
+        let root = PathBuf::from(format!("tests/fixtures/bundler/{case}/input"));
+        let result = match bundle(&root, root.join("index.jsx").as_path(), None) {
+            Ok(code) => code,
+            Err(e) => panic!("Unexpected bundling error: {}", e),
+        };
+
+        let expected =
+            read_to_string(format!("tests/fixtures/bundler/{case}/output.js"))
+                .expect("Failed to read expected output");
+        self::assert_eq!(result, expected);
+    }
+}
