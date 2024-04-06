@@ -345,10 +345,8 @@ mod tests {
         // Test the most basic bundler functionalities, with no dependencies and are
         // expected to succeed
         let root = PathBuf::from(format!("tests/fixtures/bundler/{case}/input"));
-        let result = match bundle(&root, root.join("index.jsx").as_path(), None) {
-            Ok(code) => code,
-            Err(e) => panic!("Unexpected bundling error: {}", e),
-        };
+        let result = bundle(&root, root.join("index.jsx").as_path(), None)
+            .expect("Failed to bundle");
 
         let expected =
             read_to_string(format!("tests/fixtures/bundler/{case}/output.js"))
