@@ -5,5 +5,8 @@
 # otherwise the fancy output of lint-staged will be disabled; see the husky issue
 # https://github.com/typicode/husky/issues/968
 
-exec 1> /dev/tty
+if [ -t 2 ]; then
+  exec >/dev/tty 2>&1
+fi
+
 npx lint-staged

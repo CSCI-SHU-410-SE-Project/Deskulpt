@@ -1,12 +1,17 @@
 //! The module implements configuration-related utilities and structures.
 
-use std::{collections::HashMap, fs::read_to_string, path::PathBuf};
+use std::{
+    collections::HashMap,
+    fs::read_to_string,
+    path::{Path, PathBuf},
+};
 
 use anyhow::{bail, Context, Error};
 use serde::{Deserialize, Serialize};
 
 /// Full configuration of a widget.
 #[derive(Clone, Serialize)]
+#[cfg_attr(test, derive(PartialEq, Debug))]
 pub(crate) struct WidgetConfig {
     /// Deskulpt configuration [`DeskulptConf`].
     pub(crate) deskulpt: DeskulptConf,
@@ -22,6 +27,7 @@ pub(crate) struct WidgetConfig {
 
 /// Deskulpt configuration of a widget, corresponding to `deskulpt.conf.json`.
 #[derive(Clone, Deserialize, Serialize)]
+#[cfg_attr(test, derive(PartialEq, Debug))]
 pub(crate) struct DeskulptConf {
     /// The name of the widget.
     pub(crate) name: String,
@@ -35,6 +41,7 @@ pub(crate) struct DeskulptConf {
 
 /// Node package configuration, corresponding to `package.json`.
 #[derive(Clone, Deserialize, Serialize)]
+#[cfg_attr(test, derive(PartialEq, Debug))]
 pub(crate) struct PackageJson {
     /// The `dependencies` field of `package.json`
     ///
@@ -52,9 +59,7 @@ pub(crate) struct PackageJson {
 ///
 /// - If `deskulpt.conf.json` is not found in the given directory, we do not consider
 ///   it a widget and return `Ok(None)` instead of an error.
-pub(crate) fn read_widget_config(
-    path: &PathBuf,
-) -> Result<Option<WidgetConfig>, Error> {
+pub(crate) fn read_widget_config(path: &Path) -> Result<Option<WidgetConfig>, Error> {
     if !path.is_absolute() || !path.is_dir() {
         bail!("Absolute path to a directory is expected; got: {:?}", path);
     }
@@ -90,4 +95,19 @@ pub(crate) fn read_widget_config(
         deskulpt: deskulpt_conf,
         node: package_json,
     }))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use pretty_assertions::assert_eq;
+
+    #[test]
+    fn test_read_no_conf_error() {
+        //
+        let widget_dir =
+            Path::new("tests/fixtures/config/no-conf").canonicalize().unwrap();
+        let result = read_widget_config(&widget_dir).unwrap();
+        self::assert_eq!(result, None);
+    }
 }
