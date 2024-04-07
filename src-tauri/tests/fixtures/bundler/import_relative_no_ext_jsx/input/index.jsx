@@ -1,11 +1,9 @@
-import getMessage from "./utils";
+import MessageInner from "./MessageInner";
 
 const React = window.__DESKULPT__.defaultDeps.React;
 
 function Message() {
-  return (
-    <div>{getMessage()}</div>
-  );
+  return <div><MessageInner /></div>;
 }
 
 const App = {

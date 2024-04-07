@@ -359,14 +359,14 @@ mod tests {
     }
 
     #[parameterized(case = {
-        "no_react",  // Not explicitly using React
-        "with_react_hook",  // Using React hook
-        "import_relative",  // Relative import with extension
+        "no_react",
+        "with_react_hook",
+        "import_relative",
         "import_relative_no_ext",
         "import_relative_directory",
-        "import_jsx",
-        "import_no_inner_React",
-        "import_no_outer_React"
+        "import_relative_no_ext_jsx",
+        "import_no_inner_react_def",
+        "import_no_outer_react_def",
     })]
     fn test_bundle_basic(case: &str) {
         // Test the most basic bundler functionalities, with no dependencies and are
@@ -402,18 +402,18 @@ mod tests {
 
     #[test]
     fn test_bundle_beyond_root_error() {
-        // Test that we do not allow absolute path import
+        // Test that we do not allow relative import that goes beyond the root path
         let root_path = "tests/fixtures/bundler/import_beyond_root/input";
         let root = PathBuf::from(root_path);
         let error = bundle(&root, root.join("index.jsx").as_path(), None)
             .expect_err("Expected an error");
-        let abs_root = root.canonicalize().expect("Failed to get absolute path");
+        let abs_root = root.canonicalize().unwrap();
 
         let expected = vec![
             "load_transformed failed".to_string(),
             "failed to analyze module".to_string(),
-            format!("failed to resolve ../../../import_jsx/input/utils from {root_path}/index.jsx"),
-            format!("Relative imports should not go beyond the root {:?}", abs_root),
+            format!("failed to resolve ../../../dummy from {root_path}/index.jsx"),
+            format!("Relative imports should not go beyond the root {abs_root:?}"),
         ];
         assert_err_eq(error, expected);
     }

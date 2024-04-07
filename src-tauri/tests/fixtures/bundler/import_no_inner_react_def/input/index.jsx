@@ -1,11 +1,11 @@
-import getMessage from "./utils";
+// This file has React defined, but its imported file does not
+
+import MessageInner from "./MessageInner";
 
 const React = window.__DESKULPT__.defaultDeps.React;
 
 function Message() {
-  return (
-    <div>{getMessage()}</div>
-  );
+  return <div><MessageInner /></div>
 }
 
 const App = {

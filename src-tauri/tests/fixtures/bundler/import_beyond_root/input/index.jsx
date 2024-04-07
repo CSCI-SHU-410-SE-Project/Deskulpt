@@ -1,15 +1,3 @@
-import { getMessage } from "../../../import_jsx/input/utils";
+// Relative import that goes beyond the root; error
 
-const React = window.__DESKULPT__.defaultDeps.React;
-
-function Message() {
-  return (
-    <div>{getMessage()}</div>
-  );
-}
-
-const App = {
-  render: () => <Message />,
-};
-
-export default App;
+import { getMessage } from "../../../dummy";
