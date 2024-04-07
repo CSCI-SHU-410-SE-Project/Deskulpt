@@ -1,11 +1,11 @@
 use tauri::command;
 
 #[command]
-pub fn get_dummy_info() -> String {
-    "Hello from Deskulpt dummy api!".to_string()
+pub async fn get_dummy_info(widget_id: String) -> String {
+    format!("Hello from the dummy widget with ID: {}", widget_id)
 }
 
 #[command]
-pub fn shout_text(text: String) -> String {
-    text.to_uppercase()
+pub async fn shout_text(widget_id: String, text: String) -> String {
+    format!("{}: {}", widget_id, text.to_uppercase())
 }
