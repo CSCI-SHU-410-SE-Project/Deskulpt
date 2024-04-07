@@ -55,13 +55,16 @@ pub(crate) struct PackageJson {
 /// file in the given widget directory `path`.
 ///
 /// If widget configuration is loaded successfully, it will return `Ok(Some(config))`.
-/// Any failure to load the configuration will return an error, except:
+/// If the directory should not be treated as a widget, it will return `Ok(None)`. Any
+/// failure to load the configuration will return an error.
 ///
-/// - If `deskulpt.conf.json` is not found in the given directory, we do not consider
-///   it a widget and return `Ok(None)` instead of an error.
+/// The cases where a directory should not be treated as a widget include:
+/// - `deskulpt.conf.json` is not found.
+/// - The `ignore` flag in `deskulpt.conf.json` is set to `true`.
 pub(crate) fn read_widget_config(path: &Path) -> Result<Option<WidgetConfig>, Error> {
     if !path.is_absolute() || !path.is_dir() {
-        bail!("Absolute path to a directory is expected; got: {:?}", path);
+        // Note that `is_dir` also checks if the path exists
+        bail!("Absolute path to an existing directory is expected; got: {path:?}");
     }
 
     let deskulpt_conf_path = path.join("deskulpt.conf.json");
@@ -77,8 +80,13 @@ pub(crate) fn read_widget_config(path: &Path) -> Result<Option<WidgetConfig>, Er
             }
         },
     };
-    let deskulpt_conf = serde_json::from_str(&deskulpt_conf_str)
+    let deskulpt_conf: DeskulptConf = serde_json::from_str(&deskulpt_conf_str)
         .context("Failed to parse deskulpt.conf.json")?;
+
+    // Respect the `ignore` flag in configuration
+    if deskulpt_conf.ignore {
+        return Ok(None);
+    }
 
     let package_json_path = path.join("package.json");
     let package_json = if package_json_path.is_file() {
@@ -103,11 +111,40 @@ mod tests {
     use pretty_assertions::assert_eq;
 
     #[test]
-    fn test_read_no_conf_error() {
-        //
-        let widget_dir =
-            Path::new("tests/fixtures/config/no-conf").canonicalize().unwrap();
-        let result = read_widget_config(&widget_dir).unwrap();
-        self::assert_eq!(result, None);
+    fn test_read_return_none() {
+        // Check the cases we return `Ok(None)`, i.e., no configuration file or the
+        // ignore flag is set to `true`
+        for widget_dir in [
+            Path::new("tests/fixtures/config/no_conf").canonicalize().unwrap(),
+            Path::new("tests/fixtures/config/ignore_true").canonicalize().unwrap(),
+        ] {
+            let result = read_widget_config(&widget_dir);
+            assert!(result.is_ok());
+            assert!(result.unwrap().is_none());
+        }
+    }
+
+    #[test]
+    fn test_read_invalid_path_error() {
+        // Check that we get an error unless we pass an absolute path to a directory,
+        // i.e., error if path is not absolute, not a directory, or does not exist
+        for widget_dir in [
+            PathBuf::from("tests/fixtures/config/full"),
+            Path::new("tests/fixtures/config/dummy").canonicalize().unwrap(),
+            Path::new("tests/fixtures/config")
+                .canonicalize()
+                .unwrap()
+                .join("non_existent"),
+        ] {
+            let result = read_widget_config(&widget_dir);
+            assert!(result.is_err());
+            assert_eq!(
+                result.unwrap_err().to_string(),
+                format!(
+                    "Absolute path to an existing directory is expected; got: \
+                    {widget_dir:?}"
+                ),
+            );
+        }
     }
 }
