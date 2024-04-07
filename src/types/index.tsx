@@ -38,6 +38,13 @@ declare global {
 }
 
 /**
+ * The props of the widget component.
+ */
+interface WidgetProps {
+  id: string;
+}
+
+/**
  * The user-defined widget class.
  *
  * The entry file of each user-defined widget should export a class that extends the Widget class
@@ -46,27 +53,28 @@ declare global {
  * we need a way to associate widget api with widget data. Since a widget is just a html element
  * instead of a window, we need class to do the job.
  */
-export class Widget extends React.Component {
-  #widget_id = "";
+export class Widget extends React.Component<WidgetProps> {
+  // #widget_id = "";
 
-  constructor(widget_id: string) {
-    super({});
-    this.#widget_id = widget_id;
-  }
+  // // constructor(widget_id: string) {
+  // //   super({});
+  // //   this.#widget_id = widget_id;
+  // // }
+  // constructor({ widget_id }: { widget_id: string }) {
+  //   super({});
+  //   this.#widget_id = widget_id;
+  // }
 
-  get widget_id() {
-    return this.#widget_id;
-  }
+  // get widget_id() {
+  //   return this.#widget_id;
+  // }
 
   widget_api = {
     dummy: {
       shout: async (text: string) => {
         try {
-          // const result = await window.__TAURI_INVOKE__(
-          //   {cmd: `plugin:widget_api.dummy|shout_text`, text: text }
-          // );
           const result = await invoke("plugin:widget_api.dummy|shout_text", {
-            widgetId: this.#widget_id,
+            widgetId: this.props.id,
             text: text,
           });
           console.log(result);
@@ -80,11 +88,8 @@ export class Widget extends React.Component {
     fs: {
       read_file: async (path: string) => {
         try {
-          // const result = await window.__TAURI_INVOKE__(
-          //   {cmd: `plugin:widget_api.fs|read_file`, path: path }
-          // );
           const result = await invoke("plugin:widget_api.fs|read_file", {
-            widgetId: this.#widget_id,
+            widgetId: this.props.id,
             path: path,
           });
           console.log(result);
@@ -97,6 +102,6 @@ export class Widget extends React.Component {
   };
 
   render(): React.JSX.Element {
-    return <h1>Widget {this.#widget_id}</h1>;
+    return <h1>Widget {this.props.id}</h1>;
   }
 }

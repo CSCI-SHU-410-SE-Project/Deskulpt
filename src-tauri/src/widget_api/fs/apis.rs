@@ -8,12 +8,12 @@ use tauri::{command, AppHandle, Manager, Runtime};
 pub fn read_file<R: Runtime>(
     app_handle: AppHandle<R>,
     widget_id: String,
-    file_relpath: String,
+    path: String,
 ) -> Result<String, String> {
     let widget_base = &app_handle.state::<WidgetBaseDirectoryState>().0;
     let widget_dir = widget_base.join(widget_id);
     let widget_storage_dir = widget_dir.join("storage");
-    let file_path = widget_storage_dir.join(file_relpath);
+    let file_path = widget_storage_dir.join(path);
     match std::fs::read_to_string(file_path) {
         Ok(content) => Ok(content),
         Err(e) => Err(e.to_string()),

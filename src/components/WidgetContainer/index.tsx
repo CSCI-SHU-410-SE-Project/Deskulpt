@@ -11,12 +11,13 @@ import React from "react";
  * - `id`: The ID of the widget to render.
  * - `inner`: The JSX element to render inside the container.
  */
-export default function WidgetContainer(props: {
+export default function WidgetContainer({
+  children,
+  id,
+}: {
+  children: React.ReactNode;
   id: string;
-  inner: React.ReactElement;
-}) {
-  const { id, inner } = props;
-
+}): JSX.Element {
   return (
     <React.StrictMode>
       <Box
@@ -40,7 +41,7 @@ export default function WidgetContainer(props: {
             }}
           />
         </Tooltip>
-        {inner}
+        {children}
       </Box>
     </React.StrictMode>
   );

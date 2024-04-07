@@ -22,10 +22,15 @@ export interface WidgetModule {
   /**
    * The default export of the entry file of a user-defined widget.
    */
-  default: WidgetConstructor;
+  default: Widget;
 }
 
-type WidgetConstructor = new (widget_id: string) => Widget;
+// /**
+//  * The constructor of a user-defined widget class.
+//  */
+// interface WidgetConstructor {
+//   new (id: string): Widget;
+// }
 
 /**
  * The HTML and React DOM roots for rendering a widget.
