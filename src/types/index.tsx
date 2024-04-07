@@ -88,6 +88,47 @@ export class Widget extends React.Component<WidgetProps> {
           return error;
         }
       },
+      write_file: async (path: string, content: string) => {
+        try {
+          const result = await invoke("plugin:widget_api.fs|write_file", {
+            widgetId: this.props.id,
+            path: path,
+            content: content,
+          });
+          console.log(result);
+          return result;
+        } catch (error) {
+          console.error(error);
+          return error;
+        }
+      },
+      append_file: async (path: string, content: string) => {
+        try {
+          const result = await invoke("plugin:widget_api.fs|append_file", {
+            widgetId: this.props.id,
+            path: path,
+            content: content,
+          });
+          console.log(result);
+          return result;
+        } catch (error) {
+          console.error(error);
+          return error;
+        }
+      },
+      remove_file: async (path: string) => {
+        try {
+          const result = await invoke("plugin:widget_api.fs|remove_file", {
+            widgetId: this.props.id,
+            path: path,
+          });
+          console.log(result);
+          return result;
+        } catch (error) {
+          console.error(error);
+          return error;
+        }
+      },
     },
   };
 
