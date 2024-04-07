@@ -30,8 +30,8 @@ listen("render-widget", (event: TauriEvent<RenderWidgetPayload>) => {
         }
 
         // Early return before rendering if there are known errors in the widget
-        const widget = module.default;
-        if (widget === undefined) {
+        const WidgetClass = module.default;
+        if (WidgetClass === undefined) {
           handleError(
             widgetId,
             widgetDOMRoot,
@@ -41,6 +41,9 @@ listen("render-widget", (event: TauriEvent<RenderWidgetPayload>) => {
           );
           return;
         }
+
+        const widget = new WidgetClass(widgetId);
+
         if (widget.render === undefined || typeof widget.render !== "function") {
           handleError(
             widgetId,
