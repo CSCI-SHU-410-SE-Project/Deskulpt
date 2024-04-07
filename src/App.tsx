@@ -8,6 +8,8 @@ import { CommandOut, WidgetConfig } from "./types";
 
 export default function App() {
   const [widgetConfigs, setWidgetConfigs] = useState<Record<string, WidgetConfig>>({});
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [value, setValue] = useState("test");
 
   /**
    * Open the widget base directory in the file explorer of the OS.
@@ -30,8 +32,11 @@ export default function App() {
    */
   async function refreshWidgetCollection() {
     const output: CommandOut<Record<string, WidgetConfig>> = await invoke(
-      "refresh_widget_collection",
+      "plugin:widget_api.str|get_text",
     );
+    console.log("output", output);
+    alert(output);
+    setValue("test widget");
     if ("success" in output) {
       setWidgetConfigs(output.success);
       return output.success;
@@ -98,6 +103,7 @@ export default function App() {
       <Button variant="outlined" onClick={refreshWidgetCollection}>
         Rescan
       </Button>
+      <div>{value}</div>
       <Button variant="outlined" onClick={refreshWidgetCollection}>
         Rescan
       </Button>

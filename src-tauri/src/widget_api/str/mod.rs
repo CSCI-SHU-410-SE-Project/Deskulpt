@@ -13,9 +13,6 @@ use tauri::{
 // The registered apis can be invoked as "plugin:widget_api.dummy|<api_name>"
 pub fn init<R: Runtime>() -> TauriPlugin<R> {
     Builder::new("widget_api.str")
-        .invoke_handler(tauri::generate_handler![
-            apis::get_dummy_info,
-            apis::shout_text,
-        ])
+        .invoke_handler(tauri::generate_handler![apis::get_text,])
         .build()
 }
