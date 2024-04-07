@@ -4,6 +4,7 @@
 use crate::states::WidgetBaseDirectoryState;
 use tauri::{command, AppHandle, Manager, Runtime};
 
+// Read the file at path $APPDATA/widgets/<widget_id>/storage/<path>
 #[command]
 pub fn read_file<R: Runtime>(
     app_handle: AppHandle<R>,
