@@ -40,7 +40,7 @@ declare global {
 /**
  * The props of the widget component.
  */
-interface WidgetProps {
+export interface WidgetProps {
   id: string;
 }
 
@@ -54,20 +54,9 @@ interface WidgetProps {
  * instead of a window, we need class to do the job.
  */
 export class Widget extends React.Component<WidgetProps> {
-  // #widget_id = "";
-
-  // // constructor(widget_id: string) {
-  // //   super({});
-  // //   this.#widget_id = widget_id;
-  // // }
-  // constructor({ widget_id }: { widget_id: string }) {
-  //   super({});
-  //   this.#widget_id = widget_id;
-  // }
-
-  // get widget_id() {
-  //   return this.#widget_id;
-  // }
+  constructor(props: WidgetProps) {
+    super(props);
+  }
 
   widget_api = {
     dummy: {
@@ -96,12 +85,13 @@ export class Widget extends React.Component<WidgetProps> {
           return result;
         } catch (error) {
           console.error(error);
+          return error;
         }
       },
     },
   };
 
-  render(): React.JSX.Element {
+  render() {
     return <h1>Widget {this.props.id}</h1>;
   }
 }

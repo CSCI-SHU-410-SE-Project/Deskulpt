@@ -4,7 +4,7 @@
  */
 
 import ReactDOM from "react-dom/client";
-import { Widget } from ".";
+import { Widget, WidgetProps } from ".";
 import { CommandOut } from "./backend";
 
 /**
@@ -22,8 +22,13 @@ export interface WidgetModule {
   /**
    * The default export of the entry file of a user-defined widget.
    */
-  default: Widget;
+  default: WidgetConstructor;
 }
+
+/**
+ * The constructor of a user-defined widget class.
+ */
+type WidgetConstructor = new (props: WidgetProps) => Widget;
 
 // /**
 //  * The constructor of a user-defined widget class.
