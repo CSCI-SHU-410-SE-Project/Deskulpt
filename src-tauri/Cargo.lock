@@ -741,6 +741,7 @@ dependencies = [
  "parking_lot",
  "path-clean 1.0.1",
  "pretty_assertions",
+ "regex",
  "serde",
  "serde-error",
  "serde_json",

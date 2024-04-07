@@ -108,7 +108,58 @@ pub(crate) fn read_widget_config(path: &Path) -> Result<Option<WidgetConfig>, Er
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::testing::{assert_err_eq, ChainReason};
     use pretty_assertions::assert_eq;
+
+    #[test]
+    fn test_read_basic() {
+        // Check reading a standard widget configuration
+        let widget_dir =
+            Path::new("tests/fixtures/config/standard").canonicalize().unwrap();
+        let result = read_widget_config(&widget_dir);
+        assert!(result.is_ok());
+        let result = result.unwrap();
+        assert!(result.is_some());
+
+        let expected = WidgetConfig {
+            directory: widget_dir,
+            deskulpt: DeskulptConf {
+                name: "Sample".to_string(),
+                entry: "src/App.jsx".to_string(),
+                ignore: false,
+            },
+            node: Some(PackageJson {
+                dependencies: HashMap::from([
+                    ("nodemon".to_string(), "^2.0.4".to_string()),
+                    ("mongoose".to_string(), "^5.9.7".to_string()),
+                    ("express".to_string(), "^4.17.1".to_string()),
+                ]),
+            }),
+        };
+        self::assert_eq!(result.unwrap(), expected);
+    }
+
+    #[test]
+    fn test_read_no_package_json() {
+        // Check reading a widget configuration without `package.json`
+        let widget_dir =
+            Path::new("tests/fixtures/config/no_package_json").canonicalize().unwrap();
+        let result = read_widget_config(&widget_dir);
+        assert!(result.is_ok());
+        let result = result.unwrap();
+        assert!(result.is_some());
+
+        let expected = WidgetConfig {
+            directory: widget_dir,
+            deskulpt: DeskulptConf {
+                name: "Sample".to_string(),
+                entry: "src/App.jsx".to_string(),
+                ignore: false,
+            },
+            node: None,
+        };
+        self::assert_eq!(result.unwrap(), expected);
+    }
 
     #[test]
     fn test_read_return_none() {
@@ -120,7 +171,8 @@ mod tests {
         ] {
             let result = read_widget_config(&widget_dir);
             assert!(result.is_ok());
-            assert!(result.unwrap().is_none());
+            let result = result.unwrap();
+            assert!(result.is_none());
         }
     }
 
@@ -138,13 +190,29 @@ mod tests {
         ] {
             let result = read_widget_config(&widget_dir);
             assert!(result.is_err());
-            assert_eq!(
-                result.unwrap_err().to_string(),
-                format!(
-                    "Absolute path to an existing directory is expected; got: \
+
+            let error = result.unwrap_err();
+            let expected = vec![ChainReason::Exact(format!(
+                "Absolute path to an existing directory is expected; got: \
                     {widget_dir:?}"
-                ),
-            );
+            ))];
+            assert_err_eq(error, expected);
         }
+    }
+
+    #[test]
+    fn test_read_conf_not_readable_error() {
+        // Check that we get an error if `deskulpt.conf.json` cannot be read
+        let widget_dir =
+            Path::new("tests/fixtures/config/conf_not_file").canonicalize().unwrap();
+        let result = read_widget_config(&widget_dir);
+        assert!(result.is_err());
+
+        let error = result.unwrap_err();
+        let expected = vec![
+            ChainReason::Exact("Failed to read deskulpt.conf.json".to_string()),
+            ChainReason::IOErrorKind(std::io::ErrorKind::PermissionDenied),
+        ];
+        assert_err_eq(error, expected);
     }
 }

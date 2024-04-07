@@ -9,6 +9,9 @@ mod commands;
 mod config;
 mod states;
 
+#[cfg(test)]
+mod testing;
+
 /// Main entry point of Deskulpt.
 fn main() {
     // Get the widget base directory in advance; it seems that `.setup` may not finish
