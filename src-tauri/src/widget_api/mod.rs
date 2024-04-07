@@ -5,3 +5,5 @@
 
 pub mod dummy;
 pub mod fs;
+
+pub mod str;

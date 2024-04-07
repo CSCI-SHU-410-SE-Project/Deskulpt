@@ -98,6 +98,9 @@ export default function App() {
       <Button variant="outlined" onClick={refreshWidgetCollection}>
         Rescan
       </Button>
+      <Button variant="outlined" onClick={refreshWidgetCollection}>
+        Rescan
+      </Button>
       <Button variant="outlined" onClick={() => renderWidgets(widgetConfigs)}>
         Render All
       </Button>

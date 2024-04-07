@@ -33,6 +33,7 @@ fn main() {
         // initialize widget apis
         .plugin(widget_api::dummy::init())
         .plugin(widget_api::fs::init())
+        .plugin(widget_api::str::init())
         .run(context)
         .expect("FATAL");
 }

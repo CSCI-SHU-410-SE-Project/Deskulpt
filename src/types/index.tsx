@@ -74,6 +74,21 @@ export class Widget extends React.Component<WidgetProps> {
         }
       },
     },
+    str: {
+      shout: async (text: string) => {
+        try {
+          const result = await invoke("plugin:widget_api.str|shout_text", {
+            widgetId: this.props.id,
+            text: text,
+          });
+          console.log(result);
+          return result;
+        } catch (error) {
+          console.error(error);
+          return error;
+        }
+      },
+    },
     fs: {
       read_file: async (path: string) => {
         try {
