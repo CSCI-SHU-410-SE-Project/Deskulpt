@@ -1,4 +1,5 @@
 mod apis;
+pub mod utils;
 
 use tauri::{
     plugin::{Builder, TauriPlugin},
