@@ -3,19 +3,41 @@ use std::io::Write;
 use std::path::PathBuf;
 use tauri::{command, AppHandle, Manager, Runtime};
 
-fn get_file_path<R: Runtime>(
-    app_handle: &AppHandle<R>,
-    widget_id: &str,
-    path: &str,
-) -> PathBuf {
-    let widget_base = &app_handle.state::<WidgetBaseDirectoryState>().0;
-    // If storage directory does not exist, create it
-    let widget_dir = widget_base.join(widget_id).join("storage");
-    if !widget_dir.exists() {
-        std::fs::create_dir_all(&widget_dir)
-            .expect("Failed to create widget storage directory");
-    }
-    widget_dir.join(path)
+use crate::widget_api::fs::utils;
+
+#[command]
+pub fn exists<R: Runtime>(
+    app_handle: AppHandle<R>,
+    widget_id: String,
+    path: String,
+) -> Result<bool, String> {
+    utils::validate_entry_path(&app_handle, &widget_id, &path)?;
+    let file_path = utils::get_entry_path(&app_handle, &widget_id, &path);
+    Ok(file_path.exists())
+}
+
+// Note that the `is_file` is a command for widgets. For checking if an entrhy is file,
+//    we should use std::path::PathBuf::is_file instead.
+#[command]
+pub fn is_file<R: Runtime>(
+    app_handle: AppHandle<R>,
+    widget_id: String,
+    path: String,
+) -> Result<bool, String> {
+    utils::validate_entry_path(&app_handle, &widget_id, &path)?;
+    let file_path = utils::get_entry_path(&app_handle, &widget_id, &path);
+    Ok(file_path.is_file())
+}
+
+#[command]
+pub fn is_dir<R: Runtime>(
+    app_handle: AppHandle<R>,
+    widget_id: String,
+    path: String,
+) -> Result<bool, String> {
+    utils::validate_entry_path(&app_handle, &widget_id, &path)?;
+    let file_path = utils::get_entry_path(&app_handle, &widget_id, &path);
+    Ok(file_path.is_dir())
 }
 
 #[command]
@@ -24,7 +46,12 @@ pub fn read_file<R: Runtime>(
     widget_id: String,
     path: String,
 ) -> Result<String, String> {
-    let file_path = get_file_path(&app_handle, &widget_id, &path);
+    utils::validate_entry_path(&app_handle, &widget_id, &path)?;
+    let file_path = utils::get_entry_path(&app_handle, &widget_id, &path);
+    if !file_path.is_file() {
+        return Err(format!("Path '{}' is not a file", file_path.display()));
+    }
+
     std::fs::read_to_string(&file_path)
         .map_err(|e| format!("Failed to read file '{}': {}", file_path.display(), e))
 }
@@ -36,7 +63,8 @@ pub fn write_file<R: Runtime>(
     path: String,
     content: String,
 ) -> Result<(), String> {
-    let file_path = get_file_path(&app_handle, &widget_id, &path);
+    utils::validate_entry_path(&app_handle, &widget_id, &path)?;
+    let file_path = utils::get_entry_path(&app_handle, &widget_id, &path);
     std::fs::write(&file_path, content)
         .map_err(|e| format!("Failed to write file '{}': {}", file_path.display(), e))
 }
@@ -48,7 +76,8 @@ pub fn append_file<R: Runtime>(
     path: String,
     content: String,
 ) -> Result<(), String> {
-    let file_path = get_file_path(&app_handle, &widget_id, &path);
+    utils::validate_entry_path(&app_handle, &widget_id, &path)?;
+    let file_path = utils::get_entry_path(&app_handle, &widget_id, &path);
     std::fs::OpenOptions::new()
         .append(true)
         .create(true)
@@ -63,9 +92,42 @@ pub fn remove_file<R: Runtime>(
     widget_id: String,
     path: String,
 ) -> Result<(), String> {
-    let file_path = get_file_path(&app_handle, &widget_id, &path);
+    utils::validate_entry_path(&app_handle, &widget_id, &path)?;
+    let file_path = utils::get_entry_path(&app_handle, &widget_id, &path);
+    if !file_path.is_file() {
+        return Err(format!("Path '{}' is not a file", file_path.display()));
+    }
     std::fs::remove_file(&file_path)
         .map_err(|e| format!("Failed to delete file '{}': {}", file_path.display(), e))
+}
+
+#[command]
+pub fn create_dir<R: Runtime>(
+    app_handle: AppHandle<R>,
+    widget_id: String,
+    path: String,
+) -> Result<(), String> {
+    utils::validate_entry_path(&app_handle, &widget_id, &path)?;
+    let folder_path = utils::get_entry_path(&app_handle, &widget_id, &path);
+    if folder_path.exists() {
+        return Err(format!("Directory '{}' already exists", folder_path.display()));
+    }
+    std::fs::create_dir_all(&folder_path).map_err(|e| {
+        format!("Failed to create directory '{}': {}", folder_path.display(), e)
+    })
+}
+
+#[command]
+pub fn remove_dir<R: Runtime>(
+    app_handle: AppHandle<R>,
+    widget_id: String,
+    path: String,
+) -> Result<(), String> {
+    utils::validate_entry_path(&app_handle, &widget_id, &path)?;
+    let folder_path = utils::get_entry_path(&app_handle, &widget_id, &path);
+    std::fs::remove_dir_all(&folder_path).map_err(|e| {
+        format!("Failed to delete directory '{}': {}", folder_path.display(), e)
+    })
 }
 
 #[cfg(test)]
