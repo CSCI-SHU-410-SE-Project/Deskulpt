@@ -725,7 +725,7 @@ version = "0.0.0"
 dependencies = [
  "anyhow",
  "cargo-llvm-cov",
- "normpath 1.2.0",
+ "normpath",
  "parameterized",
  "parking_lot",
  "path-clean",
@@ -2045,7 +2045,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f9901cb49d7fc923b256db329ee26ffed69130bf05d74b9efdd1875c92d6af01"
 dependencies = [
  "bstr",
- "normpath 1.2.0",
+ "normpath",
  "windows-sys 0.52.0",
 ]
 
@@ -3919,6 +3919,15 @@ dependencies = [
  "futf",
  "mac",
  "utf-8",
+]
+
+[[package]]
+name = "termcolor"
+version = "1.4.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "06794f8f6c5c898b3275aebefa6b8a1cb24cd2c6c79397ab15774837a0bc5755"
+dependencies = [
+ "winapi-util",
 ]
 
 [[package]]
