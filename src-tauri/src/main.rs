@@ -28,10 +28,8 @@ fn main() {
             commands::bundle_widget,
             commands::open_widget_base,
             commands::refresh_widget_collection,
-            // widget_api::dummy::get_dummy_info,
         ])
-        // initialize widget apis
-        .plugin(widget_api::dummy::init())
+        // Initialize widget apis
         .plugin(widget_api::fs::init())
         .run(context)
         .expect("FATAL");
