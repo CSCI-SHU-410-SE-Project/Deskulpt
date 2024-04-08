@@ -59,7 +59,7 @@ pub fn validate_widget_id<R: Runtime>(
     }
 
     // Test if the $widget_base/$widget_id is a **direct** subdirectory of $widget_base
-    if widget_dir_absolute.parent() != Some(&widget_base) {
+    if !widget_dir_absolute.starts_with(&widget_base) {
         if cfg!(debug_assertions) {
             return Err(format!(
                 "Invalid widget ID: '{}'. Widget ID must be a direct subfolder of the widget base directory.\n\twidget_base: '{}'\n\twidget_dir: '{}'",
@@ -105,11 +105,18 @@ pub fn validate_entry_path<R: Runtime>(
     })?;
 
     // Validate if the file is within the widget directory
-    if entry_path_absolute.parent() != Some(&widget_dir) {
-        return Err(format!(
-            "Invalid entry path: '{}'. Entry must be within the widget directory.",
-            path
-        ));
+    if !entry_path_absolute.starts_with(&widget_dir) {
+        if cfg!(debug_assertions) {
+            return Err(format!(
+                "Invalid entry path: '{}'. Entry must be within the widget directory\n\twidget_dir: '{}'\n\tentry_path: '{}'",
+                path, widget_dir.display(), entry_path_absolute.display()
+            ));
+        } else {
+            return Err(format!(
+                "Invalid entry path: '{}'. Entry must be within the widget directory.",
+                path
+            ));
+        }
     }
 
     Ok(())
