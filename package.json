@@ -8,7 +8,9 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "tauri": "tauri",
+    "format": "node ./maint_tools/format.js",
     "lint": "node ./maint_tools/lint.js",
+    "test": "node ./maint_tools/test.js",
     "prepare": "husky"
   },
   "dependencies": {

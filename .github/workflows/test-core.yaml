@@ -1,4 +1,4 @@
-name: Lint Deskulpt core
+name: Test Deskulpt core
 
 on:
   push:
@@ -30,8 +30,6 @@ jobs:
 
       - name: Rust setup
         uses: dtolnay/rust-toolchain@stable
-        with:
-          components: clippy, rustfmt
 
       - name: Rust cache
         uses: swatinem/rust-cache@v2
@@ -47,8 +45,5 @@ jobs:
       - name: Install frontend dependencies
         run: npm install
 
-      - name: Check code formatting
-        run: npm run format
-
-      - name: Check code linting
-        run: npm run lint
+      - name: Run full test suite
+        run: npm run test

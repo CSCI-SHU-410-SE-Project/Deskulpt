@@ -14,34 +14,34 @@ const commandMatrix = {
     check: {
       dir: ".",
       cmd: "npx",
-      args: ["eslint", "--max-warnings=0", "."],
+      args: ["prettier", "--check", "."],
     },
     fix: {
       dir: ".",
       cmd: "npx",
-      args: ["eslint", "--fix", "--max-warnings=0", "."],
+      args: ["prettier", "--write", "."],
     },
   },
   rs: {
     check: {
       dir: "src-tauri",
       cmd: "cargo",
-      args: ["clippy", "--", "-D", "warnings"],
+      args: ["fmt", "--", "--check"],
     },
     fix: {
       dir: "src-tauri",
       cmd: "cargo",
-      args: ["clippy", "--fix", "--allow-dirty", "--allow-staged", "--", "-Dwarnings"],
+      args: ["fmt"],
     },
   },
 };
 
 // Setup the commander
 program
-  .name("lint")
-  .description("Lint the codebase")
+  .name("format")
+  .description("Format the codebase")
   .addArgument(
-    new Argument("[lang]", "The language to lint")
+    new Argument("[lang]", "The language to format")
       .choices(["js", "rs", "all"])
       .default("all"),
   )
