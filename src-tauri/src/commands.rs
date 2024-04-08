@@ -25,7 +25,7 @@ pub(crate) enum CommandOut<T> {
 
 impl<T> CommandOut<T> {
     pub(crate) fn fail<E: Debug>(err: E) -> Self {
-        CommandOut::Failure(format!("{:#?}", err))
+        CommandOut::Failure(format!("{:?}", err))
     }
 }
 
