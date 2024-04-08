@@ -210,7 +210,8 @@ mod tests {
             test_read_error!(
                 widget_dir,
                 vec![ChainReason::Exact(format!(
-                    "Absolute path to an existing directory is expected; got: {widget_dir:?}"
+                    "Absolute path to an existing directory is expected; got: \
+                    {widget_dir:?}"
                 ))]
             );
         }
