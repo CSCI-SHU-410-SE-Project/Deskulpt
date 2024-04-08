@@ -14,6 +14,9 @@ pub(crate) enum ChainReason {
     _Skip,
     /// The error reason should be an IO error with the given kind.
     IOErrorKind(std::io::ErrorKind),
+    /// The error reason should be a serde_json error with the given category and whose
+    /// message matches the given regex if given.
+    SerdeErrorCategory(serde_json::error::Category, Regex),
 }
 
 /// Assert that an [`Error`] object has the expected chain of reasons.
@@ -21,20 +24,38 @@ pub(crate) fn assert_err_eq(error: Error, chain: Vec<ChainReason>) {
     let mut error_chain = error.chain();
     for expected_reason in chain {
         let reason = error_chain.next();
-        assert!(reason.is_some());
+        assert!(reason.is_some(), "Expected more reasons in the error chain");
         let reason = reason.unwrap();
 
         match expected_reason {
-            ChainReason::Exact(msg) => assert_eq!(reason.to_string(), msg),
-            ChainReason::_Match(expr) => assert!(expr.is_match(&reason.to_string())),
+            ChainReason::Exact(msg) => {
+                assert_eq!(reason.to_string(), msg, "Expected reason: {reason:?}")
+            },
+            ChainReason::_Match(expr) => assert!(
+                expr.is_match(&reason.to_string()),
+                "Expected reason: {reason:?}",
+            ),
             ChainReason::_Skip => continue,
             ChainReason::IOErrorKind(kind) => {
                 let io_error = reason.downcast_ref::<std::io::Error>();
-                assert!(io_error.is_some());
+                assert!(io_error.is_some(), "Expected an IO error in the error chain");
                 assert_eq!(io_error.unwrap().kind(), kind);
+            },
+            ChainReason::SerdeErrorCategory(cat, expr) => {
+                let serde_error = reason.downcast_ref::<serde_json::Error>();
+                assert!(
+                    serde_error.is_some(),
+                    "Expected a serde_json error in the error chain",
+                );
+                let serde_error = serde_error.unwrap();
+                assert_eq!(serde_error.classify(), cat);
+                assert!(
+                    expr.is_match(&serde_error.to_string()),
+                    "Expected reason: {reason:?}"
+                );
             },
         }
     }
     // Assert that the chain of reasons ends here
-    assert!(error_chain.next().is_none());
+    assert!(error_chain.next().is_none(), "Expected no more reason in the error chain");
 }
