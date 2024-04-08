@@ -1,0 +1,1 @@
+function MessageInner(){return React.createElement("div",null,"This React component is successfully imported.");}const React=window.__DESKULPT__.defaultDeps.React;function Message(){return React.createElement("div",null,React.createElement(MessageInner,null));}const App={render:()=>React.createElement(Message,null)};export{App as default};

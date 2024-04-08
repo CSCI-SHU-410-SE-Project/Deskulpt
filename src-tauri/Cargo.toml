@@ -11,6 +11,7 @@ tauri-build = { version = "1.5.1", features = ["config-json5"] }
 [dev-dependencies]
 pretty_assertions = "1.4.0"
 parameterized = "2.0.0"
+cargo-llvm-cov = "0.6.9"
 
 [dependencies]
 tauri = { version = "1.6.1", features = ["shell-open", "config-json5"] }
