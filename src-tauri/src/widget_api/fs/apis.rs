@@ -9,7 +9,15 @@ fn get_file_path<R: Runtime>(
     path: &str,
 ) -> PathBuf {
     let widget_base = &app_handle.state::<WidgetBaseDirectoryState>().0;
-    widget_base.join("widgets").join(widget_id).join("storage").join(path)
+    // print out widget base
+    println!("widget_base: {:?}", widget_base);
+    // if storage directory does not exist, create it
+    let widget_dir = widget_base.join(widget_id).join("storage");
+    if !widget_dir.exists() {
+        std::fs::create_dir_all(&widget_dir)
+            .expect("Failed to create widget storage directory");
+    }
+    widget_dir.join(path)
 }
 
 #[command]
@@ -73,12 +81,13 @@ mod tests {
     ) -> (AppHandle<MockRuntime>, tempfile::TempDir) {
         let temp_dir = tempdir().expect("Failed to create a temporary directory");
         let app_dir = temp_dir.path();
+        let widget_base = app_dir.join("widgets");
 
         let app = mock_app();
         let app_handle = app.handle();
-        app_handle.manage(WidgetBaseDirectoryState(app_dir.to_path_buf()));
+        app_handle.manage(WidgetBaseDirectoryState(widget_base.to_path_buf()));
 
-        let widget_dir = app_dir.join("widgets").join(widget_id).join("storage");
+        let widget_dir = widget_base.join(widget_id).join("storage");
         std::fs::create_dir_all(&widget_dir)
             .expect("Failed to create widget storage directory");
 
