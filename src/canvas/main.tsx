@@ -30,8 +30,8 @@ listen("render-widget", (event: TauriEvent<RenderWidgetPayload>) => {
         }
 
         // Early return before rendering if there are known errors in the widget
-        const WidgetClass = module.default;
-        if (WidgetClass === undefined) {
+        const widget = module.default;
+        if (widget === undefined) {
           handleError(
             widgetId,
             widgetDOMRoot,
@@ -41,28 +41,22 @@ listen("render-widget", (event: TauriEvent<RenderWidgetPayload>) => {
           );
           return;
         }
-
-        // const widget = new WidgetClass(widgetId);
-
-        // if (widget.render === undefined || typeof widget.render !== "function") {
-        //   handleError(
-        //     widgetId,
-        //     widgetDOMRoot,
-        //     widgetRecords,
-        //     `Widget (id=${widgetId}) is invalid`,
-        //     "The object exported by the widget entry file does not have a `render` " +
-        //       "key, or the `render` key does not correspond to a function.",
-        //   );
-        //   return;
-        // }
+        if (widget.render === undefined || typeof widget.render !== "function") {
+          handleError(
+            widgetId,
+            widgetDOMRoot,
+            widgetRecords,
+            `Widget (id=${widgetId}) is invalid`,
+            "The object exported by the widget entry file does not have a `render` " +
+              "key, or the `render` key does not correspond to a function.",
+          );
+          return;
+        }
 
         // Try rendering the widget, otherwise render the error information
         try {
           widgetDOMRoot.react.render(
-            // <WidgetContainer id={widgetId} inner={widget.render()} />,
-            <WidgetContainer id={widgetId}>
-              <WidgetClass id={widgetId} />
-            </WidgetContainer>,
+            <WidgetContainer id={widgetId} inner={widget.render()} />,
           );
         } catch (err) {
           handleError(

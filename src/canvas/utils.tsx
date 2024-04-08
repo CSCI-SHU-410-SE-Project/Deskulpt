@@ -48,9 +48,10 @@ export function handleError(
 ) {
   try {
     widgetDOMRoot.react.render(
-      <WidgetContainer id={widgetId}>
-        <ErrorDisplay title={title} error={error} />
-      </WidgetContainer>,
+      <WidgetContainer
+        id={widgetId}
+        inner={<ErrorDisplay title={title} error={error} />}
+      />,
     );
     widgetRecords[widgetId] = { root: widgetDOMRoot, error: true };
     return true;
