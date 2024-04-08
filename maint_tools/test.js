@@ -4,8 +4,6 @@ import { fileURLToPath } from "url";
 import spawn from "cross-spawn";
 import chalk from "chalk";
 
-import { logError, logContent } from "./utils.js";
-
 const program = new Command();
 const basedir = join(fileURLToPath(new URL(".", import.meta.url)), "..");
 
@@ -33,55 +31,51 @@ program
       .choices(["rs", "all"])
       .default("all"),
   )
-  .option("--jstests [name...]", "Run only matching jest tests")
-  .option("--rstests [name...]", "Run only matching rust tests")
-  .option("-c, --cov", "Check code coverage")
-  .option("-s, --suppress", "Suppress stdout and stderr when no errors")
+  .option("--rs [name...]", "Run only matching cargo tests")
   .action((lang, options) => {
     const langs = lang === "all" ? ["rs"] : [lang];
 
-    let anyErrors = false;
+    let anyError = false;
     langs.map((lang) => {
       const { dir, cmd, args } = commandMatrix[lang][options.cov ? "cov" : "run"];
       const cwd = join(basedir, dir);
 
-      let newArgs = args.slice();
-      if (lang == "rs") {
-        newArgs = args.concat(options.rstests || []);
-      }
+      // Concatenate test pattern specifications to the command
+      const newArgs = [...args, ...(options[lang] || [])];
 
       // Print the current job information
-      console.log(chalk.blue.underline(`${lang}`));
-      console.log(`  ${chalk.blue("cmd")} : ${cmd} ${newArgs.join(" ")}`);
-      console.log(`  ${chalk.blue("cwd")} : ${cwd}`);
+      console.log(chalk.blue.underline(`Testing for lang=${lang}`));
+      console.log(chalk.blue(">>>"), cmd, newArgs.join(" "));
+      console.log(chalk.blue(">>>"), cwd);
       console.log();
 
       try {
-        const { stdout, stderr, status, error } = spawn.sync(cmd, newArgs, {
-          cwd: cwd,
-        });
+        const { status, error } = spawn.sync(cmd, args, { cwd: cwd, stdio: "inherit" });
+
         if (error) {
-          // Unexpected error
-          logError("FATAL: process failed", error);
-          anyErrors = true;
+          anyError = true;
+          console.log("\u274C", chalk.red(error.toString()));
         } else if (status != 0) {
-          // Most likely a linting error
-          logError(`Failed with status code ${status}`, null);
-          logContent(stdout, stderr);
-          anyErrors = true;
-        } else if (!options.suppress) {
-          // No errors and log not suppressed
-          logContent(stdout, stderr);
+          anyError = true;
+          console.log(
+            "\u274C",
+            chalk.red.underline(`[lang=${lang}] Testing failed with status=${status}`),
+          );
+        } else {
+          console.log(
+            "\u2705",
+            chalk.green.underline(`[lang=${lang}] All tests passed!`),
+          );
         }
       } catch (err) {
-        // Unexpected error
-        logError(err);
-        anyErrors = true;
+        anyError = true;
+        console.log("\u274C", chalk.red(err.toString()));
       }
+      console.log();
     });
 
     // Exit with error code if errors were found; this is useful for CI/CD pipelines
-    if (anyErrors) {
+    if (anyError) {
       process.exit(1);
     }
   });
