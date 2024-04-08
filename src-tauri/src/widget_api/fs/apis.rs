@@ -9,8 +9,6 @@ fn get_file_path<R: Runtime>(
     path: &str,
 ) -> PathBuf {
     let widget_base = &app_handle.state::<WidgetBaseDirectoryState>().0;
-    // print out widget base
-    println!("widget_base: {:?}", widget_base);
     // if storage directory does not exist, create it
     let widget_dir = widget_base.join(widget_id).join("storage");
     if !widget_dir.exists() {
