@@ -371,7 +371,7 @@ mod tests {
         let mut error_chain = error.chain();
         for expected_msg in chain {
             let reason = error_chain.next().expect("Expected more reasons");
-            assert_eq!(format!("{reason}"), expected_msg, "{reason:?}");
+            assert_eq!(format!("{reason}"), expected_msg, "{error:?}");
         }
         // Assert that the chain of reasons ends here
         assert_eq!(error_chain.next().map(|msg| format!("{msg}")), None);
