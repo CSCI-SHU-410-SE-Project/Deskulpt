@@ -1,17 +1,42 @@
-use crate::states::WidgetBaseDirectoryState;
 use std::io::Write;
-use std::path::PathBuf;
-use tauri::{command, AppHandle, Manager, Runtime};
+
+use tauri::{command, AppHandle, InvokeError, Runtime};
 
 use crate::widget_api::fs::utils;
+
+use anyhow::Context;
+
+// TODO: (Future) Write formatted string to files (now there is no way to break new lines)
+// TODO: (Future) Write auto-generated unittests to cover more corner cases
+
+// fn bar(flag: bool) -> AnyhowResult<String, AnyhowError> {
+//     if flag {
+//         Ok("OK".to_string())
+//     } else {
+//         Err(AnyhowError::msg("Not OK"))
+//     }
+// }
+
+// #[command]
+// pub fn foo<R: Runtime>(
+//     app_handle: AppHandle<R>,
+//     widget_id: String,
+//     flag: bool,
+// ) -> Result<String, InvokeError> {
+//     bar(flag)
+//         .context("Failed to call bar in foo")
+//         .map_err(InvokeError::from_anyhow)
+// }
 
 #[command]
 pub fn exists<R: Runtime>(
     app_handle: AppHandle<R>,
     widget_id: String,
     path: String,
-) -> Result<bool, String> {
-    utils::validate_entry_path(&app_handle, &widget_id, &path)?;
+) -> Result<bool, InvokeError> {
+    utils::validate_entry_path(&app_handle, &widget_id, &path)
+        .context("Failed to validate entry path")
+        .map_err(InvokeError::from_anyhow)?;
     let file_path = utils::get_entry_path(&app_handle, &widget_id, &path);
     Ok(file_path.exists())
 }
@@ -23,8 +48,10 @@ pub fn is_file<R: Runtime>(
     app_handle: AppHandle<R>,
     widget_id: String,
     path: String,
-) -> Result<bool, String> {
-    utils::validate_entry_path(&app_handle, &widget_id, &path)?;
+) -> Result<bool, InvokeError> {
+    utils::validate_entry_path(&app_handle, &widget_id, &path)
+        .context("Failed to validate entry path")
+        .map_err(InvokeError::from_anyhow)?;
     let file_path = utils::get_entry_path(&app_handle, &widget_id, &path);
     Ok(file_path.is_file())
 }
@@ -34,8 +61,10 @@ pub fn is_dir<R: Runtime>(
     app_handle: AppHandle<R>,
     widget_id: String,
     path: String,
-) -> Result<bool, String> {
-    utils::validate_entry_path(&app_handle, &widget_id, &path)?;
+) -> Result<bool, InvokeError> {
+    utils::validate_entry_path(&app_handle, &widget_id, &path)
+        .context("Failed to validate entry path")
+        .map_err(InvokeError::from_anyhow)?;
     let file_path = utils::get_entry_path(&app_handle, &widget_id, &path);
     Ok(file_path.is_dir())
 }
@@ -45,15 +74,21 @@ pub fn read_file<R: Runtime>(
     app_handle: AppHandle<R>,
     widget_id: String,
     path: String,
-) -> Result<String, String> {
-    utils::validate_entry_path(&app_handle, &widget_id, &path)?;
+) -> Result<String, InvokeError> {
+    utils::validate_entry_path(&app_handle, &widget_id, &path)
+        .context("Failed to validate entry path")
+        .map_err(InvokeError::from_anyhow)?;
     let file_path = utils::get_entry_path(&app_handle, &widget_id, &path);
     if !file_path.is_file() {
-        return Err(format!("Path '{}' is not a file", file_path.display()));
+        return Err(InvokeError::from(format!(
+            "Path '{}' is not a file",
+            file_path.display()
+        )));
     }
 
     std::fs::read_to_string(&file_path)
-        .map_err(|e| format!("Failed to read file '{}': {}", file_path.display(), e))
+        .context(format!("Failed to read file '{}'", file_path.display()))
+        .map_err(InvokeError::from_anyhow)
 }
 
 #[command]
@@ -62,11 +97,14 @@ pub fn write_file<R: Runtime>(
     widget_id: String,
     path: String,
     content: String,
-) -> Result<(), String> {
-    utils::validate_entry_path(&app_handle, &widget_id, &path)?;
+) -> Result<(), InvokeError> {
+    utils::validate_entry_path(&app_handle, &widget_id, &path)
+        .context("Failed to validate entry path")
+        .map_err(InvokeError::from_anyhow)?;
     let file_path = utils::get_entry_path(&app_handle, &widget_id, &path);
     std::fs::write(&file_path, content)
-        .map_err(|e| format!("Failed to write file '{}': {}", file_path.display(), e))
+        .context(format!("Failed to write file '{}'", file_path.display()))
+        .map_err(InvokeError::from_anyhow)
 }
 
 #[command]
@@ -75,15 +113,18 @@ pub fn append_file<R: Runtime>(
     widget_id: String,
     path: String,
     content: String,
-) -> Result<(), String> {
-    utils::validate_entry_path(&app_handle, &widget_id, &path)?;
+) -> Result<(), InvokeError> {
+    utils::validate_entry_path(&app_handle, &widget_id, &path)
+        .context("Failed to validate entry path")
+        .map_err(InvokeError::from_anyhow)?;
     let file_path = utils::get_entry_path(&app_handle, &widget_id, &path);
     std::fs::OpenOptions::new()
         .append(true)
         .create(true)
         .open(&file_path)
         .and_then(|mut file| file.write_all(content.as_bytes()))
-        .map_err(|e| format!("Failed to append file '{}': {}", file_path.display(), e))
+        .context(format!("Failed to append file '{}'", file_path.display()))
+        .map_err(InvokeError::from_anyhow)
 }
 
 #[command]
@@ -91,14 +132,20 @@ pub fn remove_file<R: Runtime>(
     app_handle: AppHandle<R>,
     widget_id: String,
     path: String,
-) -> Result<(), String> {
-    utils::validate_entry_path(&app_handle, &widget_id, &path)?;
+) -> Result<(), InvokeError> {
+    utils::validate_entry_path(&app_handle, &widget_id, &path)
+        .context("Failed to validate entry path")
+        .map_err(InvokeError::from_anyhow)?;
     let file_path = utils::get_entry_path(&app_handle, &widget_id, &path);
     if !file_path.is_file() {
-        return Err(format!("Path '{}' is not a file", file_path.display()));
+        return Err(InvokeError::from(format!(
+            "Path '{}' is not a file",
+            file_path.display()
+        )));
     }
     std::fs::remove_file(&file_path)
-        .map_err(|e| format!("Failed to delete file '{}': {}", file_path.display(), e))
+        .context(format!("Failed to delete file '{}'", file_path.display()))
+        .map_err(InvokeError::from_anyhow)
 }
 
 #[command]
@@ -106,15 +153,23 @@ pub fn create_dir<R: Runtime>(
     app_handle: AppHandle<R>,
     widget_id: String,
     path: String,
-) -> Result<(), String> {
-    utils::validate_entry_path(&app_handle, &widget_id, &path)?;
+) -> Result<(), InvokeError> {
+    utils::validate_entry_path(&app_handle, &widget_id, &path)
+        .context("Failed to validate entry path")
+        .map_err(InvokeError::from_anyhow)?;
     let folder_path = utils::get_entry_path(&app_handle, &widget_id, &path);
     if folder_path.exists() {
-        return Err(format!("Directory '{}' already exists", folder_path.display()));
+        return Err(InvokeError::from(format!(
+            "Directory '{}' already exists",
+            folder_path.display()
+        )));
     }
-    std::fs::create_dir_all(&folder_path).map_err(|e| {
-        format!("Failed to create directory '{}': {}", folder_path.display(), e)
-    })
+    std::fs::create_dir_all(&folder_path)
+    // .map_err(|e| {
+    //     format!("Failed to create directory '{}': {}", folder_path.display(), e)
+    // })
+        .context(format!("Failed to create directory '{}'", folder_path.display()))
+        .map_err(InvokeError::from_anyhow)
 }
 
 #[command]
@@ -122,20 +177,28 @@ pub fn remove_dir<R: Runtime>(
     app_handle: AppHandle<R>,
     widget_id: String,
     path: String,
-) -> Result<(), String> {
-    utils::validate_entry_path(&app_handle, &widget_id, &path)?;
+) -> Result<(), InvokeError> {
+    utils::validate_entry_path(&app_handle, &widget_id, &path)
+        .context("Failed to validate entry path")
+        .map_err(InvokeError::from_anyhow)?;
     let folder_path = utils::get_entry_path(&app_handle, &widget_id, &path);
-    std::fs::remove_dir_all(&folder_path).map_err(|e| {
-        format!("Failed to delete directory '{}': {}", folder_path.display(), e)
-    })
+    std::fs::remove_dir_all(&folder_path)
+    // .map_err(|e| {
+    //     format!("Failed to delete directory '{}': {}", folder_path.display(), e)
+    // })
+        .context(format!("Failed to delete directory '{}'", folder_path.display()))
+        .map_err(InvokeError::from_anyhow)
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::states::WidgetBaseDirectoryState;
     use std::fs::{self, File};
     use std::io::Write;
+    use std::path::PathBuf;
     use tauri::test::{mock_app, MockRuntime};
+    use tauri::Manager;
     use tempfile::tempdir;
 
     fn setup_base_environment() -> (AppHandle<MockRuntime>, PathBuf, tempfile::TempDir)
@@ -258,8 +321,8 @@ mod tests {
             read_file(app_handle.clone(), widget_id.to_string(), file_name.to_string());
         assert!(
             result.is_ok(),
-            "Reading an existing file should succeed: {}",
-            result.unwrap_err()
+            "Reading an existing file should succeed: {:?}",
+            result
         );
         let content = result.unwrap();
         assert_eq!(content, file_content, "File content should match");
@@ -283,8 +346,8 @@ mod tests {
         );
         assert!(
             result.is_ok(),
-            "Reading an existing sub file should succeed: {}",
-            result.unwrap_err()
+            "Reading an existing sub file should succeed: {:?}",
+            result
         );
         let content = result.unwrap();
         assert_eq!(content, sub_file_content, "Sub file content should match");
@@ -297,7 +360,7 @@ mod tests {
             non_existent_file.to_string(),
         );
         assert!(result.is_err(), "Reading a non-existent file should return an error");
-        println!("Error message: {}", result.unwrap_err());
+        println!("Error message: {:?}", result);
 
         // Test for reading a nonexisting file outside widget dir whose path contains relative path components
         let relative_outside_nonexistent_file = "../non_existent_file.txt";
@@ -310,7 +373,7 @@ mod tests {
             result.is_err(),
             "Reading a non-existent file outside widget dir should return an error"
         );
-        println!("Error message: {}", result.unwrap_err());
+        println!("Error message: {:?}", result);
 
         // Test for reading a existing file outside widget dir whose path contains relative path components
         let relative_outside_existing_file = "../test_file.txt";
@@ -330,7 +393,7 @@ mod tests {
             result.is_err(),
             "Reading a file outside widget dir should return an error"
         );
-        println!("Error message: {}", result.unwrap_err());
+        println!("Error message: {:?}", result);
     }
 
     #[test]
@@ -404,11 +467,7 @@ mod tests {
 
         let result =
             create_dir(app_handle, widget_id.to_string(), dir_name.to_string());
-        assert!(
-            result.is_ok(),
-            "Creating a directory should succeed: {}",
-            result.unwrap_err()
-        );
+        assert!(result.is_ok(), "Creating a directory should succeed: {:?}", result);
         assert!(widget_base.join(widget_id).join(dir_name).is_dir());
     }
 
