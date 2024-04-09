@@ -361,7 +361,10 @@ mod tests {
     use super::*;
     use parameterized::parameterized;
     use pretty_assertions::assert_eq;
-    use std::fs::read_to_string;
+    use std::{
+        fs::{read_to_string, remove_file, File},
+        io::Write,
+    };
 
     /// Assert that an [`Error`] object has the expected chain of reasons.
     fn assert_err_eq(error: Error, chain: Vec<String>) {
@@ -403,27 +406,36 @@ mod tests {
     #[test]
     fn test_bundle_absolute_import_error() {
         // Test that we do not allow absolute path import
-        #[cfg(windows)]
-        let (test_case, import_path) = (
-            "tests/fixtures/bundler/import_absolute_win/input",
-            "C:/Users/username/script.js",
-        );
-        #[cfg(not(windows))]
-        let (test_case, import_path) =
-            ("tests/fixtures/bundler/import_absolute_unix/input", "/usr/bin/script.js");
-
-        let root = Path::new(test_case).canonicalize().unwrap();
+        let root = Path::new("tests/fixtures/bundler/import_absolute/input")
+            .canonicalize()
+            .unwrap();
         let entry = root.join("index.jsx");
-        let error = bundle(&root, &entry, None).expect_err("Expected bundling error");
 
+        // We need to write the entry file here because absolute paths cannot be
+        // determined statically
+        let import_file = root.join("utils.js");
+        {
+            let mut entry_file = File::create(&entry).unwrap();
+            // Debug print of the import path will automatically include the quotes
+            writeln!(entry_file, "import foo from {import_file:?};").unwrap();
+        }
+
+        let error = bundle(&root, &entry, None).expect_err("Expected bundling error");
         let expected = vec![
             "load_transformed failed".to_string(),
             "failed to analyze module".to_string(),
-            format!("failed to resolve {import_path} from {}", entry.to_string_lossy()),
+            format!(
+                "failed to resolve {} from {}",
+                import_file.to_string_lossy(),
+                entry.to_string_lossy()
+            ),
             "Absolute imports are not supported; use relative imports instead"
                 .to_string(),
         ];
         assert_err_eq(error, expected);
+
+        // Clean up the entry file
+        remove_file(&entry).unwrap();
     }
 
     #[test]
