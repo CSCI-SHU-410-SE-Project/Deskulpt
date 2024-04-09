@@ -31,9 +31,6 @@ use swc_ecma_transforms_react::jsx;
 use swc_ecma_visit::FoldWith;
 use tempfile::NamedTempFile;
 
-#[cfg(windows)]
-use normpath::BasePath;
-
 /// The file extensions to try when an import is given without an extension
 static EXTENSIONS: &[&str] = &["js", "jsx", "ts", "tsx"];
 
@@ -215,12 +212,25 @@ struct PathResolver {
 }
 
 impl PathResolver {
-    /// Wrap a resolved module path if specified, otherwise raise an error.
+    /// Wrap a resolved module path.
+    ///
+    /// It will return an error if the resolved path is `None` or if the resolved path
+    /// goes beyond the root path.
     fn wrap(&self, path: Option<PathBuf>) -> Result<FileName, Error> {
-        if let Some(path) = path {
-            return Ok(FileName::Real(path.clean()));
+        if path.is_none() {
+            bail!("File resolution failed");
         }
-        bail!("File resolution failed")
+        let path = path.unwrap();
+
+        // Reject imports that go beyond the root path
+        if !path.starts_with(&self.root) {
+            bail!(
+                "Relative imports should not go beyond the root {}",
+                self.root.to_string_lossy()
+            );
+        }
+
+        Ok(FileName::Real(path.clean()))
     }
 
     // Resolve a path as a file; if `path` refers to a file then it is directly
@@ -248,7 +258,7 @@ impl PathResolver {
                 }
             }
         }
-        bail!("File resolution failed: {:?}", path)
+        bail!("Failed to resolve as file");
     }
 
     /// Resolve a path as a directory.
@@ -294,30 +304,8 @@ impl PathResolver {
         // we support only relative import among these types
         let mut components = spec_path.components();
         if let Some(Component::CurDir | Component::ParentDir) = components.next() {
-            // Workaround for the fs::canonicalize issue on Windows; normalization is
-            // usually a better choice unless one specifically needs a canonical path;
-            // note that `normalize_virtually` is an equivalent of `normalize` without
-            // accessing the file system
-            #[cfg(windows)]
-            let path = {
-                let base_dir = BasePath::new(base_dir).unwrap();
-                base_dir
-                    .join(module_specifier)
-                    .normalize_virtually()
-                    .unwrap()
-                    .into_path_buf()
-            };
-            // Perform a simple join on Unix-like systems; as mentioned canonicalization
-            // is not preferred but Rust does not provide a better alternative, and
-            // Unix-like systems do not provide canonicalization functionality without
-            // file system access
-            #[cfg(not(windows))]
             let path = base_dir.join(module_specifier);
-
-            // Reject paths that go beyond the root
-            if !path.starts_with(&self.root) {
-                bail!("Relative imports should not go beyond the root {:?}", self.root);
-            }
+            let path = path.clean(); // Virtual normalization
 
             return self
                 .resolve_as_file(&path)
@@ -449,7 +437,10 @@ mod tests {
             "load_transformed failed".to_string(),
             "failed to analyze module".to_string(),
             format!("failed to resolve ../../dummy from {}", entry.to_string_lossy()),
-            format!("Relative imports should not go beyond the root {root:?}"),
+            format!(
+                "Relative imports should not go beyond the root {}",
+                root.to_string_lossy()
+            ),
         ];
         assert_err_eq(error, expected);
     }
