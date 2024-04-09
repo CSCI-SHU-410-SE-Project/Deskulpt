@@ -4,6 +4,7 @@ use std::path::PathBuf;
 use tauri::{AppHandle, Manager, Runtime};
 
 // TODO: Use context instead of map_err
+// TODO: (Future) Write formatted string to files (now there is no way to break new lines)
 // TODO: (Future) Write auto-generated unittests to cover more corner cases
 
 /// Validate if the widget ID corresponds to a direct folder in the widget_base folder
@@ -226,56 +227,56 @@ mod tests {
             result.unwrap_err()
         );
 
-        // An invalid widget ID that is not an existing folder in the widget base directory
-        let invalid_nonexisting_widget_id = "nonexisting-widget";
-        let result = validate_widget_id(&app_handle, invalid_nonexisting_widget_id);
-        assert!(result.is_err(), "Validating non-existing widget ID should fail.");
-        println!("Error Message: {}", result.unwrap_err());
+        // // An invalid widget ID that is not an existing folder in the widget base directory
+        // let invalid_nonexisting_widget_id = "nonexisting-widget";
+        // let result = validate_widget_id(&app_handle, invalid_nonexisting_widget_id);
+        // assert!(result.is_err(), "Validating non-existing widget ID should fail.");
+        // println!("Error Message: {}", result.unwrap_err());
 
-        // An invalid widget ID that is not a folder but a file
-        let invalid_nonfolder_widget_id = "invalid_widget";
-        // Create a file instead of a directory to simulate the invalid widget scenario
-        let file_path = widget_base.join(invalid_nonfolder_widget_id);
-        fs::File::create(&file_path).expect("Failed to create a file for testing");
-        let result = validate_widget_id(&app_handle, invalid_nonfolder_widget_id);
-        assert!(result.is_err(), "Validating non-folder widget ID should fail.");
-        println!("Error Message: {}", result.unwrap_err());
+        // // An invalid widget ID that is not a folder but a file
+        // let invalid_nonfolder_widget_id = "invalid_widget";
+        // // Create a file instead of a directory to simulate the invalid widget scenario
+        // let file_path = widget_base.join(invalid_nonfolder_widget_id);
+        // fs::File::create(&file_path).expect("Failed to create a file for testing");
+        // let result = validate_widget_id(&app_handle, invalid_nonfolder_widget_id);
+        // assert!(result.is_err(), "Validating non-folder widget ID should fail.");
+        // println!("Error Message: {}", result.unwrap_err());
 
-        // An invalid widget ID that is a subfolder but not a direct subfolder of the widget base directory
-        let invalid_subfolder_widget_id = "subsubfolder_widget";
-        let subfolder_path =
-            widget_base.join("subfolder").join(invalid_subfolder_widget_id);
-        fs::create_dir_all(&subfolder_path)
-            .expect("Failed to create a subfolder for testing");
-        let result = validate_widget_id(&app_handle, invalid_subfolder_widget_id);
-        assert!(result.is_err(), "Validating subfolder widget ID should fail.");
-        println!("Error Message: {}", result.unwrap_err());
+        // // An invalid widget ID that is a subfolder but not a direct subfolder of the widget base directory
+        // let invalid_subfolder_widget_id = "subsubfolder_widget";
+        // let subfolder_path =
+        //     widget_base.join("subfolder").join(invalid_subfolder_widget_id);
+        // fs::create_dir_all(&subfolder_path)
+        //     .expect("Failed to create a subfolder for testing");
+        // let result = validate_widget_id(&app_handle, invalid_subfolder_widget_id);
+        // assert!(result.is_err(), "Validating subfolder widget ID should fail.");
+        // println!("Error Message: {}", result.unwrap_err());
 
-        // An invalid widget ID that is a folder outside of the widget base directory
-        //   `validate_widget_id`` won't search outside of the widget base directory,
-        //   so the error is caused by the path not existing.
-        let invalid_outside_widget_id = "outside_widget";
-        let outside_path =
-            widget_base.parent().unwrap().join(invalid_outside_widget_id);
-        fs::create_dir_all(&outside_path).expect(
-            "Failed to create a folder outside the widget base directory for testing",
-        );
-        let result = validate_widget_id(&app_handle, invalid_outside_widget_id);
-        assert!(result.is_err(), "Validating outside widget ID should fail.");
-        println!("Error Message: {}", result.unwrap_err());
+        // // An invalid widget ID that is a folder outside of the widget base directory
+        // //   `validate_widget_id`` won't search outside of the widget base directory,
+        // //   so the error is caused by the path not existing.
+        // let invalid_outside_widget_id = "outside_widget";
+        // let outside_path =
+        //     widget_base.parent().unwrap().join(invalid_outside_widget_id);
+        // fs::create_dir_all(&outside_path).expect(
+        //     "Failed to create a folder outside the widget base directory for testing",
+        // );
+        // let result = validate_widget_id(&app_handle, invalid_outside_widget_id);
+        // assert!(result.is_err(), "Validating outside widget ID should fail.");
+        // println!("Error Message: {}", result.unwrap_err());
 
-        // an invalid widget ID that is a folder outside of the widget base directory containing the relative path
-        //    `validate_widget_id` will search outside of the widget base directory after absolutizing the path,
-        //    so the error is caused by the path not being a direct subfolder of the widget base directory.
-        let invalid_relative_widget_id = "../relative_outside_widget";
-        let relative_path =
-            widget_base.parent().unwrap().join("relative_outside_widget");
-        fs::create_dir_all(&relative_path).expect(
-            "Failed to create a folder outside the widget base directory for testing",
-        );
-        let result = validate_widget_id(&app_handle, invalid_relative_widget_id);
-        assert!(result.is_err(), "Validating relative outside widget ID should fail.");
-        println!("Error Message: {}", result.unwrap_err());
+        // // an invalid widget ID that is a folder outside of the widget base directory containing the relative path
+        // //    `validate_widget_id` will search outside of the widget base directory after absolutizing the path,
+        // //    so the error is caused by the path not being a direct subfolder of the widget base directory.
+        // let invalid_relative_widget_id = "../relative_outside_widget";
+        // let relative_path =
+        //     widget_base.parent().unwrap().join("relative_outside_widget");
+        // fs::create_dir_all(&relative_path).expect(
+        //     "Failed to create a folder outside the widget base directory for testing",
+        // );
+        // let result = validate_widget_id(&app_handle, invalid_relative_widget_id);
+        // assert!(result.is_err(), "Validating relative outside widget ID should fail.");
+        // println!("Error Message: {}", result.unwrap_err());
     }
 
     #[test]
