@@ -370,10 +370,8 @@ mod tests {
     fn assert_err_eq(error: Error, chain: Vec<String>) {
         let mut error_chain = error.chain();
         for expected_msg in chain {
-            assert_eq!(
-                error_chain.next().map(|msg| format!("{msg}")),
-                Some(expected_msg)
-            );
+            let reason = error_chain.next().expect("Expected more reasons");
+            assert_eq!(format!("{reason}"), expected_msg, "{expected_msg:?}");
         }
         // Assert that the chain of reasons ends here
         assert_eq!(error_chain.next().map(|msg| format!("{msg}")), None);
