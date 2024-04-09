@@ -403,15 +403,23 @@ mod tests {
     #[test]
     fn test_bundle_absolute_import_error() {
         // Test that we do not allow absolute path import
-        let root_path = "tests/fixtures/bundler/import_absolute/input";
-        let root = PathBuf::from(root_path);
-        let error = bundle(&root, root.join("index.jsx").as_path(), None)
-            .expect_err("Expected an error");
+        #[cfg(windows)]
+        let (test_case, import_path) = (
+            "tests/fixtures/bundler/import_absolute_win/input",
+            "C:/Users/username/script.js",
+        );
+        #[cfg(not(windows))]
+        let (test_case, import_path) =
+            ("tests/fixtures/bundler/import_absolute_unix/input", "/usr/bin/script.js");
+
+        let root = Path::new(test_case).canonicalize().unwrap();
+        let entry = root.join("index.jsx");
+        let error = bundle(&root, &entry, None).expect_err("Expected bundling error");
 
         let expected = vec![
             "load_transformed failed".to_string(),
             "failed to analyze module".to_string(),
-            format!("failed to resolve /usr/bin/script.js from {root_path}/index.jsx"),
+            format!("failed to resolve {import_path} from {}", entry.to_string_lossy()),
             "Absolute imports are not supported; use relative imports instead"
                 .to_string(),
         ];
@@ -421,17 +429,20 @@ mod tests {
     #[test]
     fn test_bundle_beyond_root_error() {
         // Test that we do not allow relative import that goes beyond the root path
-        let root_path = "tests/fixtures/bundler/import_beyond_root/input";
-        let root = PathBuf::from(root_path);
-        let error = bundle(&root, root.join("index.jsx").as_path(), None)
-            .expect_err("Expected an error");
-        let abs_root = root.canonicalize().unwrap();
+        let root = Path::new("tests/fixtures/bundler/import_beyond_root/input")
+            .canonicalize()
+            .unwrap();
+        let entry = root.join("index.jsx");
+        let error = bundle(&root, &entry, None).expect_err("Expected bundling error");
 
         let expected = vec![
             "load_transformed failed".to_string(),
             "failed to analyze module".to_string(),
-            format!("failed to resolve ../../../dummy from {root_path}/index.jsx"),
-            format!("Relative imports should not go beyond the root {abs_root:?}"),
+            format!(
+                "failed to resolve ../../../dummy from {}",
+                entry.to_string_lossy()
+            ),
+            format!("Relative imports should not go beyond the root {root:?}"),
         ];
         assert_err_eq(error, expected);
     }
