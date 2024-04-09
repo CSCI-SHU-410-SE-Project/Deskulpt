@@ -12,10 +12,15 @@ pub(crate) enum ChainReason {
     _Match(Regex),
     /// Skip this reason.
     _Skip,
-    /// The error reason should be an IO error with the given kind.
-    IOErrorKind(std::io::ErrorKind),
-    /// The error reason should be a serde_json error with the given category and whose
-    /// message matches the given regex if given.
+    /// The error reason should be an IO error.
+    ///
+    /// It can wrap the expected kind of IO error, or specify `None` to skip the step of
+    /// checking the error kind.
+    IOErrorKind(Option<std::io::ErrorKind>),
+    /// The error reason should be a `serde_json` error.
+    ///
+    /// It wraps the expected category of the error and a regular expression that the
+    /// error message should match.
     SerdeErrorCategory(serde_json::error::Category, Regex),
 }
 
@@ -39,7 +44,9 @@ pub(crate) fn assert_err_eq(error: Error, chain: Vec<ChainReason>) {
             ChainReason::IOErrorKind(kind) => {
                 let io_error = reason.downcast_ref::<std::io::Error>();
                 assert!(io_error.is_some(), "Expected an IO error in the error chain");
-                assert_eq!(io_error.unwrap().kind(), kind);
+                if let Some(kind) = kind {
+                    assert_eq!(io_error.unwrap().kind(), kind);
+                }
             },
             ChainReason::SerdeErrorCategory(cat, expr) => {
                 let serde_error = reason.downcast_ref::<serde_json::Error>();

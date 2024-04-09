@@ -224,7 +224,7 @@ mod tests {
             Path::new("tests/fixtures/config/conf_not_file").canonicalize().unwrap(),
             vec![
                 ChainReason::Exact("Failed to read deskulpt.conf.json".to_string()),
-                ChainReason::IOErrorKind(std::io::ErrorKind::PermissionDenied),
+                ChainReason::IOErrorKind(None), // Different kinds across platforms
             ]
         );
     }
@@ -277,7 +277,7 @@ mod tests {
                 .unwrap(),
             vec![
                 ChainReason::Exact("Failed to read package.json".to_string()),
-                ChainReason::IOErrorKind(std::io::ErrorKind::PermissionDenied),
+                ChainReason::IOErrorKind(None), // Different kinds across platforms
             ]
         );
     }
