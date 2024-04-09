@@ -448,10 +448,7 @@ mod tests {
         let expected = vec![
             "load_transformed failed".to_string(),
             "failed to analyze module".to_string(),
-            format!(
-                "failed to resolve ../../../dummy from {}",
-                entry.to_string_lossy()
-            ),
+            format!("failed to resolve ../../dummy from {}", entry.to_string_lossy()),
             format!("Relative imports should not go beyond the root {root:?}"),
         ];
         assert_err_eq(error, expected);
