@@ -55,10 +55,10 @@ pub(crate) struct PackageJson {
 /// file in the given widget directory `path`.
 ///
 /// If widget configuration is loaded successfully, it will return `Ok(Some(config))`.
-/// If the directory should not be treated as a widget, it will return `Ok(None)`. Any
-/// failure to load the configuration will return an error.
+/// If the directory does not represent a widget that is meant to be rendered, it will
+/// return `Ok(None)`. Any failure to load the configuration will return an error.
 ///
-/// The cases where a directory should not be treated as a widget include:
+/// The cases where a directory is not meant to be rendered include:
 /// - `deskulpt.conf.json` is not found.
 /// - The `ignore` flag in `deskulpt.conf.json` is set to `true`.
 pub(crate) fn read_widget_config(path: &Path) -> Result<Option<WidgetConfig>, Error> {
