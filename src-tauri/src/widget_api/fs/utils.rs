@@ -1,10 +1,9 @@
 use crate::states::WidgetBaseDirectoryState;
 use anyhow::{bail, Context, Error};
-use path_absolutize::Absolutize;
+use path_clean::{clean, PathClean};
 use std::path::PathBuf;
 use tauri::{AppHandle, Manager, Runtime};
 
-// TODO: try absolutization from `path-clean``
 // TODO: (Future) Write auto-generated unittests to cover more corner cases
 
 /// Validate if the widget ID corresponds to a direct folder in the widget_base folder
@@ -15,28 +14,23 @@ pub fn validate_widget_id<R: Runtime>(
     app_handle: &AppHandle<R>,
     widget_id: &str,
 ) -> Result<(), Error> {
-    // Error messages should be generic and not contain any specific information
-    // to prevent information leakage.
-    // let error_msg = format!(
-    //     "Invalid widget ID: '{}'. Widget ID must correspond to a folder in the widget base directory.",
-    //     widget_id
-    // );
-
     let widget_base = get_widget_base(app_handle);
     let widget_dir = get_widget_dir(app_handle, widget_id);
     // If canonicalized() is used, and the app runs on Windows, the long path prefix "\\?\" will be added
     // to the path, which may cause issues with path comparisons.
-    let widget_dir_absolute = widget_dir.absolutize().map_err(|e| {
-        Error::msg(format!("Failed to get absolute path of widget directory: {}", e))
-    })?;
-    if !widget_dir_absolute.exists() {
+    let widget_base_clean = PathBuf::from(widget_base).clean();
+    let widget_dir_clean = PathBuf::from(widget_dir).clean();
+
+    // Error messages should be generic and not contain any specific information
+    // to prevent information leakage.
+    if !widget_dir_clean.exists() {
         bail!("Invalid widget ID: '{}'. Widget ID must correspond to an existing folder in the widget base directory.", widget_id);
     }
 
-    // Test
-    // - if the $widget_base/$widget_id is a directory
-    // - if the $widget_base/$widget_id is a **direct** subdirectory of $widget_base
-    if !widget_dir_absolute.is_dir() || !widget_dir_absolute.starts_with(&widget_base) {
+    // If the following conditions are not met, the widget ID is invalid:
+    // - the $widget_base/$widget_id is a directory
+    // - the $widget_base/$widget_id is a **direct** subdirectory of $widget_base
+    if !widget_dir_clean.is_dir() || !widget_dir_clean.starts_with(&widget_base_clean) {
         bail!("Invalid widget ID: '{}'. Widget ID must correspond to a folder in the widget base directory.", widget_id);
     }
 
@@ -60,15 +54,12 @@ pub fn validate_resource_path<R: Runtime>(
     let widget_dir = get_widget_dir(app_handle, widget_id);
     let resource_path = widget_dir.join(path);
 
-    // Note that we use absolutize() instead of canonicalize() here, since we don't need to check
+    // Note that we don't use canonicalize() here, since we don't need to check
     //   if the file exists or not.
-    let resource_path_absolute = resource_path.absolutize().context(format!(
-        "Failed to get absolute path of resource '{}'",
-        resource_path.display()
-    ))?;
+    let resource_path_clean = PathBuf::from(resource_path).clean();
 
     // Validate if the file is within the widget directory
-    if !resource_path_absolute.starts_with(&widget_dir) {
+    if !resource_path_clean.starts_with(&widget_dir) {
         bail!(
             "Invalid resource path: '{}'. Resource must be within the widget directory",
             path
@@ -78,7 +69,7 @@ pub fn validate_resource_path<R: Runtime>(
     Ok(())
 }
 
-/// Get the widget base directory from the app state, return the absolute path of the widget base directory.
+/// Get the widget base directory from the app state, return the cleaned path of the widget base directory.
 pub fn get_widget_base<R: Runtime>(app_handle: &AppHandle<R>) -> PathBuf {
     app_handle.state::<WidgetBaseDirectoryState>().0.clone()
 }
@@ -103,8 +94,9 @@ pub fn get_resource_path<R: Runtime>(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use path_absolutize::Absolutize;
+    use path_clean::{clean, PathClean};
     use std::fs;
+    use std::path::PathBuf;
     use tauri::test::{mock_app, MockRuntime};
     use tempfile::tempdir;
 
@@ -114,11 +106,7 @@ mod tests {
         let temp_dir = tempdir().expect("Failed to create a temporary directory");
         let app_dir = temp_dir.path();
 
-        let widget_base = app_dir
-            .join("widgets")
-            .absolutize()
-            .expect("Failed to get absolute path of widget base directory")
-            .to_path_buf();
+        let widget_base = PathBuf::from(app_dir).join("widgets").clean();
 
         let app = mock_app();
         let app_handle = app.handle();
@@ -223,7 +211,7 @@ mod tests {
         println!("Error Message: {}", result.unwrap_err());
 
         // an invalid widget ID that is a folder outside of the widget base directory containing the relative path
-        //    `validate_widget_id` will search outside of the widget base directory after absolutizing the path,
+        //    `validate_widget_id` will search outside of the widget base directory after cleaning the path,
         //    so the error is caused by the path not being a direct subfolder of the widget base directory.
         let invalid_relative_widget_id = "../relative_outside_widget";
         let relative_path =
