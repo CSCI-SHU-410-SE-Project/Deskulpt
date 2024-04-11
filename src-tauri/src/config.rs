@@ -125,17 +125,22 @@ mod tests {
         current_dir().unwrap().join("tests/fixtures/config").clean()
     }
 
+    /// Get the standard Deskulpt configuration.
+    fn get_standard_deskulpt_conf() -> DeskulptConf {
+        DeskulptConf {
+            name: "sample".to_string(),
+            entry: "index.jsx".to_string(),
+            ignore: false,
+        }
+    }
+
     #[rstest]
     // A standard configuration with both `deskulpt.conf.json` and `package.json`
     #[case::standard(
         fixture_dir().join("standard"),
         Some(WidgetConfig {
             directory: fixture_dir().join("standard"),
-            deskulpt: DeskulptConf {
-                name: "standard".to_string(),
-                entry: "src/App.jsx".to_string(),
-                ignore: false,
-            },
+            deskulpt: get_standard_deskulpt_conf(),
             node: Some(PackageJson {
                 dependencies: [("express".to_string(), "^4.17.1".to_string())].into(),
             }),
@@ -146,11 +151,7 @@ mod tests {
         fixture_dir().join("no_package_json"),
         Some(WidgetConfig {
             directory: fixture_dir().join("no_package_json"),
-            deskulpt: DeskulptConf {
-                name: "no package.json".to_string(),
-                entry: "src/App.jsx".to_string(),
-                ignore: false,
-            },
+            deskulpt: get_standard_deskulpt_conf(),
             node: None,
         }),
     )]
@@ -180,10 +181,10 @@ mod tests {
     )]
     // Input path is not a directory
     #[case::not_dir(
-        fixture_dir().join("dummy"),
+        fixture_dir().join("not_a_directory"),
         vec![ChainReason::Exact(format!(
             "Absolute path to an existing directory is expected; got: {}",
-            fixture_dir().join("dummy").display(),
+            fixture_dir().join("not_a_directory").display(),
         ))],
     )]
     // Input path does not exist

@@ -1,5 +1,5 @@
 {
-  "name": "no package.json",
-  "entry": "src/App.jsx",
+  "name": "sample",
+  "entry": "index.jsx",
   "ignore": false
 }

@@ -1,7 +1,6 @@
 {
-  "name": "standard",
+  "name": "sample",
   "version": "1.0.0",
-  "description": "standard configuration",
   "dependencies": {
     "express": "^4.17.1"
   }
