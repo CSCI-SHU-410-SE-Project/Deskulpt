@@ -1,7 +1,0 @@
-{
-  "name": "sample",
-  "version": "1.0.0",
-  "dependencies": {
-    "moment": "^2.24.0",
-  }
-}

@@ -12,7 +12,7 @@ tauri-build = { version = "1.5.1", features = ["config-json5"] }
 pretty_assertions = "1.4.0"
 parameterized = "2.0.0"
 cargo-llvm-cov = "0.6.9"
-regex = "1.10.4"
+rstest = "0.19.0"
 
 [dependencies]
 tauri = { version = "1.6.1", features = ["shell-open", "config-json5"] }

@@ -1,5 +1,5 @@
 {
-  "name": "Sample",
+  "name": "standard",
   "entry": "src/App.jsx",
   "ignore": false
 }

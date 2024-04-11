@@ -1,11 +1,8 @@
 {
-  "name": "nodejs-mongodb-crud",
+  "name": "standard",
   "version": "1.0.0",
-  "description": "Node.js CRUD application with MongoDB",
-  "main": "index.js",
+  "description": "standard configuration",
   "dependencies": {
-    "express": "^4.17.1",
-    "mongoose": "^5.9.7",
-    "nodemon": "^2.0.4"
+    "express": "^4.17.1"
   }
 }

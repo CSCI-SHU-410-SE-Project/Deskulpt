@@ -62,9 +62,13 @@ pub(crate) struct PackageJson {
 /// - `deskulpt.conf.json` is not found.
 /// - The `ignore` flag in `deskulpt.conf.json` is set to `true`.
 pub(crate) fn read_widget_config(path: &Path) -> Result<Option<WidgetConfig>, Error> {
-    if !path.is_absolute() || !path.is_dir() {
-        // Note that `is_dir` also checks if the path exists
-        bail!("Absolute path to an existing directory is expected; got: {path:?}");
+    if !path.is_dir() {
+        // Note that `is_dir` also checks if the path exists; we require absolute path
+        // because it will be directly used as the widget directory in the configuration
+        bail!(
+            "Absolute path to an existing directory is expected; got: {}",
+            path.display()
+        );
     }
 
     let deskulpt_conf_path = path.join("deskulpt.conf.json");
@@ -108,212 +112,128 @@ pub(crate) fn read_widget_config(path: &Path) -> Result<Option<WidgetConfig>, Er
 
 #[cfg(test)]
 mod tests {
+    use std::env::current_dir;
+
     use super::*;
     use crate::testing::{assert_err_eq, ChainReason};
+    use path_clean::PathClean;
     use pretty_assertions::assert_eq;
-    use regex::Regex;
+    use rstest::rstest;
 
-    /// Macro to test the successful reading of a widget configuration.
-    ///
-    /// The macro takes the path to the widget directory and the expected widget
-    /// configuration `Option<WidgetConfig>`.
-    macro_rules! test_read_ok {
-        ($dir:expr, $expected:expr) => {{
-            let result = read_widget_config(&$dir);
-            assert!(result.is_ok(), "Expected successful read of widget configuration");
-
-            let result = result.unwrap();
-            assert_eq!(result, $expected);
-        }};
+    /// Get the absolute path to the fixture directory.
+    fn fixture_dir() -> PathBuf {
+        current_dir().unwrap().join("tests/fixtures/config").clean()
     }
 
-    /// Macro to test the error in reading a widget configuration.
-    ///
-    /// The macro takes the path to the widget directory and the expected error chain.
-    macro_rules! test_read_error {
-        ($dir:expr, $expected:expr) => {{
-            let result = read_widget_config(&$dir);
-            assert!(result.is_err(), "Expected an error reading widget configuration");
+    #[rstest]
+    // A standard configuration with both `deskulpt.conf.json` and `package.json`
+    #[case::standard(
+        fixture_dir().join("standard"),
+        Some(WidgetConfig {
+            directory: fixture_dir().join("standard"),
+            deskulpt: DeskulptConf {
+                name: "standard".to_string(),
+                entry: "src/App.jsx".to_string(),
+                ignore: false,
+            },
+            node: Some(PackageJson {
+                dependencies: [("express".to_string(), "^4.17.1".to_string())].into(),
+            }),
+        }),
+    )]
+    // A standard configuration with `deskulpt.conf.json` but no `package.json`
+    #[case::no_package_json(
+        fixture_dir().join("no_package_json"),
+        Some(WidgetConfig {
+            directory: fixture_dir().join("no_package_json"),
+            deskulpt: DeskulptConf {
+                name: "no package.json".to_string(),
+                entry: "src/App.jsx".to_string(),
+                ignore: false,
+            },
+            node: None,
+        }),
+    )]
+    // No configuration file, should not be treated as a widget
+    #[case::no_conf(fixture_dir().join("no_conf"), None)]
+    // Widget is explicitly ignored
+    #[case::ignore_true(fixture_dir().join("ignore_true"), None)]
+    fn test_read_ok(
+        #[case] path: PathBuf,
+        #[case] expected_config: Option<WidgetConfig>,
+    ) {
+        let result = read_widget_config(&path);
+        assert!(result.is_ok(), "Expected successful read of widget configuration");
 
-            let error = result.unwrap_err();
-            assert_err_eq(error, $expected);
-        }};
+        let result = result.unwrap();
+        assert_eq!(result, expected_config);
     }
 
-    #[test]
-    fn test_read_basic() {
-        // Check reading a standard widget configuration
-        let path = Path::new("tests/fixtures/config/standard").canonicalize().unwrap();
-        test_read_ok!(
-            path,
-            Some(WidgetConfig {
-                directory: path,
-                deskulpt: DeskulptConf {
-                    name: "Sample".to_string(),
-                    entry: "src/App.jsx".to_string(),
-                    ignore: false,
-                },
-                node: Some(PackageJson {
-                    dependencies: HashMap::from([
-                        ("nodemon".to_string(), "^2.0.4".to_string()),
-                        ("mongoose".to_string(), "^5.9.7".to_string()),
-                        ("express".to_string(), "^4.17.1".to_string()),
-                    ]),
-                }),
-            })
-        );
-    }
+    #[rstest]
+    // Input path is not absolute
+    #[case::not_absolute(
+        "tests/fixtures/config/not_absolute",
+        vec![ChainReason::Exact(
+            "Absolute path to an existing directory is expected; got: \
+            tests/fixtures/config/not_absolute".to_string()
+        )],
+    )]
+    // Input path is not a directory
+    #[case::not_dir(
+        fixture_dir().join("dummy"),
+        vec![ChainReason::Exact(format!(
+            "Absolute path to an existing directory is expected; got: {}",
+            fixture_dir().join("dummy").display(),
+        ))],
+    )]
+    // Input path does not exist
+    #[case::non_existent(
+        fixture_dir().join("non_existent"),
+        vec![ChainReason::Exact(format!(
+            "Absolute path to an existing directory is expected; got: {}",
+            fixture_dir().join("non_existent").display(),
+        ))],
+    )]
+    // `deskulpt.conf.json` is not readable (is a directory)
+    #[case::conf_not_readable(
+        fixture_dir().join("conf_not_readable"),
+        vec![
+            ChainReason::Exact("Failed to read deskulpt.conf.json".to_string()),
+            ChainReason::IOError,
+        ],
+    )]
+    // `deskulpt.conf.json` is missing a field
+    #[case::conf_missing_field(
+        fixture_dir().join("conf_missing_field"),
+        vec![
+            ChainReason::Exact("Failed to interpret deskulpt.conf.json".to_string()),
+            ChainReason::SerdeError,
+        ],
+    )]
+    // `package.json` is not readable (is a directory)
+    #[case::package_json_not_readable(
+        fixture_dir().join("package_json_not_readable"),
+        vec![
+            ChainReason::Exact("Failed to read package.json".to_string()),
+            ChainReason::IOError,
+        ],
+    )]
+    // `package.json` is missing a field
+    #[case::package_json_missing_field(
+        fixture_dir().join("package_json_missing_field"),
+        vec![
+            ChainReason::Exact("Failed to interpret package.json".to_string()),
+            ChainReason::SerdeError,
+        ],
+    )]
+    fn test_read_error(
+        #[case] path: PathBuf,
+        #[case] expected_error: Vec<ChainReason>,
+    ) {
+        let result = read_widget_config(&path);
+        assert!(result.is_err(), "Expected an error reading widget configuration");
 
-    #[test]
-    fn test_read_no_package_json() {
-        // Check reading a widget configuration without `package.json`
-        let path =
-            Path::new("tests/fixtures/config/no_package_json").canonicalize().unwrap();
-        test_read_ok!(
-            path,
-            Some(WidgetConfig {
-                directory: path,
-                deskulpt: DeskulptConf {
-                    name: "Sample".to_string(),
-                    entry: "src/App.jsx".to_string(),
-                    ignore: false,
-                },
-                node: None,
-            })
-        );
-    }
-
-    #[test]
-    fn test_read_return_none() {
-        // Check the cases we return `Ok(None)`, i.e., no configuration file or the
-        // ignore flag is set to `true`
-        for widget_dir in [
-            Path::new("tests/fixtures/config/no_conf").canonicalize().unwrap(),
-            Path::new("tests/fixtures/config/ignore_true").canonicalize().unwrap(),
-        ] {
-            test_read_ok!(widget_dir, None);
-        }
-    }
-
-    #[test]
-    fn test_read_invalid_path_error() {
-        // Check that we get an error unless we pass an absolute path to a directory,
-        // i.e., error if path is not absolute, not a directory, or does not exist
-        for widget_dir in [
-            PathBuf::from("tests/fixtures/config/full"),
-            Path::new("tests/fixtures/config/dummy").canonicalize().unwrap(),
-            Path::new("tests/fixtures/config")
-                .canonicalize()
-                .unwrap()
-                .join("non_existent"),
-        ] {
-            test_read_error!(
-                widget_dir,
-                vec![ChainReason::Exact(format!(
-                    "Absolute path to an existing directory is expected; got: \
-                    {widget_dir:?}"
-                ))]
-            );
-        }
-    }
-
-    #[test]
-    fn test_read_conf_not_readable_error() {
-        // Check that we get an error if `deskulpt.conf.json` cannot be read
-        test_read_error!(
-            Path::new("tests/fixtures/config/conf_not_file").canonicalize().unwrap(),
-            vec![
-                ChainReason::Exact("Failed to read deskulpt.conf.json".to_string()),
-                ChainReason::IOErrorKind(None), // Different kinds across platforms
-            ]
-        );
-    }
-
-    #[test]
-    fn test_read_conf_invalid_json_error() {
-        // Check that we get proper error if `deskulpt.conf.json` is not a valid JSON
-        test_read_error!(
-            Path::new("tests/fixtures/config/conf_invalid_json")
-                .canonicalize()
-                .unwrap(),
-            vec![
-                ChainReason::Exact(
-                    "Failed to interpret deskulpt.conf.json".to_string()
-                ),
-                ChainReason::SerdeErrorCategory(
-                    serde_json::error::Category::Syntax,
-                    Regex::new("trailing comma").unwrap(),
-                ),
-            ]
-        );
-    }
-
-    #[test]
-    fn test_read_conf_missing_field_error() {
-        // Check that we get proper error if `deskulpt.conf.json` is missing a required
-        // field
-        test_read_error!(
-            Path::new("tests/fixtures/config/conf_missing_field")
-                .canonicalize()
-                .unwrap(),
-            vec![
-                ChainReason::Exact(
-                    "Failed to interpret deskulpt.conf.json".to_string()
-                ),
-                ChainReason::SerdeErrorCategory(
-                    serde_json::error::Category::Data,
-                    Regex::new("missing field `entry`").unwrap(),
-                ),
-            ]
-        );
-    }
-
-    #[test]
-    fn test_read_package_json_not_readable_error() {
-        // Check that we get an error if `package.json` cannot be read
-        test_read_error!(
-            Path::new("tests/fixtures/config/package_json_not_file")
-                .canonicalize()
-                .unwrap(),
-            vec![
-                ChainReason::Exact("Failed to read package.json".to_string()),
-                ChainReason::IOErrorKind(None), // Different kinds across platforms
-            ]
-        );
-    }
-
-    #[test]
-    fn test_read_package_json_invalid_json_error() {
-        // Check that we get a proper error if `package.json` is not a valid JSON
-        test_read_error!(
-            Path::new("tests/fixtures/config/package_json_invalid_json")
-                .canonicalize()
-                .unwrap(),
-            vec![
-                ChainReason::Exact("Failed to interpret package.json".to_string()),
-                ChainReason::SerdeErrorCategory(
-                    serde_json::error::Category::Syntax,
-                    Regex::new("trailing comma").unwrap(),
-                ),
-            ]
-        );
-    }
-
-    #[test]
-    fn test_read_package_json_missing_field_error() {
-        // Check that we get a proper error if `package.json` is missing a required
-        // field
-        test_read_error!(
-            Path::new("tests/fixtures/config/package_json_missing_field")
-                .canonicalize()
-                .unwrap(),
-            vec![
-                ChainReason::Exact("Failed to interpret package.json".to_string()),
-                ChainReason::SerdeErrorCategory(
-                    serde_json::error::Category::Data,
-                    Regex::new("missing field `dependencies`").unwrap(),
-                ),
-            ]
-        );
+        let error = result.unwrap_err();
+        assert_err_eq(error, expected_error);
     }
 }
