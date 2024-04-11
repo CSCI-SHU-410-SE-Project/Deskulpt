@@ -359,10 +359,22 @@ impl Hook for NoopHook {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::testing::{assert_err_eq, ChainReason};
     use parameterized::parameterized;
     use pretty_assertions::assert_eq;
     use std::fs::read_to_string;
+
+    /// Assert that an [`Error`] object has the expected chain of reasons.
+    fn assert_err_eq(error: Error, chain: Vec<String>) {
+        let mut error_chain = error.chain();
+        for expected_msg in chain {
+            assert_eq!(
+                error_chain.next().map(|msg| format!("{msg}")),
+                Some(expected_msg)
+            );
+        }
+        // Assert that the chain of reasons ends here
+        assert_eq!(error_chain.next().map(|msg| format!("{msg}")), None);
+    }
 
     #[parameterized(case = {
         "no_react",
@@ -397,15 +409,11 @@ mod tests {
             .expect_err("Expected an error");
 
         let expected = vec![
-            ChainReason::Exact("load_transformed failed".to_string()),
-            ChainReason::Exact("failed to analyze module".to_string()),
-            ChainReason::Exact(format!(
-                "failed to resolve /usr/bin/script.js from {root_path}/index.jsx"
-            )),
-            ChainReason::Exact(
-                "Absolute imports are not supported; use relative imports instead"
-                    .to_string(),
-            ),
+            "load_transformed failed".to_string(),
+            "failed to analyze module".to_string(),
+            format!("failed to resolve /usr/bin/script.js from {root_path}/index.jsx"),
+            "Absolute imports are not supported; use relative imports instead"
+                .to_string(),
         ];
         assert_err_eq(error, expected);
     }
@@ -420,14 +428,10 @@ mod tests {
         let abs_root = root.canonicalize().unwrap();
 
         let expected = vec![
-            ChainReason::Exact("load_transformed failed".to_string()),
-            ChainReason::Exact("failed to analyze module".to_string()),
-            ChainReason::Exact(format!(
-                "failed to resolve ../../../dummy from {root_path}/index.jsx"
-            )),
-            ChainReason::Exact(format!(
-                "Relative imports should not go beyond the root {abs_root:?}"
-            )),
+            "load_transformed failed".to_string(),
+            "failed to analyze module".to_string(),
+            format!("failed to resolve ../../../dummy from {root_path}/index.jsx"),
+            format!("Relative imports should not go beyond the root {abs_root:?}"),
         ];
         assert_err_eq(error, expected);
     }
