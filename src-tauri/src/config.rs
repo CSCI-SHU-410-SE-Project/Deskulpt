@@ -62,9 +62,10 @@ pub(crate) struct PackageJson {
 /// - `deskulpt.conf.json` is not found.
 /// - The `ignore` flag in `deskulpt.conf.json` is set to `true`.
 pub(crate) fn read_widget_config(path: &Path) -> Result<Option<WidgetConfig>, Error> {
-    if !path.is_dir() {
-        // Note that `is_dir` also checks if the path exists; we require absolute path
-        // because it will be directly used as the widget directory in the configuration
+    if !path.is_absolute() || !path.is_dir() {
+        // We require absolute path because it will be directly used as the widget
+        // directory in the configuration; there is no need to check path existence
+        // because `is_dir` already does that
         bail!(
             "Absolute path to an existing directory is expected; got: {}",
             path.display()
