@@ -4,7 +4,6 @@ use path_absolutize::Absolutize;
 use std::path::PathBuf;
 use tauri::{AppHandle, Manager, Runtime};
 
-// TODO: Remove debugging print
 // TODO: try absolutization from `path-clean``
 // TODO: (Future) Write auto-generated unittests to cover more corner cases
 
@@ -16,16 +15,12 @@ pub fn validate_widget_id<R: Runtime>(
     app_handle: &AppHandle<R>,
     widget_id: &str,
 ) -> Result<(), Error> {
-    if cfg!(debug_assertions) {
-        println!("Validating widget ID: '{}'", widget_id);
-    }
-
     // Error messages should be generic and not contain any specific information
     // to prevent information leakage.
-    let error_msg = format!(
-        "Invalid widget ID: '{}'. Widget ID must correspond to a folder in the widget base directory.",
-        widget_id
-    );
+    // let error_msg = format!(
+    //     "Invalid widget ID: '{}'. Widget ID must correspond to a folder in the widget base directory.",
+    //     widget_id
+    // );
 
     let widget_base = get_widget_base(app_handle);
     let widget_dir = get_widget_dir(app_handle, widget_id);
@@ -38,33 +33,13 @@ pub fn validate_widget_id<R: Runtime>(
         bail!("Invalid widget ID: '{}'. Widget ID must correspond to an existing folder in the widget base directory.", widget_id);
     }
 
-    // Test if the $widget_base/$widget_id is a directory
-    if !widget_dir_absolute.is_dir() {
-        if cfg!(debug_assertions) {
-            // return Err(Error::msg(format!(
-            //     "Invalid widget ID: '{}'. Widget ID must be a folder",
-            //     widget_id
-            // )));
-            bail!("Invalid widget ID: '{}'. Widget ID must be a folder", widget_id);
-        } else {
-            // return Err(Error::msg(error_msg));
-            bail!(error_msg);
-        }
+    // Test
+    // - if the $widget_base/$widget_id is a directory
+    // - if the $widget_base/$widget_id is a **direct** subdirectory of $widget_base
+    if !widget_dir_absolute.is_dir() || !widget_dir_absolute.starts_with(&widget_base) {
+        bail!("Invalid widget ID: '{}'. Widget ID must correspond to a folder in the widget base directory.", widget_id);
     }
 
-    // Test if the $widget_base/$widget_id is a **direct** subdirectory of $widget_base
-    if !widget_dir_absolute.starts_with(&widget_base) {
-        if cfg!(debug_assertions) {
-            // return Err(Error::msg(format!(
-            //     "Invalid widget ID: '{}'. Widget ID must be a direct subfolder of the widget base directory.\n\twidget_base: '{}'\n\twidget_dir: '{}'",
-            //     widget_id, widget_base.display(), widget_dir_absolute.display()
-            // )));
-            bail!("Invalid widget ID: '{}'. Widget ID must be a direct subfolder of the widget base directory.", widget_id);
-        } else {
-            // return Err(Error::msg(error_msg));
-            bail!(error_msg);
-        }
-    }
     Ok(())
 }
 
@@ -78,10 +53,6 @@ pub fn validate_resource_path<R: Runtime>(
     widget_id: &str,
     path: &str,
 ) -> Result<(), Error> {
-    if cfg!(debug_assertions) {
-        println!("Validating resource path: '{}' for widget '{}'", path, widget_id);
-    }
-
     // Validate if the widget ID is a direct subfolder of the widget_base folder
     validate_widget_id(app_handle, widget_id)
         .context(format!("Failed to validate widget ID: '{}'", widget_id))?;
@@ -98,25 +69,10 @@ pub fn validate_resource_path<R: Runtime>(
 
     // Validate if the file is within the widget directory
     if !resource_path_absolute.starts_with(&widget_dir) {
-        if cfg!(debug_assertions) {
-            // return Err(Error::msg(format!(
-            //     "Invalid resource path: '{}'. Resource must be within the widget directory\n\twidget_dir: '{}'\n\tresource_path: '{}'",
-            //     path, widget_dir.display(), resource_path_absolute.display()
-            // )));
-            bail!(
-                "Invalid resource path: '{}'. Resource must be within the widget directory",
-                path
-            );
-        } else {
-            // return Err(Error::msg(format!(
-            //     "Invalid resource path: '{}'. Resource must be within the widget directory.",
-            //     path
-            // )));
-            bail!(
-                "Invalid resource path: '{}'. Resource must be within the widget directory",
-                path
-            );
-        }
+        bail!(
+            "Invalid resource path: '{}'. Resource must be within the widget directory",
+            path
+        );
     }
 
     Ok(())
