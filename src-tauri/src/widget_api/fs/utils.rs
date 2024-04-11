@@ -1,9 +1,13 @@
 use crate::states::WidgetBaseDirectoryState;
-use anyhow::{Context, Error as AnyhowError};
+use anyhow::{bail, Context, Error};
 use path_absolutize::Absolutize;
 use std::path::PathBuf;
 use tauri::{AppHandle, Manager, Runtime};
 
+// TODO: Switch to `bail!` for error passing
+// TODO: Choice of word: change "entry" to "resource"
+// TODO: Remove debugging print
+// TODO: try absolutization from `path-clean``
 // TODO: (Future) Write auto-generated unittests to cover more corner cases
 
 /// Validate if the widget ID corresponds to a direct folder in the widget_base folder
@@ -13,13 +17,13 @@ use tauri::{AppHandle, Manager, Runtime};
 pub fn validate_widget_id<R: Runtime>(
     app_handle: &AppHandle<R>,
     widget_id: &str,
-) -> Result<(), AnyhowError> {
+) -> Result<(), Error> {
     if cfg!(debug_assertions) {
         println!("Validating widget ID: '{}'", widget_id);
     }
 
     // Error messages should be generic and not contain any specific information
-    //  to prevent information leakage.
+    // to prevent information leakage.
     let error_msg = format!(
         "Invalid widget ID: '{}'. Widget ID must correspond to a folder in the widget base directory.",
         widget_id
@@ -27,60 +31,55 @@ pub fn validate_widget_id<R: Runtime>(
 
     let widget_base = get_widget_base(app_handle);
     let widget_dir = get_widget_dir(app_handle, widget_id);
-    // if canonicalized() is used, and the app runs on Windows, the long path prefix "\\?\" will be added
-    //  to the path, which may cause issues with path comparisons.
+    // If canonicalized() is used, and the app runs on Windows, the long path prefix "\\?\" will be added
+    // to the path, which may cause issues with path comparisons.
     let widget_dir_absolute = widget_dir.absolutize().map_err(|e| {
-        AnyhowError::msg(format!(
-            "Failed to get absolute path of widget directory: {}",
-            e
-        ))
+        Error::msg(format!("Failed to get absolute path of widget directory: {}", e))
     })?;
     if !widget_dir_absolute.exists() {
-        // return Err(error_msg);
-        return Err(AnyhowError::msg(format!(
-            "Invalid widget ID: '{}'. Widget ID must correspond to an existing folder in the widget base directory.",
-            widget_id
-        )));
+        bail!("Invalid widget ID: '{}'. Widget ID must correspond to an existing folder in the widget base directory.", widget_id);
     }
 
     // Test if the $widget_base/$widget_id is a directory
     if !widget_dir_absolute.is_dir() {
         if cfg!(debug_assertions) {
-            return Err(AnyhowError::msg(format!(
-                "Invalid widget ID: '{}'. Widget ID must be a folder",
-                widget_id
-            )));
+            // return Err(Error::msg(format!(
+            //     "Invalid widget ID: '{}'. Widget ID must be a folder",
+            //     widget_id
+            // )));
+            bail!("Invalid widget ID: '{}'. Widget ID must be a folder", widget_id);
         } else {
-            return Err(AnyhowError::msg(error_msg));
+            // return Err(Error::msg(error_msg));
+            bail!(error_msg);
         }
     }
 
     // Test if the $widget_base/$widget_id is a **direct** subdirectory of $widget_base
     if !widget_dir_absolute.starts_with(&widget_base) {
         if cfg!(debug_assertions) {
-            return Err(AnyhowError::msg(format!(
-                "Invalid widget ID: '{}'. Widget ID must be a direct subfolder of the widget base directory.\n\twidget_base: '{}'\n\twidget_dir: '{}'",
-                widget_id, widget_base.display(), widget_dir_absolute.display()
-            )));
+            // return Err(Error::msg(format!(
+            //     "Invalid widget ID: '{}'. Widget ID must be a direct subfolder of the widget base directory.\n\twidget_base: '{}'\n\twidget_dir: '{}'",
+            //     widget_id, widget_base.display(), widget_dir_absolute.display()
+            // )));
+            bail!("Invalid widget ID: '{}'. Widget ID must be a direct subfolder of the widget base directory.", widget_id);
         } else {
-            return Err(AnyhowError::msg(error_msg));
+            // return Err(Error::msg(error_msg));
+            bail!(error_msg);
         }
     }
     Ok(())
 }
 
-/// Validate the file system entry (file or folder) path by checking
-/// - if the widget ID is valid
-/// - if the entry is within the widget directory.
+/// Validate the file system entry (file or folder) path by checking if the widget id corresponds to a direct subfolder of $APPDATA/widgets
 ///
 /// Note that this function doesn't check if the entry exists or not, unlike `validate_widget_id()`
-///   where the widget folder must exist to be valid. This is because the file or folder may not exist yet,
-///   and will be created later.
+/// where the widget folder must exist to be valid. This is because the file or folder may not exist yet,
+/// and will be created later.
 pub fn validate_entry_path<R: Runtime>(
     app_handle: &AppHandle<R>,
     widget_id: &str,
     path: &str,
-) -> Result<(), AnyhowError> {
+) -> Result<(), Error> {
     if cfg!(debug_assertions) {
         println!("Validating entry path: '{}' for widget '{}'", path, widget_id);
     }
@@ -102,15 +101,23 @@ pub fn validate_entry_path<R: Runtime>(
     // Validate if the file is within the widget directory
     if !entry_path_absolute.starts_with(&widget_dir) {
         if cfg!(debug_assertions) {
-            return Err(AnyhowError::msg(format!(
-                "Invalid entry path: '{}'. Entry must be within the widget directory\n\twidget_dir: '{}'\n\tentry_path: '{}'",
-                path, widget_dir.display(), entry_path_absolute.display()
-            )));
-        } else {
-            return Err(AnyhowError::msg(format!(
-                "Invalid entry path: '{}'. Entry must be within the widget directory.",
+            // return Err(Error::msg(format!(
+            //     "Invalid entry path: '{}'. Entry must be within the widget directory\n\twidget_dir: '{}'\n\tentry_path: '{}'",
+            //     path, widget_dir.display(), entry_path_absolute.display()
+            // )));
+            bail!(
+                "Invalid entry path: '{}'. Entry must be within the widget directory",
                 path
-            )));
+            );
+        } else {
+            // return Err(Error::msg(format!(
+            //     "Invalid entry path: '{}'. Entry must be within the widget directory.",
+            //     path
+            // )));
+            bail!(
+                "Invalid entry path: '{}'. Entry must be within the widget directory",
+                path
+            );
         }
     }
 

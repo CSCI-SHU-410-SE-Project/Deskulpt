@@ -9,25 +9,6 @@ use anyhow::Context;
 // TODO: (Future) Write formatted string to files (now there is no way to break new lines)
 // TODO: (Future) Write auto-generated unittests to cover more corner cases
 
-// fn bar(flag: bool) -> AnyhowResult<String, AnyhowError> {
-//     if flag {
-//         Ok("OK".to_string())
-//     } else {
-//         Err(AnyhowError::msg("Not OK"))
-//     }
-// }
-
-// #[command]
-// pub fn foo<R: Runtime>(
-//     app_handle: AppHandle<R>,
-//     widget_id: String,
-//     flag: bool,
-// ) -> Result<String, InvokeError> {
-//     bar(flag)
-//         .context("Failed to call bar in foo")
-//         .map_err(InvokeError::from_anyhow)
-// }
-
 #[command]
 pub fn exists<R: Runtime>(
     app_handle: AppHandle<R>,
@@ -165,9 +146,6 @@ pub fn create_dir<R: Runtime>(
         )));
     }
     std::fs::create_dir_all(&folder_path)
-    // .map_err(|e| {
-    //     format!("Failed to create directory '{}': {}", folder_path.display(), e)
-    // })
         .context(format!("Failed to create directory '{}'", folder_path.display()))
         .map_err(InvokeError::from_anyhow)
 }
@@ -183,9 +161,6 @@ pub fn remove_dir<R: Runtime>(
         .map_err(InvokeError::from_anyhow)?;
     let folder_path = utils::get_entry_path(&app_handle, &widget_id, &path);
     std::fs::remove_dir_all(&folder_path)
-    // .map_err(|e| {
-    //     format!("Failed to delete directory '{}': {}", folder_path.display(), e)
-    // })
         .context(format!("Failed to delete directory '{}'", folder_path.display()))
         .map_err(InvokeError::from_anyhow)
 }
@@ -377,7 +352,7 @@ mod tests {
 
         // Test for reading a existing file outside widget dir whose path contains relative path components
         let relative_outside_existing_file = "../test_file.txt";
-        // create a file outside the widget directory
+        // Create a file outside the widget directory
         let outside_file_path = widget_base.join(relative_outside_existing_file);
         let outside_file_content = "Outside file content";
         File::create(&outside_file_path)
