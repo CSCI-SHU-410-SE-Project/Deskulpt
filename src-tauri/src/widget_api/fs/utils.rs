@@ -1,6 +1,6 @@
 use crate::states::WidgetBaseDirectoryState;
 use anyhow::{bail, Context, Error};
-use path_clean::{clean, PathClean};
+use path_clean::PathClean;
 use std::path::PathBuf;
 use tauri::{AppHandle, Manager, Runtime};
 
@@ -18,8 +18,8 @@ pub fn validate_widget_id<R: Runtime>(
     let widget_dir = get_widget_dir(app_handle, widget_id);
     // If canonicalized() is used, and the app runs on Windows, the long path prefix "\\?\" will be added
     // to the path, which may cause issues with path comparisons.
-    let widget_base_clean = PathBuf::from(widget_base).clean();
-    let widget_dir_clean = PathBuf::from(widget_dir).clean();
+    let widget_base_clean = widget_base.clean();
+    let widget_dir_clean = widget_dir.clean();
 
     // Error messages should be generic and not contain any specific information
     // to prevent information leakage.
@@ -30,7 +30,7 @@ pub fn validate_widget_id<R: Runtime>(
     // If the following conditions are not met, the widget ID is invalid:
     // - the $widget_base/$widget_id is a directory
     // - the $widget_base/$widget_id is a **direct** subdirectory of $widget_base
-    if !widget_dir_clean.is_dir() || !widget_dir_clean.starts_with(&widget_base_clean) {
+    if !widget_dir_clean.is_dir() || !widget_dir_clean.starts_with(widget_base_clean) {
         bail!("Invalid widget ID: '{}'. Widget ID must correspond to a folder in the widget base directory.", widget_id);
     }
 
@@ -56,7 +56,7 @@ pub fn validate_resource_path<R: Runtime>(
 
     // Note that we don't use canonicalize() here, since we don't need to check
     //   if the file exists or not.
-    let resource_path_clean = PathBuf::from(resource_path).clean();
+    let resource_path_clean = resource_path.clean();
 
     // Validate if the file is within the widget directory
     if !resource_path_clean.starts_with(&widget_dir) {
