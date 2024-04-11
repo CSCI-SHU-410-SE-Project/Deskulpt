@@ -15,14 +15,14 @@ pub fn exists<R: Runtime>(
     widget_id: String,
     path: String,
 ) -> Result<bool, InvokeError> {
-    utils::validate_entry_path(&app_handle, &widget_id, &path)
-        .context("Failed to validate entry path")
+    utils::validate_resource_path(&app_handle, &widget_id, &path)
+        .context("Failed to validate resource path")
         .map_err(InvokeError::from_anyhow)?;
-    let file_path = utils::get_entry_path(&app_handle, &widget_id, &path);
+    let file_path = utils::get_resource_path(&app_handle, &widget_id, &path);
     Ok(file_path.exists())
 }
 
-// Note that the `is_file` is a command for widgets. For checking if an entrhy is file,
+// Note that the `is_file` is a command for widgets. For checking if a resource is file,
 //    we should use std::path::PathBuf::is_file instead.
 #[command]
 pub fn is_file<R: Runtime>(
@@ -30,10 +30,10 @@ pub fn is_file<R: Runtime>(
     widget_id: String,
     path: String,
 ) -> Result<bool, InvokeError> {
-    utils::validate_entry_path(&app_handle, &widget_id, &path)
-        .context("Failed to validate entry path")
+    utils::validate_resource_path(&app_handle, &widget_id, &path)
+        .context("Failed to validate resource path")
         .map_err(InvokeError::from_anyhow)?;
-    let file_path = utils::get_entry_path(&app_handle, &widget_id, &path);
+    let file_path = utils::get_resource_path(&app_handle, &widget_id, &path);
     Ok(file_path.is_file())
 }
 
@@ -43,10 +43,10 @@ pub fn is_dir<R: Runtime>(
     widget_id: String,
     path: String,
 ) -> Result<bool, InvokeError> {
-    utils::validate_entry_path(&app_handle, &widget_id, &path)
-        .context("Failed to validate entry path")
+    utils::validate_resource_path(&app_handle, &widget_id, &path)
+        .context("Failed to validate resource path")
         .map_err(InvokeError::from_anyhow)?;
-    let file_path = utils::get_entry_path(&app_handle, &widget_id, &path);
+    let file_path = utils::get_resource_path(&app_handle, &widget_id, &path);
     Ok(file_path.is_dir())
 }
 
@@ -56,10 +56,10 @@ pub fn read_file<R: Runtime>(
     widget_id: String,
     path: String,
 ) -> Result<String, InvokeError> {
-    utils::validate_entry_path(&app_handle, &widget_id, &path)
-        .context("Failed to validate entry path")
+    utils::validate_resource_path(&app_handle, &widget_id, &path)
+        .context("Failed to validate resource path")
         .map_err(InvokeError::from_anyhow)?;
-    let file_path = utils::get_entry_path(&app_handle, &widget_id, &path);
+    let file_path = utils::get_resource_path(&app_handle, &widget_id, &path);
     if !file_path.is_file() {
         return Err(InvokeError::from(format!(
             "Path '{}' is not a file",
@@ -79,10 +79,10 @@ pub fn write_file<R: Runtime>(
     path: String,
     content: String,
 ) -> Result<(), InvokeError> {
-    utils::validate_entry_path(&app_handle, &widget_id, &path)
-        .context("Failed to validate entry path")
+    utils::validate_resource_path(&app_handle, &widget_id, &path)
+        .context("Failed to validate resource path")
         .map_err(InvokeError::from_anyhow)?;
-    let file_path = utils::get_entry_path(&app_handle, &widget_id, &path);
+    let file_path = utils::get_resource_path(&app_handle, &widget_id, &path);
     std::fs::write(&file_path, content)
         .context(format!("Failed to write file '{}'", file_path.display()))
         .map_err(InvokeError::from_anyhow)
@@ -95,10 +95,10 @@ pub fn append_file<R: Runtime>(
     path: String,
     content: String,
 ) -> Result<(), InvokeError> {
-    utils::validate_entry_path(&app_handle, &widget_id, &path)
-        .context("Failed to validate entry path")
+    utils::validate_resource_path(&app_handle, &widget_id, &path)
+        .context("Failed to validate resource path")
         .map_err(InvokeError::from_anyhow)?;
-    let file_path = utils::get_entry_path(&app_handle, &widget_id, &path);
+    let file_path = utils::get_resource_path(&app_handle, &widget_id, &path);
     std::fs::OpenOptions::new()
         .append(true)
         .create(true)
@@ -114,10 +114,10 @@ pub fn remove_file<R: Runtime>(
     widget_id: String,
     path: String,
 ) -> Result<(), InvokeError> {
-    utils::validate_entry_path(&app_handle, &widget_id, &path)
-        .context("Failed to validate entry path")
+    utils::validate_resource_path(&app_handle, &widget_id, &path)
+        .context("Failed to validate resource path")
         .map_err(InvokeError::from_anyhow)?;
-    let file_path = utils::get_entry_path(&app_handle, &widget_id, &path);
+    let file_path = utils::get_resource_path(&app_handle, &widget_id, &path);
     if !file_path.is_file() {
         return Err(InvokeError::from(format!(
             "Path '{}' is not a file",
@@ -135,10 +135,10 @@ pub fn create_dir<R: Runtime>(
     widget_id: String,
     path: String,
 ) -> Result<(), InvokeError> {
-    utils::validate_entry_path(&app_handle, &widget_id, &path)
-        .context("Failed to validate entry path")
+    utils::validate_resource_path(&app_handle, &widget_id, &path)
+        .context("Failed to validate resource path")
         .map_err(InvokeError::from_anyhow)?;
-    let folder_path = utils::get_entry_path(&app_handle, &widget_id, &path);
+    let folder_path = utils::get_resource_path(&app_handle, &widget_id, &path);
     if folder_path.exists() {
         return Err(InvokeError::from(format!(
             "Directory '{}' already exists",
@@ -156,10 +156,10 @@ pub fn remove_dir<R: Runtime>(
     widget_id: String,
     path: String,
 ) -> Result<(), InvokeError> {
-    utils::validate_entry_path(&app_handle, &widget_id, &path)
-        .context("Failed to validate entry path")
+    utils::validate_resource_path(&app_handle, &widget_id, &path)
+        .context("Failed to validate resource path")
         .map_err(InvokeError::from_anyhow)?;
-    let folder_path = utils::get_entry_path(&app_handle, &widget_id, &path);
+    let folder_path = utils::get_resource_path(&app_handle, &widget_id, &path);
     std::fs::remove_dir_all(&folder_path)
         .context(format!("Failed to delete directory '{}'", folder_path.display()))
         .map_err(InvokeError::from_anyhow)

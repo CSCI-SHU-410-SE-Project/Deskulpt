@@ -4,8 +4,6 @@ use path_absolutize::Absolutize;
 use std::path::PathBuf;
 use tauri::{AppHandle, Manager, Runtime};
 
-// TODO: Switch to `bail!` for error passing
-// TODO: Choice of word: change "entry" to "resource"
 // TODO: Remove debugging print
 // TODO: try absolutization from `path-clean``
 // TODO: (Future) Write auto-generated unittests to cover more corner cases
@@ -70,18 +68,18 @@ pub fn validate_widget_id<R: Runtime>(
     Ok(())
 }
 
-/// Validate the file system entry (file or folder) path by checking if the widget id corresponds to a direct subfolder of $APPDATA/widgets
+/// Validate the file system resource (file or folder) path by checking if the widget id corresponds to a direct subfolder of $APPDATA/widgets
 ///
-/// Note that this function doesn't check if the entry exists or not, unlike `validate_widget_id()`
+/// Note that this function doesn't check if the resource exists or not, unlike `validate_widget_id()`
 /// where the widget folder must exist to be valid. This is because the file or folder may not exist yet,
 /// and will be created later.
-pub fn validate_entry_path<R: Runtime>(
+pub fn validate_resource_path<R: Runtime>(
     app_handle: &AppHandle<R>,
     widget_id: &str,
     path: &str,
 ) -> Result<(), Error> {
     if cfg!(debug_assertions) {
-        println!("Validating entry path: '{}' for widget '{}'", path, widget_id);
+        println!("Validating resource path: '{}' for widget '{}'", path, widget_id);
     }
 
     // Validate if the widget ID is a direct subfolder of the widget_base folder
@@ -89,33 +87,33 @@ pub fn validate_entry_path<R: Runtime>(
         .context(format!("Failed to validate widget ID: '{}'", widget_id))?;
 
     let widget_dir = get_widget_dir(app_handle, widget_id);
-    let entry_path = widget_dir.join(path);
+    let resource_path = widget_dir.join(path);
 
     // Note that we use absolutize() instead of canonicalize() here, since we don't need to check
     //   if the file exists or not.
-    let entry_path_absolute = entry_path.absolutize().context(format!(
-        "Failed to get absolute path of entry '{}'",
-        entry_path.display()
+    let resource_path_absolute = resource_path.absolutize().context(format!(
+        "Failed to get absolute path of resource '{}'",
+        resource_path.display()
     ))?;
 
     // Validate if the file is within the widget directory
-    if !entry_path_absolute.starts_with(&widget_dir) {
+    if !resource_path_absolute.starts_with(&widget_dir) {
         if cfg!(debug_assertions) {
             // return Err(Error::msg(format!(
-            //     "Invalid entry path: '{}'. Entry must be within the widget directory\n\twidget_dir: '{}'\n\tentry_path: '{}'",
-            //     path, widget_dir.display(), entry_path_absolute.display()
+            //     "Invalid resource path: '{}'. Resource must be within the widget directory\n\twidget_dir: '{}'\n\tresource_path: '{}'",
+            //     path, widget_dir.display(), resource_path_absolute.display()
             // )));
             bail!(
-                "Invalid entry path: '{}'. Entry must be within the widget directory",
+                "Invalid resource path: '{}'. Resource must be within the widget directory",
                 path
             );
         } else {
             // return Err(Error::msg(format!(
-            //     "Invalid entry path: '{}'. Entry must be within the widget directory.",
+            //     "Invalid resource path: '{}'. Resource must be within the widget directory.",
             //     path
             // )));
             bail!(
-                "Invalid entry path: '{}'. Entry must be within the widget directory",
+                "Invalid resource path: '{}'. Resource must be within the widget directory",
                 path
             );
         }
@@ -137,8 +135,8 @@ pub fn get_widget_dir<R: Runtime>(
     get_widget_base(app_handle).join(widget_id)
 }
 
-// Get the entry path in the widget directory given the widget ID and the entry path.
-pub fn get_entry_path<R: Runtime>(
+// Get the resource path in the widget directory given the widget ID and the resource path.
+pub fn get_resource_path<R: Runtime>(
     app_handle: &AppHandle<R>,
     widget_id: &str,
     path: &str,
@@ -204,15 +202,15 @@ mod tests {
     }
 
     #[test]
-    fn test_get_entry_path() {
+    fn test_get_resource_path() {
         let widget_id = "test_widget";
         let (app_handle, widget_base, _temp_dir) = setup_base_environment();
         let _widget_dir = setup_widget_directory(&widget_base, widget_id);
-        let entry_path = get_entry_path(&app_handle, widget_id, "test.txt");
+        let resource_path = get_resource_path(&app_handle, widget_id, "test.txt");
         let expected_path = get_widget_dir(&app_handle, widget_id).join("test.txt");
         assert_eq!(
-            entry_path, expected_path,
-            "The entry path should match the expected path."
+            resource_path, expected_path,
+            "The resource path should match the expected path."
         );
     }
 
@@ -283,49 +281,50 @@ mod tests {
     }
 
     #[test]
-    fn test_validate_entry_path() {
-        let widget_id = "widget_for_entry_validation";
+    fn test_validate_resource_path() {
+        let widget_id = "widget_for_resource_validation";
         let (app_handle, widget_base, _temp_dir) = setup_base_environment();
         let widget_dir = setup_widget_directory(&widget_base, widget_id);
 
         // Valid file path within the widget directory
-        let entry = "file.txt";
-        let file_path = widget_dir.join(&entry);
+        let resource = "file.txt";
+        let file_path = widget_dir.join(&resource);
         fs::File::create(&file_path).expect("Failed to create a file for testing");
-        let result = validate_entry_path(&app_handle, widget_id, &entry);
+        let result = validate_resource_path(&app_handle, widget_id, &resource);
         assert!(
             result.is_ok(),
-            "Validating entry path within widget directory should succeed. Error: {}",
+            "Validating resource path within widget directory should succeed. Error: {}",
             result.unwrap_err()
         );
 
         // Valid folder path within the widget directory
-        let directory_entry = "subdir";
-        let dir_path = widget_dir.join(&directory_entry);
+        let directory_resource = "subdir";
+        let dir_path = widget_dir.join(&directory_resource);
         fs::create_dir_all(&dir_path)
             .expect("Failed to create a directory for testing");
-        let result = validate_entry_path(&app_handle, widget_id, directory_entry);
+        let result = validate_resource_path(&app_handle, widget_id, directory_resource);
         assert!(
             result.is_ok(),
-            "Validating entry path that is a directory should succeed. Error: {}",
+            "Validating resource path that is a directory should succeed. Error: {}",
             result.unwrap_err()
         );
 
         // Valid file path pointing to a non-existent file
-        let non_existing_entry = "non_existing_file.txt";
-        let result = validate_entry_path(&app_handle, widget_id, non_existing_entry);
+        let non_existing_resource = "non_existing_file.txt";
+        let result =
+            validate_resource_path(&app_handle, widget_id, non_existing_resource);
         assert!(
             result.is_ok(),
-            "Validating non-existent entry path should succeed. Error: {}",
+            "Validating non-existent resource path should succeed. Error: {}",
             result.unwrap_err()
         );
 
-        // Entry path outside the widget directory
-        let outside_entry = "../outside_file.txt";
-        let result = validate_entry_path(&app_handle, widget_id, outside_entry);
+        // Resource path outside the widget directory
+        let outside_resource = "../outside_file.txt";
+        let result = validate_resource_path(&app_handle, widget_id, outside_resource);
         assert!(
             result.is_err(),
-            "Validating entry path outside widget directory should fail."
+            "Validating resource path outside widget directory should fail."
         );
         println!("Error Message: {}", result.unwrap_err());
     }
