@@ -94,7 +94,7 @@ pub fn get_resource_path<R: Runtime>(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use path_clean::{clean, PathClean};
+    use path_clean::PathClean;
     use std::fs;
     use std::path::PathBuf;
     use tauri::test::{mock_app, MockRuntime};

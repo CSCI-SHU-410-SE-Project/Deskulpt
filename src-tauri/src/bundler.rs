@@ -19,7 +19,7 @@ use swc_common::{
     comments::SingleThreadedComments, errors::Handler, pass::Repeat, sync::Lrc,
     FileName, FilePathMapping, Globals, Mark, SourceMap, Span, GLOBALS,
 };
-use swc_ecma_ast::KeyValueProp;
+use swc_ecma_ast::{KeyValueProp, Module, ModuleDecl, ModuleItem};
 use swc_ecma_codegen::{
     text_writer::{JsWriter, WriteJs},
     Emitter,
@@ -28,7 +28,7 @@ use swc_ecma_loader::resolve::Resolution;
 use swc_ecma_parser::{parse_file_as_module, EsConfig, Syntax};
 use swc_ecma_transforms_optimization::simplify::dce;
 use swc_ecma_transforms_react::jsx;
-use swc_ecma_visit::FoldWith;
+use swc_ecma_visit::{Fold, FoldWith};
 use tempfile::NamedTempFile;
 
 #[cfg(windows)]
@@ -116,9 +116,16 @@ pub(crate) fn bundle(
             Mark::new(),        // unresolved mark
         );
 
+        // Rename import of "@deskulpt" to "@deskulpt/<widget-id>" for widget-specific import of apis
+        let widget_id = "my-clock-widget";
+        let mut import_renamer = ImportRenamer { widget_id: widget_id.to_string() };
+
         // Apply the module transformations
         // @Charlie-XIAO: chain more transforms e.g. TypeScript
-        let module = module.fold_with(&mut tree_shaking).fold_with(&mut jsx_transform);
+        let module = module
+            .fold_with(&mut tree_shaking)
+            .fold_with(&mut jsx_transform)
+            .fold_with(&mut import_renamer);
 
         // Emit the bundled module as string into a buffer
         let mut buf = vec![];
@@ -136,6 +143,32 @@ pub(crate) fn bundle(
     });
 
     Ok(code)
+}
+
+/// Rename import of "@deskulpt" so as to redirect to a widget-specific module
+struct ImportRenamer {
+    widget_id: String,
+}
+
+impl Fold for ImportRenamer {
+    /// For widget with <widget-id>, we rename import of "@deskulpt" to "@deskulpt/<widget-id>"
+    fn fold_module(&mut self, module: Module) -> Module {
+        let mut module = module.fold_children_with(self);
+
+        for stmt in &mut module.body {
+            if let ModuleItem::ModuleDecl(ModuleDecl::Import(import_decl)) = stmt {
+                // ModuleItem::ModuleDecl(ModuleDecl::Import(import_decl)) => {
+                let src = import_decl.src.value.to_string();
+                if src.starts_with("@deskulpt") {
+                    let stripped = src.strip_prefix("@deskulpt").unwrap();
+                    import_decl.src.value =
+                        Atom::from(format!("@deskulpt-{}{}", self.widget_id, stripped));
+                }
+            }
+        }
+
+        module
+    }
 }
 
 /// Deskulpt-customized path loader for SWC bundler.
@@ -361,6 +394,7 @@ mod tests {
     use super::*;
     use parameterized::parameterized;
     use pretty_assertions::assert_eq;
+    use std::collections::HashMap;
     use std::fs::read_to_string;
 
     /// Assert that an [`Error`] object has the expected chain of reasons.
@@ -398,6 +432,46 @@ mod tests {
         let expected =
             read_to_string(format!("tests/fixtures/bundler/{case}/output.js")).unwrap();
         self::assert_eq!(result, expected);
+    }
+
+    #[test]
+    fn test_with_react_hook() {
+        // Test that the bundler can handle React hooks
+        let root = PathBuf::from("tests/fixtures/bundler/with_react_hook/input")
+            .canonicalize()
+            .unwrap();
+        let result = bundle(&root, root.join("index.jsx").as_path(), None)
+            .expect("Failed to bundle");
+
+        let expected =
+            read_to_string("tests/fixtures/bundler/with_react_hook/output.js").unwrap();
+        self::assert_eq!(result, expected);
+    }
+
+    #[test]
+    fn test_with_deskulpt() {
+        // Test that the bundler can handle Deskulpt imports
+        let root = PathBuf::from("tests/fixtures/bundler/with_deskulpt/input")
+            .canonicalize()
+            .unwrap();
+        let mut dependency_map: HashMap<String, String> = HashMap::new();
+        // a list of ignored dependencies
+        let ignored = vec!["@deskulpt/api/fs"];
+        for dep in ignored {
+            dependency_map.insert(dep.to_string(), "".to_string());
+        }
+        let result =
+            bundle(&root, root.join("index.jsx").as_path(), Some(&dependency_map))
+                .expect("Failed to bundle");
+
+        let expected =
+            read_to_string("tests/fixtures/bundler/with_deskulpt/output.js").unwrap();
+        // self::assert_eq!(result, expected);
+        if result != expected {
+            println!("result: {}", result);
+            println!("expected: {}", expected);
+            assert!(false);
+        }
     }
 
     #[test]
