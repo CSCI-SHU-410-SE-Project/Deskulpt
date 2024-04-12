@@ -1,8 +1,8 @@
 import React from "react";
-
 import { Event as TauriEvent, listen } from "@tauri-apps/api/event";
 import { RenderWidgetPayload, WidgetModule, WidgetRecord } from "../types";
-import { grabErrorInfo, handleError, getDOMRoot } from "./utils";
+import { handleError, getDOMRoot } from "./utils";
+import { grabErrorInfo } from "../utils";
 import WidgetContainer from "../components/WidgetContainer";
 
 window.__DESKULPT__ = { defaultDeps: { React } };

@@ -1,6 +1,9 @@
 import { Box, Tooltip } from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
 import React from "react";
+import { ErrorBoundary } from "react-error-boundary";
+import ErrorDisplay from "../ErrorDisplay";
+import { grabErrorInfo } from "../../utils";
 
 /**
  * The widget container component.
@@ -40,8 +43,19 @@ export default function WidgetContainer(props: {
             }}
           />
         </Tooltip>
-        {inner}
+        <ErrorBoundary fallbackRender={fallbackRender}>{inner}</ErrorBoundary>
       </Box>
     </React.StrictMode>
+  );
+}
+
+function fallbackRender(props: { error: unknown }) {
+  const { error } = props;
+
+  return (
+    <ErrorDisplay
+      title="Rendering error caught by the React error boundary"
+      error={grabErrorInfo(error)}
+    />
   );
 }
