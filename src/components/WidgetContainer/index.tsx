@@ -49,6 +49,9 @@ export default function WidgetContainer(props: {
   );
 }
 
+/**
+ * The fallback component if the user widget fails to render.
+ */
 function fallbackRender(props: { error: unknown }) {
   const { error } = props;
 
