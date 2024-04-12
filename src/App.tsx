@@ -25,6 +25,9 @@ export default function App() {
    * The reason why this function returns the updated state is that in some cases we
    * need to access the updated state before React actually updates the component.
    *
+   * This will also emit a "remove-widgets" event to notify the canvas to remove the
+   * widgets that are no longer present in the updated state, if any.
+   *
    * @returns The updated state of `widgetConfigs` if the operation is successful or
    * `null` otherwise.
    */
@@ -33,8 +36,16 @@ export default function App() {
       "refresh_widget_collection",
     );
     if ("success" in output) {
-      setWidgetConfigs(output.success);
-      return output.success;
+      const newConfigs = output.success;
+
+      // Check for removed widgets and notify the canvas if any
+      const removedIds = Object.keys(widgetConfigs).filter((id) => !(id in newConfigs));
+      if (removedIds.length > 0) {
+        await emit("remove-widgets", { widgetIds: removedIds });
+      }
+
+      setWidgetConfigs(newConfigs);
+      return newConfigs;
     } else {
       console.error(output.failure);
       return null;
