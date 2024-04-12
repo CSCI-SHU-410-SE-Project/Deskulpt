@@ -14,7 +14,7 @@ parameterized = "2.0.0"
 cargo-llvm-cov = "0.6.9"
 
 [dependencies]
-tauri = { version = "1.6.1", features = ["shell-open", "config-json5"] }
+tauri = { version = "1.6.1", features = ["shell-open", "config-json5", "test"] }
 
 # Utilities
 anyhow = "1.0.80"
