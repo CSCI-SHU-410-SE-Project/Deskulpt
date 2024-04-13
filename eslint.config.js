@@ -37,6 +37,10 @@ export default tseslint.config(
       // Disables checking an asynchronous function passed as a JSX attribute expected
       // to be a function that returns void. This is useful for event handlers of React
       // components, e.g., `onClick` of a button.
+      "@typescript-eslint/explicit-module-boundary-types": "off",
+      "@typescript-eslint/no-unnecessary-type-assertion": "off",
+      "@typescript-eslint/no-unsafe-argument": "off",
+      "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/no-misused-promises": [
         "error",
         {

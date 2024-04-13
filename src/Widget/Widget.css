@@ -1,0 +1,8 @@
+.widget {
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  background-color: rgb(34, 97, 161);
+  color: whitesmoke;
+  opacity: 1;
+}

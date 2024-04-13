@@ -1,0 +1,14 @@
+.logo.vite:hover {
+  filter: drop-shadow(0 0 2em #747bff);
+}
+
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em #61dafb);
+}
+
+/* add a border to logo */
+.logo {
+  border: 1px solid #000;
+  padding: 0.5em;
+  margin: 0.5em;
+}

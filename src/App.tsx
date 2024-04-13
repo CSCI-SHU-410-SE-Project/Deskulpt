@@ -5,6 +5,7 @@ import { invoke } from "@tauri-apps/api";
 import { emit } from "@tauri-apps/api/event";
 import { useEffect, useState } from "react";
 import { CommandOut, WidgetConfig } from "./types";
+import WidgetManager from "./WidgetManager/WidgetManager.tsx";
 
 export default function App() {
   const [widgetConfigs, setWidgetConfigs] = useState<Record<string, WidgetConfig>>({});
@@ -78,32 +79,38 @@ export default function App() {
   }, []);
 
   return (
-    <Box>
-      <List>
-        {Object.entries(widgetConfigs)
-          .sort()
-          .map(([widgetId, widgetConfig]) => (
-            <ListItem
-              key={widgetId}
-              secondaryAction={
-                <IconButton onClick={() => renderWidget(widgetId)}>
-                  <RefreshIcon />
-                </IconButton>
-              }
-            >
-              <ListItemText primary={widgetConfig.deskulpt.name} secondary={widgetId} />
-            </ListItem>
-          ))}
-      </List>
-      <Button variant="outlined" onClick={refreshWidgetCollection}>
-        Rescan
-      </Button>
-      <Button variant="outlined" onClick={() => renderWidgets(widgetConfigs)}>
-        Render All
-      </Button>
-      <Button variant="outlined" onClick={openWidgetBase}>
-        Open Widget Base Directory
-      </Button>
-    </Box>
+    <>
+      <Box>
+        <List>
+          {Object.entries(widgetConfigs)
+            .sort()
+            .map(([widgetId, widgetConfig]) => (
+              <ListItem
+                key={widgetId}
+                secondaryAction={
+                  <IconButton onClick={() => renderWidget(widgetId)}>
+                    <RefreshIcon />
+                  </IconButton>
+                }
+              >
+                <ListItemText
+                  primary={widgetConfig.deskulpt.name}
+                  secondary={widgetId}
+                />
+              </ListItem>
+            ))}
+        </List>
+        <Button variant="outlined" onClick={refreshWidgetCollection}>
+          Rescan
+        </Button>
+        <Button variant="outlined" onClick={() => renderWidgets(widgetConfigs)}>
+          Render All
+        </Button>
+        <Button variant="outlined" onClick={openWidgetBase}>
+          Open Widget Base Directory
+        </Button>
+      </Box>
+      <WidgetManager />
+    </>
   );
 }
