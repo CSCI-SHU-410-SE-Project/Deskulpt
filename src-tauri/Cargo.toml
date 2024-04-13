@@ -1,19 +1,24 @@
 [package]
-name = "tauri-app"
+name = "deskulpt"
 version = "0.0.0"
-description = "A Tauri App"
-authors = ["you"]
+description = "Deskulpt (Desktop + Sculpt, pronounced /'deskʌlpt/), a cross-platform desktop customization tool."
+authors = ["Xinyu Li", "Yao Xiao", "Yuchen Zhou", "Frank Zhu"]
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+[dev-dependencies]
+pretty_assertions = "1.4.0"
+parameterized = "2.0.0"
+cargo-llvm-cov = "0.6.9"
+rstest = "0.19.0"
 [build-dependencies]
-tauri-build = { version = "1.5",features = ["config-json5"] }
+tauri-build = { version = "1.5.1",features = ["config-json5"] }
 
 [dependencies]
 tauri = { version = "1.6.1",features = ["shell-open", "config-json5"] }
-serde = { version = "1.0", features = ["derive"] }
-serde_json = "1.0"
+serde = { version = "1.0.197", features = ["derive"] }
+serde_json = "1.0.1"
 winapi = { version = "0.3.9", features = ["winuser", "windef"] }
 
 # Utilities
