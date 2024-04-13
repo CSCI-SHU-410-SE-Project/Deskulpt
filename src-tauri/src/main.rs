@@ -3,18 +3,15 @@
 
 use std::fs::create_dir_all;
 use tauri::{
-    api, generate_context,
-    utils::config::{parse::parse_json, WindowConfig},
-    AppHandle, Event, Manager, Window, WindowBuilder, WindowEvent, WindowUrl,
+    api, generate_context, utils::config::WindowConfig, AppHandle, Event, Manager,
+    Window, WindowBuilder, WindowUrl,
 };
-use windows::Win32::UI::WindowsAndMessaging::HWND_DESKTOP;
+
 use windows::Win32::{
     Foundation::HWND,
     UI::WindowsAndMessaging::{
-        GetWindowLongPtrA, GetWindowLongPtrW, SetWindowLongPtrW, SetWindowPos,
-        GWL_EXSTYLE, GWL_STYLE, HWND_BOTTOM, SWP_NOACTIVATE, SWP_NOMOVE, SWP_NOSIZE,
-        WS_DISABLED, WS_EX_APPWINDOW, WS_EX_LAYERED, WS_EX_NOACTIVATE, WS_EX_TOPMOST,
-        WS_EX_TRANSPARENT,
+        GetWindowLongPtrW, SetWindowLongPtrW, SetWindowPos, GWL_EXSTYLE, HWND_BOTTOM,
+        SWP_NOACTIVATE, SWP_NOMOVE, SWP_NOSIZE, WS_EX_NOACTIVATE,
     },
 };
 // use std::time::{SystemTime, UNIX_EPOCH};
@@ -109,8 +106,7 @@ fn make_window_non_activatable(window: Window) {
 fn set_window_zindex(window: Window) {
     // Window-specific solution
     let hwnd = HWND(window.hwnd().unwrap().0); // Get the HWND of the current window
-                                               // Set window to be always at bottom (behind all other windows but above the desktop)
-                                               //hwnd: P0, hwndinsertafter: P1, x: i32, y: i32, cx: i32, cy: i32, uflags: SET_WINDOW_POS_FLAGS
+                                               // Set window to be always at bottom (behind all other windows but above the desktop) //hwnd: P0, hwndinsertafter: P1, x: i32, y: i32, cx: i32, cy: i32, uflags: SET_WINDOW_POS_FLAGS
     unsafe {
         SetWindowPos(
             hwnd,
