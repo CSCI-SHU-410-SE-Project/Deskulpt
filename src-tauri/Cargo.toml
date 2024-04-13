@@ -11,7 +11,7 @@ edition = "2021"
 tauri-build = { version = "1.5",features = ["config-json5"] }
 
 [dependencies]
-tauri = { version = "1.5",features = ["shell-open", "config-json5"] }
+tauri = { version = "1.6.1",features = ["shell-open", "config-json5"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 winapi = { version = "0.3.9", features = ["winuser", "windef"] }
