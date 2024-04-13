@@ -12,9 +12,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Label pull request
-        uses: actions/labeler@v5
+      - uses: actions/labeler@v5
         if: github.repository == 'CSCI-SHU-410-SE-Project/Deskulpt'
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
-          configuration-path: ".github/labeler.yaml"
+          configuration-path: .github/labeler.yaml
