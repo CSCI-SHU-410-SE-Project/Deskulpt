@@ -1,116 +1,89 @@
-import { Box, Button, IconButton, List, ListItem, ListItemText } from "@mui/material";
-import RefreshIcon from "@mui/icons-material/Refresh";
+import { useState, useEffect } from "react";
+// import JsxParser from 'react-jsx-parser';
 
-import { invoke } from "@tauri-apps/api";
-import { emit } from "@tauri-apps/api/event";
-import { useEffect, useState } from "react";
-import { CommandOut, WidgetConfig } from "./types";
-import WidgetManager from "./WidgetManager/WidgetManager.tsx";
+import Button from "@mui/material/Button";
 
-export default function App() {
-  const [widgetConfigs, setWidgetConfigs] = useState<Record<string, WidgetConfig>>({});
+// Material UI component
+// import Textfield from '@mui/material/TextField';
 
-  /**
-   * Open the widget base directory in the file explorer of the OS.
-   */
-  async function openWidgetBase() {
-    const output: CommandOut<null> = await invoke("open_widget_base");
-    if ("failure" in output) {
-      console.error(output.failure);
-    }
-  }
+// import { invoke } from '@tauri-apps/api/tauri';
+// import { LogicalSize, appWindow } from '@tauri-apps/api/window';
 
-  /**
-   * Refresh the state of `widgetConfigs`.
-   *
-   * The reason why this function returns the updated state is that in some cases we
-   * need to access the updated state before React actually updates the component.
-   *
-   * @returns The updated state of `widgetConfigs` if the operation is successful or
-   * `null` otherwise.
-   */
-  async function refreshWidgetCollection() {
-    const output: CommandOut<Record<string, WidgetConfig>> = await invoke(
-      "refresh_widget_collection",
-    );
-    if ("success" in output) {
-      setWidgetConfigs(output.success);
-      return output.success;
-    } else {
-      console.error(output.failure);
-      return null;
-    }
-  }
+// import MultiWindowManager from './MultiWindowManager/MultiWindowManager';
+import WidgetManager from "./WidgetManager/WidgetManager";
 
-  /**
-   * Render a widget.
-   *
-   * In essence, this simply calls the backend command to bundle the widget and emit a
-   * corresponding "render-widget" event. The canvas will listen to this event and
-   * manage the actual rendering.
-   *
-   * @param widgetId The ID of the widget to render.
-   */
-  async function renderWidget(widgetId: string) {
-    const bundlerOutput: CommandOut<string> = await invoke("bundle_widget", {
-      widgetId,
-    });
-    await emit("render-widget", { widgetId, bundlerOutput });
-  }
+// to pease tsc and ignore unmatched type
+// const JsxParserComponent = JsxParser as any;
 
-  /**
-   * Render a collection of widgets asynchronously in parallel.
-   *
-   * @param configs The collection of widget configurations to render.
-   */
-  async function renderWidgets(configs: Record<string, WidgetConfig>) {
-    await Promise.all(Object.keys(configs).map((widgetId) => renderWidget(widgetId)));
-  }
+// const myScriptTSX = `
+//   <div>
+//     <p>This is rendered by <code>TSX</code> userscript.</p>
+//     <h2>Counter</h2>
+//     <Counter />
+//   </div>
+// `
 
+// Predefined element with props
+// const EchoText = (props: { value: string }) => {
+//   return <p>{props.value}</p>;
+// }
+
+// Predefined element with state
+const Counter = () => {
+  const [count, setCount] = useState(0);
+  return (
+    <div>
+      <p>Count: {count}</p>
+      <Button variant="contained" color="primary" onClick={() => setCount(count + 1)}>
+        Increment
+      </Button>
+    </div>
+  );
+};
+
+// await appWindow.setSize(new LogicalSize(
+//   document.body.scrollWidth, document.body.scrollHeight
+// ));
+
+// async function setWindowMinSize( { width, height }: { width: number, height: number }) {
+//   const curSize = await appWindow.innerSize();
+//   // console.log(curSize);
+//   // console.log(width, height);
+//   const newSize = new LogicalSize(
+//     Math.min(width, curSize.width),
+//     Math.min(height, curSize.height)
+//   );
+//   // console.log(await appWindow.innerSize());
+//   await appWindow.setSize(newSize);
+// }
+
+// const UserComponent = ( {userscript}: { userscript: string } ) => {
+//   return (
+//     <JsxParserComponent
+//         bindings={{
+//           myEventHandler: () => { console.log("click") }
+//         }}
+//         components={{ Counter, Textfield, EchoText, Button }}
+//         jsx={userscript}
+//       />
+//   );
+// }
+
+const App = () => {
   useEffect(() => {
-    // Fetch the widget collection and render all on mount
-    refreshWidgetCollection()
-      .then(async (configs) => {
-        if (configs !== null) {
-          await renderWidgets(configs);
-        }
-      })
-      .catch(console.error);
+    // Call the default tauri api to adjust the window size
+    console.log("UseEffect called in App.tsx");
   }, []);
 
   return (
-    <>
-      <Box>
-        <List>
-          {Object.entries(widgetConfigs)
-            .sort()
-            .map(([widgetId, widgetConfig]) => (
-              <ListItem
-                key={widgetId}
-                secondaryAction={
-                  <IconButton onClick={() => renderWidget(widgetId)}>
-                    <RefreshIcon />
-                  </IconButton>
-                }
-              >
-                <ListItemText
-                  primary={widgetConfig.deskulpt.name}
-                  secondary={widgetId}
-                />
-              </ListItem>
-            ))}
-        </List>
-        <Button variant="outlined" onClick={refreshWidgetCollection}>
-          Rescan
-        </Button>
-        <Button variant="outlined" onClick={() => renderWidgets(widgetConfigs)}>
-          Render All
-        </Button>
-        <Button variant="outlined" onClick={openWidgetBase}>
-          Open Widget Base Directory
-        </Button>
-      </Box>
+    <div>
+      {/* To drag the window in tauri, see this Github discussion: https://github.com/tauri-apps/tauri/discussions/4362 */}
+      <div data-tauri-drag-region>Drag area</div>
+      {/* <UserComponent userscript={myScriptTSX} /> */}
+      <h2>Counter</h2>
+      <Counter />
       <WidgetManager />
-    </>
+    </div>
   );
-}
+};
+export default App;

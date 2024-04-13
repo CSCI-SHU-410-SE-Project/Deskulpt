@@ -27,6 +27,7 @@
         url: "views/canvas.html",
         width: 800,
         height: 600,
+        transparent: true,
       },
       {
         label: "manager",
