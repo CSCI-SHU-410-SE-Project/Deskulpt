@@ -21,14 +21,15 @@
       },
     },
     windows: [
-      {
-        label: "canvas",
-        title: "Deskulpt Canvas",
-        url: "views/canvas.html",
-        width: 800,
-        height: 600,
-        transparent: true,
-      },
+      //      {
+      //        label: "canvas",
+      //        title: "Deskulpt Canvas",
+      //        url: "views/canvas.html",
+      //        width: 800,
+      //        height: 600,
+      //        transparent: true,
+      //        decorations:false
+      //      },
       {
         label: "manager",
         title: "Deskulpt Manager",

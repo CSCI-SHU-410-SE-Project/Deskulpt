@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import Widget from "../Widget/Widget";
 
 import "./WidgetCanvas.css";
+import { invoke } from "@tauri-apps/api/tauri";
 
 const WidgetCanvas = () => {
   // Note: This shouldn't be a React state, because it's not a part of the component's state.
@@ -76,6 +77,14 @@ const WidgetCanvas = () => {
       mouseDownInfo.mouse_y = 0;
       mouseDownInfo.elem_left = 0;
       mouseDownInfo.elem_top = 0;
+    });
+
+    window.document.addEventListener("keydown", function (event) {
+      // console.log('sss',event);
+      if (event.key === "Escape") {
+        // after pressing ESC
+        invoke("sink_canvas");
+      }
     });
 
     // initialize widget settings

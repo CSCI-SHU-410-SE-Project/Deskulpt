@@ -37,8 +37,8 @@ mod testing;
 fn create_widget_canvas_window(app_handle: AppHandle) -> String {
     let window_label = "widget-canvas".to_string();
     let window_config: WindowConfig = WindowConfig {
-        url: WindowUrl::App("src/canvas/index.html".into()),
-        // url: WindowUrl::App("views/canvas.html".into()),
+        // url: WindowUrl::App("src/canvas/index.html".into()),
+        url: WindowUrl::App("views/canvas.html".into()),
 
         // url: WindowUrl::App("http://localhost:8080/particles/".into()),
         // url: WindowUrl::App("http://localhost:8080/mytest/".into()),
