@@ -81,12 +81,12 @@ fn create_widget_canvas_window(app_handle: AppHandle) -> String {
 
 // When the user clicks the window, it won't become the foreground window
 // This should be applied to both main and widget windows, o/w the widget window will still be activatable. This is likely a bug in Tauri or webview2
+#[cfg(windows)]
 fn make_window_non_activatable(window: Window) {
     match window.hwnd() {
         Ok(hwnd) => {
             // Window-specific solution
             let hwnd = HWND(hwnd.0);
-            #[cfg(windows)]
             unsafe {
                 let ex_style = GetWindowLongPtrW(hwnd, GWL_EXSTYLE);
                 SetWindowLongPtrW(
@@ -104,11 +104,11 @@ fn make_window_non_activatable(window: Window) {
 
 // Set window to be below all other windows
 #[tauri::command]
+#[cfg(windows)]
 fn set_window_zindex(window: Window) {
     // Window-specific solution
     let hwnd = HWND(window.hwnd().unwrap().0); // Get the HWND of the current window
-    #[cfg(windows)]
-    // Set window to be always at bottom (behind all other windows but above the desktop) //hwnd: P0, hwndinsertafter: P1, x: i32, y: i32, cx: i32, cy: i32, uflags: SET_WINDOW_POS_FLAGS
+                                               // Set window to be always at bottom (behind all other windows but above the desktop) //hwnd: P0, hwndinsertafter: P1, x: i32, y: i32, cx: i32, cy: i32, uflags: SET_WINDOW_POS_FLAGS
     unsafe {
         SetWindowPos(
             hwnd,
@@ -141,6 +141,7 @@ fn float_canvas(app_handle: AppHandle) {
                                   // make_window_non_activatable(window.clone()); // Make the window non-activatable
 }
 
+#[cfg(windows)]
 fn sink_window(window: Window) {
     window.set_ignore_cursor_events(true).unwrap();
     // let hwnd = HWND(window.hwnd().unwrap().0);
