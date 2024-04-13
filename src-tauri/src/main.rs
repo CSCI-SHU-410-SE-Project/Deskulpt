@@ -82,22 +82,22 @@ fn create_widget_canvas_window(app_handle: AppHandle) -> String {
 // When the user clicks the window, it won't become the foreground window
 // This should be applied to both main and widget windows, o/w the widget window will still be activatable. This is likely a bug in Tauri or webview2
 fn make_window_non_activatable(window: Window) {
-    // Window-specific solution
-    let hwnd = HWND(window.hwnd().unwrap().0);
-    unsafe {
-        let ex_style = GetWindowLongPtrW(hwnd, GWL_EXSTYLE);
-        SetWindowLongPtrW(
-            hwnd,
-            GWL_EXSTYLE,
-            ex_style | WS_EX_NOACTIVATE.0 as isize, // WS_EX_TOPMOST.0 as isize
-        );
-        // let style = GetWindowLongPtrW(hwnd, GWL_STYLE);
-        // SetWindowLongPtrW(
-        //     hwnd,
-        //     GWL_STYLE,
-        //     style |
-        //     WS_DISABLED.0 as isize
-        // );
+    match window.hwnd() {
+        Ok(hwnd) => {
+            // Window-specific solution
+            let hwnd = HWND(hwnd.0);
+            unsafe {
+                let ex_style = GetWindowLongPtrW(hwnd, GWL_EXSTYLE);
+                SetWindowLongPtrW(
+                    hwnd,
+                    GWL_EXSTYLE,
+                    ex_style | WS_EX_NOACTIVATE.0 as isize, // WS_EX_TOPMOST.0 as isize
+                );
+            }
+        },
+        Err(err) => {
+            println!("Failed to get window handle: {}", err);
+        },
     }
 }
 
