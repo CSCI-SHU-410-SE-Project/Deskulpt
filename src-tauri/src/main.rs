@@ -29,6 +29,10 @@ mod bundler;
 mod commands;
 mod config;
 mod states;
+mod widget_api;
+
+#[cfg(test)]
+mod testing;
 
 fn create_widget_canvas_window(app_handle: AppHandle) -> String {
     let window_label = "widget-canvas".to_string();
