@@ -86,6 +86,7 @@ fn make_window_non_activatable(window: Window) {
         Ok(hwnd) => {
             // Window-specific solution
             let hwnd = HWND(hwnd.0);
+            #[cfg(windows)]
             unsafe {
                 let ex_style = GetWindowLongPtrW(hwnd, GWL_EXSTYLE);
                 SetWindowLongPtrW(
@@ -106,7 +107,8 @@ fn make_window_non_activatable(window: Window) {
 fn set_window_zindex(window: Window) {
     // Window-specific solution
     let hwnd = HWND(window.hwnd().unwrap().0); // Get the HWND of the current window
-                                               // Set window to be always at bottom (behind all other windows but above the desktop) //hwnd: P0, hwndinsertafter: P1, x: i32, y: i32, cx: i32, cy: i32, uflags: SET_WINDOW_POS_FLAGS
+    #[cfg(windows)]
+    // Set window to be always at bottom (behind all other windows but above the desktop) //hwnd: P0, hwndinsertafter: P1, x: i32, y: i32, cx: i32, cy: i32, uflags: SET_WINDOW_POS_FLAGS
     unsafe {
         SetWindowPos(
             hwnd,
