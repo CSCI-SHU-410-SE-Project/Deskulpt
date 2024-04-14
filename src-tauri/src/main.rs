@@ -7,13 +7,13 @@ use tauri::{
     Window, WindowBuilder, WindowUrl,
 };
 
-use windows::Win32::{
-    Foundation::HWND,
-    UI::WindowsAndMessaging::{
-        GetWindowLongPtrW, SetWindowLongPtrW, SetWindowPos, GWL_EXSTYLE, HWND_BOTTOM,
-        SWP_NOACTIVATE, SWP_NOMOVE, SWP_NOSIZE, WS_EX_NOACTIVATE,
-    },
-};
+// use windows::Win32::{
+//     Foundation::HWND,
+//     UI::WindowsAndMessaging::{
+//         GetWindowLongPtrW, SetWindowLongPtrW, SetWindowPos, GWL_EXSTYLE, HWND_BOTTOM,
+//         SWP_NOACTIVATE, SWP_NOMOVE, SWP_NOSIZE, WS_EX_NOACTIVATE,
+//     },
+// };
 // use std::time::{SystemTime, UNIX_EPOCH};
 
 // Greet the user with a message
@@ -65,10 +65,10 @@ fn create_widget_canvas_window(app_handle: AppHandle) -> String {
 
     // let window: Window = app_handle.get_window(&window_label).unwrap(); // Get the window by label
     new_window.maximize().unwrap();
-    set_window_zindex(new_window.clone()); // Set the window to be below all other windows
-    make_window_non_activatable(new_window.clone()); // Make the window non-activatable
-    sink_window(new_window.clone()); // Sink the window
-                                     // new_window.set_ignore_cursor_events(true).unwrap();
+    // set_window_zindex(new_window.clone()); // Set the window to be below all other windows
+    // make_window_non_activatable(new_window.clone()); // Make the window non-activatable
+    // sink_window(new_window.clone()); // Sink the window
+    // new_window.set_ignore_cursor_events(true).unwrap();
     return window_label;
 }
 
@@ -81,56 +81,56 @@ fn create_widget_canvas_window(app_handle: AppHandle) -> String {
 
 // When the user clicks the window, it won't become the foreground window
 // This should be applied to both main and widget windows, o/w the widget window will still be activatable. This is likely a bug in Tauri or webview2
-#[cfg(windows)]
-fn make_window_non_activatable(window: Window) {
-    match window.hwnd() {
-        Ok(hwnd) => {
-            // Window-specific solution
-            let hwnd = HWND(hwnd.0);
-            unsafe {
-                let ex_style = GetWindowLongPtrW(hwnd, GWL_EXSTYLE);
-                SetWindowLongPtrW(
-                    hwnd,
-                    GWL_EXSTYLE,
-                    ex_style | WS_EX_NOACTIVATE.0 as isize, // WS_EX_TOPMOST.0 as isize
-                );
-            }
-        },
-        Err(err) => {
-            println!("Failed to get window handle: {}", err);
-        },
-    }
-}
+// #[cfg(windows)]
+// fn make_window_non_activatable(window: Window) {
+//     match window.hwnd() {
+//         Ok(hwnd) => {
+//             // Window-specific solution
+//             let hwnd = HWND(hwnd.0);
+//             unsafe {
+//                 let ex_style = GetWindowLongPtrW(hwnd, GWL_EXSTYLE);
+//                 SetWindowLongPtrW(
+//                     hwnd,
+//                     GWL_EXSTYLE,
+//                     ex_style | WS_EX_NOACTIVATE.0 as isize, // WS_EX_TOPMOST.0 as isize
+//                 );
+//             }
+//         },
+//         Err(err) => {
+//             println!("Failed to get window handle: {}", err);
+//         },
+//     }
+// }
 
 // Set window to be below all other windows
-#[tauri::command]
-#[cfg(windows)]
-fn set_window_zindex(window: Window) {
-    // Window-specific solution
-    let hwnd = HWND(window.hwnd().unwrap().0); // Get the HWND of the current window
-                                               // Set window to be always at bottom (behind all other windows but above the desktop) //hwnd: P0, hwndinsertafter: P1, x: i32, y: i32, cx: i32, cy: i32, uflags: SET_WINDOW_POS_FLAGS
-    unsafe {
-        SetWindowPos(
-            hwnd,
-            // progman, // This places your window above the desktop but below other windows
-            HWND_BOTTOM,
-            0,
-            0,
-            0,
-            0,
-            SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOSIZE,
-        )
-        .unwrap();
-    };
-    println!("Window with label {} set to be below all other windows", window.label());
-}
+// #[tauri::command]
+// #[cfg(windows)]
+// fn set_window_zindex(window: Window) {
+//     // Window-specific solution
+//     let hwnd = HWND(window.hwnd().unwrap().0); // Get the HWND of the current window
+//                                                // Set window to be always at bottom (behind all other windows but above the desktop) //hwnd: P0, hwndinsertafter: P1, x: i32, y: i32, cx: i32, cy: i32, uflags: SET_WINDOW_POS_FLAGS
+//     unsafe {
+//         SetWindowPos(
+//             hwnd,
+//             // progman, // This places your window above the desktop but below other windows
+//             HWND_BOTTOM,
+//             0,
+//             0,
+//             0,
+//             0,
+//             SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOSIZE,
+//         )
+//         .unwrap();
+//     };
+//     println!("Window with label {} set to be below all other windows", window.label());
+// }
 
 #[tauri::command]
 fn sink_canvas(app_handle: AppHandle) {
     let window: Window = app_handle.get_window("widget-canvas").unwrap(); // Get the window by label
     sink_window(window.clone()); // Sink the window
-    set_window_zindex(window.clone()); // Set the window to be below all other windows
-                                       // make_window_non_activatable(window.clone()); // Make the window non-activatable
+                                 // set_window_zindex(window.clone()); // Set the window to be below all other windows
+                                 // make_window_non_activatable(window.clone()); // Make the window non-activatable
 }
 
 #[tauri::command]
@@ -141,7 +141,7 @@ fn float_canvas(app_handle: AppHandle) {
                                   // make_window_non_activatable(window.clone()); // Make the window non-activatable
 }
 
-#[cfg(windows)]
+// #[cfg(windows)]
 fn sink_window(window: Window) {
     window.set_ignore_cursor_events(true).unwrap();
     // let hwnd = HWND(window.hwnd().unwrap().0);
@@ -212,7 +212,7 @@ fn main() {
             sink_canvas,
             float_canvas,
             test,
-            set_window_zindex,
+            // set_window_zindex,
             // create_widget_window,
             // config_window,
             // config_window
