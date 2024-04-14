@@ -69,7 +69,7 @@ fn create_widget_canvas_window(app_handle: AppHandle) -> String {
     // make_window_non_activatable(new_window.clone()); // Make the window non-activatable
     // sink_window(new_window.clone()); // Sink the window
     // new_window.set_ignore_cursor_events(true).unwrap();
-    return window_label;
+    window_label
 }
 
 // // Common configuration for both main and widget windows
