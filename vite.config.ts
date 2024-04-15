@@ -46,6 +46,9 @@ export default defineConfig({
       },
       output: {
         preserveModules: true,
+        entryFileNames: "assets/[name].js",
+        chunkFileNames: "assets/[name].js",
+        assetFileNames: "assets/[name].[ext]",
       },
       preserveEntrySignatures: "allow-extension",
       // external: [

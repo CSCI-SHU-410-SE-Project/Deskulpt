@@ -6,8 +6,13 @@ import { grabErrorInfo, handleError, getDOMRoot } from "./utils";
 import WidgetContainer from "../components/WidgetContainer";
 
 // // explicitly import the default dependencies so that it won't be tree-shaken
-// import "../@deskulpt/react"
-// import "../@deskulpt/apis";
+// import "../../default_deps_dist/react"
+// import "../../default_deps_dist/apis";
+
+import * as p from "../@deskulpt/react";
+import * as q from "../@deskulpt/apis";
+console.log(p);
+console.log(q);
 
 window.__DESKULPT__ = { defaultDeps: { React } };
 

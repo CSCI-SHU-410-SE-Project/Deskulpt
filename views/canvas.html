@@ -8,17 +8,27 @@
     <script type="importmap">
       {
         "imports": {
+          "@deskulpt/react": "./assets/src/@deskulpt/react/index.js",
+          "@deskulpt/apis": "./assets/src/@deskulpt/apis/index.js",
+        }
+      }
+    </script>
+    <!-- <script type="importmap">
+      {
+        "imports": {
           "@deskulpt/react": "/src/@deskulpt/react",
           "@deskulpt/apis": "/src/@deskulpt/apis"
         }
       }
-    </script>
+    </script> -->
   </head>
 
   <body>
     <div id="canvas"></div>
-    <script type="module" crossorigin src="../default_deps_dist/react/index.js"></script>
-    <script type="module" crossorigin src="../default_deps_dist/apis/index.js"></script>
+    <!-- <script type="module" crossorigin src="../default_deps_dist/react/index.js"></script>
+    <script type="module" crossorigin src="../default_deps_dist/apis/index.js"></script> -->
+    <!-- <script type="module" crossorigin src="../src/@deskulpt/react/index.ts"></script>
+    <script type="module" crossorigin src="../src/@deskulpt/apis/index.ts"></script> -->
     <script type="module" src="../src/canvas/main.tsx"></script>
   </body>
 </html>
