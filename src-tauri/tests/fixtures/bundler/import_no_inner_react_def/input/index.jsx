@@ -1,5 +1,3 @@
-// This file has React defined, but its imported file does not
-
 import MessageInner from "./MessageInner";
 
 const React = window.__DESKULPT__.defaultDeps.React;
