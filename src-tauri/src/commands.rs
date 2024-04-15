@@ -17,15 +17,16 @@ use crate::{
 pub(crate) type CommandOut<T> = Result<T, String>;
 
 /// Stringify an [`Error`].
+///
+/// This is a similar representation to that one gets by default if returning an error
+/// from `fn main`, except that it never includes the backtrace to not be too verbose.
 pub(crate) fn stringify_anyhow(err: Error) -> String {
     err.chain()
         .enumerate()
-        .map(|(index, reason)| {
-            if index == 0 {
-                format!("{reason}\n\nCaused by:")
-            } else {
-                format!("  {index}: {reason}")
-            }
+        .map(|(index, reason)| match index {
+            0 => reason.to_string(),
+            1 => format!("\nCaused by:\n  1: {reason}"),
+            _ => format!("  {index}: {reason}"),
         })
         .collect::<Vec<String>>()
         .join("\n")
