@@ -1,21 +1,15 @@
 {
-	"compilerOptions": {
-	  "outDir": "./default_deps_dist",            
-	  "rootDir": "./src/@deskulpt",            
-	  "module": "ESNext",            
-	  "target": "ES6",               
-	  "strict": true,                
-	  "esModuleInterop": true,       
-	  "skipLibCheck": true,          
-	  "forceConsistentCasingInFileNames": true,
-	  "moduleResolution": "node"
-	},
-	"include": [
-	  "src/@deskulpt/**/*"                     
-	],
-	"exclude": [
-	  "node_modules",                
-	  "**/*.test.ts"                 
-	]
-  }
-  
+  "compilerOptions": {
+    "outDir": "./public/default_deps_dist",
+    "rootDir": "./src/@deskulpt",
+    "module": "ESNext",
+    "target": "ES6",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "moduleResolution": "node"
+  },
+  "include": ["src/@deskulpt/**/*"],
+  "exclude": ["node_modules", "**/*.test.ts"]
+}
