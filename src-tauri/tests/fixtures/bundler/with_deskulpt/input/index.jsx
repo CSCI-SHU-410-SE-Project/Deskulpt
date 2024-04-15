@@ -1,12 +1,12 @@
 const React = window.__DESKULPT__.defaultDeps.React;
 
-import { readFile } from "@deskulpt/api/fs";
+import { fs } from "@deskulpt/apis";
 
 function Counter() {
   const [count, setCount] = React.useState(0);
 
   function handleClick() {
-    readFile("myfile.txt");
+    fs.readFile("myfile.txt");
     setCount(count + 1);
   }
 

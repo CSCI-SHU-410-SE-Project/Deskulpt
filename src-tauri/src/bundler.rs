@@ -156,10 +156,12 @@ impl Fold for ImportRenamer {
             if let ModuleItem::ModuleDecl(ModuleDecl::Import(import_decl)) = stmt {
                 // ModuleItem::ModuleDecl(ModuleDecl::Import(import_decl)) => {
                 let src = import_decl.src.value.to_string();
-                if src.starts_with("@deskulpt") {
-                    let stripped = src.strip_prefix("@deskulpt").unwrap();
-                    import_decl.src.value =
-                        Atom::from(format!("@deskulpt-{}{}", self.widget_id, stripped));
+                if src.starts_with("@deskulpt/apis") {
+                    let stripped = src.strip_prefix("@deskulpt/apis").unwrap();
+                    import_decl.src.value = Atom::from(format!(
+                        "@deskulpt-{}{}/apis",
+                        self.widget_id, stripped
+                    ));
                 }
             }
         }
@@ -417,7 +419,7 @@ mod tests {
             .unwrap();
         let mut dependency_map: HashMap<String, String> = HashMap::new();
         // a list of ignored dependencies
-        let ignored = vec!["@deskulpt/api/fs"];
+        let ignored = vec!["@deskulpt/react", "@deskulpt/apis"];
         for dep in ignored {
             dependency_map.insert(dep.to_string(), "".to_string());
         }
