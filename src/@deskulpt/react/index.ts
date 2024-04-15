@@ -1,6 +1,6 @@
 // wrap react so that widget can do
 // `import React, { useState } from "@deskulpt/react"`
 
-import * as React from "react";
+import React from "react";
 
-export { React };
+export default React;

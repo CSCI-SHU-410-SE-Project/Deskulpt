@@ -9,7 +9,11 @@ import tseslint from "typescript-eslint";
 
 export default tseslint.config(
   {
-    ignores: ["**/dist/**", "**/fixtures/**", "**/target/**"],
+    ignores: [
+      "**/dist/**", 
+      "**/default_deps_dist/**", 
+      "**/fixtures/**", 
+      "**/target/**"],
   },
 
   // --- Language Options -------------------------------------------------------------

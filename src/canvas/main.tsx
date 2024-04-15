@@ -5,9 +5,9 @@ import { RenderWidgetPayload, WidgetModule, WidgetRecord } from "../types";
 import { grabErrorInfo, handleError, getDOMRoot } from "./utils";
 import WidgetContainer from "../components/WidgetContainer";
 
-// explicitly import the default dependencies so that it won't be tree-shaken
-import "../@deskulpt/react";
-import "../@deskulpt/apis";
+// // explicitly import the default dependencies so that it won't be tree-shaken
+// import "../@deskulpt/react"
+// import "../@deskulpt/apis";
 
 window.__DESKULPT__ = { defaultDeps: { React } };
 

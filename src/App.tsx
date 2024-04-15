@@ -6,7 +6,7 @@ import { emit } from "@tauri-apps/api/event";
 import { useEffect, useState } from "react";
 import { CommandOut, WidgetConfig } from "./types";
 
-import { fs } from "./@deskulpt/apis";
+// import { fs } from "./@deskulpt/apis";
 
 export default function App() {
   const [widgetConfigs, setWidgetConfigs] = useState<Record<string, WidgetConfig>>({});
@@ -70,11 +70,11 @@ export default function App() {
 
   useEffect(() => {
     // Fetch the widget collection and render all on mount
-    fs.readFile("test-widget-api", "output.txt")
-      .then((content) => {
-        console.log("Read file content:", content);
-      })
-      .catch(console.error);
+    // fs.readFile("test-widget-api", "output.txt")
+    //   .then((content) => {
+    //     console.log("Read file content:", content);
+    //   })
+    //   .catch(console.error);
     refreshWidgetCollection()
       .then(async (configs) => {
         if (configs !== null) {
