@@ -39,12 +39,15 @@ export default function WidgetContainer(props: {
               sx={{
                 position: "absolute",
                 top: 5,
+                right: 5,
                 zIndex: 2000,
                 fontSize: 15,
               }}
             />
           </Tooltip>
-          <ErrorBoundary fallbackRender={fallbackRender}>{inner}</ErrorBoundary>
+          <ErrorBoundary fallbackRender={(props) => FallBack(id, props)}>
+            {inner}
+          </ErrorBoundary>
         </Box>
       </Draggable>
     </React.StrictMode>
@@ -54,12 +57,12 @@ export default function WidgetContainer(props: {
 /**
  * The fallback component if the user widget fails to render.
  */
-function fallbackRender(props: { error: unknown }) {
+function FallBack(id: string, props: { error: unknown }) {
   const { error } = props;
 
   return (
     <ErrorDisplay
-      title="Rendering error caught by the React error boundary"
+      title={`Error in '${id}': widget rendering failed (likely a problem with the React component returned by the \`render\` function)`}
       error={grabErrorInfo(error)}
     />
   );

@@ -1,7 +1,27 @@
 import ReactDOM from "react-dom/client";
 import ErrorDisplay from "../components/ErrorDisplay";
 import WidgetContainer from "../components/WidgetContainer";
-import { WidgetDOMRoot, WidgetRecord } from "../types";
+import { WidgetDOMRoot, WidgetModule, WidgetRecord } from "../types";
+
+/**
+ * Validate a user widget module.
+ *
+ * If the module is invalid, the function returns an error message, and otherwise it
+ * returns `null`.
+ */
+export function getWidgetModuleError(module: WidgetModule) {
+  const widget = module.default;
+  if (widget === undefined) {
+    return "The widget must provide a default export.";
+  }
+  if (widget.render === undefined) {
+    return "The default export of the widget must provide a `render` function.";
+  }
+  if (typeof widget.render !== "function") {
+    return "The `render` key of the default export must be a function.";
+  }
+  return null;
+}
 
 /**
  * Handle a rendering error by trying to display error information in the DOM root.
