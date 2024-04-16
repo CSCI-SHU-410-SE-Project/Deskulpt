@@ -36,5 +36,7 @@ website/build
 website/.docusaurus
 website/.cache-loader
 
-# # compiled default dependencies
-src/@deskulpt/**/*.js
+# Ignore views/canvas.html because it's dynamically chosen by npm based on
+# whether it's dev or build
+views/canvas.html
+
