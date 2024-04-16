@@ -5,9 +5,9 @@ import path from "path";
 // import copy from "rollup-plugin-copy";
 // import { createHtmlPlugin } from "vite-plugin-html";
 
-function normalizePath(p: string) {
-  return p.replace(/\\/g, "/");
-}
+// function normalizePath(p: string) {
+//   return p.replace(/\\/g, "/");
+// }
 
 export default defineConfig({
   plugins: [react()],
@@ -42,30 +42,37 @@ export default defineConfig({
         canvas: resolve(__dirname, "views/canvas.html"),
       },
       output: {
-        // Map `__diranme/src/@deskulpt/**/*.tsx?` to `__dirname/dist/@deskulpt/**/*`
-        manualChunks(id) {
-          // Normalize the incoming module ID and the base path for @deskulpt
-          const normalizedId = normalizePath(id);
-          const deskulptPath = normalizePath(path.resolve(__dirname, "src/@deskulpt"));
+        preserveModules: true,
+        // remove hash from chunk names
+        entryFileNames: `assets/[name].js`,
+        chunkFileNames: `assets/[name].js`,
+        assetFileNames: `assets/[name].[ext]`,
 
-          if (normalizedId.includes(deskulptPath)) {
-            console.log(normalizedId);
-            const pathParts = normalizedId.split("/");
-            const deskulptIndex = pathParts.indexOf("@deskulpt");
-            const specificPath = pathParts
-              .slice(deskulptIndex)
-              .join("/")
-              .replace(/\.tsx?$/, "");
-            return `${specificPath}`;
-          }
-        },
-        chunkFileNames(chunkInfo) {
-          if (chunkInfo.name.startsWith("@deskulpt")) {
-            return `[name].js`;
-          }
-          return `assets/[name]-[hash].js`;
-        },
+        // Map `__diranme/src/@deskulpt/**/*.tsx?` to `__dirname/dist/@deskulpt/**/*`
+        // manualChunks(id) {
+        //   // Normalize the incoming module ID and the base path for @deskulpt
+        //   const normalizedId = normalizePath(id);
+        //   const deskulptPath = normalizePath(path.resolve(__dirname, "src/@deskulpt"));
+
+        //   if (normalizedId.includes(deskulptPath)) {
+        //     console.log(normalizedId);
+        //     const pathParts = normalizedId.split("/");
+        //     const deskulptIndex = pathParts.indexOf("@deskulpt");
+        //     const specificPath = pathParts
+        //       .slice(deskulptIndex)
+        //       .join("/")
+        //       .replace(/\.tsx?$/, "");
+        //     return `${specificPath}`;
+        //   }
+        // },
+        // chunkFileNames(chunkInfo) {
+        //   if (chunkInfo.name.startsWith("@deskulpt")) {
+        //     return `[name].js`;
+        //   }
+        //   return `assets/[name]-[hash].js`;
+        // },
       },
+      preserveEntrySignatures: "allow-extension",
     },
   },
 });

@@ -9,8 +9,8 @@ import WidgetContainer from "../components/WidgetContainer";
 // import "../../default_deps_dist/react"
 // import "../../default_deps_dist/apis";
 
-// These two lines will force the bundler to create variables named `DReact` and `apis`
-// Without these lines, the bundler will tree-shake the imports and widget api will not be bundled
+// These three lines will add `@deskulpt/react` and `@deskulpt/apis` to the import graph.
+// Without these lines, the bundler will tree-shake the two modules and widget api will not be bundled
 import * as reactDummy from "@deskulpt/react";
 import * as apisDummy from "@deskulpt/apis";
 console.log(reactDummy, apisDummy);
