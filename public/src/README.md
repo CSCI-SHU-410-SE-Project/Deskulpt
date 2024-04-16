@@ -1,1 +1,0 @@
-We use a proxy import instead of directly include the compiled deskulpt api in public. This is to ensure that deskulpt api can reference other node modules, such as "react". If we simply include the compiled deskulpt api in public dir, the reference to "react" won't be resolved in the browser.
