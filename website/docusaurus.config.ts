@@ -58,9 +58,9 @@ const config: Config = {
           to: "/blog",
         },
         {
-          label: "GitHub",
           href: "https://github.com/CSCI-SHU-410-SE-Project/Deskulpt",
           position: "right",
+          className: "header-github-link",
         },
       ],
     },
