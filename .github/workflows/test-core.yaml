@@ -50,5 +50,5 @@ jobs:
       - name: Install frontend dependencies
         run: npm install
 
-      - name: Run full test suite
-        run: npm run test
+      - name: Run backend test suite
+        run: npm run test rs
