@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "tsc && vite build && bash post-vite-build.sh",
     "preview": "vite preview",
     "tauri": "tauri",
     "lint": "node ./maint_tools/lint.js",

@@ -10,6 +10,7 @@ lerna-debug.log*
 node_modules
 default_deps_dist
 dist
+backup-dist
 dist-ssr
 *.local
 
