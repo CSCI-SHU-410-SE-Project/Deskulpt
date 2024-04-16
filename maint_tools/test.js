@@ -23,31 +23,19 @@ const commandMatrix = {
 
 // Setup the commander
 program
-  .name("format")
-  .description("Format the codebase")
-  .addArgument(
-    new Argument("[lang]", "The language to format")
-      .choices(["rs", "all"])
-      .default("all"),
-  )
-  .option("--rs [name...]", "Run only matching rs tests")
+  .name("test")
+  .description("Test the codebase")
+  .addArgument(new Argument("<lang>", "The language to test").choices(["rs"]))
+  .addArgument(new Argument("[testname]", "Select a subset of tests"))
   .option("--cov", "Generate coverage report")
-  .action((lang, options) => {
-    const langs = lang === "all" ? ["rs"] : [lang];
-
-    let anyError = false;
-    langs.map((lang) => {
-      const { dir, cmd, args } = commandMatrix[lang][options.cov ? "cov" : "run"];
-      const cwd = join(basedir, dir);
-      const fullArgs = [...args, ...(options[lang] || [])];
-      const passed = executeCommand(cmd, fullArgs, cwd, `Testing for lang=${lang}`);
-      if (!passed) {
-        anyError = true;
-      }
-    });
+  .action((lang, testname, options) => {
+    const { dir, cmd, args } = commandMatrix[lang][options.cov ? "cov" : "run"];
+    const cwd = join(basedir, dir);
+    const fullArgs = [...args, ...(testname !== undefined ? [testname] : [])];
+    const passed = executeCommand(cmd, fullArgs, cwd, `Testing for lang=${lang}`);
 
     // Exit with error code if errors were found; this is useful for CI/CD pipelines
-    if (anyError) {
+    if (!passed) {
       process.exit(1);
     }
   });
