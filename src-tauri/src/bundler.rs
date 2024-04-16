@@ -157,10 +157,13 @@ impl Fold for ImportRenamer {
                 // ModuleItem::ModuleDecl(ModuleDecl::Import(import_decl)) => {
                 let src = import_decl.src.value.to_string();
                 if src.starts_with("@deskulpt/apis") {
-                    let stripped = src.strip_prefix("@deskulpt/apis").unwrap();
+                    // let stripped = src.strip_prefix("@deskulpt/apis").unwrap();
+                    // import_decl.src.value = Atom::from(format!(
+                    //     "@deskulpt-{}{}/apis",
+                    //     self.widget_id, stripped
+                    // ));
                     import_decl.src.value = Atom::from(format!(
-                        "@deskulpt-{}{}/apis",
-                        self.widget_id, stripped
+                        "@deskulpt/apis",
                     ));
                 }
             }

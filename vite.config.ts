@@ -2,7 +2,6 @@ import { defineConfig } from "vite";
 import { resolve } from "path";
 import react from "@vitejs/plugin-react";
 import path from "path";
-import { PreRenderedChunk } from "rollup";
 // import copy from "rollup-plugin-copy";
 // import { createHtmlPlugin } from "vite-plugin-html";
 
@@ -27,12 +26,23 @@ export default defineConfig({
     },
   },
   build: {
+    // TODO: Set up vite config to avoid "React" being renamed to "R" in production
+    minify: "terser",
+    terserOptions: {
+      // compress: false,
+      mangle: false,
+      // format: {
+      //   beautify: true, 
+      // },
+    },
     rollupOptions: {
+      // treeshake: false,
       input: {
         main: resolve(__dirname, "views/index.html"),
         canvas: resolve(__dirname, "views/canvas.html"),
       },
       output: {
+        // Map `__diranme/src/@deskulpt/**/*.tsx?` to `__dirname/dist/@deskulpt/**/*`
         manualChunks(id) {
           // Normalize the incoming module ID and the base path for @deskulpt
           const normalizedId = normalizePath(id);
@@ -40,7 +50,6 @@ export default defineConfig({
 
           if (normalizedId.includes(deskulptPath)) {
             console.log(normalizedId);
-            // Map `__diranme/src/@deskulpt/**/*` to `__dirname/dist/@deskulpt/**/*`
             const pathParts = normalizedId.split("/");
             const deskulptIndex = pathParts.indexOf("@deskulpt");
             const specificPath = pathParts
@@ -50,7 +59,7 @@ export default defineConfig({
             return `${specificPath}`;
           }
         },
-        chunkFileNames(chunkInfo: PreRenderedChunk) {
+        chunkFileNames(chunkInfo) {
           if (chunkInfo.name.startsWith("@deskulpt")) {
             return `[name].js`;
           }
