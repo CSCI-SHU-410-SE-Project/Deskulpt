@@ -1,8 +1,7 @@
 import { Argument, Command } from "commander";
 import { join } from "path";
 import { fileURLToPath } from "url";
-import spawn from "cross-spawn";
-import chalk from "chalk";
+import { executeCommand } from "./utils.js";
 
 const program = new Command();
 const basedir = join(fileURLToPath(new URL(".", import.meta.url)), "..");
@@ -12,12 +11,12 @@ const commandMatrix = {
     run: {
       dir: "src-tauri",
       cmd: "cargo",
-      args: ["test"],
+      args: ["test", "--quiet"],
     },
     cov: {
       dir: "src-tauri",
       cmd: "cargo",
-      args: ["llvm-cov", "--open", "--"],
+      args: ["llvm-cov", "--quiet", "--html", "--"],
     },
   },
 };
@@ -31,7 +30,8 @@ program
       .choices(["rs", "all"])
       .default("all"),
   )
-  .option("--rs [name...]", "Run only matching cargo tests")
+  .option("--rs [name...]", "Run only matching rs tests")
+  .option("--cov", "Generate coverage report")
   .action((lang, options) => {
     const langs = lang === "all" ? ["rs"] : [lang];
 
@@ -39,39 +39,11 @@ program
     langs.map((lang) => {
       const { dir, cmd, args } = commandMatrix[lang][options.cov ? "cov" : "run"];
       const cwd = join(basedir, dir);
-
-      // Concatenate test pattern specifications to the command
-      const newArgs = [...args, ...(options[lang] || [])];
-
-      // Print the current job information
-      console.log(chalk.blue.underline(`Testing for lang=${lang}`));
-      console.log(chalk.blue(">>>"), cmd, newArgs.join(" "));
-      console.log(chalk.blue(">>>"), cwd);
-      console.log();
-
-      try {
-        const { status, error } = spawn.sync(cmd, args, { cwd: cwd, stdio: "inherit" });
-
-        if (error) {
-          anyError = true;
-          console.log("\u274C", chalk.red(error.toString()));
-        } else if (status != 0) {
-          anyError = true;
-          console.log(
-            "\u274C",
-            chalk.red.underline(`[lang=${lang}] Testing failed with status=${status}`),
-          );
-        } else {
-          console.log(
-            "\u2705",
-            chalk.green.underline(`[lang=${lang}] All tests passed!`),
-          );
-        }
-      } catch (err) {
+      const fullArgs = [...args, ...(options[lang] || [])];
+      const passed = executeCommand(cmd, fullArgs, cwd, `Testing for lang=${lang}`);
+      if (!passed) {
         anyError = true;
-        console.log("\u274C", chalk.red(err.toString()));
       }
-      console.log();
     });
 
     // Exit with error code if errors were found; this is useful for CI/CD pipelines
