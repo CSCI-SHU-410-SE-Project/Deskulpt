@@ -113,13 +113,12 @@ pub(crate) fn read_widget_config(path: &Path) -> Result<Option<WidgetConfig>, Er
 
 #[cfg(test)]
 mod tests {
-    use std::env::current_dir;
-
     use super::*;
     use crate::testing::{assert_err_eq, ChainReason};
     use path_clean::PathClean;
     use pretty_assertions::assert_eq;
     use rstest::rstest;
+    use std::env::current_dir;
 
     /// Get the absolute path to the fixture directory.
     fn fixture_dir() -> PathBuf {
@@ -164,10 +163,8 @@ mod tests {
         #[case] path: PathBuf,
         #[case] expected_config: Option<WidgetConfig>,
     ) {
-        let result = read_widget_config(&path);
-        assert!(result.is_ok(), "Expected successful read of widget configuration");
-
-        let result = result.unwrap();
+        let result = read_widget_config(&path)
+            .expect("Expected successful read of widget configuration");
         assert_eq!(result, expected_config);
     }
 
@@ -232,10 +229,8 @@ mod tests {
         #[case] path: PathBuf,
         #[case] expected_error: Vec<ChainReason>,
     ) {
-        let result = read_widget_config(&path);
-        assert!(result.is_err(), "Expected an error reading widget configuration");
-
-        let error = result.unwrap_err();
+        let error = read_widget_config(&path)
+            .expect_err("Expected an error reading widget configuration");
         assert_err_eq(error, expected_error);
     }
 }

@@ -169,8 +169,7 @@ impl Load for PathLoader {
                 {
                     let context = format!(
                         "Parsing error occurred but failed to emit the formatted error \
-                        analysis; falling back to raw version: {:?}",
-                        err
+                        analysis; falling back to raw version: {err:?}"
                     );
                     let buffer = NamedTempFile::new().context(context.clone())?;
                     let buffer_path = buffer.path().to_path_buf();
@@ -212,38 +211,14 @@ struct PathResolver {
 }
 
 impl PathResolver {
-    /// Wrap a resolved module path.
-    ///
-    /// It will return an error if the resolved path is `None` or if the resolved path
-    /// goes beyond the root path.
-    fn wrap(&self, path: Option<PathBuf>) -> Result<FileName, Error> {
-        if path.is_none() {
-            bail!("File resolution failed");
-        }
-        let path = path.unwrap();
-
-        // Reject imports that go beyond the root path
-        if !path.starts_with(&self.root) {
-            bail!(
-                "Relative imports should not go beyond the root {}",
-                self.root.to_string_lossy()
-            );
-        }
-
-        Ok(FileName::Real(path.clean()))
-    }
-
-    // Resolve a path as a file; if `path` refers to a file then it is directly
-    // returned; otherwise, `path` with each extension is tried
-
-    /// Resolve a path as a file.
+    /// Helper function for resolving a path by treating it as a file.
     ///
     /// If `path` refers to a file then it is directly returned. Otherwise, `path` with
     /// each extension in [`EXTENSIONS`] is tried in order.
-    fn resolve_as_file(&self, path: &Path) -> Result<Option<PathBuf>, Error> {
+    fn resolve_as_file(&self, path: &Path) -> Result<PathBuf, Error> {
         if path.is_file() {
             // Early return if `path` is directly a file
-            return Ok(Some(path.to_path_buf()));
+            return Ok(path.to_path_buf());
         }
 
         if let Some(name) = path.file_name() {
@@ -252,30 +227,20 @@ impl PathResolver {
 
             // Try all extensions we support for importing
             for ext in EXTENSIONS {
-                ext_path.set_file_name(format!("{}.{}", name, ext));
+                ext_path.set_file_name(format!("{name}.{ext}"));
                 if ext_path.is_file() {
-                    return Ok(Some(ext_path));
+                    return Ok(ext_path);
                 }
             }
         }
-        bail!("Failed to resolve as file");
-    }
-
-    /// Resolve a path as a directory.
-    ///
-    /// This essentially resolves `${path}/index` as a file. Note that it does not try
-    /// any node resolution, e.g., looking for the `main` field in `package.json`.
-    fn resolve_as_directory(&self, path: &Path) -> Result<Option<PathBuf>, Error> {
-        for ext in EXTENSIONS {
-            let ext_path = path.join(format!("index.{}", ext));
-            if ext_path.is_file() {
-                return Ok(Some(ext_path));
-            }
-        }
-        Ok(None)
+        bail!("File resolution failed")
     }
 
     /// Helper function for the [`Resolve`] trait.
+    ///
+    /// Note that errors emitted here do not need to provide information about `base`
+    /// and `module_specifier` because the call to this function should have already
+    /// been wrapped in an SWC context that provides this information.
     fn resolve_filename(
         &self,
         base: &FileName,
@@ -283,7 +248,7 @@ impl PathResolver {
     ) -> Result<FileName, Error> {
         let base = match base {
             FileName::Real(v) => v,
-            _ => bail!("Invalid base for resolution: {}", base),
+            _ => bail!("Invalid base for resolution: '{base}'"),
         };
 
         // Determine the base directory (or `base` itself if already a directory)
@@ -304,14 +269,24 @@ impl PathResolver {
         // we support only relative import among these types
         let mut components = spec_path.components();
         if let Some(Component::CurDir | Component::ParentDir) = components.next() {
-            let path = base_dir.join(module_specifier);
-            let path = path.clean(); // Virtual normalization
+            let path = base_dir.join(module_specifier).clean();
 
-            return self
+            // Try to resolve by treating `path` as a file first, otherwise try by
+            // looking for an `index` file under `path` as a directory
+            let resolved_path = self
                 .resolve_as_file(&path)
-                .or_else(|_| self.resolve_as_directory(&path))
-                .and_then(|p| self.wrap(p));
+                .or_else(|_| self.resolve_as_file(&path.join("index")))?;
+
+            // Reject if the resolved path goes beyond the root
+            if !resolved_path.starts_with(&self.root) {
+                bail!(
+                    "Relative imports should not go beyond the root '{}'",
+                    self.root.display(),
+                );
+            }
+            return Ok(FileName::Real(resolved_path));
         }
+
         bail!(
             "node_modules imports should be explicitly included in package.json to \
             avoid being bundled at runtime; URL imports are not supported, one should \
@@ -347,101 +322,114 @@ impl Hook for NoopHook {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use parameterized::parameterized;
+    use crate::testing::{assert_err_eq, ChainReason};
     use pretty_assertions::assert_eq;
-    use std::{
-        fs::{read_to_string, remove_file, File},
-        io::Write,
-    };
+    use rstest::rstest;
+    use std::fs::{create_dir, read_to_string};
+    use tempfile::{tempdir, TempDir};
 
-    /// Assert that an [`Error`] object has the expected chain of reasons.
-    fn assert_err_eq(error: Error, chain: Vec<String>) {
-        let mut error_chain = error.chain();
-        for expected_msg in chain {
-            let reason = error_chain.next().expect("Expected more reasons");
-            assert_eq!(format!("{reason}"), expected_msg, "{error:?}");
-        }
-        // Assert that the chain of reasons ends here
-        assert_eq!(error_chain.next().map(|msg| format!("{msg}")), None);
+    /// Get the absolute path to the fixture directory.
+    ///
+    /// The paths used within the SWC bundler are all canonicalized (and thus verbatim
+    /// with the `\\?\` prefix on Windows), so canonicalize here to match them. Note
+    /// that this is not the case elsewhere in the codebase.
+    fn fixture_dir() -> PathBuf {
+        Path::new("tests/fixtures/bundler").canonicalize().unwrap()
     }
 
-    #[parameterized(case = {
-        "no_react",
-        "with_react_hook",
-        "import_relative",
-        "import_relative_no_ext",
-        "import_relative_directory",
-        "import_relative_no_ext_jsx",
-        "import_no_inner_react_def",
-        "import_no_outer_react_def",
-    })]
-    fn test_bundle_basic(case: &str) {
-        // Test the most basic bundler functionalities, with no dependencies and are
-        // expected to succeed
-        let root = PathBuf::from(format!("tests/fixtures/bundler/{case}/input"))
-            .canonicalize()
-            .unwrap();
-        let result = bundle(&root, root.join("index.jsx").as_path(), None)
-            .expect("Failed to bundle");
+    /// Setup a temporary directory for testing.
+    ///
+    /// This would create a temporary directory and an `input` directory inside it.
+    fn setup_temp_dir() -> TempDir {
+        let temp_dir = tempdir().unwrap();
+        create_dir(temp_dir.path().join("input")).unwrap();
+        temp_dir
+    }
 
-        let expected =
-            read_to_string(format!("tests/fixtures/bundler/{case}/output.js")).unwrap();
+    #[rstest]
+    // Entry does not use the `React` variable; note that we require `React` to be
+    // brought into scope and the bundler should not removed it because of unused
+    #[case::no_react("no_react")]
+    // Entry uses a `React` hook
+    #[case::with_react_hook("with_react_hook")]
+    // Entry imports a JS file with the extension
+    #[case::import("import")]
+    // Entry imports a JS file without specifying the extension
+    #[case::import_no_ext("import_no_ext")]
+    // Entry imports a JSX file without specifying the extension
+    #[case::import_no_ext_jsx("import_no_ext_jsx")]
+    // Entry imports a directory with `index.js`
+    #[case::import_directory("import_directory")]
+    // Entry defines `React` but the imported JSX file does not
+    #[case::import_no_inner_react_def("import_no_inner_react_def")]
+    // Entry does not define `React` but the imported JSX file does
+    #[case::import_no_outer_react_def("import_no_outer_react_def")]
+    fn test_bundle_ok(#[case] case: &str) {
+        let case_dir = fixture_dir().join(case);
+        let bundle_root = case_dir.join("input");
+        let result = bundle(&bundle_root, &bundle_root.join("index.jsx"), None)
+            .expect("Expected bundling to succeed");
+
+        let expected = read_to_string(case_dir.join("output.js")).unwrap();
         self::assert_eq!(result, expected);
     }
 
-    #[test]
-    fn test_bundle_absolute_import_error() {
-        // Test that we do not allow absolute path import
-        let root = Path::new("tests/fixtures/bundler/import_absolute/input")
-            .canonicalize()
-            .unwrap();
-        let entry = root.join("index.jsx");
-
-        // We need to write the entry file here because absolute paths cannot be
-        // determined statically
-        let import_file = root.join("utils.js");
-        {
-            let mut entry_file = File::create(&entry).unwrap();
-            // Debug print of the import path will automatically include the quotes
-            writeln!(entry_file, "import foo from {import_file:?};").unwrap();
-        }
-
-        let error = bundle(&root, &entry, None).expect_err("Expected bundling error");
-        let expected = vec![
-            "load_transformed failed".to_string(),
-            "failed to analyze module".to_string(),
-            format!(
-                "failed to resolve {} from {}",
-                import_file.to_string_lossy(),
-                entry.to_string_lossy()
-            ),
-            "Absolute imports are not supported; use relative imports instead"
-                .to_string(),
-        ];
-        assert_err_eq(error, expected);
-
-        // Clean up the entry file
-        remove_file(&entry).unwrap();
+    #[rstest]
+    // Relative import that goes beyond the root
+    #[case::import_beyond_root(
+        "import_beyond_root",
+        vec![
+            ChainReason::Exact("load_transformed failed".to_string()),
+            ChainReason::Exact("failed to analyze module".to_string()),
+            ChainReason::Exact(format!(
+                "failed to resolve ../../foo from {}",
+                fixture_dir().join("import_beyond_root/input/index.jsx").display(),
+            )),
+            ChainReason::Exact(format!(
+                "Relative imports should not go beyond the root '{}'",
+                fixture_dir().join("import_beyond_root/input").display(),
+            )),
+        ]
+    )]
+    fn test_bundle_error(#[case] case: &str, #[case] expected_error: Vec<ChainReason>) {
+        let case_dir = fixture_dir().join(case);
+        let bundle_root = case_dir.join("input");
+        let error = bundle(&bundle_root, &bundle_root.join("index.jsx"), None)
+            .expect_err("Expected bundling error");
+        assert_err_eq(error, expected_error);
     }
 
-    #[test]
-    fn test_bundle_beyond_root_error() {
-        // Test that we do not allow relative import that goes beyond the root path
-        let root = Path::new("tests/fixtures/bundler/import_beyond_root/input")
-            .canonicalize()
-            .unwrap();
-        let entry = root.join("index.jsx");
-        let error = bundle(&root, &entry, None).expect_err("Expected bundling error");
+    #[rstest]
+    fn test_bundle_absolute_import_error() {
+        // Test that an absolute import raises a proper error
+        let temp_dir = setup_temp_dir();
+        let bundle_root = temp_dir.path().canonicalize().unwrap().join("input");
+        let utils_path = bundle_root.join("utils.js");
+        std::fs::write(&utils_path, "export const foo = 42;").unwrap();
 
-        let expected = vec![
-            "load_transformed failed".to_string(),
-            "failed to analyze module".to_string(),
-            format!("failed to resolve ../../dummy from {}", entry.to_string_lossy()),
-            format!(
-                "Relative imports should not go beyond the root {}",
-                root.to_string_lossy()
+        // Create an entry file that imports the absolute path of `utils.js`; note that
+        // we use debugging format for the path because otherwise path separator "\" on
+        // Windows will not be escaped
+        let entry_path = bundle_root.join("index.jsx");
+        println!("import {{ foo }} from {utils_path:?};");
+        std::fs::write(&entry_path, format!("import {{ foo }} from {utils_path:?};"))
+            .unwrap();
+
+        let error = bundle(&bundle_root, &entry_path, None)
+            .expect_err("Expected bundling error");
+        let expected_error = vec![
+            ChainReason::Exact("load_transformed failed".to_string()),
+            ChainReason::Exact("failed to analyze module".to_string()),
+            ChainReason::Exact(format!(
+                "failed to resolve {} from {}",
+                utils_path.display(),
+                entry_path.display()
+            )),
+            ChainReason::Exact(
+                "Absolute imports are not supported; use relative imports instead"
+                    .to_string(),
             ),
         ];
-        assert_err_eq(error, expected);
+        assert_err_eq(error, expected_error);
     }
 }

@@ -9,9 +9,8 @@ edition = "2021"
 tauri-build = { version = "1.5.1", features = ["config-json5"] }
 
 [dev-dependencies]
-pretty_assertions = "1.4.0"
-parameterized = "2.0.0"
 cargo-llvm-cov = "0.6.9"
+pretty_assertions = "1.4.0"
 rstest = "0.19.0"
 
 [dependencies]
@@ -19,7 +18,6 @@ tauri = { version = "1.6.1", features = ["shell-open", "config-json5", "test"] }
 
 # Utilities
 anyhow = "1.0.80"
-normpath = "1.2.0"
 path-clean = "1.0.1"
 serde = { version = "1.0.197", features = ["derive"] }
 serde-error = "0.1.2"

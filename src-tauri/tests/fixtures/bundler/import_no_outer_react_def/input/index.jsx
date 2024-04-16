@@ -1,5 +1,3 @@
-// This file does not have React defined, but its imported file does
-
 const App = {
   render: () => <Message />,
 };
