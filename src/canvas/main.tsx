@@ -9,6 +9,7 @@ import WidgetContainer from "../components/WidgetContainer";
 // import "../../default_deps_dist/react"
 // import "../../default_deps_dist/apis";
 
+// These two lines will force the bundler to create variables named `react` and `apis`
 import * as react from "@deskulpt/react";
 import * as apis from "@deskulpt/apis";
 console.log(react, apis);
