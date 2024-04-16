@@ -162,7 +162,7 @@ impl Fold for ImportRenamer {
                     //     "@deskulpt-{}{}/apis",
                     //     self.widget_id, stripped
                     // ));
-                    import_decl.src.value = Atom::from("deskulpt/apis");
+                    import_decl.src.value = Atom::from("@deskulpt/apis");
                 }
             }
         }
