@@ -27,6 +27,7 @@ const config: Config = {
           routeBasePath: "/",
           path: "./docs",
           sidebarPath: "./sidebars.ts",
+          showLastUpdateTime: true,
         },
         theme: {
           customCss: ["./src/css/custom.scss"],
