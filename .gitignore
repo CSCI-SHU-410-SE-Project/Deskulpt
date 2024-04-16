@@ -32,4 +32,4 @@ src-tauri/target
 src-tauri/gen/schemas
 
 # # compiled default dependencies
-# src/@deskulpt/**/*.js
+src/@deskulpt/**/*.js

@@ -1,5 +1,5 @@
-# if `dist/@deskulpt/react/index.js` exists, append `export default React`
-# if `dist/@deskulpt/apis/index.js` exists, append `export default apis`
+# if `dist/src/@deskulpt/react/index.js` exists, append `export default React`
+# if `dist/src/@deskulpt/apis/index.js` exists, append `export default apis`
 
 # React
 if [ -f dist/@deskulpt/react/index.js ]; then
@@ -8,7 +8,7 @@ fi
 
 # apis
 if [ -f dist/@deskulpt/apis/index.js ]; then
-  echo "export default apis" >> dist/@deskulpt/apis/index.js
+  echo "export { apisDummy as apis }" >> dist/@deskulpt/apis/index.js
 fi
 
 echo "Post vite build script executed"
