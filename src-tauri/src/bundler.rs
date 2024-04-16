@@ -115,7 +115,7 @@ pub(crate) fn bundle(
 
         // Rename import of "@deskulpt" to "@deskulpt/<widget-id>" for widget-specific import of apis
         let widget_id = "my-clock-widget";
-        let mut import_renamer = ImportRenamer { widget_id: widget_id.to_string() };
+        let mut import_renamer = ImportRenamer { _widget_id: widget_id.to_string() };
 
         // Apply the module transformations
         // @Charlie-XIAO: chain more transforms e.g. TypeScript
@@ -144,7 +144,7 @@ pub(crate) fn bundle(
 
 /// Rename import of "@deskulpt" so as to redirect to a widget-specific module
 struct ImportRenamer {
-    widget_id: String,
+    _widget_id: String,
 }
 
 impl Fold for ImportRenamer {
@@ -162,9 +162,7 @@ impl Fold for ImportRenamer {
                     //     "@deskulpt-{}{}/apis",
                     //     self.widget_id, stripped
                     // ));
-                    import_decl.src.value = Atom::from(format!(
-                        "@deskulpt/apis",
-                    ));
+                    import_decl.src.value = Atom::from("deskulpt/apis");
                 }
             }
         }

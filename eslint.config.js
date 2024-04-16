@@ -10,10 +10,11 @@ import tseslint from "typescript-eslint";
 export default tseslint.config(
   {
     ignores: [
-      "**/dist/**", 
-      "**/default_deps_dist/**", 
-      "**/fixtures/**", 
-      "**/target/**"],
+      "**/dist/**",
+      "**/default_deps_dist/**",
+      "**/fixtures/**",
+      "**/target/**",
+    ],
   },
 
   // --- Language Options -------------------------------------------------------------

@@ -32,7 +32,7 @@ export default defineConfig({
       // compress: false,
       mangle: false,
       // format: {
-      //   beautify: true, 
+      //   beautify: true,
       // },
     },
     rollupOptions: {
