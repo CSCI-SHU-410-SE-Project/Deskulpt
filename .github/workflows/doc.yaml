@@ -1,7 +1,10 @@
-name: Deploy docs to GitHub Pages
+name: Doc build and deploy
 
 on:
   push:
+    branches:
+      - main
+  pull_request:
     branches:
       - main
 
@@ -51,7 +54,9 @@ jobs:
           npm run build
 
       - name: Copy Rust docs to build directory
-        run: cp -r src-tauri/target/doc website/build/rustdoc
+        run: |
+          rm -f src-tauri/target/doc/.lock
+          cp -r src-tauri/target/doc website/build/rustdoc
 
       - name: Upload build artifact
         uses: actions/upload-pages-artifact@v3
@@ -60,6 +65,7 @@ jobs:
 
   deploy:
     needs: build
+    if: github.event_name == 'push' # Do not deploy on PRs
     permissions:
       pages: write
       id-token: write
