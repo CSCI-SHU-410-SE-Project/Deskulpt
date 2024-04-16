@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "outDir": "./public/default_deps_dist",
+    // "outDir": "./public/default_deps_dist",
     "rootDir": "./src/@deskulpt",
     "module": "ESNext",
     "target": "ES6",

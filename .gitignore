@@ -29,3 +29,6 @@ src-tauri/target
 
 # Tauri generated files
 src-tauri/gen/schemas
+
+# compiled default dependencies
+src/@deskulpt/**/*.js
