@@ -1,4 +1,4 @@
-name: Deploy docs to GitHub Pages
+name: Build docs
 
 on:
   pull_request:
@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latestt
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
