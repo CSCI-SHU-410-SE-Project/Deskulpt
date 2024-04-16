@@ -31,5 +31,10 @@ src-tauri/target
 # Tauri generated files
 src-tauri/gen/schemas
 
+# Doc
+website/build
+website/.docusaurus
+website/.cache-loader
+
 # # compiled default dependencies
 src/@deskulpt/**/*.js
