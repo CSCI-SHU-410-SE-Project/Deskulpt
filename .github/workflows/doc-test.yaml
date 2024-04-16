@@ -1,4 +1,4 @@
-name: Build docs
+name: Test doc build
 
 on:
   pull_request:
@@ -49,15 +49,3 @@ jobs:
         run: |
           cd website
           npm run build
-
-      - name: Copy Rust docs to build directory
-        run: cp -r src-tauri/target/doc website/build/rustdoc
-
-      - name: Upload build artifact
-        id: artifact-upload
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: website/build
-
-      - name: Output artifact URL
-        run: echo 'Artifact URL is ${{ steps.artifact-upload.outputs.artifact-url }}'
