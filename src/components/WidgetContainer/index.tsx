@@ -2,6 +2,7 @@ import { Box, Tooltip } from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
 import React from "react";
 import Draggable from "react-draggable";
+
 /**
  * The widget container component.
  *
@@ -26,8 +27,8 @@ export default function WidgetContainer(props: {
             py: 1,
             m: 1,
             borderRadius: 1,
-            // bgcolor: "lightblue",
-            position: "relative",
+            border: "2px solid black",
+            bgcolor: "rgba(0, 0, 0, 0.2)",
           }}
         >
           <Tooltip title={id} placement="left">
