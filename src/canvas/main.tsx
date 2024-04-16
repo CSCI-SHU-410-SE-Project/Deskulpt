@@ -9,10 +9,9 @@ import WidgetContainer from "../components/WidgetContainer";
 // import "../../default_deps_dist/react"
 // import "../../default_deps_dist/apis";
 
-import * as p from "../@deskulpt/react";
-import * as q from "../@deskulpt/apis";
-console.log(p);
-console.log(q);
+import * as p from "../@deskulpt/react"
+import * as q from "../@deskulpt/apis"
+console.log(p, q);
 
 window.__DESKULPT__ = { defaultDeps: { React } };
 
