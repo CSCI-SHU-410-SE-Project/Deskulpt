@@ -4,7 +4,9 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "predev": "bash scripts/beforeDev.sh",
     "dev": "vite",
+    "prebuild": "bash scripts/beforeBuild.sh",
     "build": "tsc && vite build",
     "preview": "vite preview",
     "tauri": "tauri",
