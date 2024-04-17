@@ -104,6 +104,7 @@ pub(crate) fn refresh_widget_collection(
 pub(crate) fn bundle_widget(
     app_handle: AppHandle,
     widget_id: String,
+    widget_apis_url: String,
 ) -> CommandOut<String> {
     let widget_collection_state = &app_handle.state::<WidgetCollectionState>();
     let widget_collection = widget_collection_state.0.lock().unwrap();
@@ -120,7 +121,7 @@ pub(crate) fn bundle_widget(
         // TODO: Find a more maintainable way to do this
         let mut dependency_map = HashMap::new();
         dependency_map.insert("@deskulpt/react".to_string(), "".to_string());
-        dependency_map.insert("@deskulpt/apis".to_string(), "".to_string());
+        dependency_map.insert("@deskulpt/apis".to_string(), widget_apis_url);
 
         // Ignore imports from node_modules since they are assumed to be bundled by the widget developer
         // This code merge default dependencies with the dependencies provided by the widget developer

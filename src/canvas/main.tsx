@@ -20,6 +20,11 @@ window.__DESKULPT__ = { defaultDeps: { React } };
 const canvas = document.getElementById("canvas")!;
 const widgetRecords: Record<string, WidgetRecord> = {};
 
+// fetch `/initApis.js` so that other widgets can import it
+fetch("/initApis.js")
+  .then((res) => console.log(res.text()))
+  .catch((err) => console.error(err));
+
 // Listen to the "render-widget" event, emitted by the manager
 listen("render-widget", (event: TauriEvent<RenderWidgetPayload>) => {
   const { widgetId, bundlerOutput } = event.payload;

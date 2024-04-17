@@ -4,12 +4,16 @@ import RefreshIcon from "@mui/icons-material/Refresh";
 import { invoke } from "@tauri-apps/api";
 import { emit } from "@tauri-apps/api/event";
 import { useEffect, useState } from "react";
-import { CommandOut, WidgetConfig } from "./types";
+import { CommandOut, WidgetConfig, WidgetState } from "./types";
+import { initWidgetState } from "./utils/widgetState";
 
 // import { fs } from "./@deskulpt/apis";
 
 export default function App() {
   const [widgetConfigs, setWidgetConfigs] = useState<Record<string, WidgetConfig>>({});
+
+  // Internal widget states managed by the app
+  const widgetsState: Record<string, WidgetState> = {};
 
   /**
    * Open the widget base directory in the file explorer of the OS.
@@ -53,8 +57,17 @@ export default function App() {
    * @param widgetId The ID of the widget to render.
    */
   async function renderWidget(widgetId: string) {
+    // if widget is not in widgetsState, initialize state and add it
+    if (!(widgetId in widgetsState)) {
+      console.log(`Initializing widget state for ${widgetId}`);
+      widgetsState[widgetId] = initWidgetState(widgetId);
+    }
+    console.log(
+      `Rendering widget ${widgetId} with apis blob url ${widgetsState[widgetId].widgetApisBlobUrl}`,
+    );
     const bundlerOutput: CommandOut<string> = await invoke("bundle_widget", {
-      widgetId,
+      widgetId: widgetId,
+      widgetApisUrl: widgetsState[widgetId].widgetApisBlobUrl,
     });
     await emit("render-widget", { widgetId, bundlerOutput });
   }

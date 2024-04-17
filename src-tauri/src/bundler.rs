@@ -113,9 +113,10 @@ pub(crate) fn bundle(
             Mark::new(),        // unresolved mark
         );
 
-        // Rename import of "@deskulpt" to "@deskulpt/<widget-id>" for widget-specific import of apis
-        let widget_id = "my-clock-widget";
-        let mut import_renamer = ImportRenamer { _widget_id: widget_id.to_string() };
+        // Rename import of "@deskulpt/apis" to "<url>" for widget-specific import of apis
+        let mut import_renamer = ImportRenamer {
+            rename_to: dependency_map.unwrap()["@deskulpt/apis"].clone(),
+        };
 
         // Apply the module transformations
         // @Charlie-XIAO: chain more transforms e.g. TypeScript
@@ -144,25 +145,19 @@ pub(crate) fn bundle(
 
 /// Rename import of "@deskulpt" so as to redirect to a widget-specific module
 struct ImportRenamer {
-    _widget_id: String,
+    rename_to: String,
 }
 
 impl Fold for ImportRenamer {
-    /// For widget with <widget-id>, we rename import of "@deskulpt" to "@deskulpt/<widget-id>"
+    /// For widget with apis blob url <url>, we rename import of "@deskulpt/apis" to "<url>"
     fn fold_module(&mut self, module: Module) -> Module {
         let mut module = module.fold_children_with(self);
 
         for stmt in &mut module.body {
             if let ModuleItem::ModuleDecl(ModuleDecl::Import(import_decl)) = stmt {
-                // ModuleItem::ModuleDecl(ModuleDecl::Import(import_decl)) => {
                 let src = import_decl.src.value.to_string();
-                if src.starts_with("@deskulpt/apis") {
-                    // let stripped = src.strip_prefix("@deskulpt/apis").unwrap();
-                    // import_decl.src.value = Atom::from(format!(
-                    //     "@deskulpt-{}{}/apis",
-                    //     self.widget_id, stripped
-                    // ));
-                    import_decl.src.value = Atom::from("@deskulpt/apis");
+                if src == "@deskulpt/apis" {
+                    import_decl.src.value = Atom::from(self.rename_to.clone());
                 }
             }
         }
