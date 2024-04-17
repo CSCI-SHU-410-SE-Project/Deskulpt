@@ -1,8 +1,8 @@
 //! The module configures the system tray of Deskulpt.
 
 use tauri::{
-    App, AppHandle, CustomMenuItem, GlobalWindowEvent, Manager, SystemTray,
-    SystemTrayEvent, SystemTrayMenu, WindowBuilder, WindowEvent,
+    AppHandle, CustomMenuItem, GlobalWindowEvent, Manager, SystemTray, SystemTrayEvent,
+    SystemTrayMenu, WindowBuilder, WindowEvent,
 };
 
 /// Listen to global window events.
@@ -12,15 +12,12 @@ use tauri::{
 ///
 /// - Prevent the manager window from closing when the close button is clicked.
 pub(crate) fn listen_to_windows(e: GlobalWindowEvent) {
-    match e.event() {
-        WindowEvent::CloseRequested { api, .. } => {
-            let window = e.window();
-            if window.label() == "manager" {
-                api.prevent_close();
-                window.hide().unwrap();
-            }
-        },
-        _ => {},
+    if let WindowEvent::CloseRequested { api, .. } = e.event() {
+        let window = e.window();
+        if window.label() == "manager" {
+            api.prevent_close();
+            window.hide().unwrap();
+        }
     }
 }
 
@@ -32,7 +29,7 @@ pub(crate) fn get_system_tray() -> SystemTray {
     let tray_menu = SystemTrayMenu::new()
         .add_item(CustomMenuItem::new("manage", "Manage"))
         .add_item(CustomMenuItem::new("exit", "Exit"));
-    return SystemTray::new().with_menu(tray_menu);
+    SystemTray::new().with_menu(tray_menu)
 }
 
 /// Listen to system tray events.
@@ -44,10 +41,7 @@ pub(crate) fn get_system_tray() -> SystemTray {
 ///   manager window. Note that left-clicking is unsupported on Linux, so the "manage"
 ///   menu item is present as a workaround.
 /// - When clicking the "exit" menu item, exit the application (with cleanup).
-pub(crate) fn listen_to_system_tray(
-    app_handle: &AppHandle,
-    event: SystemTrayEvent,
-) -> () {
+pub(crate) fn listen_to_system_tray(app_handle: &AppHandle, event: SystemTrayEvent) {
     match event {
         SystemTrayEvent::MenuItemClick { id, .. } => match id.as_str() {
             "manage" => show_manager_window(app_handle),
@@ -65,7 +59,7 @@ pub(crate) fn listen_to_system_tray(
 ///
 /// If the manager window does not exist, create the window. If the window exists but
 /// fails to show, consume the error and do nothing.
-fn show_manager_window(app_handle: &AppHandle) -> () {
+fn show_manager_window(app_handle: &AppHandle) {
     if let Some(manager) = app_handle.get_window("manager").or_else(|| {
         // Failed to get the manager window; we create a new one from the existing
         // configuration instead; note that the manager window is the second item in
