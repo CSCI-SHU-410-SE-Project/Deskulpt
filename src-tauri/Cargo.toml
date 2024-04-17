@@ -14,7 +14,7 @@ pretty_assertions = "1.4.0"
 rstest = "0.19.0"
 
 [dependencies]
-tauri = { version = "1.6.1", features = ["shell-open", "config-json5", "test", "devtools"] }
+tauri = { version = "1.6.1", features = ["shell-open", "config-json5", "test"] }
 
 # Utilities
 anyhow = "1.0.80"

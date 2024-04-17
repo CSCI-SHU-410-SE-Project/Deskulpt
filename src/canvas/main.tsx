@@ -5,12 +5,8 @@ import { RenderWidgetPayload, WidgetModule, WidgetRecord } from "../types";
 import { grabErrorInfo, handleError, getDOMRoot } from "./utils";
 import WidgetContainer from "../components/WidgetContainer";
 
-// // explicitly import the default dependencies so that it won't be tree-shaken
-// import "../../default_deps_dist/react"
-// import "../../default_deps_dist/apis";
-
+// We explicitly import the default dependencies so that they won't be tree-shaken
 // These three lines will add `@deskulpt/react` and `@deskulpt/apis` to the import graph.
-// Without these lines, the bundler will tree-shake the two modules and widget api will not be bundled
 import * as reactDummy from "@deskulpt/react";
 import * as apisDummy from "@deskulpt/apis";
 console.log(reactDummy, apisDummy);
@@ -19,11 +15,6 @@ window.__DESKULPT__ = { defaultDeps: { React } };
 
 const canvas = document.getElementById("canvas")!;
 const widgetRecords: Record<string, WidgetRecord> = {};
-
-// fetch `/initApis.js` so that other widgets can import it
-fetch("/initApis.js")
-  .then((res) => console.log(res.text()))
-  .catch((err) => console.error(err));
 
 // Listen to the "render-widget" event, emitted by the manager
 listen("render-widget", (event: TauriEvent<RenderWidgetPayload>) => {

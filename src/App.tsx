@@ -7,12 +7,11 @@ import { useEffect, useState } from "react";
 import { CommandOut, WidgetConfig, WidgetState } from "./types";
 import { initWidgetState } from "./utils/widgetState";
 
-// import { fs } from "./@deskulpt/apis";
-
 export default function App() {
   const [widgetConfigs, setWidgetConfigs] = useState<Record<string, WidgetConfig>>({});
 
   // Internal widget states managed by the app
+  // For now, we only keep track of the widget's APIs blob URL
   const widgetsState: Record<string, WidgetState> = {};
 
   /**
@@ -57,7 +56,6 @@ export default function App() {
    * @param widgetId The ID of the widget to render.
    */
   async function renderWidget(widgetId: string) {
-    // if widget is not in widgetsState, initialize state and add it
     if (!(widgetId in widgetsState)) {
       console.log(`Initializing widget state for ${widgetId}`);
       widgetsState[widgetId] = initWidgetState(widgetId);
@@ -83,11 +81,6 @@ export default function App() {
 
   useEffect(() => {
     // Fetch the widget collection and render all on mount
-    // fs.readFile("test-widget-api", "output.txt")
-    //   .then((content) => {
-    //     console.log("Read file content:", content);
-    //   })
-    //   .catch(console.error);
     refreshWidgetCollection()
       .then(async (configs) => {
         if (configs !== null) {

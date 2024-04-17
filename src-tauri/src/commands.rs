@@ -96,6 +96,9 @@ pub(crate) fn refresh_widget_collection(
 /// for the given widget ID. The widget will be bundled into a string of ESM code if the
 /// ID is found in the collection.
 ///
+/// The widget APIs URL is used to replace the default `@deskulpt/apis` dependency with widget api url,
+/// which imports from raw apis and partially apply widget id on them.
+///
 /// This command will return the `Failure` variant if:
 ///
 /// - The widget ID is not found in the state of the widget collection.
@@ -113,19 +116,21 @@ pub(crate) fn bundle_widget(
         // Obtain the absolute path of the widget entry point
         let widget_entry = &widget_config.directory.join(&widget_config.deskulpt.entry);
 
-        // Ignore default dependency that are provided by the widget developer
+        // Ignore default dependency that are provided by Deskulpt
         // This includes
-        // - "react"
+        // - "@deskulpt/react"
         // - "@deskulpt/apis"
-        // We manually create the hashmap for now
+        // For now, we manually create the hashmap
         // TODO: Find a more maintainable way to do this
         let mut dependency_map = HashMap::new();
         dependency_map.insert("@deskulpt/react".to_string(), "".to_string());
         dependency_map.insert("@deskulpt/apis".to_string(), widget_apis_url);
 
-        // Ignore imports from node_modules since they are assumed to be bundled by the widget developer
-        // This code merge default dependencies with the dependencies provided by the widget developer
-        // The default dependencies have higher priority
+        // We merge default dependencies with dependencies from node modules, since both should be ignored by the bundler.
+        // Dependenceis from node_modules are assumed to be bundled by the widget developer
+        //
+        // Note that the default dependencies have higher priority than the dependencies from node modules
+        // since without them, the widget will not work
         if let Some(package_json) = &widget_config.node {
             for (key, value) in &package_json.dependencies {
                 dependency_map.entry(key.clone()).or_insert(value.clone());

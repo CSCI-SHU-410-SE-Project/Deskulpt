@@ -113,7 +113,7 @@ pub(crate) fn bundle(
             Mark::new(),        // unresolved mark
         );
 
-        // Rename import of "@deskulpt/apis" to "<url>" for widget-specific import of apis
+        // Rename import of `@deskulpt/apis` to `<widget-api-blob-url>` that partially apply widget id to raw apis
         let mut import_renamer = ImportRenamer {
             rename_to: dependency_map.unwrap()["@deskulpt/apis"].clone(),
         };
@@ -143,13 +143,11 @@ pub(crate) fn bundle(
     Ok(code)
 }
 
-/// Rename import of "@deskulpt" so as to redirect to a widget-specific module
 struct ImportRenamer {
     rename_to: String,
 }
 
 impl Fold for ImportRenamer {
-    /// For widget with apis blob url <url>, we rename import of "@deskulpt/apis" to "<url>"
     fn fold_module(&mut self, module: Module) -> Module {
         let mut module = module.fold_children_with(self);
 
@@ -356,7 +354,6 @@ mod tests {
     use crate::testing::{assert_err_eq, ChainReason};
     use pretty_assertions::assert_eq;
     use rstest::rstest;
-    use std::collections::HashMap;
     use std::fs::{create_dir, read_to_string};
     use tempfile::{tempdir, TempDir};
 
@@ -404,33 +401,6 @@ mod tests {
 
         let expected = read_to_string(case_dir.join("output.js")).unwrap();
         self::assert_eq!(result, expected);
-    }
-
-    // TODO: After implementing the frontend api wrapper, remove this test or rewrite it in rstest
-    #[test]
-    fn test_with_deskulpt() {
-        // Test that the bundler can handle Deskulpt imports
-        let root = PathBuf::from("tests/fixtures/bundler/with_deskulpt/input")
-            .canonicalize()
-            .unwrap();
-        let mut dependency_map: HashMap<String, String> = HashMap::new();
-        // a list of ignored dependencies
-        let ignored = vec!["@deskulpt/react", "@deskulpt/apis"];
-        for dep in ignored {
-            dependency_map.insert(dep.to_string(), "".to_string());
-        }
-        let result =
-            bundle(&root, root.join("index.jsx").as_path(), Some(&dependency_map))
-                .expect("Failed to bundle");
-
-        let expected =
-            read_to_string("tests/fixtures/bundler/with_deskulpt/output.js").unwrap();
-        // self::assert_eq!(result, expected);
-        if result != expected {
-            println!("result: {}", result);
-            println!("expected: {}", expected);
-            assert!(false);
-        }
     }
 
     #[rstest]
