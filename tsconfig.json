@@ -26,7 +26,6 @@
       "@deskulpt/*": ["src/@deskulpt/*"]
     }
   },
-  "include": ["src/**/*", "vite.config.ts", "public/initApis.js"],
-  "exclude": ["src/@deskulpt/**/*"],
+  "include": ["src/**/*", "vite.config.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
