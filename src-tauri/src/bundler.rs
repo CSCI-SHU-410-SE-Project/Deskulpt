@@ -5,7 +5,7 @@
 //! rules and are (at least recommended to be) small.
 
 use std::{
-    collections::HashMap,
+    collections::{HashMap, HashSet},
     fs::File,
     io::Read,
     path::{Component, Path, PathBuf},
@@ -49,10 +49,14 @@ pub(crate) fn bundle(
     let globals = Globals::default();
     let cm = Lrc::new(SourceMap::new(FilePathMapping::empty()));
 
-    // Get the list of external modules not to resolve
-    let external_modules = match dependency_map {
-        Some(map) => map.keys().map(|k| Atom::from(k.clone())).collect(),
-        None => vec![],
+    // Get the list of external modules not to resolve; this should include default
+    // dependencies and (if any) external dependencies obtained from the dependency map
+    let external_modules = {
+        let mut dependencies = HashSet::from([Atom::from("@deskulpt/react")]);
+        if let Some(map) = dependency_map {
+            dependencies.extend(map.keys().map(|k| Atom::from(k.clone())));
+        }
+        Vec::from_iter(dependencies)
     };
 
     let mut bundler = Bundler::new(
