@@ -52,7 +52,7 @@ pub(crate) fn bundle(
     // Get the list of external modules not to resolve; this should include default
     // dependencies and (if any) external dependencies obtained from the dependency map
     let external_modules = {
-        let mut dependencies = HashSet::from([Atom::from("@deskulpt/react")]);
+        let mut dependencies = HashSet::from([Atom::from("@deskulpt-test/react")]);
         if let Some(map) = dependency_map {
             dependencies.extend(map.keys().map(|k| Atom::from(k.clone())));
         }
