@@ -1,0 +1,39 @@
+name: Lint Deskulpt tooling
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+env:
+  RUST_BACKTRACE: 1
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Node setup and cache
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: npm
+
+      - name: Install shared dependencies
+        run: npm install
+
+      - name: Lint @deskulpt-test/react
+        run: |
+          cd tooling/react
+          npm install
+          npm run lint
