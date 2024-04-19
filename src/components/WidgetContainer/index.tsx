@@ -2,6 +2,9 @@ import { Box, Tooltip } from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
 import React from "react";
 import Draggable from "react-draggable";
+import { ErrorBoundary } from "react-error-boundary";
+import ErrorDisplay from "../ErrorDisplay";
+import { grabErrorInfo } from "../../utils";
 
 /**
  * The widget container component.
@@ -36,14 +39,31 @@ export default function WidgetContainer(props: {
               sx={{
                 position: "absolute",
                 top: 5,
+                right: 5,
                 zIndex: 2000,
                 fontSize: 15,
               }}
             />
           </Tooltip>
-          {inner}
+          <ErrorBoundary fallbackRender={(props) => FallBack(id, props)}>
+            {inner}
+          </ErrorBoundary>
         </Box>
       </Draggable>
     </React.StrictMode>
+  );
+}
+
+/**
+ * The fallback component if the user widget fails to render.
+ */
+function FallBack(id: string, props: { error: unknown }) {
+  const { error } = props;
+
+  return (
+    <ErrorDisplay
+      title={`Error in '${id}': widget rendering failed (likely a problem with the React component returned by the \`render\` function)`}
+      error={grabErrorInfo(error)}
+    />
   );
 }
