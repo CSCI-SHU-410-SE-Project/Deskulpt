@@ -1,6 +1,6 @@
 {
   "name": "@deskulpt-test/react",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Deskulpt partial re-export of React.",
   "type": "module",
   "main": "./dist/index.js",
@@ -26,7 +26,7 @@
   "homepage": "https://csci-shu-410-se-project.github.io/Deskulpt/",
   "dependencies": {
     "@types/react": "^18.2.79",
-    "react": "18.2.0"
+    "react": "^18.2.0"
   },
   "devDependencies": {
     "@rollup/plugin-terser": "^0.4.4",
