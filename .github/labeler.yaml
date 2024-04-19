@@ -11,3 +11,14 @@ backend:
   - changed-files:
       - any-glob-to-any-file:
           - src-tauri/**
+
+documentation:
+  - changed-files:
+      - any-glob-to-any-file:
+          - website/**
+
+maintenance:
+  - changed-files:
+      - any-glob-to-any-file:
+          - .github/**
+          - maint_tools/**

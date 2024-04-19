@@ -23,8 +23,19 @@ dist-ssr
 *.sln
 *.sw?
 
+# Misc
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
 # Cargo generated files
 src-tauri/target
 
 # Tauri generated files
 src-tauri/gen/schemas
+
+# Doc
+website/build
+website/.docusaurus
+website/.cache-loader

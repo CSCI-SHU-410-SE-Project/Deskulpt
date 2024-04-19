@@ -1,4 +1,4 @@
-name: Build Deskulpt
+name: Test Deskulpt core
 
 on:
   push:
@@ -16,7 +16,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build:
+  test:
     strategy:
       fail-fast: false
       matrix:
@@ -50,9 +50,5 @@ jobs:
       - name: Install frontend dependencies
         run: npm install
 
-      # Without specifying `tagName` and `releaseId`, tauri-action will only build the
-      # application without trying to upload any assets
-      - name: Build Deskulpt
-        uses: tauri-apps/tauri-action@v0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Run backend test suite
+        run: npm run test rs
