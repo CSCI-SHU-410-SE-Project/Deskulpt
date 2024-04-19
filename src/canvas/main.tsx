@@ -12,14 +12,12 @@ const widgetRecords: Record<string, WidgetRecord> = {};
 
 // Listen to the "render-widget" event, emitted by the manager
 listen("render-widget", (event: TauriEvent<RenderWidgetPayload>) => {
-  const { widgetId, bundlerOutput } = event.payload;
+  const { widgetId, success, bundlerOutput } = event.payload;
 
-  if ("success" in bundlerOutput) {
-    // In this case the bundler output wraps the bundled code; we create an object URL
-    // so as to dynamically import the bundled code and obtain its export
-    const blob = new Blob([bundlerOutput.success], {
-      type: "application/javascript",
-    });
+  if (success) {
+    // In this case the bundler output is the bundled code; we create an object URL so
+    // that we can dynamically import the bundled code and obtain its export
+    const blob = new Blob([bundlerOutput], { type: "application/javascript" });
     const url = URL.createObjectURL(blob);
 
     import(/* @vite-ignore */ url)
@@ -75,14 +73,15 @@ listen("render-widget", (event: TauriEvent<RenderWidgetPayload>) => {
         }
       });
   } else {
+    // In this case the bundler output is the error message
     const widgetDOMRoot = getDOMRoot(widgetId, widgetRecords, canvas);
     if (widgetDOMRoot !== null) {
       handleError(
         widgetId,
         widgetDOMRoot,
         widgetRecords,
-        `Error in '${widgetId}': widget fails to be bundled`,
-        bundlerOutput.failure,
+        `[Backend] Widget (id=${widgetId}) fails to be bundled`,
+        bundlerOutput,
       );
     }
   }
