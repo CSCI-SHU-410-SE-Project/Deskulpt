@@ -1,6 +1,5 @@
 import MessageInner from "./MessageInner";
-
-const React = window.__DESKULPT__.defaultDeps.React;
+import React from "@deskulpt-test/react";
 
 function Message() {
   return <div><MessageInner /></div>

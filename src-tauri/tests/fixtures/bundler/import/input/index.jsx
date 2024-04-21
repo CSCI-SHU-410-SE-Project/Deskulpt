@@ -1,6 +1,5 @@
 import { getMessage } from "./utils.js";
-
-const React = window.__DESKULPT__.defaultDeps.React;
+import React from "@deskulpt-test/react";
 
 function Message() {
   return <div>{getMessage()}</div>;
