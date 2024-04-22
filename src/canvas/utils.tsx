@@ -1,25 +1,26 @@
 import ReactDOM from "react-dom/client";
 import ErrorDisplay from "../components/ErrorDisplay";
 import WidgetContainer from "../components/WidgetContainer";
-import { WidgetDOMRoot, WidgetRecord } from "../types";
+import { WidgetDOMRoot, WidgetModule, WidgetRecord } from "../types";
 
 /**
- * Grab as much information as possible from the unknown error.
+ * Validate a user widget module.
  *
- * A string error will be returned as is. An Error object will return its stack if it
- * exists, otherwise its message. An unknown error will return a generic message.
- *
- * @param err The unknown error, commonly from `catch`.
- * @returns The error information.
+ * If the module is invalid, the function returns an error message, and otherwise it
+ * returns `null`.
  */
-export function grabErrorInfo(err: unknown) {
-  if (typeof err === "string") {
-    return err;
+export function getWidgetModuleError(module: WidgetModule) {
+  const widget = module.default;
+  if (widget === undefined) {
+    return "The widget must provide a default export.";
   }
-  if (err instanceof Error) {
-    return err.stack ?? err.message;
+  if (widget.render === undefined) {
+    return "The default export of the widget must provide a `render` function.";
   }
-  return "Unknown error caught that is neither a string nor an Error";
+  if (typeof widget.render !== "function") {
+    return "The `render` key of the default export must be a function.";
+  }
+  return null;
 }
 
 /**

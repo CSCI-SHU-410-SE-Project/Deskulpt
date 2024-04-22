@@ -5,23 +5,22 @@
 
 import ReactDOM from "react-dom/client";
 import { Widget } from ".";
-import { CommandOut } from "./backend";
 
 /**
  * The payload of the "render-widget" event.
  */
 export interface RenderWidgetPayload {
   widgetId: string;
-  bundlerOutput: CommandOut<string>;
+  success: boolean;
+  /** The bundled code if `success` is `true` or the bundler error. */
+  bundlerOutput: string;
 }
 
 /**
  * The module obtained by dynamically importing the bundle of widget source code.
  */
 export interface WidgetModule {
-  /**
-   * The default export of the entry file of a user-defined widget.
-   */
+  /** The default export of the entry file of a user-defined widget. */
   default: Widget;
 }
 

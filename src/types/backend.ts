@@ -24,19 +24,3 @@ export interface DeskulptConf {
 export interface PackageJson {
   dependencies: Record<string, string>;
 }
-
-/**
- * See `commands.rs` for its backend counterpart.
- *
- * @example
- * ```ts
- * function processCommandOut(out: CommandOut<string>) {
- *   if ("success" in out) {
- *     const content = out.success;
- *   } else {
- *     const error = out.failure;
- *   }
- * }
- * ```
- */
-export type CommandOut<T> = { success: T } | { failure: string };

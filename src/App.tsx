@@ -4,7 +4,7 @@ import RefreshIcon from "@mui/icons-material/Refresh";
 import { invoke } from "@tauri-apps/api";
 import { emit } from "@tauri-apps/api/event";
 import { useEffect, useState } from "react";
-import { CommandOut, WidgetConfig, WidgetState } from "./types";
+import { WidgetConfig, WidgetState } from "./types";
 import { initWidgetState } from "./utils/widgetState";
 
 export default function App() {
@@ -18,10 +18,7 @@ export default function App() {
    * Open the widget base directory in the file explorer of the OS.
    */
   async function openWidgetBase() {
-    const output: CommandOut<null> = await invoke("open_widget_base");
-    if ("failure" in output) {
-      console.error(output.failure);
-    }
+    await invoke("open_widget_base").catch(console.error);
   }
 
   /**
@@ -34,16 +31,15 @@ export default function App() {
    * `null` otherwise.
    */
   async function refreshWidgetCollection() {
-    const output: CommandOut<Record<string, WidgetConfig>> = await invoke(
-      "refresh_widget_collection",
-    );
-    if ("success" in output) {
-      setWidgetConfigs(output.success);
-      return output.success;
-    } else {
-      console.error(output.failure);
-      return null;
-    }
+    return await invoke<Record<string, WidgetConfig>>("refresh_widget_collection")
+      .then((output) => {
+        setWidgetConfigs(output);
+        return output;
+      })
+      .catch((error) => {
+        console.error(error);
+        return null;
+      });
   }
 
   /**
@@ -63,11 +59,15 @@ export default function App() {
     console.log(
       `Rendering widget ${widgetId} with apis blob url ${widgetsState[widgetId].widgetApisBlobUrl}`,
     );
-    const bundlerOutput: CommandOut<string> = await invoke("bundle_widget", {
-      widgetId: widgetId,
-      widgetApisUrl: widgetsState[widgetId].widgetApisBlobUrl,
-    });
-    await emit("render-widget", { widgetId, bundlerOutput });
+    await invoke<string>("bundle_widget", { widgetId })
+      .then(async (bundlerOutput) => {
+        await emit("render-widget", { widgetId, bundlerOutput, success: true });
+      })
+      .catch(async (error: string) => {
+        console.log(typeof error);
+        console.log({ error });
+        await emit("render-widget", { widgetId, bundlerOutput: error, success: false });
+      });
   }
 
   /**
