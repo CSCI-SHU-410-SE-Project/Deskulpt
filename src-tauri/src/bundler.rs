@@ -19,7 +19,7 @@ use swc_common::{
     comments::SingleThreadedComments, errors::Handler, pass::Repeat, sync::Lrc,
     FileName, FilePathMapping, Globals, Mark, SourceMap, Span, GLOBALS,
 };
-use swc_ecma_ast::{KeyValueProp, Program};
+use swc_ecma_ast::{KeyValueProp, Module, Program};
 use swc_ecma_codegen::{
     text_writer::{JsWriter, WriteJs},
     Emitter,
@@ -28,7 +28,7 @@ use swc_ecma_loader::resolve::Resolution;
 use swc_ecma_parser::{parse_file_as_module, EsConfig, Syntax, TsConfig};
 use swc_ecma_transforms_optimization::simplify::dce;
 use swc_ecma_transforms_react::jsx;
-use swc_ecma_transforms_typescript::strip;
+use swc_ecma_transforms_typescript::typescript;
 use swc_ecma_visit::FoldWith;
 use tempfile::NamedTempFile;
 
@@ -123,10 +123,14 @@ pub(crate) fn bundle(
 
         // Transform that removes TypeScript types; weirdly, this must be applied on a
         // program rather than a module
-        let mut ts_transform = strip(top_level_mark);
+        let mut ts_transform = typescript::typescript(
+            typescript::Config { verbatim_module_syntax: true, ..Default::default() },
+            top_level_mark,
+        );
 
         // Apply the module transformations
-        let module = Program::Module(module)
+        let module = module
+            .into_program()
             .fold_with(&mut ts_transform)
             .expect_module()
             .fold_with(&mut tree_shaking)
@@ -336,6 +340,18 @@ impl Hook for NoopHook {
         _: &ModuleRecord,
     ) -> Result<Vec<KeyValueProp>, Error> {
         unimplemented!();
+    }
+}
+
+/// Trait for converting an object into a [`Program`].
+trait IntoProgram {
+    /// Return a [`Program`] wrapping the object itself.
+    fn into_program(self) -> Program;
+}
+
+impl IntoProgram for Module {
+    fn into_program(self) -> Program {
+        Program::Module(self)
     }
 }
 
