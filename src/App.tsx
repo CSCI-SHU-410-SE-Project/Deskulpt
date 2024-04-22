@@ -70,21 +70,28 @@ export default function App() {
   /**
    * Render a collection of widgets asynchronously in parallel.
    *
-   * @param configs The collection of widget configurations to render.
+   * @param widgetIds The collection of widget IDs to render.
    */
-  async function renderWidgets(configs: Record<string, WidgetConfig>) {
-    await Promise.all(Object.keys(configs).map((widgetId) => renderWidget(widgetId)));
+  async function renderWidgets(widgetIds: string[]) {
+    await Promise.all(widgetIds.map((widgetId) => renderWidget(widgetId)));
   }
 
-  useEffect(() => {
-    // Fetch the widget collection and render all on mount
-    refreshWidgetCollection()
+  /**
+   * Rescan widget collection and render newly added widgets.
+   */
+  async function rescan() {
+    await refreshWidgetCollection()
       .then(async (configs) => {
         if (configs !== null) {
-          await renderWidgets(configs);
+          const newIds = Object.keys(configs).filter((id) => !(id in widgetConfigs));
+          await renderWidgets(newIds);
         }
       })
       .catch(console.error);
+  }
+
+  useEffect(() => {
+    rescan().catch(console.error);
   }, []);
 
   return (
@@ -105,14 +112,17 @@ export default function App() {
             </ListItem>
           ))}
       </List>
-      <Button variant="outlined" onClick={refreshWidgetCollection}>
+      <Button variant="outlined" onClick={rescan}>
         Rescan
       </Button>
-      <Button variant="outlined" onClick={() => renderWidgets(widgetConfigs)}>
+      <Button
+        variant="outlined"
+        onClick={() => renderWidgets(Object.keys(widgetConfigs))}
+      >
         Render All
       </Button>
       <Button variant="outlined" onClick={openWidgetBase}>
-        Open Widget Base Directory
+        View Widgets
       </Button>
     </Box>
   );
