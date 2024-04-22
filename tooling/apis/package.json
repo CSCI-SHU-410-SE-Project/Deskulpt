@@ -1,9 +1,8 @@
 {
-  "name": "@deskulpt-test/raw-apis",
+  "name": "@deskulpt-test/apis",
   "version": "0.0.4",
   "description": "Deskulpt frontend wrapper for widget apis.",
   "type": "module",
-  "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "files": [
     "dist"
@@ -24,7 +23,9 @@
     "url": "https://github.com/CSCI-SHU-410-SE-Project/Deskulpt/issues"
   },
   "homepage": "https://csci-shu-410-se-project.github.io/Deskulpt/",
-  "dependencies": {},
+  "dependencies": {
+    "@deskulpt-test/raw-apis": "file:../raw-apis"
+  },
   "devDependencies": {
     "@rollup/plugin-terser": "^0.4.4",
     "@rollup/plugin-typescript": "^11.1.6",

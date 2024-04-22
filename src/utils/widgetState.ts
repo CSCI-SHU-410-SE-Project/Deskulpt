@@ -20,7 +20,7 @@ export interface WidgetState {
  */
 function createWidgetApisBlob(widgetId: string) {
   const jsCode = `
-import * as rapis from "@deskulpt-test/raw-apis"
+import rapis from "@deskulpt-test/raw-apis"
 
 function initApis(widgetId) {
 	let wapis = {};
