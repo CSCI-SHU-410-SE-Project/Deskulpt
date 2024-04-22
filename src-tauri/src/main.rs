@@ -7,7 +7,12 @@ use tauri::{api, generate_context, generate_handler, Builder};
 mod bundler;
 mod commands;
 mod config;
+mod setup;
 mod states;
+mod widget_api;
+
+#[cfg(test)]
+mod testing;
 
 /// Main entry point of Deskulpt.
 fn main() {
@@ -21,13 +26,21 @@ fn main() {
     }
 
     Builder::default()
+        // Additional application setup
+        .system_tray(setup::get_system_tray())
+        .on_system_tray_event(setup::listen_to_system_tray)
+        .on_window_event(setup::listen_to_windows)
+        // Initialize state management
         .manage(states::WidgetBaseDirectoryState(widget_base_dir))
         .manage(states::WidgetCollectionState::default())
+        // Register internal command handlers
         .invoke_handler(generate_handler![
             commands::bundle_widget,
             commands::open_widget_base,
             commands::refresh_widget_collection,
         ])
+        // Register widget API plugins
+        .plugin(widget_api::fs::init())
         .run(context)
-        .expect("FATAL");
+        .expect("Error running the Deskulpt application");
 }
