@@ -7,9 +7,9 @@ import WidgetContainer from "../components/WidgetContainer";
 
 // We explicitly import the default dependencies so that they won't be tree-shaken
 // These three lines will add `@deskulpt/react` and `@deskulpt/apis` to the import graph.
-import * as reactDummy from "@deskulpt/react";
-import * as apisDummy from "@deskulpt/apis";
-console.log(reactDummy, apisDummy);
+// import * as reactDummy from "@deskulpt/react";
+// import * as apisDummy from "@deskulpt/apis";
+// console.log(reactDummy, apisDummy);
 
 window.__DESKULPT__ = { defaultDeps: { React } };
 

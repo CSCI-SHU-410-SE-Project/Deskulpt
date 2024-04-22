@@ -1,0 +1,40 @@
+{
+  "name": "@deskulpt-test/raw-apis",
+  "version": "0.0.4",
+  "description": "Deskulpt frontend wrapper for widget apis.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "rollup -c --configPlugin typescript",
+    "pub": "echo 'Publishing not done yet. Need to publish widget-specific apis instead of raw apis.'",
+    "lint": "eslint --max-warnings=0 .",
+    "lint:fix": "eslint --max-warnings=0 --fix ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CSCI-SHU-410-SE-Project/Deskulpt.git"
+  },
+  "author": "Yao Xiao, Xinyu Li, Yuchen Zhou, Frank Zhu",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/CSCI-SHU-410-SE-Project/Deskulpt/issues"
+  },
+  "homepage": "https://csci-shu-410-se-project.github.io/Deskulpt/",
+  "dependencies": {
+    "@types/react": "^18.2.79",
+    "react": "^18.2.0"
+  },
+  "devDependencies": {
+    "@rollup/plugin-terser": "^0.4.4",
+    "@rollup/plugin-typescript": "^11.1.6",
+    "eslint": "^8.57.0",
+    "rollup": "^4.14.3",
+    "tslib": "^2.6.2",
+    "typescript": "^5.4.5",
+    "typescript-eslint": "^7.7.0"
+  }
+}

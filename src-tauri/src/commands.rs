@@ -154,12 +154,14 @@ pub(crate) fn bundle_widget(
         // Ignore default dependency that are provided by Deskulpt
         // This includes
         // - "@deskulpt/react"
+        // - "@deskulpt/raw-apis"
         // - "@deskulpt/apis"
         // For now, we manually create the hashmap
         // TODO: Find a more maintainable way to do this
         let mut dependency_map = HashMap::new();
-        dependency_map.insert("@deskulpt/react".to_string(), "".to_string());
-        dependency_map.insert("@deskulpt/apis".to_string(), widget_apis_url);
+        dependency_map.insert("@deskulpt-test/react".to_string(), "".to_string());
+        dependency_map.insert("@deskulpt-test/raw-apis".to_string(), "".to_string());
+        dependency_map.insert("@deskulpt-test/apis".to_string(), widget_apis_url);
 
         // We merge default dependencies with dependencies from node modules, since both should be ignored by the bundler.
         // Dependenceis from node_modules are assumed to be bundled by the widget developer
@@ -175,10 +177,9 @@ pub(crate) fn bundle_widget(
         // Wrap the bundled code if success, otherwise let the error propagate
         return bundle(
             &widget_config.directory,
-            // explicitly create an error here
-            // widget_entry,
-            widget_entry.join("index.js"),
-            widget_config.node.as_ref().map(|package_json| &package_json.dependencies),
+            widget_entry,
+            // widget_config.node.as_ref().map(|package_json| &package_json.dependencies),
+            Some(&dependency_map),
         )
         .context(format!("Failed to bundle widget (id={})", widget_id))
         .map_err(|e| cmderr!(e));

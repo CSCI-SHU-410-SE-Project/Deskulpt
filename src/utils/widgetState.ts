@@ -13,7 +13,7 @@ import { WidgetState } from "src/types";
  */
 function createWidgetApisBlob(widgetId: string) {
   const jsCode = `
-import * as rapis from "@deskulpt/apis"
+import * as rapis from "@deskulpt-test/raw-apis"
 
 function initApis(widgetId) {
 	let wapis = {};

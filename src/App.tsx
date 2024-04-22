@@ -59,7 +59,10 @@ export default function App() {
     console.log(
       `Rendering widget ${widgetId} with apis blob url ${widgetsState[widgetId].widgetApisBlobUrl}`,
     );
-    await invoke<string>("bundle_widget", { widgetId })
+    await invoke<string>("bundle_widget", {
+      widgetId: widgetId,
+      widgetApisUrl: widgetsState[widgetId].widgetApisBlobUrl,
+    })
       .then(async (bundlerOutput) => {
         await emit("render-widget", { widgetId, bundlerOutput, success: true });
       })

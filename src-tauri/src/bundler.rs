@@ -52,7 +52,7 @@ pub(crate) fn bundle(
     // Get the list of external modules not to resolve; this should include default
     // dependencies and (if any) external dependencies obtained from the dependency map
     let external_modules = {
-        let mut dependencies = HashSet::from([Atom::from("@deskulpt-test/react")]);
+        let mut dependencies = HashSet::new();
         if let Some(map) = dependency_map {
             dependencies.extend(map.keys().map(|k| Atom::from(k.clone())));
         }
@@ -119,7 +119,12 @@ pub(crate) fn bundle(
 
         // Rename import of `@deskulpt/apis` to `<widget-api-blob-url>` that partially apply widget id to raw apis
         let mut import_renamer = ImportRenamer {
-            rename_to: dependency_map.unwrap()["@deskulpt/apis"].clone(),
+            // rename_to: dependency_map.unwrap()["@deskulpt-test/apis"].clone(),
+            // only map "@deskulpt-test/apis" to the widget api url
+            mapping: HashMap::from([(
+                "@deskulpt-test/apis".to_string(),
+                dependency_map.unwrap()["@deskulpt-test/apis"].clone(),
+            )]),
         };
 
         // Apply the module transformations
@@ -147,8 +152,9 @@ pub(crate) fn bundle(
     Ok(code)
 }
 
+// input a hashmap of module specifier to new module specifier
 struct ImportRenamer {
-    rename_to: String,
+    mapping: HashMap<String, String>,
 }
 
 impl Fold for ImportRenamer {
@@ -158,8 +164,11 @@ impl Fold for ImportRenamer {
         for stmt in &mut module.body {
             if let ModuleItem::ModuleDecl(ModuleDecl::Import(import_decl)) = stmt {
                 let src = import_decl.src.value.to_string();
-                if src == "@deskulpt/apis" {
-                    import_decl.src.value = Atom::from(self.rename_to.clone());
+                // if src == "@deskulpt-test/apis" {
+                //     import_decl.src.value = Atom::from(self.rename_to.clone());
+                // }
+                if let Some(new_src) = self.mapping.get(&src) {
+                    import_decl.src.value = Atom::from(new_src.clone());
                 }
             }
         }
