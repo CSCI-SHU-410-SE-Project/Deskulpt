@@ -19,12 +19,14 @@ export default function WidgetContainer(props: {
   id: string;
   inner: React.ReactElement;
 }) {
+  const containerRef = React.useRef(null);
   const { id, inner } = props;
 
   return (
     <React.StrictMode>
-      <Draggable>
+      <Draggable nodeRef={containerRef}>
         <Box
+          ref={containerRef}
           sx={{
             px: 2,
             py: 1,

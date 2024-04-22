@@ -9,14 +9,7 @@ import tseslint from "typescript-eslint";
 
 export default tseslint.config(
   {
-    ignores: [
-      "**/dist/**",
-      "**/fixtures/**",
-      "**/target/**",
-      "**/website/**",
-      "**/tooling/**",
-      "src/.scripts/**",
-    ],
+    ignores: ["**/dist/**"],
   },
 
   // --- Language Options -------------------------------------------------------------
@@ -39,21 +32,6 @@ export default tseslint.config(
   eslint.configs.recommended,
   ...tseslint.configs.recommendedTypeChecked,
   ...tseslint.configs.stylisticTypeChecked,
-  {
-    rules: {
-      // Disables checking an asynchronous function passed as a JSX attribute expected
-      // to be a function that returns void. This is useful for event handlers of React
-      // components, e.g., `onClick` of a button.
-      "@typescript-eslint/no-misused-promises": [
-        "error",
-        {
-          checksVoidReturn: {
-            attributes: false,
-          },
-        },
-      ],
-    },
-  },
 
   // --- Linter Overrides ------------------------------------------------------------
 
