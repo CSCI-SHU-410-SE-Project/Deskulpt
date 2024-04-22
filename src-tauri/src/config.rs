@@ -15,8 +15,8 @@ use serde::{Deserialize, Serialize};
 pub(crate) struct WidgetConfig {
     /// Deskulpt configuration [`DeskulptConf`].
     pub(crate) deskulpt: DeskulptConf,
-    /// Node package configuration [`PackageJson`], optional.
-    pub(crate) node: Option<PackageJson>,
+    /// External dependencies, optional.
+    pub(crate) external_dependencies: Option<HashMap<String, String>>,
     /// Absolute path to the widget directory.
     ///
     /// It is absolute so that we do not need to query the widget base directory state
@@ -39,14 +39,9 @@ pub(crate) struct DeskulptConf {
     pub(crate) ignore: bool,
 }
 
-/// Node package configuration, corresponding to `package.json`.
-#[derive(Clone, Deserialize, Serialize)]
-#[cfg_attr(test, derive(PartialEq, Debug))]
-pub(crate) struct PackageJson {
-    /// The `dependencies` field of `package.json`
-    ///
-    /// This is used for inferring the external dependencies of the widget.
-    pub(crate) dependencies: HashMap<String, String>,
+#[derive(Deserialize)]
+struct PackageJson {
+    dependencies: Option<HashMap<String, String>>,
 }
 
 /// Read a widget directory into a widget configuration.
@@ -94,12 +89,12 @@ pub(crate) fn read_widget_config(path: &Path) -> Result<Option<WidgetConfig>, Er
     }
 
     let package_json_path = path.join("package.json");
-    let package_json = if package_json_path.exists() {
+    let external_dependencies = if package_json_path.exists() {
         let package_json_str =
             read_to_string(package_json_path).context("Failed to read package.json")?;
         let package_json: PackageJson = serde_json::from_str(&package_json_str)
             .context("Failed to interpret package.json")?;
-        Some(package_json)
+        package_json.dependencies
     } else {
         None
     };
@@ -107,7 +102,7 @@ pub(crate) fn read_widget_config(path: &Path) -> Result<Option<WidgetConfig>, Er
     Ok(Some(WidgetConfig {
         directory: path.to_path_buf(),
         deskulpt: deskulpt_conf,
-        node: package_json,
+        external_dependencies,
     }))
 }
 
@@ -141,9 +136,7 @@ mod tests {
         Some(WidgetConfig {
             directory: fixture_dir().join("standard"),
             deskulpt: get_standard_deskulpt_conf(),
-            node: Some(PackageJson {
-                dependencies: [("express".to_string(), "^4.17.1".to_string())].into(),
-            }),
+            external_dependencies: Some([("express".to_string(), "^4.17.1".to_string())].into()),
         }),
     )]
     // A standard configuration with `deskulpt.conf.json` but no `package.json`
@@ -152,7 +145,16 @@ mod tests {
         Some(WidgetConfig {
             directory: fixture_dir().join("no_package_json"),
             deskulpt: get_standard_deskulpt_conf(),
-            node: None,
+            external_dependencies: None,
+        }),
+    )]
+    // `package.json` does not contain `dependencies` field
+    #[case::package_json_no_dependencies(
+        fixture_dir().join("package_json_no_dependencies"),
+        Some(WidgetConfig {
+            directory: fixture_dir().join("package_json_no_dependencies"),
+            deskulpt: get_standard_deskulpt_conf(),
+            external_dependencies: None,
         }),
     )]
     // No configuration file, should not be treated as a widget
@@ -215,14 +217,6 @@ mod tests {
         vec![
             ChainReason::Exact("Failed to read package.json".to_string()),
             ChainReason::IOError,
-        ],
-    )]
-    // `package.json` is missing a field
-    #[case::package_json_missing_field(
-        fixture_dir().join("package_json_missing_field"),
-        vec![
-            ChainReason::Exact("Failed to interpret package.json".to_string()),
-            ChainReason::SerdeError,
         ],
     )]
     fn test_read_error(

@@ -151,7 +151,7 @@ pub(crate) fn bundle_widget(
         return bundle(
             &widget_config.directory,
             widget_entry,
-            widget_config.node.as_ref().map(|package_json| &package_json.dependencies),
+            widget_config.external_dependencies.as_ref(),
         )
         .context(format!("Failed to bundle widget (id={})", widget_id))
         .map_err(|e| cmderr!(e));
