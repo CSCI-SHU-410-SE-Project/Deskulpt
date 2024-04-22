@@ -4,8 +4,8 @@
 
 /** See `config.rs` for its backend counterpart. */
 export interface WidgetConfig {
-  deskulpt: DeskulptConf;
-  node: PackageJson | null;
+  deskulptConf: DeskulptConf;
+  externalDependencies: Record<string, string>;
   directory: string;
 }
 
@@ -14,9 +14,4 @@ export interface DeskulptConf {
   name: string;
   entry: string;
   ignore: boolean;
-}
-
-/** See `config.rs` for its backend counterpart. */
-export interface PackageJson {
-  dependencies: Record<string, string>;
 }

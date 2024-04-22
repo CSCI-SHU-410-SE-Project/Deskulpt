@@ -52,8 +52,6 @@ export default function App() {
         await emit("render-widget", { widgetId, bundlerOutput, success: true });
       })
       .catch(async (error: string) => {
-        console.log(typeof error);
-        console.log({ error });
         await emit("render-widget", { widgetId, bundlerOutput: error, success: false });
       });
   }
@@ -92,7 +90,10 @@ export default function App() {
                 </IconButton>
               }
             >
-              <ListItemText primary={widgetConfig.deskulpt.name} secondary={widgetId} />
+              <ListItemText
+                primary={widgetConfig.deskulptConf.name}
+                secondary={widgetId}
+              />
             </ListItem>
           ))}
       </List>

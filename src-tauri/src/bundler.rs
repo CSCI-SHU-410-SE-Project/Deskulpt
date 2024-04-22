@@ -44,7 +44,7 @@ static EXTENSIONS: &[&str] = &["js", "jsx", "ts", "tsx"];
 pub(crate) fn bundle(
     root: &Path,
     target: &Path,
-    dependency_map: Option<&HashMap<String, String>>,
+    dependency_map: &HashMap<String, String>,
 ) -> Result<String, Error> {
     let globals = Globals::default();
     let cm = Lrc::new(SourceMap::new(FilePathMapping::empty()));
@@ -53,9 +53,7 @@ pub(crate) fn bundle(
     // dependencies and (if any) external dependencies obtained from the dependency map
     let external_modules = {
         let mut dependencies = HashSet::from([Atom::from("@deskulpt-test/react")]);
-        if let Some(map) = dependency_map {
-            dependencies.extend(map.keys().map(|k| Atom::from(k.clone())));
-        }
+        dependencies.extend(dependency_map.keys().map(|k| Atom::from(k.clone())));
         Vec::from_iter(dependencies)
     };
 
@@ -371,8 +369,9 @@ mod tests {
     fn test_bundle_ok(#[case] case: &str) {
         let case_dir = fixture_dir().join(case);
         let bundle_root = case_dir.join("input");
-        let result = bundle(&bundle_root, &bundle_root.join("index.jsx"), None)
-            .expect("Expected bundling to succeed");
+        let result =
+            bundle(&bundle_root, &bundle_root.join("index.jsx"), &Default::default())
+                .expect("Expected bundling to succeed");
 
         let expected = read_to_string(case_dir.join("output.js")).unwrap();
         self::assert_eq!(result, expected);
@@ -398,8 +397,9 @@ mod tests {
     fn test_bundle_error(#[case] case: &str, #[case] expected_error: Vec<ChainReason>) {
         let case_dir = fixture_dir().join(case);
         let bundle_root = case_dir.join("input");
-        let error = bundle(&bundle_root, &bundle_root.join("index.jsx"), None)
-            .expect_err("Expected bundling error");
+        let error =
+            bundle(&bundle_root, &bundle_root.join("index.jsx"), &Default::default())
+                .expect_err("Expected bundling error");
         assert_err_eq(error, expected_error);
     }
 
@@ -419,7 +419,7 @@ mod tests {
         std::fs::write(&entry_path, format!("import {{ foo }} from {utils_path:?};"))
             .unwrap();
 
-        let error = bundle(&bundle_root, &entry_path, None)
+        let error = bundle(&bundle_root, &entry_path, &Default::default())
             .expect_err("Expected bundling error");
         let expected_error = vec![
             ChainReason::Exact("load_transformed failed".to_string()),
