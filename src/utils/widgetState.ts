@@ -1,4 +1,11 @@
-import { WidgetState } from "src/types";
+/**
+ * The state of the widget. This includes
+ * - the blob url of the javascript bundle for widget-specific APIs (raw APIS with widgetId passed in)
+ * - TODO: style of widgets: widget position, size, etc.
+ */
+export interface WidgetState {
+  widgetApisBlobUrl: string;
+}
 
 /**
  * Create a blob of js code that initialize the apis for the widget.

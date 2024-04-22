@@ -157,8 +157,9 @@ pub(crate) fn bundle(
     Ok(code)
 }
 
-// input a hashmap of module specifier to new module specifier
+// Rename import module specifiers in the AST.
 struct ImportRenamer {
+    // A map from the original module specifier to the new module specifier
     mapping: HashMap<String, String>,
 }
 
@@ -169,9 +170,6 @@ impl Fold for ImportRenamer {
         for stmt in &mut module.body {
             if let ModuleItem::ModuleDecl(ModuleDecl::Import(import_decl)) = stmt {
                 let src = import_decl.src.value.to_string();
-                // if src == "@deskulpt-test/apis" {
-                //     import_decl.src.value = Atom::from(self.rename_to.clone());
-                // }
                 if let Some(new_src) = self.mapping.get(&src) {
                     import_decl.src.value = Atom::from(new_src.clone());
                 }

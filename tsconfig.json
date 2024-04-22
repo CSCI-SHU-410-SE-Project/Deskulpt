@@ -18,14 +18,8 @@
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true,
-
-    /* Paths */
-    "baseUrl": ".",
-    "paths": {
-      "@deskulpt/*": ["src/@deskulpt/*"]
-    }
+    "noFallthroughCasesInSwitch": true
   },
-  "include": ["src/**/*", "vite.config.ts"],
+  "include": ["src", "vite.config.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

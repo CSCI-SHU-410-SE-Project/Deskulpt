@@ -9,10 +9,6 @@ export interface WidgetConfig {
   directory: string;
 }
 
-export interface WidgetState {
-  widgetApisBlobUrl: string;
-}
-
 /** See `config.rs` for its backend counterpart. */
 export interface DeskulptConf {
   name: string;

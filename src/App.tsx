@@ -4,8 +4,8 @@ import RefreshIcon from "@mui/icons-material/Refresh";
 import { invoke } from "@tauri-apps/api";
 import { emit } from "@tauri-apps/api/event";
 import { useEffect, useState } from "react";
-import { WidgetConfig, WidgetState } from "./types";
-import { initWidgetState } from "./utils/widgetState";
+import { WidgetConfig } from "./types";
+import { WidgetState, initWidgetState } from "./utils/widgetState";
 
 export default function App() {
   const [widgetConfigs, setWidgetConfigs] = useState<Record<string, WidgetConfig>>({});
