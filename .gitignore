@@ -39,8 +39,3 @@ src-tauri/gen/schemas
 website/build
 website/.docusaurus
 website/.cache-loader
-
-# Ignore views/canvas.html because it's dynamically chosen by npm based on
-# whether it's dev or build
-views/canvas.html
-
