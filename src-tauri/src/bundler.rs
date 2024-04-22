@@ -123,7 +123,12 @@ pub(crate) fn bundle(
             // only map "@deskulpt-test/apis" to the widget api url
             mapping: HashMap::from([(
                 "@deskulpt-test/apis".to_string(),
-                dependency_map.unwrap()["@deskulpt-test/apis"].clone(),
+                // map to the widget api url, or if it's not in the map, keep the original value
+                dependency_map
+                    .unwrap()
+                    .get("@deskulpt-test/apis")
+                    .unwrap_or(&"@deskulpt-test/apis".to_string())
+                    .clone(),
             )]),
         };
 
@@ -409,8 +414,13 @@ mod tests {
     fn test_bundle_ok(#[case] case: &str) {
         let case_dir = fixture_dir().join(case);
         let bundle_root = case_dir.join("input");
-        let result = bundle(&bundle_root, &bundle_root.join("index.jsx"), None)
-            .expect("Expected bundling to succeed");
+        let dummy_dependency_map = HashMap::new();
+        let result = bundle(
+            &bundle_root,
+            &bundle_root.join("index.jsx"),
+            Some(&dummy_dependency_map),
+        )
+        .expect("Expected bundling to succeed");
 
         let expected = read_to_string(case_dir.join("output.js")).unwrap();
         self::assert_eq!(result, expected);
