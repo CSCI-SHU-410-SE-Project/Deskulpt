@@ -160,7 +160,6 @@ pub(crate) fn bundle_widget(
         // TODO: Find a more maintainable way to do this
         let mut dependency_map = HashMap::new();
         dependency_map.insert("@deskulpt-test/react".to_string(), "".to_string());
-        dependency_map.insert("@deskulpt-test/raw-apis".to_string(), "".to_string());
         dependency_map.insert("@deskulpt-test/apis".to_string(), widget_apis_url);
 
         // We merge default dependencies with dependencies from node modules, since both should be ignored by the bundler.

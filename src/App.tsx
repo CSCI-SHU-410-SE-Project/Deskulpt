@@ -1,6 +1,5 @@
 import { Box, Button, IconButton, List, ListItem, ListItemText } from "@mui/material";
 import RefreshIcon from "@mui/icons-material/Refresh";
-
 import { invoke } from "@tauri-apps/api";
 import { emit } from "@tauri-apps/api/event";
 import { useEffect, useState } from "react";

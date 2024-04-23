@@ -1,6 +1,7 @@
 import { defineConfig, RollupLog } from "rollup";
 import typescript from "@rollup/plugin-typescript";
 import terser from "@rollup/plugin-terser";
+import replace from "@rollup/plugin-replace";
 import { fileURLToPath } from "url";
 import { join } from "path";
 import { Dir, opendirSync, rmSync } from "fs";
@@ -20,6 +21,24 @@ export default defineConfig([
     external: ["@tauri-apps/api"],
     plugins: [typescript(), terser()],
     onwarn,
+  },
+  // xxx
+  {
+    input: "src/index.ts",
+    output: {
+      format: "esm",
+      file: "../../public/.wrap-apis.js.txt",
+    },
+    external: ["@tauri-apps/api", "@deskulpt-test/raw-apis"],
+    plugins: [
+      replace({
+        "./raw": "@deskulpt-test/raw-apis",
+        delimiters: ["", ""],
+        preventAssignment: true,
+      }),
+      typescript(),
+      terser(),
+    ],
   },
   // TypeScript declarations for publishing
   {

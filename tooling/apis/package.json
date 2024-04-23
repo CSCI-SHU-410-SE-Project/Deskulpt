@@ -1,6 +1,6 @@
 {
   "name": "@deskulpt-test/apis",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "Typing supports for Deskulpt widget APIs.",
   "type": "module",
   "types": "./dist/index.d.ts",
@@ -27,6 +27,7 @@
     "@tauri-apps/api": "^1.5.3"
   },
   "devDependencies": {
+    "@rollup/plugin-replace": "^5.0.5",
     "@rollup/plugin-terser": "^0.4.4",
     "@rollup/plugin-typescript": "^11.1.6",
     "eslint": "^8.57.0",

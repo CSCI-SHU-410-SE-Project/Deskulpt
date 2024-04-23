@@ -23,4 +23,4 @@ function wrapApis<T>(widgetId: string, apis: T): { [K in keyof T]: WrappedApis<T
   return wrappedApis;
 }
 
-export default wrapApis("", rawApis);
+export default wrapApis("__DESKULPT_WIDGET_ID__", rawApis);

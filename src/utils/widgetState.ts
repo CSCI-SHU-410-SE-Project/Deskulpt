@@ -20,11 +20,10 @@ export interface WidgetState {
 async function createWidgetApisBlob(widgetId: string) {
   // "/apis.txt" is compiled from the npm package in /tooling/apis
   // It is a template for the widget's apis
-  const jsCodePath = "/apis.txt";
-  const jsCodeResponse = await fetch(jsCodePath);
+  const jsCodeResponse = await fetch("/.wrap-apis.js.txt");
   const jsCodeTemplate = await jsCodeResponse.text();
   console.log(`jsCodeTemplate: ${jsCodeTemplate}`);
-  const jsCode = jsCodeTemplate.replace("${widgetId}", widgetId);
+  const jsCode = jsCodeTemplate.replace("__DESKULPT_WIDGET_ID__", widgetId);
   console.log(`jsCode: ${jsCode}`);
 
   return new Blob([jsCode], { type: "application/javascript" });
