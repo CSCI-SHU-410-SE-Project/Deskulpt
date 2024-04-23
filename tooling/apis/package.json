@@ -1,7 +1,7 @@
 {
   "name": "@deskulpt-test/apis",
-  "version": "0.0.6",
-  "description": "Deskulpt frontend wrapper for widget apis.",
+  "version": "0.0.8",
+  "description": "Typing supports for Deskulpt widget APIs.",
   "type": "module",
   "types": "./dist/index.d.ts",
   "files": [
@@ -23,6 +23,9 @@
     "url": "https://github.com/CSCI-SHU-410-SE-Project/Deskulpt/issues"
   },
   "homepage": "https://csci-shu-410-se-project.github.io/Deskulpt/",
+  "dependencies": {
+    "@tauri-apps/api": "^1.5.3"
+  },
   "devDependencies": {
     "@rollup/plugin-terser": "^0.4.4",
     "@rollup/plugin-typescript": "^11.1.6",
@@ -31,8 +34,5 @@
     "tslib": "^2.6.2",
     "typescript": "^5.4.5",
     "typescript-eslint": "^7.7.0"
-  },
-  "dependencies": {
-    "@deskulpt-test/raw-apis": "^0.0.4"
   }
 }

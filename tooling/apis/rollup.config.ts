@@ -10,40 +10,45 @@ const __dirname = fileURLToPath(new URL(".", import.meta.url));
 cleanDir(join(__dirname, "./dist"));
 
 export default defineConfig([
-  // ESM build to be used internally
+  // ESM build of raw APIs to be used internally
+  {
+    input: "src/raw.ts",
+    output: {
+      format: "esm",
+      file: "../../src/.scripts/raw-apis.js",
+    },
+    external: ["@tauri-apps/api"],
+    plugins: [typescript(), terser()],
+    onwarn,
+  },
+  // TypeScript declarations for publishing
   {
     input: "src/index.ts",
     output: {
       format: "esm",
-      file: "../../public/apis.txt",
-    },
-    // resolved at runtime by an importmap
-    external: ["@deskulpt-test/raw-apis"],
-    plugins: [typescript(), terser()],
-    onwarn,
-  },
-  // CJS build for publishing
-  {
-    input: "src/index.ts",
-    output: {
-      format: "es",
       dir: "./dist",
     },
-    external: ["@deskulpt-test/raw-apis"],
+    external: ["@tauri-apps/api"],
     plugins: [
       typescript({
         declaration: true,
         declarationDir: "./dist",
-        emitDeclarationOnly: true,
         rootDir: "./src",
       }),
-      terser(),
     ],
     onwarn,
   },
 ]);
 
 function onwarn(warning: RollupLog) {
+  if (
+    warning.code === "EMPTY_BUNDLE" &&
+    warning.names?.length === 1 &&
+    warning.names[0] === "index"
+  ) {
+    // `index.ts` is a type-only file, which is expected to be empty
+    return;
+  }
   throw Object.assign(new Error(), warning);
 }
 

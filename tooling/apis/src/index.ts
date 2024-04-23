@@ -1,23 +1,18 @@
-import rapis from "@deskulpt-test/raw-apis";
+import rawApis from "./raw";
 
-type ModifyFirstArg<F> = F extends (widgetId: infer W, ...args: infer P) => infer R
+type AssignWidgetId<T> = T extends (widgetId: string, ...args: infer P) => infer R
   ? (...args: P) => R
   : never;
 
-type ApiWithPrependedArg<M> = {
-  [Property in keyof M]: M[Property] extends (...args: any[]) => any
-    ? ModifyFirstArg<M[Property]>
-    : never;
+type WrappedApis<T> = {
+  [K in keyof T]: T[K] extends Function ? AssignWidgetId<T[K]> : never;
 };
 
-const createApiWithWidgetId = <T>(
-  widgetId: string,
-  apiModule: T,
-): { [P in keyof T]: ApiWithPrependedArg<T[P]> } => {
+function wrapApis<T>(widgetId: string, apis: T): { [K in keyof T]: WrappedApis<T[K]> } {
   const wrappedApis: any = {};
-  for (const modName in apiModule) {
+  for (const modName in apis) {
     wrappedApis[modName] = {};
-    const module = apiModule[modName];
+    const module = apis[modName];
     for (const funcName in module) {
       const func = module[funcName];
       if (typeof func === "function") {
@@ -26,8 +21,6 @@ const createApiWithWidgetId = <T>(
     }
   }
   return wrappedApis;
-};
+}
 
-// Example Usage with proper typing
-const apis = createApiWithWidgetId("${widgetId}", rapis);
-export default apis;
+export default wrapApis("", rawApis);
