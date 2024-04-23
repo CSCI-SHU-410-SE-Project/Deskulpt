@@ -41,6 +41,7 @@ export default tseslint.config(
     ...tseslint.configs.disableTypeChecked,
   },
   {
+    // It is hard to pass these rules when wrapping raw APIs.
     files: ["src/index.ts"],
     rules: {
       "@typescript-eslint/ban-types": "off",

@@ -22,7 +22,10 @@ export default defineConfig([
     plugins: [typescript(), terser()],
     onwarn,
   },
-  // xxx
+  // ESM build of wrapped APIs, but with raw APIs externalized; essentially we replace
+  // the relative import of raw APIs with `@deskulpt-test/raw-apis` and externalize it;
+  // `@deskulpt-test/raw-apis` does not really exist but should be mapped to the actual
+  // raw APIs bundled above
   {
     input: "src/index.ts",
     output: {
@@ -39,8 +42,9 @@ export default defineConfig([
       typescript(),
       terser(),
     ],
+    onwarn,
   },
-  // TypeScript declarations for publishing
+  // ESM build of wrapped APIs for publishing
   {
     input: "src/index.ts",
     output: {
@@ -60,14 +64,6 @@ export default defineConfig([
 ]);
 
 function onwarn(warning: RollupLog) {
-  if (
-    warning.code === "EMPTY_BUNDLE" &&
-    warning.names?.length === 1 &&
-    warning.names[0] === "index"
-  ) {
-    // `index.ts` is a type-only file, which is expected to be empty
-    return;
-  }
   throw Object.assign(new Error(), warning);
 }
 

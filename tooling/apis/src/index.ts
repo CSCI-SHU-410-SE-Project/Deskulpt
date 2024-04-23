@@ -23,4 +23,7 @@ function wrapApis<T>(widgetId: string, apis: T): { [K in keyof T]: WrappedApis<T
   return wrappedApis;
 }
 
+// `__DESKULPT_WIDGET_ID__` is a placeholder; in the published package this does not
+// matter at all because we only care about type hints; for internal usage this will be
+// replaced with the actual widget ID
 export default wrapApis("__DESKULPT_WIDGET_ID__", rawApis);
