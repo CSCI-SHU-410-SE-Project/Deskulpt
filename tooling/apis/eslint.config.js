@@ -40,4 +40,15 @@ export default tseslint.config(
     files: ["**/*.js"],
     ...tseslint.configs.disableTypeChecked,
   },
+
+  // --- Custom Rules -----------------------------------------------------------------
+  {
+    // To apply widgetId to first argument of raw apis of arbitrary signature, we need to disable these rules.
+    rules: {
+      "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/no-unsafe-return": "off",
+      "@typescript-eslint/no-unsafe-argument": "off",
+      "@typescript-eslint/no-unsafe-member-access": "off",
+    },
+  },
 );
