@@ -1,7 +1,7 @@
 use tauri::Window;
 
 #[cfg(target_os = "windows")]
-pub(crate) fn set_window_always_on_bottom(window: &Window) {
+pub(crate) fn platform_set_window_to_bottom(window: &Window) {
     use windows::Win32::{
         Foundation::HWND,
         UI::WindowsAndMessaging::{

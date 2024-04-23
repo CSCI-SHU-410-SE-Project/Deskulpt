@@ -41,6 +41,7 @@ fn main() {
             commands::refresh_widget_collection,
             canvas::commands::sink_canvas,
             canvas::commands::float_canvas,
+            canvas::commands::set_canvas_to_bottom,
         ])
         // Register widget API plugins
         .plugin(widget_api::fs::init())
