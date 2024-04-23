@@ -16,7 +16,12 @@ rstest = "0.19.0"
 [dependencies]
 tauri = { version = "1.6.1", features = ["shell-open", "config-json5", "test", "system-tray"] }
 [ target.'cfg(target_os = "windows")'.dependencies ]
-windows = { version = "0.56.0", features = ["Win32_Foundation", "Win32_UI_WindowsAndMessaging"] }
+windows = { version = "0.56.0", features = [
+	"Win32_Foundation", 
+	"Win32_System_LibraryLoader",
+	"Win32_UI_WindowsAndMessaging",
+	"Win32_Graphics_Gdi",
+] }
 
 # Utilities
 anyhow = "1.0.80"

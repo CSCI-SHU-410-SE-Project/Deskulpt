@@ -1,10 +1,4 @@
-use crate::canvas::platform::windows::platform_set_window_to_bottom;
 use tauri::window::Window;
-
-/// Set the window to always be on the bottom of all windows
-pub(crate) fn set_window_to_bottom(window: &Window) {
-    platform_set_window_to_bottom(&window);
-}
 
 /// ignore cursor so that we click through the window
 ///
@@ -19,4 +13,20 @@ pub(crate) fn ignore_cursor(window: &Window) {
 pub(crate) fn catch_cursor(window: &Window) {
     window.set_ignore_cursor_events(false).unwrap();
     println!("Catch cursor events");
+}
+
+/// Set the window to always be on the bottom of all windows
+pub(crate) fn set_window_to_bottom(window: &Window) {
+    if cfg!(target_os = "windows") {
+        use crate::canvas::platform::windows::platform_set_window_to_bottom;
+        platform_set_window_to_bottom(window);
+    }
+}
+
+/// Set the window to be always at the bottom of all windows
+pub(crate) fn set_window_always_to_bottom(window: &Window) {
+    if cfg!(target_os = "windows") {
+        use crate::canvas::platform::windows::platform_set_window_always_to_bottom;
+        platform_set_window_always_to_bottom(window).unwrap();
+    }
 }

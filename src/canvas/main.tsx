@@ -5,7 +5,7 @@ import { handleError, getDOMRoot, getWidgetModuleError } from "./utils";
 import { grabErrorInfo } from "../utils";
 import WidgetContainer from "../components/WidgetContainer";
 import { invoke } from "@tauri-apps/api";
-import { appWindow } from "@tauri-apps/api/window";
+// import { appWindow } from "@tauri-apps/api/window";
 
 window.__DESKULPT__ = { defaultDeps: { React } };
 
@@ -14,12 +14,18 @@ window.__DESKULPT__ = { defaultDeps: { React } };
 //     console.error(err);
 //   })
 // });
-await appWindow.onFocusChanged((focused) => {
-  if (focused) {
-    invoke("set_canvas_to_bottom", {}).catch((err) => {
-      console.error(err);
-    });
-  }
+// We directly listen to window WM_FOCUS event instead of using the onFocusChanged method
+// because the latter is executed only after the window has been focused, which is too late
+// await appWindow.onFocusChanged((focused) => {
+//   if (focused) {
+//     invoke("set_canvas_to_bottom", {}).catch((err) => {
+//       console.error(err);
+//     });
+//   }
+// });
+
+await invoke("set_canvas_always_to_bottom", {}).catch((err) => {
+  console.error(err);
 });
 
 const canvas = document.getElementById("canvas")!;

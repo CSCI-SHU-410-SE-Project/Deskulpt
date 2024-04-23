@@ -1,4 +1,15 @@
 use tauri::Window;
+use windows::{
+    core::*,
+    Win32::{
+        Foundation::{HWND, LPARAM, LRESULT, WPARAM},
+        System::LibraryLoader::GetModuleHandleA,
+        UI::WindowsAndMessaging::{
+            DefWindowProcA, RegisterClassA, SetWindowLongPtrA, GWLP_WNDPROC,
+            WM_SETFOCUS, WNDCLASSA,
+        },
+    },
+};
 
 #[cfg(target_os = "windows")]
 pub(crate) fn platform_set_window_to_bottom(window: &Window) {
@@ -32,26 +43,25 @@ pub(crate) fn platform_set_window_to_bottom(window: &Window) {
     println!("Window set to always on bottom (Windows)");
 }
 
-// #[cfg(target_os = "macos")]
-// fn set_window_always_on_bottom(window: &Window) {
-//     use cocoa::appkit::{NSWindow, NSWindowOrderingMode};
-//     use objc::runtime::YES;
-//     // Cast to id (specific to macOS/Cocoa)
-//     let ns_window = window.ns_window().unwrap() as id;
-//     unsafe {
-//         ns_window.setOrdered(NSWindowOrderingMode::NSWindowBelow, None, YES);
-//     }
-//     println!("Window set to always on bottom (macOS)");
-// }
+extern "system" fn window_proc(
+    hwnd: HWND,
+    msg: u32,
+    wparam: WPARAM,
+    lparam: LPARAM,
+) -> LRESULT {
+    match msg {
+        WM_SETFOCUS => {
+            println!("Window got focus");
+            unsafe { DefWindowProcA(hwnd, msg, wparam, lparam) }
+        },
+        _ => unsafe { DefWindowProcA(hwnd, msg, wparam, lparam) },
+    }
+}
 
-// #[cfg(target_os = "linux")]
-// fn set_window_always_on_bottom(window: &Window) {
-//     use x11::xlib::{XLowerWindow, Display, Window as XWindow};
-// 	   // Cast to XWindow (specific to X11/Linux)
-//     let x_window = window.xlib_window().unwrap() as XWindow;
-//     let display = window.xlib_display().unwrap() as *mut Display;
-//     unsafe {
-//         XLowerWindow(display, x_window);
-//     }
-//     println!("Window set to always on bottom (Linux)");
-// }
+pub(crate) fn platform_set_window_always_to_bottom(window: &Window) -> Result<()> {
+    let hwnd = HWND(window.hwnd().unwrap().0);
+    unsafe {
+        let original_proc = SetWindowLongPtrA(hwnd, GWLP_WNDPROC, window_proc as isize);
+    }
+    Ok(())
+}
