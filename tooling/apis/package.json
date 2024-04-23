@@ -1,6 +1,6 @@
 {
   "name": "@deskulpt-test/apis",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Deskulpt frontend wrapper for widget apis.",
   "type": "module",
   "types": "./dist/index.d.ts",
@@ -33,7 +33,6 @@
     "typescript-eslint": "^7.7.0"
   },
   "dependencies": {
-    "@deskulpt-test/raw-apis": "^0.0.4",
-    "@rollup/plugin-node-resolve": "^15.2.3"
+    "@deskulpt-test/raw-apis": "^0.0.4"
   }
 }
