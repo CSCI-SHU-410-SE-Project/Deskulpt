@@ -54,7 +54,7 @@ export default function App() {
   async function renderWidget(widgetId: string) {
     if (!(widgetId in widgetsState)) {
       console.log(`Initializing widget state for ${widgetId}`);
-      widgetsState[widgetId] = initWidgetState(widgetId);
+      widgetsState[widgetId] = await initWidgetState(widgetId);
     }
     console.log(
       `Rendering widget ${widgetId} with apis blob url ${widgetsState[widgetId].widgetApisBlobUrl}`,

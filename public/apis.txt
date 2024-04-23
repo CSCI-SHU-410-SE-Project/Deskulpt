@@ -1,0 +1,1 @@
+import t from"@deskulpt-test/raw-apis";const o=((t,o)=>{const n={};for(const s in o){n[s]={};const r=o[s];for(const o in r){const c=r[o];"function"==typeof c&&(n[s][o]=(...o)=>c(t,...o))}}return n})("${widgetId}",t);export{o as default};

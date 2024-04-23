@@ -6,7 +6,6 @@
 export interface WidgetState {
   widgetApisBlobUrl: string;
 }
-
 /**
  * Create a blob of js code that initialize the apis for the widget.
  *
@@ -18,27 +17,16 @@ export interface WidgetState {
  * ```
  * @param widgetId
  */
-function createWidgetApisBlob(widgetId: string) {
-  const jsCode = `
-import rapis from "@deskulpt-test/raw-apis"
+async function createWidgetApisBlob(widgetId: string) {
+  // "/apis.txt" is compiled from the npm package in /tooling/apis
+  // It is a template for the widget's apis
+  const jsCodePath = "/apis.txt";
+  const jsCodeResponse = await fetch(jsCodePath);
+  const jsCodeTemplate = await jsCodeResponse.text();
+  console.log(`jsCodeTemplate: ${jsCodeTemplate}`);
+  const jsCode = jsCodeTemplate.replace("${widgetId}", widgetId);
+  console.log(`jsCode: ${jsCode}`);
 
-function initApis(widgetId) {
-	let wapis = {};
-	for (const modName in rapis) {
-	const mod = rapis[modName];
-	const pmod = {};
-	for (const funcName in mod) {
-		const func = mod[funcName];
-		pmod[funcName] = (...args) => func(widgetId, ...args);
-	}
-	wapis[modName] = pmod;
-	}
-	return wapis;
-}
-
-const apis = initApis("${widgetId}")
-export default apis;
-	`;
   return new Blob([jsCode], { type: "application/javascript" });
 }
 
@@ -48,8 +36,8 @@ export default apis;
  * @param widgetId
  * @returns
  */
-export function initWidgetState(widgetId: string): WidgetState {
-  const blob = createWidgetApisBlob(widgetId);
+export async function initWidgetState(widgetId: string): Promise<WidgetState> {
+  const blob = await createWidgetApisBlob(widgetId);
   const url = URL.createObjectURL(blob);
   return {
     widgetApisBlobUrl: url,

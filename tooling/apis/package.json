@@ -23,9 +23,6 @@
     "url": "https://github.com/CSCI-SHU-410-SE-Project/Deskulpt/issues"
   },
   "homepage": "https://csci-shu-410-se-project.github.io/Deskulpt/",
-  "dependencies": {
-    "@deskulpt-test/raw-apis": "file:../raw-apis"
-  },
   "devDependencies": {
     "@rollup/plugin-terser": "^0.4.4",
     "@rollup/plugin-typescript": "^11.1.6",
@@ -34,5 +31,8 @@
     "tslib": "^2.6.2",
     "typescript": "^5.4.5",
     "typescript-eslint": "^7.7.0"
+  },
+  "dependencies": {
+    "@deskulpt-test/raw-apis": "file:../raw-apis"
   }
 }

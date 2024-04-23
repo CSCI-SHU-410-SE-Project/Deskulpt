@@ -11,16 +11,16 @@ cleanDir(join(__dirname, "./dist"));
 
 export default defineConfig([
   // ESM build to be used internally
-  // {
-  //   input: "src/index.ts",
-  //   output: {
-  //     format: "esm",
-  //     file: "../../src/.scripts/apis.js",
-  //   },
-  //   external: ["@deskulpt-test/raw-apis"],
-  //   plugins: [typescript(), terser()],
-  //   onwarn,
-  // },
+  {
+    input: "src/index.ts",
+    output: {
+      format: "esm",
+      file: "../../public/apis.txt",
+    },
+    external: ["@deskulpt-test/raw-apis"],
+    plugins: [typescript(), terser()],
+    onwarn,
+  },
   // CJS build for publishing
   {
     input: "src/index.ts",
