@@ -12,7 +12,11 @@ use tauri::{
 ///
 /// - Prevent the manager window from closing when the close button is clicked.
 pub(crate) fn listen_to_windows(e: GlobalWindowEvent) {
-    if let WindowEvent::CloseRequested { api, .. } = e.event() {
+    if let WindowEvent::CloseRequested {
+        api,
+        ..
+    } = e.event()
+    {
         let window = e.window();
         if window.label() == "manager" {
             api.prevent_close();
@@ -43,12 +47,17 @@ pub(crate) fn get_system_tray() -> SystemTray {
 /// - When clicking the "exit" menu item, exit the application (with cleanup).
 pub(crate) fn listen_to_system_tray(app_handle: &AppHandle, event: SystemTrayEvent) {
     match event {
-        SystemTrayEvent::MenuItemClick { id, .. } => match id.as_str() {
+        SystemTrayEvent::MenuItemClick {
+            id,
+            ..
+        } => match id.as_str() {
             "manage" => show_manager_window(app_handle),
             "exit" => app_handle.exit(0),
             _ => {},
         },
-        SystemTrayEvent::LeftClick { .. } => {
+        SystemTrayEvent::LeftClick {
+            ..
+        } => {
             show_manager_window(app_handle);
         },
         _ => {},

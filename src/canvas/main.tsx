@@ -4,8 +4,23 @@ import { RenderWidgetPayload, WidgetModule, WidgetRecord } from "../types";
 import { handleError, getDOMRoot, getWidgetModuleError } from "./utils";
 import { grabErrorInfo } from "../utils";
 import WidgetContainer from "../components/WidgetContainer";
+import { invoke } from "@tauri-apps/api";
+import { appWindow } from "@tauri-apps/api/window";
 
 window.__DESKULPT__ = { defaultDeps: { React } };
+
+// window.addEventListener("click", () => {
+//   invoke("set_canvas_to_bottom", {}).catch((err) => {
+//     console.error(err);
+//   })
+// });
+await appWindow.onFocusChanged((focused) => {
+  if (focused) {
+    invoke("set_canvas_to_bottom", {}).catch((err) => {
+      console.error(err);
+    });
+  }
+});
 
 const canvas = document.getElementById("canvas")!;
 const widgetRecords: Record<string, WidgetRecord> = {};

@@ -9,7 +9,8 @@ pub(crate) fn platform_set_window_to_bottom(window: &Window) {
         },
     };
 
-    // let hwnd = window.hwnd().unwrap(); // Cast to HWND (specific to Windows platform)
+    // // Cast to HWND (specific to Windows platform)
+    // let hwnd = window.hwnd().unwrap();
     let hwnd: HWND = HWND(window.hwnd().unwrap().0);
     unsafe {
         SetWindowPos(
@@ -35,8 +36,8 @@ pub(crate) fn platform_set_window_to_bottom(window: &Window) {
 // fn set_window_always_on_bottom(window: &Window) {
 //     use cocoa::appkit::{NSWindow, NSWindowOrderingMode};
 //     use objc::runtime::YES;
-
-//     let ns_window = window.ns_window().unwrap() as id; // Cast to id (specific to macOS/Cocoa)
+//     // Cast to id (specific to macOS/Cocoa)
+//     let ns_window = window.ns_window().unwrap() as id;
 //     unsafe {
 //         ns_window.setOrdered(NSWindowOrderingMode::NSWindowBelow, None, YES);
 //     }
@@ -46,8 +47,8 @@ pub(crate) fn platform_set_window_to_bottom(window: &Window) {
 // #[cfg(target_os = "linux")]
 // fn set_window_always_on_bottom(window: &Window) {
 //     use x11::xlib::{XLowerWindow, Display, Window as XWindow};
-
-//     let x_window = window.xlib_window().unwrap() as XWindow; // Cast to XWindow (specific to X11/Linux)
+// 	   // Cast to XWindow (specific to X11/Linux)
+//     let x_window = window.xlib_window().unwrap() as XWindow;
 //     let display = window.xlib_display().unwrap() as *mut Display;
 //     unsafe {
 //         XLowerWindow(display, x_window);

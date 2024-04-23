@@ -66,7 +66,9 @@ pub(crate) fn bundle(
         // The path resolver produces paths with the \\?\ prefix on Windows, and since
         // we need to compare paths with the root we canonicalize the root path here to
         // get the same prefix; XXX not sure if there will be symlink issues
-        PathResolver { root: root.canonicalize()?.to_path_buf() },
+        PathResolver {
+            root: root.canonicalize()?.to_path_buf(),
+        },
         // We must disabled the default tree-shaking by the SWC bundler, otherwise it
         // will remove unused `React` variables, which is required by the JSX transform
         swc_bundler::Config {
@@ -97,7 +99,10 @@ pub(crate) fn bundle(
         // apply the transform; we need to retain the top level mark `React` because it
         // is needed by the JSX transform even if not explicitly used in the code
         let mut tree_shaking = Repeat::new(dce::dce(
-            dce::Config { top_retain: vec![Atom::from("React")], ..Default::default() },
+            dce::Config {
+                top_retain: vec![Atom::from("React")],
+                ..Default::default()
+            },
             Mark::new(),
         ));
 
@@ -154,13 +159,20 @@ impl Load for PathLoader {
         };
 
         // @Charlie-XIAO: maybe need to use Syntax::TypeScript based on file extension
-        let syntax = Syntax::Es(EsConfig { jsx: true, ..Default::default() });
+        let syntax = Syntax::Es(EsConfig {
+            jsx: true,
+            ..Default::default()
+        });
 
         // Parse the file as a module; note that transformations are not applied here,
         // because per-file transformations may lead to unexpected results when bundled
         // together; instead, transformations are postponed until the bundling phase
         match parse_file_as_module(&fm, syntax, Default::default(), None, &mut vec![]) {
-            Ok(module) => Ok(ModuleData { fm, module, helpers: Default::default() }),
+            Ok(module) => Ok(ModuleData {
+                fm,
+                module,
+                helpers: Default::default(),
+            }),
             Err(err) => {
                 // The error handler requires a destination for the emitter writer that
                 // implements `Write`; a buffer implements `Write` but its borrowed
@@ -305,8 +317,10 @@ impl Resolve for PathResolver {
         base: &FileName,
         module_specifier: &str,
     ) -> Result<Resolution, Error> {
-        self.resolve_filename(base, module_specifier)
-            .map(|filename| Resolution { filename, slug: None })
+        self.resolve_filename(base, module_specifier).map(|filename| Resolution {
+            filename,
+            slug: None,
+        })
     }
 }
 

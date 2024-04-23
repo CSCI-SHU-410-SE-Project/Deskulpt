@@ -1,4 +1,5 @@
-//! This module provides a cross-platform interface for adjusting the position of the canvas (sink, float)
+//! This module provides a cross-platform interface for adjusting the
+//! position of the canvas (sink, float)
 
 use crate::canvas::platform;
 use tauri::{command, window::Window, AppHandle, Manager};
@@ -25,7 +26,7 @@ pub(crate) fn sink_canvas(app_handle: AppHandle) {
     println!("Sink the canvas");
     let window: Window = get_canvas(&app_handle);
     platform::common::ignore_cursor(&window);
-    platform::common::set_window_to_bottom(&window);
+    // platform::common::set_window_to_bottom(&window);
 }
 
 /// Float the canvas
@@ -40,5 +41,5 @@ pub(crate) fn float_canvas(app_handle: AppHandle) {
     println!("Float the canvas");
     let window: Window = get_canvas(&app_handle);
     platform::common::catch_cursor(&window);
-    platform::common::set_window_to_bottom(&window);
+    // platform::common::set_window_to_bottom(&window);
 }
