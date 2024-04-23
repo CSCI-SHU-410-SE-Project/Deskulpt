@@ -17,7 +17,8 @@ fn get_canvas(app_handle: &AppHandle) -> Window {
 pub(crate) fn sink_canvas(app_handle: AppHandle) {
     println!("Sink the canvas");
     let window: Window = get_canvas(&app_handle);
-    platform::common::ignore_cursor(window);
+    platform::common::ignore_cursor(&window);
+    platform::common::set_always_on_bottom(&window);
 }
 
 /// Float the canvas
@@ -31,5 +32,6 @@ pub(crate) fn sink_canvas(app_handle: AppHandle) {
 pub(crate) fn float_canvas(app_handle: AppHandle) {
     println!("Float the canvas");
     let window: Window = get_canvas(&app_handle);
-    platform::common::catch_cursor(window)
+    platform::common::catch_cursor(&window);
+    platform::common::set_always_on_bottom(&window);
 }
