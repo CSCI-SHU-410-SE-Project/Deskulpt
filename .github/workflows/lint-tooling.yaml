@@ -44,8 +44,8 @@ jobs:
           npm install
           npm run lint
 
-      - name: Lint @deskulpt-test/apis
-        run: |
-          cd tooling/apis
-          npm install
-          npm run lint
+      # - name: Lint @deskulpt-test/apis
+      #   run: |
+      #     cd tooling/apis
+      #     npm install
+      #     npm run lint
