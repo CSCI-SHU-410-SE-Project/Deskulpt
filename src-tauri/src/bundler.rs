@@ -44,6 +44,7 @@ static EXTENSIONS: &[&str] = &["js", "jsx", "ts", "tsx"];
 pub(crate) fn bundle(
     root: &Path,
     target: &Path,
+    widget_apis_url: String,
     dependency_map: Option<&HashMap<String, String>>,
 ) -> Result<String, Error> {
     let globals = Globals::default();
@@ -52,7 +53,10 @@ pub(crate) fn bundle(
     // Get the list of external modules not to resolve; this should include default
     // dependencies and (if any) external dependencies obtained from the dependency map
     let external_modules = {
-        let mut dependencies = HashSet::new();
+        let mut dependencies = HashSet::from([
+            Atom::from("@deskulpt-test/react"),
+            Atom::from("@deskulpt-test/apis"),
+        ]);
         if let Some(map) = dependency_map {
             dependencies.extend(map.keys().map(|k| Atom::from(k.clone())));
         }
@@ -117,19 +121,12 @@ pub(crate) fn bundle(
             Mark::new(),        // unresolved mark
         );
 
-        // Rename import of `@deskulpt/apis` to `<widget-api-blob-url>` that partially apply widget id to raw apis
-        let mut import_renamer = ImportRenamer {
-            // rename_to: dependency_map.unwrap()["@deskulpt-test/apis"].clone(),
-            // only map "@deskulpt-test/apis" to the widget api url
-            mapping: HashMap::from([(
-                "@deskulpt-test/apis".to_string(),
-                // map to the widget api url, or if it's not in the map, keep the original value
-                dependency_map
-                    .unwrap()
-                    .get("@deskulpt-test/apis")
-                    .unwrap_or(&"@deskulpt-test/apis".to_string())
-                    .clone(),
-            )]),
+        // We need to rename the imports of `@deskulpt-test/apis` to the blob URL which
+        // wraps the widget APIs to avoid exposing the raw APIs that allow specifying
+        // widget IDs; note that this transform should be done last to avoid messing up
+        // with import resolution
+        let mut wrap_apis = ImportRenamer {
+            mapping: [("@deskulpt-test/apis".to_string(), widget_apis_url)].into(),
         };
 
         // Apply the module transformations
@@ -137,7 +134,7 @@ pub(crate) fn bundle(
         let module = module
             .fold_with(&mut tree_shaking)
             .fold_with(&mut jsx_transform)
-            .fold_with(&mut import_renamer);
+            .fold_with(&mut wrap_apis);
 
         // Emit the bundled module as string into a buffer
         let mut buf = vec![];
@@ -412,11 +409,11 @@ mod tests {
     fn test_bundle_ok(#[case] case: &str) {
         let case_dir = fixture_dir().join(case);
         let bundle_root = case_dir.join("input");
-        let dummy_dependency_map = HashMap::new();
         let result = bundle(
             &bundle_root,
             &bundle_root.join("index.jsx"),
-            Some(&dummy_dependency_map),
+            Default::default(),
+            None,
         )
         .expect("Expected bundling to succeed");
 
@@ -444,8 +441,13 @@ mod tests {
     fn test_bundle_error(#[case] case: &str, #[case] expected_error: Vec<ChainReason>) {
         let case_dir = fixture_dir().join(case);
         let bundle_root = case_dir.join("input");
-        let error = bundle(&bundle_root, &bundle_root.join("index.jsx"), None)
-            .expect_err("Expected bundling error");
+        let error = bundle(
+            &bundle_root,
+            &bundle_root.join("index.jsx"),
+            Default::default(),
+            None,
+        )
+        .expect_err("Expected bundling error");
         assert_err_eq(error, expected_error);
     }
 
@@ -465,7 +467,7 @@ mod tests {
         std::fs::write(&entry_path, format!("import {{ foo }} from {utils_path:?};"))
             .unwrap();
 
-        let error = bundle(&bundle_root, &entry_path, None)
+        let error = bundle(&bundle_root, &entry_path, Default::default(), None)
             .expect_err("Expected bundling error");
         let expected_error = vec![
             ChainReason::Exact("load_transformed failed".to_string()),
