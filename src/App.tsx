@@ -4,10 +4,10 @@ import RefreshIcon from "@mui/icons-material/Refresh";
 import { invoke } from "@tauri-apps/api";
 import { emit } from "@tauri-apps/api/event";
 import { useEffect, useState } from "react";
-import { WidgetConfig } from "./types";
+import { WidgetCollection } from "./types";
 
 export default function App() {
-  const [widgetConfigs, setWidgetConfigs] = useState<Record<string, WidgetConfig>>({});
+  const [widgetCollection, setWidgetCollection] = useState<WidgetCollection>({});
 
   /**
    * Open the widget base directory in the file explorer of the OS.
@@ -17,18 +17,18 @@ export default function App() {
   }
 
   /**
-   * Refresh the state of `widgetConfigs`.
+   * Refresh the state of `widgetCollection`.
    *
    * The reason why this function returns the updated state is that in some cases we
    * need to access the updated state before React actually updates the component.
    *
-   * @returns The updated state of `widgetConfigs` if the operation is successful or
+   * @returns The updated state of `widgetCollection` if the operation is successful or
    * `null` otherwise.
    */
   async function refreshWidgetCollection() {
-    return await invoke<Record<string, WidgetConfig>>("refresh_widget_collection")
+    return await invoke<WidgetCollection>("refresh_widget_collection")
       .then((output) => {
-        setWidgetConfigs(output);
+        setWidgetCollection(output);
         return output;
       })
       .catch((error) => {
@@ -52,8 +52,6 @@ export default function App() {
         await emit("render-widget", { widgetId, bundlerOutput, success: true });
       })
       .catch(async (error: string) => {
-        console.log(typeof error);
-        console.log({ error });
         await emit("render-widget", { widgetId, bundlerOutput: error, success: false });
       });
   }
@@ -63,7 +61,7 @@ export default function App() {
    *
    * @param configs The collection of widget configurations to render.
    */
-  async function renderWidgets(configs: Record<string, WidgetConfig>) {
+  async function renderWidgets(configs: WidgetCollection) {
     await Promise.all(Object.keys(configs).map((widgetId) => renderWidget(widgetId)));
   }
 
@@ -81,7 +79,7 @@ export default function App() {
   return (
     <Box>
       <List>
-        {Object.entries(widgetConfigs)
+        {Object.entries(widgetCollection)
           .sort()
           .map(([widgetId, widgetConfig]) => (
             <ListItem
@@ -92,14 +90,17 @@ export default function App() {
                 </IconButton>
               }
             >
-              <ListItemText primary={widgetConfig.deskulpt.name} secondary={widgetId} />
+              <ListItemText
+                primary={"Ok" in widgetConfig ? widgetConfig.Ok.deskulpt.name : "???"}
+                secondary={widgetId}
+              />
             </ListItem>
           ))}
       </List>
       <Button variant="outlined" onClick={refreshWidgetCollection}>
         Rescan
       </Button>
-      <Button variant="outlined" onClick={() => renderWidgets(widgetConfigs)}>
+      <Button variant="outlined" onClick={() => renderWidgets(widgetCollection)}>
         Render All
       </Button>
       <Button variant="outlined" onClick={openWidgetBase}>

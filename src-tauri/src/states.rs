@@ -3,9 +3,8 @@
 //! In Tauri, different states are distinguished by their unique types, thus we always
 //! use structs to mark the states.
 
-use crate::config::WidgetConfig;
-
-use std::{collections::HashMap, path::PathBuf, sync::Mutex};
+use crate::config::WidgetCollection;
+use std::{path::PathBuf, sync::Mutex};
 
 /// The type for the state of the collection of widgets.
 ///
@@ -19,9 +18,7 @@ use std::{collections::HashMap, path::PathBuf, sync::Mutex};
 /// let widget_collection = widget_collection_state.0.lock().unwrap();
 /// ```
 #[derive(Default)]
-pub(crate) struct WidgetCollectionState(
-    pub(crate) Mutex<HashMap<String, WidgetConfig>>,
-);
+pub(crate) struct WidgetCollectionState(pub(crate) Mutex<WidgetCollection>);
 
 /// The type for the state of the widget base directory.
 ///

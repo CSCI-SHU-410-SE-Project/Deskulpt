@@ -9,6 +9,8 @@ use std::{
 use anyhow::{bail, Context, Error};
 use serde::{Deserialize, Serialize};
 
+pub(crate) type WidgetCollection = HashMap<String, Result<WidgetConfig, String>>;
+
 /// Full configuration of a widget.
 #[derive(Clone, Serialize)]
 #[cfg_attr(test, derive(PartialEq, Debug))]
