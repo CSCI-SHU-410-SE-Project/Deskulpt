@@ -5,6 +5,7 @@ use std::fs::create_dir_all;
 use tauri::{api, generate_context, generate_handler, Builder};
 
 mod bundler;
+mod canvas;
 mod commands;
 mod config;
 mod setup;
@@ -38,6 +39,8 @@ fn main() {
             commands::bundle_widget,
             commands::open_widget_base,
             commands::refresh_widget_collection,
+            canvas::commands::sink_canvas,
+            canvas::commands::float_canvas,
         ])
         // Register widget API plugins
         .plugin(widget_api::fs::init())

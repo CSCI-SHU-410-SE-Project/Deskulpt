@@ -67,6 +67,14 @@ export default function App() {
     await Promise.all(Object.keys(configs).map((widgetId) => renderWidget(widgetId)));
   }
 
+  async function sinkCanvas() {
+    await invoke("sink_canvas", {});
+  }
+
+  async function floatCanvas() {
+    await invoke("float_canvas", {});
+  }
+
   useEffect(() => {
     // Fetch the widget collection and render all on mount
     refreshWidgetCollection()
@@ -104,6 +112,12 @@ export default function App() {
       </Button>
       <Button variant="outlined" onClick={openWidgetBase}>
         Open Widget Base Directory
+      </Button>
+      <Button variant="outlined" onClick={sinkCanvas}>
+        Sink Canvas
+      </Button>
+      <Button variant="outlined" onClick={floatCanvas}>
+        Float Canvas
       </Button>
     </Box>
   );
