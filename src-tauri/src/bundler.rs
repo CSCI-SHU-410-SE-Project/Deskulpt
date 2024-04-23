@@ -19,7 +19,7 @@ use swc_common::{
     comments::SingleThreadedComments, errors::Handler, pass::Repeat, sync::Lrc,
     FileName, FilePathMapping, Globals, Mark, SourceMap, Span, GLOBALS,
 };
-use swc_ecma_ast::{KeyValueProp, Module, ModuleDecl, ModuleItem};
+use swc_ecma_ast::{KeyValueProp, ModuleDecl};
 use swc_ecma_codegen::{
     text_writer::{JsWriter, WriteJs},
     Emitter,
@@ -28,7 +28,9 @@ use swc_ecma_loader::resolve::Resolution;
 use swc_ecma_parser::{parse_file_as_module, EsConfig, Syntax};
 use swc_ecma_transforms_optimization::simplify::dce;
 use swc_ecma_transforms_react::jsx;
-use swc_ecma_visit::{Fold, FoldWith};
+use swc_ecma_visit::{
+    as_folder, noop_visit_mut_type, FoldWith, VisitMut, VisitMutWith,
+};
 use tempfile::NamedTempFile;
 
 /// The file extensions to try when an import is given without an extension
@@ -125,9 +127,9 @@ pub(crate) fn bundle(
         // wraps the widget APIs to avoid exposing the raw APIs that allow specifying
         // widget IDs; note that this transform should be done last to avoid messing up
         // with import resolution
-        let mut wrap_apis = ImportRenamer {
-            mapping: [("@deskulpt-test/apis".to_string(), widget_apis_url)].into(),
-        };
+        let mut wrap_apis = as_folder(ImportRenamer(
+            [("@deskulpt-test/apis".to_string(), widget_apis_url)].into(),
+        ));
 
         // Apply the module transformations
         // @Charlie-XIAO: chain more transforms e.g. TypeScript
@@ -154,26 +156,23 @@ pub(crate) fn bundle(
     Ok(code)
 }
 
-// Rename import module specifiers in the AST.
-struct ImportRenamer {
-    // A map from the original module specifier to the new module specifier
-    mapping: HashMap<String, String>,
-}
+/// An AST transformer that renames import module specifiers.
+///
+/// This should be wrapped within [`as_folder`].
+struct ImportRenamer(HashMap<String, String>);
 
-impl Fold for ImportRenamer {
-    fn fold_module(&mut self, module: Module) -> Module {
-        let mut module = module.fold_children_with(self);
+impl VisitMut for ImportRenamer {
+    noop_visit_mut_type!();
 
-        for stmt in &mut module.body {
-            if let ModuleItem::ModuleDecl(ModuleDecl::Import(import_decl)) = stmt {
-                let src = import_decl.src.value.to_string();
-                if let Some(new_src) = self.mapping.get(&src) {
-                    import_decl.src.value = Atom::from(new_src.clone());
-                }
+    fn visit_mut_module_decl(&mut self, n: &mut ModuleDecl) {
+        n.visit_mut_children_with(self);
+
+        if let ModuleDecl::Import(import_decl) = n {
+            let src = import_decl.src.value.to_string();
+            if let Some(new_src) = self.0.get(&src) {
+                import_decl.src.value = Atom::from(new_src.clone());
             }
         }
-
-        module
     }
 }
 
