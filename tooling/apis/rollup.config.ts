@@ -1,6 +1,7 @@
 import { defineConfig, RollupLog } from "rollup";
 import typescript from "@rollup/plugin-typescript";
 import terser from "@rollup/plugin-terser";
+import { nodeResolve } from "@rollup/plugin-node-resolve";
 import { fileURLToPath } from "url";
 import { join } from "path";
 import { Dir, opendirSync, rmSync } from "fs";
@@ -17,6 +18,7 @@ export default defineConfig([
       format: "esm",
       file: "../../public/apis.txt",
     },
+    // resolved at runtime by an importmap
     external: ["@deskulpt-test/raw-apis"],
     plugins: [typescript(), terser()],
     onwarn,
@@ -28,8 +30,9 @@ export default defineConfig([
       format: "es",
       dir: "./dist",
     },
-    external: ["@deskulpt-test/raw-apis"],
+    // external: ["@deskulpt-test/raw-apis"],
     plugins: [
+      nodeResolve(),
       typescript({
         declaration: true,
         declarationDir: "./dist",

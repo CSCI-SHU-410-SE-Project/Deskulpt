@@ -25,7 +25,7 @@ export default defineConfig([
   {
     input: "src/index.ts",
     output: {
-      format: "cjs",
+      format: "esm",
       file: "./dist/index.js",
     },
     external: ["@tauri-apps/api"],

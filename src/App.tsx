@@ -56,6 +56,10 @@ export default function App() {
       console.log(`Initializing widget state for ${widgetId}`);
       widgetsState[widgetId] = await initWidgetState(widgetId);
     }
+    const blobUrlText = await (
+      await fetch(widgetsState[widgetId].widgetApisBlobUrl)
+    ).text();
+    console.log(`blobUrlText outside initWidgetState: ${blobUrlText}`);
     console.log(
       `Rendering widget ${widgetId} with apis blob url ${widgetsState[widgetId].widgetApisBlobUrl}`,
     );

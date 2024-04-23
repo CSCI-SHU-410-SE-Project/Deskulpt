@@ -33,6 +33,7 @@
     "typescript-eslint": "^7.7.0"
   },
   "dependencies": {
-    "@deskulpt-test/raw-apis": "file:../raw-apis"
+    "@deskulpt-test/raw-apis": "file:../raw-apis",
+    "@rollup/plugin-node-resolve": "^15.2.3"
   }
 }
