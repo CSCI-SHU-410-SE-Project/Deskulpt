@@ -7,5 +7,5 @@
 //     unsafe {
 //         ns_window.setOrdered(NSWindowOrderingMode::NSWindowBelow, None, YES);
 //     }
-//     println!("Window set to always on bottom (macOS)");
+//     println!("Window set to bottom (macOS)");
 // }

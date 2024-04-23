@@ -7,5 +7,5 @@
 //     unsafe {
 //         XLowerWindow(display, x_window);
 //     }
-//     println!("Window set to always on bottom (Linux)");
+//     println!("Window set to bottom (Linux)");
 // }

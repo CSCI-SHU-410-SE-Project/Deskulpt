@@ -5,7 +5,9 @@ import { handleError, getDOMRoot, getWidgetModuleError } from "./utils";
 import { grabErrorInfo } from "../utils";
 import WidgetContainer from "../components/WidgetContainer";
 import { invoke } from "@tauri-apps/api";
-// import { appWindow } from "@tauri-apps/api/window";
+import { appWindow } from "@tauri-apps/api/window";
+
+import "./main.css";
 
 window.__DESKULPT__ = { defaultDeps: { React } };
 
@@ -24,9 +26,37 @@ window.__DESKULPT__ = { defaultDeps: { React } };
 //   }
 // });
 
-await invoke("set_canvas_always_to_bottom", {}).catch((err) => {
-  console.error(err);
+// on webpage load, set the canvas to the bottom
+document.addEventListener("DOMContentLoaded", () => {
+  // Register the onFocusChanged event listener to set the canvas
+  // to the bottom whenever the window is focused
+  appWindow
+    .onFocusChanged((focused) => {
+      if (focused.payload) {
+        invoke("set_canvas_to_bottom", {}).catch((err) => {
+          console.error(err);
+        });
+      }
+    })
+    .then(() => {
+      // Note that this function must be called after the
+      // onFocusChanged event listener is registered. Otherwise
+      // no content will be rendered, for unknown reasons.
+      invoke("set_canvas_to_bottom", {})
+        .catch((err) => {
+          console.error(err);
+        })
+        .catch(console.error);
+    })
+    .catch(console.error);
 });
+
+// // on webpage load, set the canvas to be always at the bottom
+// document.addEventListener("DOMContentLoaded", () => {
+//   invoke("set_canvas_always_to_bottom", {}).catch((err) => {
+//     console.error(err);
+//   });
+// });
 
 const canvas = document.getElementById("canvas")!;
 const widgetRecords: Record<string, WidgetRecord> = {};
