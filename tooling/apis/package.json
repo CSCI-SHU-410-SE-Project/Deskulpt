@@ -1,6 +1,6 @@
 {
   "name": "@deskulpt-test/apis",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Deskulpt frontend wrapper for widget apis.",
   "type": "module",
   "types": "./dist/index.d.ts",
@@ -9,7 +9,7 @@
   ],
   "scripts": {
     "build": "rollup -c --configPlugin typescript",
-    "pub": "echo 'Publishing not done yet. Need to publish widget-specific apis instead of raw apis.'",
+    "pub": "npm run build && npm publish --access public",
     "lint": "eslint --max-warnings=0 .",
     "lint:fix": "eslint --max-warnings=0 --fix ."
   },
@@ -33,7 +33,7 @@
     "typescript-eslint": "^7.7.0"
   },
   "dependencies": {
-    "@deskulpt-test/raw-apis": "file:../raw-apis",
+    "@deskulpt-test/raw-apis": "^0.0.4",
     "@rollup/plugin-node-resolve": "^15.2.3"
   }
 }

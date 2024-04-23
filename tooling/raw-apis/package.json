@@ -10,7 +10,7 @@
   ],
   "scripts": {
     "build": "rollup -c --configPlugin typescript",
-    "pub": "echo 'Publishing not done yet. Need to publish widget-specific apis instead of raw apis.'",
+    "pub": "npm run build && npm publish --access public",
     "lint": "eslint --max-warnings=0 .",
     "lint:fix": "eslint --max-warnings=0 --fix ."
   },
