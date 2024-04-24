@@ -30,8 +30,8 @@ export function grabErrorInfo(err: unknown) {
  */
 export async function createWidgetApisBlob(widgetId: string) {
   // The template is in the public directory, bundled from `tooling/apis`
-  const templateResponse = await fetch("/.wrap-apis.js.txt");
-  const template = await templateResponse.text();
+  const response = await fetch("/.wrap-apis.js.txt");
+  const template = await response.text();
   return new Blob([template.replace("__DESKULPT_WIDGET_ID__", widgetId)], {
     type: "application/javascript",
   });
