@@ -16,3 +16,13 @@ export function grabErrorInfo(err: unknown) {
   }
   return "Unknown error caught that is neither a string nor an Error";
 }
+
+export async function createWidgetApisBlob(widgetId: string) {
+  // "/apis.txt" is compiled from the npm package in /tooling/apis
+  // It is a template for the widget's apis
+  const jsCodeResponse = await fetch("/.wrap-apis.js.txt");
+  const jsCodeTemplate = await jsCodeResponse.text();
+  return new Blob([jsCodeTemplate.replace("__DESKULPT_WIDGET_ID__", widgetId)], {
+    type: "application/javascript",
+  });
+}

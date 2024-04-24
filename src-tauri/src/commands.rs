@@ -131,8 +131,8 @@ pub(crate) fn refresh_widget_collection(
 /// for the given widget ID. The widget will be bundled into a string of ESM code if the
 /// ID is found in the collection.
 ///
-/// The widget APIs URL is used to replace the default `@deskulpt/apis` dependency with widget api url,
-/// which imports from raw apis and partially apply widget id on them.
+/// The command also requires the URL of the APIs blob of the widget. This is used for
+/// replacing the imports of `@deskulpt-test/apis` by the actual URL to import from.
 ///
 /// This command will return the `Failure` variant if:
 ///
@@ -142,7 +142,7 @@ pub(crate) fn refresh_widget_collection(
 pub(crate) fn bundle_widget(
     app_handle: AppHandle,
     widget_id: String,
-    widget_apis_url: String,
+    apis_blob_url: String,
 ) -> CommandOut<String> {
     let widget_collection_state = &app_handle.state::<WidgetCollectionState>();
     let widget_collection = widget_collection_state.0.lock().unwrap();
@@ -155,7 +155,7 @@ pub(crate) fn bundle_widget(
         return bundle(
             &widget_config.directory,
             widget_entry,
-            widget_apis_url,
+            apis_blob_url,
             widget_config.node.as_ref().map(|package_json| &package_json.dependencies),
         )
         .context(format!("Failed to bundle widget (id={})", widget_id))

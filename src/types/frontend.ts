@@ -5,6 +5,17 @@
 
 import ReactDOM from "react-dom/client";
 import { Widget } from ".";
+import { WidgetConfig } from "./backend";
+
+/**
+ * The frontend state of a widget.
+ */
+export interface WidgetState {
+  /** Widget configuration. */
+  config: WidgetConfig;
+  /** Import URL of the widget APIs. */
+  apisBlobUrl: string;
+}
 
 /**
  * The payload of the "render-widget" event.

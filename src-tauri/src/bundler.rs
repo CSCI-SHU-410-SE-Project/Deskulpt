@@ -46,7 +46,7 @@ static EXTENSIONS: &[&str] = &["js", "jsx", "ts", "tsx"];
 pub(crate) fn bundle(
     root: &Path,
     target: &Path,
-    widget_apis_url: String,
+    apis_blob_url: String,
     dependency_map: Option<&HashMap<String, String>>,
 ) -> Result<String, Error> {
     let globals = Globals::default();
@@ -128,7 +128,7 @@ pub(crate) fn bundle(
         // widget IDs; note that this transform should be done last to avoid messing up
         // with import resolution
         let mut wrap_apis = as_folder(ImportRenamer(
-            [("@deskulpt-test/apis".to_string(), widget_apis_url)].into(),
+            [("@deskulpt-test/apis".to_string(), apis_blob_url)].into(),
         ));
 
         // Apply the module transformations
