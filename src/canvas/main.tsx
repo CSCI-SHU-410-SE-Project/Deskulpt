@@ -1,8 +1,8 @@
 import React from "react";
-
 import { Event as TauriEvent, listen } from "@tauri-apps/api/event";
 import { RenderWidgetPayload, WidgetModule, WidgetRecord } from "../types";
-import { grabErrorInfo, handleError, getDOMRoot } from "./utils";
+import { handleError, getDOMRoot, getWidgetModuleError } from "./utils";
+import { grabErrorInfo } from "../utils";
 import WidgetContainer from "../components/WidgetContainer";
 
 window.__DESKULPT__ = { defaultDeps: { React } };
@@ -12,14 +12,12 @@ const widgetRecords: Record<string, WidgetRecord> = {};
 
 // Listen to the "render-widget" event, emitted by the manager
 listen("render-widget", (event: TauriEvent<RenderWidgetPayload>) => {
-  const { widgetId, bundlerOutput } = event.payload;
+  const { widgetId, success, bundlerOutput } = event.payload;
 
-  if ("success" in bundlerOutput) {
-    // In this case the bundler output wraps the bundled code; we create an object URL
-    // so as to dynamically import the bundled code and obtain its export
-    const blob = new Blob([bundlerOutput.success], {
-      type: "application/javascript",
-    });
+  if (success) {
+    // In this case the bundler output is the bundled code; we create an object URL so
+    // that we can dynamically import the bundled code and obtain its export
+    const blob = new Blob([bundlerOutput], { type: "application/javascript" });
     const url = URL.createObjectURL(blob);
 
     import(/* @vite-ignore */ url)
@@ -30,30 +28,20 @@ listen("render-widget", (event: TauriEvent<RenderWidgetPayload>) => {
         }
 
         // Early return before rendering if there are known errors in the widget
-        const widget = module.default;
-        if (widget === undefined) {
+        const widgetModuleError = getWidgetModuleError(module);
+        if (widgetModuleError !== null) {
           handleError(
             widgetId,
             widgetDOMRoot,
             widgetRecords,
-            `Widget (id=${widgetId}) is invalid`,
-            "The widget entry file does not provide a default export.",
-          );
-          return;
-        }
-        if (widget.render === undefined || typeof widget.render !== "function") {
-          handleError(
-            widgetId,
-            widgetDOMRoot,
-            widgetRecords,
-            `Widget (id=${widgetId}) is invalid`,
-            "The object exported by the widget entry file does not have a `render` " +
-              "key, or the `render` key does not correspond to a function.",
+            `Error in '${widgetId}': invalid widget module`,
+            widgetModuleError,
           );
           return;
         }
 
         // Try rendering the widget, otherwise render the error information
+        const widget = module.default;
         try {
           widgetDOMRoot.react.render(
             <WidgetContainer id={widgetId} inner={widget.render()} />,
@@ -63,7 +51,7 @@ listen("render-widget", (event: TauriEvent<RenderWidgetPayload>) => {
             widgetId,
             widgetDOMRoot,
             widgetRecords,
-            `Widget (id=${widgetId}) fails to be rendered`,
+            `Error in '${widgetId}': widget rendering failed (likely a problem with the \`render\` function)`,
             grabErrorInfo(err),
           );
           return;
@@ -79,12 +67,13 @@ listen("render-widget", (event: TauriEvent<RenderWidgetPayload>) => {
             widgetId,
             widgetDOMRoot,
             widgetRecords,
-            `Widget (id=${widgetId}) fails to be loaded`,
+            `Error in '${widgetId}': widget module fails to be imported`,
             grabErrorInfo(err),
           );
         }
       });
   } else {
+    // In this case the bundler output is the error message
     const widgetDOMRoot = getDOMRoot(widgetId, widgetRecords, canvas);
     if (widgetDOMRoot !== null) {
       handleError(
@@ -92,7 +81,7 @@ listen("render-widget", (event: TauriEvent<RenderWidgetPayload>) => {
         widgetDOMRoot,
         widgetRecords,
         `[Backend] Widget (id=${widgetId}) fails to be bundled`,
-        bundlerOutput.failure,
+        bundlerOutput,
       );
     }
   }

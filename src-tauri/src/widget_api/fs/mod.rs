@@ -6,7 +6,7 @@ use tauri::{
     Runtime,
 };
 
-/// The registered APIs can be invoked as `plugin:widget_api.fs|<api_name>``.
+/// The registered APIs can be invoked as `plugin:widget_api.fs|<api_name>`.
 pub(crate) fn init<R: Runtime>() -> TauriPlugin<R> {
     Builder::new("widget_api.fs")
         .invoke_handler(tauri::generate_handler![

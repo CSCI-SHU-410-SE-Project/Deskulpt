@@ -1,10 +1,9 @@
 //! The module provides the commands used internally by Deskulpt.
 
-use serde::Serialize;
-use std::{collections::HashMap, fmt::Debug, fs::read_dir};
+use std::{collections::HashMap, fs::read_dir};
 use tauri::{api, command, AppHandle, Manager};
 
-use anyhow::Context;
+use anyhow::{Context, Error};
 
 use crate::{
     bundler::bundle,
@@ -12,21 +11,57 @@ use crate::{
     states::{WidgetBaseDirectoryState, WidgetCollectionState},
 };
 
-/// The output of a Tauri command.
-#[derive(Serialize)]
-pub(crate) enum CommandOut<T> {
-    /// Indicates that the command has succeeded, containing the output.
-    #[serde(rename = "success")]
-    Success(T),
-    /// Indicates that the command has failed, containing the error message.
-    #[serde(rename = "failure")]
-    Failure(String),
+/// Alias for `Result<T, String>`.
+///
+/// This is the type to use for the return value of Tauri commands in the project.
+pub(crate) type CommandOut<T> = Result<T, String>;
+
+/// Stringify an [`Error`].
+///
+/// This is a similar representation to that one gets by default if returning an error
+/// from `fn main`, except that it never includes the backtrace to not be too verbose.
+pub(crate) fn stringify_anyhow(err: Error) -> String {
+    err.chain()
+        .enumerate()
+        .map(|(index, reason)| match index {
+            0 => reason.to_string(),
+            1 => format!("\nCaused by:\n  1: {reason}"),
+            _ => format!("  {index}: {reason}"),
+        })
+        .collect::<Vec<String>>()
+        .join("\n")
 }
 
-impl<T> CommandOut<T> {
-    pub(crate) fn fail<E: Debug>(err: E) -> Self {
-        CommandOut::Failure(format!("{:?}", err))
-    }
+/// Get a formatted error string.
+///
+/// It accepts any arguments that can be passed to [`anyhow::anyhow`].
+#[macro_export]
+macro_rules! cmderr {
+    ($msg:literal $(,)?) => {
+        $crate::commands::stringify_anyhow(anyhow::anyhow!($msg))
+    };
+    ($err:expr $(,)?) => {
+        $crate::commands::stringify_anyhow(anyhow::anyhow!($err))
+    };
+    ($fmt:expr, $($arg:tt)*) => {
+        $crate::commands::stringify_anyhow(anyhow::anyhow!($fmt, $($arg)*))
+    };
+}
+
+/// Return early a formatted error string.
+///
+/// This is equivalent to `return Err(cmderr!($args...))`.
+#[macro_export]
+macro_rules! cmdbail {
+    ($msg:literal $(,)?) => {
+        return Err(cmderr!($msg))
+    };
+    ($err:expr $(,)?) => {{
+        return Err(cmderr!($err))
+    }};
+    ($fmt:expr, $($arg:tt)*) => {
+        return Err(cmderr!($fmt, $($arg)*))
+    };
 }
 
 /// Command for refreshing the state of the widget collection.
@@ -50,14 +85,14 @@ pub(crate) fn refresh_widget_collection(
 
     let entries = match read_dir(widget_base) {
         Ok(entries) => entries,
-        Err(e) => return CommandOut::fail(e),
+        Err(e) => cmdbail!(e),
     };
 
     for entry in entries {
         // There could be intermittent IO errors during iteration
         let entry = match entry {
             Ok(entry) => entry,
-            Err(e) => return CommandOut::fail(e),
+            Err(e) => cmdbail!(e),
         };
 
         let path = entry.path();
@@ -68,19 +103,15 @@ pub(crate) fn refresh_widget_collection(
         // Load the widget configuration and raise on error
         let widget_config = match read_widget_config(&path) {
             Ok(widget_config) => widget_config,
-            Err(e) => return CommandOut::fail(e),
+            Err(e) => cmdbail!(e),
         };
 
-        // Widget configuration being `None` means that the directory is not considered
-        // a widget; thus it should be silently excluded from the collection instead of
-        // returning a failure that blocks other widgets from rendering
+        // Widget configuration being `None` means that the directory is not a widget
+        // that is meant to be rendered
         if let Some(widget_config) = widget_config {
-            if widget_config.deskulpt.ignore {
-                continue; // Respect the `ignore` flag in configuration
-            }
             let widget_id = match path.file_name() {
                 Some(file_name) => file_name.to_string_lossy().to_string(),
-                None => return CommandOut::fail("Failed to get file name"),
+                None => cmdbail!("Failed to get file name"),
             };
 
             // All checks passed, insert into the new widget collection
@@ -91,7 +122,7 @@ pub(crate) fn refresh_widget_collection(
     // Update the widget collection state
     let widget_collection = app_handle.state::<WidgetCollectionState>();
     *widget_collection.0.lock().unwrap() = new_widget_collection.clone();
-    CommandOut::Success(new_widget_collection)
+    Ok(new_widget_collection)
 }
 
 /// Command for bundling the specified widget.
@@ -117,23 +148,17 @@ pub(crate) fn bundle_widget(
         let widget_entry = &widget_config.directory.join(&widget_config.deskulpt.entry);
 
         // Wrap the bundled code if success, otherwise let the error propagate
-        match bundle(
+        return bundle(
             &widget_config.directory,
             widget_entry,
             widget_config.node.as_ref().map(|package_json| &package_json.dependencies),
         )
         .context(format!("Failed to bundle widget (id={})", widget_id))
-        {
-            Ok(bundled_code) => return CommandOut::Success(bundled_code),
-            Err(e) => return CommandOut::fail(e),
-        }
+        .map_err(|e| cmderr!(e));
     }
 
     // Error out if the widget ID is not found in the collection
-    CommandOut::fail(format!(
-        "Failed to bundle widget (id={}) because it is not found in the collection",
-        widget_id
-    ))
+    cmdbail!("Widget '{widget_id}' is not found in the collection")
 }
 
 /// Command for opening the widget base directory.
@@ -144,12 +169,6 @@ pub(crate) fn bundle_widget(
 pub(crate) fn open_widget_base(app_handle: AppHandle) -> CommandOut<()> {
     let widget_base = &app_handle.state::<WidgetBaseDirectoryState>().0;
 
-    match api::shell::open(
-        &app_handle.shell_scope(),
-        widget_base.to_string_lossy(),
-        None,
-    ) {
-        Ok(_) => CommandOut::Success(()),
-        Err(e) => CommandOut::fail(e),
-    }
+    api::shell::open(&app_handle.shell_scope(), widget_base.to_string_lossy(), None)
+        .map_err(|e| cmderr!(e))
 }
