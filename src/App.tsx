@@ -90,8 +90,6 @@ export default function App() {
 
   /**
    * Render a collection of widgets asynchronously in parallel.
-   *
-   * @param configs The collection of widget configurations to render.
    */
   async function renderWidgets(states: Record<string, WidgetState>) {
     await Promise.all(
