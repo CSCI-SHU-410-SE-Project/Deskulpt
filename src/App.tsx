@@ -34,6 +34,8 @@ export default function App() {
           removedIds.forEach((id) => URL.revokeObjectURL(widgetStates[id].apisBlobUrl));
         };
 
+        // If a widget exists in the previous states but does not exist in the newly
+        // scanning result, we consider it as removed and perform cleanup
         const removedIds = Object.keys(widgetStates).filter(
           (id) => !(id in widgetConfigs),
         );
@@ -97,11 +99,10 @@ export default function App() {
   }
 
   useEffect(() => {
-    // Fetch the widget collection and render all on mount
+    // Scan widget base directory and render all on mount
     rescanWidgetBase()
       .then(async (states) => {
         if (states !== null) {
-          console.log(states);
           await renderWidgets(states);
         }
       })
