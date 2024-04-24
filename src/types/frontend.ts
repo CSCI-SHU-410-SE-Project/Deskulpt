@@ -5,6 +5,23 @@
 
 import ReactDOM from "react-dom/client";
 import { Widget } from ".";
+import { WidgetConfig } from "./backend";
+
+/**
+ * The state of a widget.
+ *
+ * We cannot manage widget states purely in the backend or in the frontend. Managing
+ * purely in the backend may cause too frequent communication when the frontend needs
+ * information. Managing purely in the frontend would cause use to send large objects
+ * to the backend when sometimes we can just send the widget ID.
+ *
+ * The frontend widget state thus consists of (1) a shared part that is synced with the
+ * backend at times, and (2) a frontend part that does not bother the backend.
+ */
+export interface WidgetState {
+  /** [SHARED] Widget configuration. */
+  config: WidgetConfig;
+}
 
 /**
  * The payload of the "render-widget" event.

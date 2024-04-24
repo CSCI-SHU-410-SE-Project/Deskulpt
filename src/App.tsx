@@ -1,13 +1,12 @@
 import { Box, Button, IconButton, List, ListItem, ListItemText } from "@mui/material";
 import RefreshIcon from "@mui/icons-material/Refresh";
-
 import { invoke } from "@tauri-apps/api";
 import { emit } from "@tauri-apps/api/event";
 import { useEffect, useState } from "react";
-import { WidgetConfig } from "./types";
+import { WidgetConfig, WidgetState } from "./types";
 
 export default function App() {
-  const [widgetConfigs, setWidgetConfigs] = useState<Record<string, WidgetConfig>>({});
+  const [widgetStates, setWidgetStates] = useState<Record<string, WidgetState>>({});
 
   /**
    * Open the widget base directory in the file explorer of the OS.
@@ -17,28 +16,39 @@ export default function App() {
   }
 
   /**
-   * Refresh the state of `widgetConfigs`.
+   * Rescan the widget base diretory.
    *
-   * The reason why this function returns the updated state is that in some cases we
-   * need to access the updated state before React actually updates the component.
-   *
-   * This will also emit a "remove-widgets" event to notify the canvas to remove the
-   * widgets that are no longer present in the updated state, if any.
-   *
-   * @returns The updated state of `widgetConfigs` if the operation is successful or
-   * `null` otherwise.
+   * This function fetches the widget collection from the backend and wraps them with
+   * states in the frontend. It updates `widgetStates` and also returns the updated
+   * widget states (because in some cases we need to access the updated states before
+   * React actually re-renders the component). It returns `null` if the operation fails.
    */
-  async function refreshWidgetCollection() {
+  async function rescanWidgetBase() {
     return await invoke<Record<string, WidgetConfig>>("refresh_widget_collection")
-      .then(async (output) => {
-        // Check for removed widgets and notify the canvas if any
-        const removedIds = Object.keys(widgetConfigs).filter((id) => !(id in output));
-        if (removedIds.length > 0) {
+      .then(async (widgetConfigs) => {
+        const cleanupRemovedWidgets = async (removedIds: string[]) => {
+          // Notify the canvas to cleanup resourced allocated for removed widgets
           await emit("remove-widgets", { widgetIds: removedIds });
+        };
+
+        // If a widget exists in the previous states but does not exist in the new
+        // scanning result, we consider it as removed and perform cleanup
+        const removedIds = Object.keys(widgetStates).filter(
+          (id) => !(id in widgetConfigs),
+        );
+        if (removedIds.length > 0) {
+          await cleanupRemovedWidgets(removedIds);
         }
 
-        setWidgetConfigs(output);
-        return output;
+        // Update the widget states and return the updated states
+        const newWidgetStates = Object.fromEntries(
+          Object.entries(widgetConfigs).map(([widgetId, config]) => [
+            widgetId,
+            { config },
+          ]),
+        );
+        setWidgetStates(newWidgetStates);
+        return newWidgetStates;
       })
       .catch((error) => {
         console.error(error);
@@ -52,8 +62,6 @@ export default function App() {
    * In essence, this simply calls the backend command to bundle the widget and emit a
    * corresponding "render-widget" event. The canvas will listen to this event and
    * manage the actual rendering.
-   *
-   * @param widgetId The ID of the widget to render.
    */
   async function renderWidget(widgetId: string) {
     await invoke<string>("bundle_widget", { widgetId })
@@ -61,45 +69,41 @@ export default function App() {
         await emit("render-widget", { widgetId, bundlerOutput, success: true });
       })
       .catch(async (error: string) => {
-        console.log(typeof error);
-        console.log({ error });
         await emit("render-widget", { widgetId, bundlerOutput: error, success: false });
       });
   }
 
   /**
    * Render a collection of widgets asynchronously in parallel.
-   *
-   * @param widgetIds The collection of widget IDs to render.
    */
   async function renderWidgets(widgetIds: string[]) {
     await Promise.all(widgetIds.map((widgetId) => renderWidget(widgetId)));
   }
 
   /**
-   * Rescan widget collection and render newly added widgets.
+   * Rescan the widget base directory and render newly added widgets.
+   *
+   * Newly added widgets are those that exist in the new scanning result but does not
+   * exist in the previous states.
    */
-  async function rescan() {
-    await refreshWidgetCollection()
-      .then(async (configs) => {
-        if (configs !== null) {
-          const newIds = Object.keys(configs).filter((id) => !(id in widgetConfigs));
-          await renderWidgets(newIds);
-        }
-      })
-      .catch(console.error);
+  async function rescanAndRender() {
+    const states = await rescanWidgetBase();
+    if (states !== null) {
+      const newIds = Object.keys(states).filter((id) => !(id in widgetStates));
+      await renderWidgets(newIds);
+    }
   }
 
   useEffect(() => {
-    rescan().catch(console.error);
+    rescanAndRender().catch(console.error);
   }, []);
 
   return (
     <Box>
       <List>
-        {Object.entries(widgetConfigs)
+        {Object.entries(widgetStates)
           .sort()
-          .map(([widgetId, widgetConfig]) => (
+          .map(([widgetId, widgetState]) => (
             <ListItem
               key={widgetId}
               secondaryAction={
@@ -108,16 +112,19 @@ export default function App() {
                 </IconButton>
               }
             >
-              <ListItemText primary={widgetConfig.deskulpt.name} secondary={widgetId} />
+              <ListItemText
+                primary={widgetState.config.deskulpt.name}
+                secondary={widgetId}
+              />
             </ListItem>
           ))}
       </List>
-      <Button variant="outlined" onClick={rescan}>
+      <Button variant="outlined" onClick={rescanAndRender}>
         Rescan
       </Button>
       <Button
         variant="outlined"
-        onClick={() => renderWidgets(Object.keys(widgetConfigs))}
+        onClick={() => renderWidgets(Object.keys(widgetStates))}
       >
         Render All
       </Button>
