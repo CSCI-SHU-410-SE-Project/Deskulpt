@@ -37,7 +37,7 @@ export interface RenderWidgetPayload {
  * The payload of the "remove-widgets" event.
  */
 export interface RemoveWidgetsPayload {
-  widgetIds: string[];
+  removedIds: string[];
 }
 
 /**

@@ -28,7 +28,7 @@ export default function App() {
       .then(async (widgetConfigs) => {
         const cleanupRemovedWidgets = async (removedIds: string[]) => {
           // Notify the canvas to cleanup resourced allocated for removed widgets
-          await emit("remove-widgets", { widgetIds: removedIds });
+          await emit("remove-widgets", { removedIds });
         };
 
         // If a widget exists in the previous states but does not exist in the new

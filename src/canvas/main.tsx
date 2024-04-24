@@ -100,10 +100,10 @@ listen("render-widget", (event: TauriEvent<RenderWidgetPayload>) => {
 
 // Listen to the "remove-widgets" event, emitted by the manager
 listen("remove-widgets", (event: TauriEvent<RemoveWidgetsPayload>) => {
-  const { widgetIds } = event.payload;
+  const { removedIds } = event.payload;
 
   // Remove from canvas based on the received widget IDs and delete their records
-  widgetIds.forEach((widgetId) => {
+  removedIds.forEach((widgetId) => {
     if (widgetId in widgetRecords) {
       const widgetDOMRoot = widgetRecords[widgetId].root;
       widgetDOMRoot.react.unmount();
