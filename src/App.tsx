@@ -31,14 +31,11 @@ export default function App() {
           // Revoke the API blob URLs of removed widgets for optimal performance and
           // memory usage as they will not be used anymore; even if the same widget ID
           // appears some time later, the blob URL will be recreated rather than reused
-          removedIds.forEach((widgetId) => {
-            URL.revokeObjectURL(widgetStates[widgetId].apisBlobUrl);
-          });
+          removedIds.forEach((id) => URL.revokeObjectURL(widgetStates[id].apisBlobUrl));
         };
 
-        // Clean up removed widgets
         const removedIds = Object.keys(widgetStates).filter(
-          (widgetId) => !(widgetId in widgetConfigs),
+          (id) => !(id in widgetConfigs),
         );
         cleanupRemovedWidgets(removedIds);
 
@@ -55,13 +52,13 @@ export default function App() {
           return [widgetId, { config, apisBlobUrl }];
         };
 
-        // Set the new widget states according to the scanning result
-        const newWidgetStateEntries = await Promise.all(
-          Object.entries(widgetConfigs).map(([widgetId, config]) =>
-            createWidgetState(widgetId, config),
+        const newWidgetStates = Object.fromEntries(
+          await Promise.all(
+            Object.entries(widgetConfigs).map(([widgetId, config]) =>
+              createWidgetState(widgetId, config),
+            ),
           ),
         );
-        const newWidgetStates = Object.fromEntries(newWidgetStateEntries);
         setWidgetStates(newWidgetStates);
         return newWidgetStates;
       })
