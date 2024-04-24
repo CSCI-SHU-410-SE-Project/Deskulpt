@@ -4,6 +4,7 @@ import { invoke } from "@tauri-apps/api";
 import { emit } from "@tauri-apps/api/event";
 import { useEffect, useState } from "react";
 import { WidgetConfig, WidgetState } from "./types";
+import { createWidgetApisBlob } from "./utils";
 
 export default function App() {
   const [widgetStates, setWidgetStates] = useState<Record<string, WidgetState>>({});
@@ -16,7 +17,7 @@ export default function App() {
   }
 
   /**
-   * Rescan the widget base diretory.
+   * Rescan the widget base directory.
    *
    * This function fetches the widget collection from the backend and wraps them with
    * states in the frontend. It updates `widgetStates` and also returns the updated
@@ -25,9 +26,12 @@ export default function App() {
    */
   async function rescanWidgetBase() {
     return await invoke<Record<string, WidgetConfig>>("refresh_widget_collection")
-      .then((widgetConfigs) => {
+      .then(async (widgetConfigs) => {
         const cleanupRemovedWidgets = (removedIds: string[]) => {
-          console.log(removedIds); // Placeholder for the actual cleanup logic
+          // Revoke the API blob URLs of removed widgets for optimal performance and
+          // memory usage as they will not be used anymore; even if the same widget ID
+          // appears some time later, the blob URL will be recreated rather than reused
+          removedIds.forEach((id) => URL.revokeObjectURL(widgetStates[id].apisBlobUrl));
         };
 
         // If a widget exists in the previous states but does not exist in the newly
@@ -37,12 +41,25 @@ export default function App() {
         );
         cleanupRemovedWidgets(removedIds);
 
-        // Update the widget states and return the updated states
+        const createWidgetState = async (
+          widgetId: string,
+          config: WidgetConfig,
+        ): Promise<[string, WidgetState]> => {
+          // Reuse the blob URL of widget APIs if the widget state previously exists;
+          // create a new one otherwise
+          const apisBlobUrl =
+            widgetId in widgetStates
+              ? widgetStates[widgetId].apisBlobUrl
+              : URL.createObjectURL(await createWidgetApisBlob(widgetId));
+          return [widgetId, { config, apisBlobUrl }];
+        };
+
         const newWidgetStates = Object.fromEntries(
-          Object.entries(widgetConfigs).map(([widgetId, config]) => [
-            widgetId,
-            { config },
-          ]),
+          await Promise.all(
+            Object.entries(widgetConfigs).map(([widgetId, config]) =>
+              createWidgetState(widgetId, config),
+            ),
+          ),
         );
         setWidgetStates(newWidgetStates);
         return newWidgetStates;
@@ -60,8 +77,8 @@ export default function App() {
    * corresponding "render-widget" event. The canvas will listen to this event and
    * manage the actual rendering.
    */
-  async function renderWidget(widgetId: string) {
-    await invoke<string>("bundle_widget", { widgetId })
+  async function renderWidget(widgetId: string, apisBlobUrl: string) {
+    await invoke<string>("bundle_widget", { widgetId, apisBlobUrl })
       .then(async (bundlerOutput) => {
         await emit("render-widget", { widgetId, bundlerOutput, success: true });
       })
@@ -74,7 +91,11 @@ export default function App() {
    * Render a collection of widgets asynchronously in parallel.
    */
   async function renderWidgets(states: Record<string, WidgetState>) {
-    await Promise.all(Object.keys(states).map((widgetId) => renderWidget(widgetId)));
+    await Promise.all(
+      Object.entries(states).map(([widgetId, widgetState]) =>
+        renderWidget(widgetId, widgetState.apisBlobUrl),
+      ),
+    );
   }
 
   useEffect(() => {
@@ -97,7 +118,11 @@ export default function App() {
             <ListItem
               key={widgetId}
               secondaryAction={
-                <IconButton onClick={() => renderWidget(widgetId)}>
+                <IconButton
+                  onClick={() =>
+                    renderWidget(widgetId, widgetStates[widgetId].apisBlobUrl)
+                  }
+                >
                   <RefreshIcon />
                 </IconButton>
               }
