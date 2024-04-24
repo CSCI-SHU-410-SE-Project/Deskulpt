@@ -46,6 +46,10 @@ pub(crate) fn bundle(
     target: &Path,
     dependency_map: Option<&HashMap<String, String>>,
 ) -> Result<String, Error> {
+    if !target.exists() {
+        bail!("Entry point does not exist: '{}'", target.display());
+    }
+
     let globals = Globals::default();
     let cm = Lrc::new(SourceMap::new(FilePathMapping::empty()));
 
@@ -393,6 +397,12 @@ mod tests {
                 "Relative imports should not go beyond the root '{}'",
                 fixture_dir().join("import_beyond_root/input").display(),
             )),
+        ]
+    )]
+    #[case::entry_not_exist(
+        "entry_not_exist",
+        vec![
+            ChainReason::Exact(format!("Entry point does not exist: '{}'", fixture_dir().join("entry_not_exist").join("input").join("index.jsx").display()))
         ]
     )]
     fn test_bundle_error(#[case] case: &str, #[case] expected_error: Vec<ChainReason>) {
