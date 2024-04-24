@@ -21,6 +21,8 @@ import { WidgetConfig } from "./backend";
 export interface WidgetState {
   /** [SHARED] Widget configuration. */
   config: WidgetConfig;
+  /** [FRONTEND] Import URL of the widget APIs. */
+  apisBlobUrl: string;
 }
 
 /**
