@@ -17,16 +17,14 @@ pub(crate) fn catch_cursor(window: &Window) {
 
 /// Set the window to always be on the bottom of all windows
 pub(crate) fn set_window_to_bottom(window: &Window) {
-    if cfg!(target_os = "windows") {
-        use crate::canvas::platform::windows::platform_set_window_to_bottom;
-        platform_set_window_to_bottom(window);
-    }
+    #[cfg(target_os = "windows")]
+    crate::canvas::platform::windows::platform_set_window_to_bottom(window);
+    #[cfg(target_os = "linux")]
+    crate::canvas::platform::linux::platform_set_window_to_bottom(window);
 }
 
 /// Set the window to be always at the bottom of all windows
 pub(crate) fn set_window_always_to_bottom(window: &Window) {
-    if cfg!(target_os = "windows") {
-        use crate::canvas::platform::windows::platform_set_window_always_to_bottom;
-        platform_set_window_always_to_bottom(window).unwrap();
-    }
+    #[cfg(target_os = "windows")]
+    crate::canvas::platform::windows::platform_set_window_always_to_bottom(window);
 }

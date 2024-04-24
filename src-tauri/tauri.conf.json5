@@ -25,14 +25,14 @@
         label: "canvas",
         // title: "Deskulpt Canvas",
         url: "views/canvas.html",
-        fullscreen: true,
-        transparent: true,
+        // fullscreen: true,
+        // transparent: true,
         // Oddly, setting decorations to false will create a visible menubar with the window title in it
-        decorations: true,
+        // decorations: true,
         // With skipTaskBar being true, Win+Tab won't show the canvas window
-        skipTaskbar: true,
+        // skipTaskbar: true,
         // titleBarStyle: "Transparent",
-        resizable: false,
+        // resizable: false,
         // maximized: true,
       },
       {
