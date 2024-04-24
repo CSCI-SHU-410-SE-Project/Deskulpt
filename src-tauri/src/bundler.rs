@@ -444,7 +444,14 @@ mod tests {
     #[case::entry_not_exist(
         "entry_not_exist",
         vec![
-            ChainReason::Exact(format!("Entry point does not exist: '{}'", fixture_dir().join("entry_not_exist").join("input").join("index.jsx").display()))
+            ChainReason::Exact(format!(
+                "Entry point does not exist: '{}'",
+                fixture_dir()
+                    .join("entry_not_exist")
+                    .join("input")
+                    .join("index.jsx")
+                    .display()
+            ))
         ]
     )]
     fn test_bundle_error(#[case] case: &str, #[case] expected_error: Vec<ChainReason>) {
