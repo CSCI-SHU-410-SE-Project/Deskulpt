@@ -1,15 +1,13 @@
 //! The module provides the commands used internally by Deskulpt.
 
-use std::{collections::HashMap, fs::read_dir};
-use tauri::{api, command, AppHandle, Manager};
-
-use anyhow::{Context, Error};
-
 use crate::{
     bundler::bundle,
     config::{read_widget_config, WidgetConfig},
     states::{WidgetBaseDirectoryState, WidgetCollectionState},
 };
+use anyhow::{Context, Error};
+use std::{collections::HashMap, fs::read_dir};
+use tauri::{api, command, AppHandle, Manager};
 
 /// Alias for `Result<T, String>`.
 ///
@@ -149,14 +147,15 @@ pub(crate) fn bundle_widget(
 
     if let Some(widget_config) = widget_collection.get(&widget_id) {
         // Obtain the absolute path of the widget entry point
-        let widget_entry = &widget_config.directory.join(&widget_config.deskulpt.entry);
+        let widget_entry =
+            &widget_config.directory.join(&widget_config.deskulpt_conf.entry);
 
         // Wrap the bundled code if success, otherwise let the error propagate
         return bundle(
             &widget_config.directory,
             widget_entry,
             apis_blob_url,
-            widget_config.node.as_ref().map(|package_json| &package_json.dependencies),
+            &widget_config.external_dependencies,
         )
         .context(format!("Failed to bundle widget (id={})", widget_id))
         .map_err(|e| cmderr!(e));

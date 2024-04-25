@@ -128,7 +128,7 @@ export default function App() {
               }
             >
               <ListItemText
-                primary={widgetState.config.deskulpt.name}
+                primary={widgetState.config.deskulptConf.name}
                 secondary={widgetId}
               />
             </ListItem>
