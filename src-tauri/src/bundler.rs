@@ -128,7 +128,8 @@ pub(crate) fn bundle(
         );
 
         // Transform that removes TypeScript types; weirdly, this must be applied on a
-        // program rather than a module
+        // program rather than a module; note that we use the verbatim module syntax to
+        // avoid removing unused import statements (particularly the `React` import)
         let mut ts_transform = typescript::typescript(
             typescript::Config { verbatim_module_syntax: true, ..Default::default() },
             top_level_mark,
@@ -379,6 +380,18 @@ impl Hook for NoopHook {
 }
 
 /// Trait for converting an object into a [`Program`].
+///
+/// Some transforms requires a [`Program`] as input, so this trait is for providing a
+/// better syntax for chaining the transforms, for instance:
+///
+/// ```ignore
+/// module
+///     .fold_with(&mut transform1)
+///     .into_program()
+///     .fold_with(&mut transform2) // `transform2` requires a `Program`
+///     .expect_module()
+///     .fold_with(&mut transform3)
+/// ```
 trait IntoProgram {
     /// Return a [`Program`] wrapping the object itself.
     fn into_program(self) -> Program;
