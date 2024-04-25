@@ -1,13 +1,12 @@
 //! The module implements configuration-related utilities and structures.
 
+use anyhow::{bail, Context, Error};
+use serde::{Deserialize, Serialize};
 use std::{
     collections::HashMap,
     fs::read_to_string,
     path::{Path, PathBuf},
 };
-
-use anyhow::{bail, Context, Error};
-use serde::{Deserialize, Serialize};
 
 /// Full configuration of a widget.
 #[derive(Clone, Serialize)]
@@ -96,7 +95,6 @@ pub(crate) fn read_widget_config(path: &Path) -> Result<Option<WidgetConfig>, Er
             read_to_string(package_json_path).context("Failed to read package.json")?;
         let package_json: PackageJson = serde_json::from_str(&package_json_str)
             .context("Failed to interpret package.json")?;
-        // If dependencies is None, we return an empty HashMap
         package_json.dependencies.unwrap_or_default()
     } else {
         Default::default()
@@ -139,7 +137,9 @@ mod tests {
         Some(WidgetConfig {
             directory: fixture_dir().join("standard"),
             deskulpt_conf: get_standard_deskulpt_conf(),
-            external_dependencies: [("express".to_string(), "^4.17.1".to_string())].into(),
+            external_dependencies: [
+                ("express".to_string(), "^4.17.1".to_string())
+            ].into(),
         }),
     )]
     // A standard configuration with `deskulpt.conf.json` but no `package.json`

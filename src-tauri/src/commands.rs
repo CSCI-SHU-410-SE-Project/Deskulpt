@@ -1,15 +1,13 @@
 //! The module provides the commands used internally by Deskulpt.
 
-use std::{collections::HashMap, fs::read_dir};
-use tauri::{api, command, AppHandle, Manager};
-
-use anyhow::{Context, Error};
-
 use crate::{
     bundler::bundle,
     config::{read_widget_config, WidgetConfig},
     states::{WidgetBaseDirectoryState, WidgetCollectionState},
 };
+use anyhow::{Context, Error};
+use std::{collections::HashMap, fs::read_dir};
+use tauri::{api, command, AppHandle, Manager};
 
 /// Alias for `Result<T, String>`.
 ///

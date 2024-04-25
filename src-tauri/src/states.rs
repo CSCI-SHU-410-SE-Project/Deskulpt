@@ -4,7 +4,6 @@
 //! use structs to mark the states.
 
 use crate::config::WidgetConfig;
-
 use std::{collections::HashMap, path::PathBuf, sync::Mutex};
 
 /// The type for the state of the collection of widgets.

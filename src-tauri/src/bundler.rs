@@ -4,15 +4,14 @@
 //! the use case of bundling Deskulpt widgets which has a custom set of dependency
 //! rules and are (at least recommended to be) small.
 
+use anyhow::{bail, Context, Error};
+use path_clean::PathClean;
 use std::{
     collections::{HashMap, HashSet},
     fs::File,
     io::Read,
     path::{Component, Path, PathBuf},
 };
-
-use anyhow::{bail, Context, Error};
-use path_clean::PathClean;
 use swc_atoms::Atom;
 use swc_bundler::{Bundler, Hook, Load, ModuleData, ModuleRecord, Resolve};
 use swc_common::{
