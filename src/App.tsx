@@ -95,10 +95,10 @@ export default function App() {
   /**
    * Render a collection of widgets asynchronously in parallel.
    */
-  async function renderWidgets(widgetIds: string[]) {
+  async function renderWidgets(states: Record<string, WidgetState>) {
     await Promise.all(
-      widgetIds.map((widgetId) =>
-        renderWidget(widgetId, widgetStates[widgetId].apisBlobUrl),
+      Object.entries(states).map(([widgetId, widgetState]) =>
+        renderWidget(widgetId, widgetState.apisBlobUrl),
       ),
     );
   }
@@ -112,8 +112,10 @@ export default function App() {
   async function rescanAndRender() {
     const states = await rescanWidgetBase();
     if (states !== null) {
-      const newIds = Object.keys(states).filter((id) => !(id in widgetStates));
-      await renderWidgets(newIds);
+      const newStates = Object.fromEntries(
+        Object.entries(states).filter(([widgetId]) => !(widgetId in widgetStates)),
+      );
+      await renderWidgets(newStates);
     }
   }
 
@@ -149,10 +151,7 @@ export default function App() {
       <Button variant="outlined" onClick={rescanAndRender}>
         Rescan
       </Button>
-      <Button
-        variant="outlined"
-        onClick={() => renderWidgets(Object.keys(widgetStates))}
-      >
+      <Button variant="outlined" onClick={() => renderWidgets(widgetStates)}>
         Render All
       </Button>
       <Button variant="outlined" onClick={openWidgetBase}>
