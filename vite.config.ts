@@ -9,6 +9,7 @@ export default defineConfig(({ command }) => ({
     react(),
     importmapPlugin(command, {
       "@deskulpt-test/react": "src/.scripts/react.js",
+      "@deskulpt-test/raw-apis": "src/.scripts/raw-apis.js",
     }),
   ],
   clearScreen: false,
