@@ -32,7 +32,7 @@ fn main() {
         .on_window_event(setup::listen_to_windows)
         // Initialize state management
         .manage(states::WidgetBaseDirectoryState(widget_base_dir))
-        .manage(states::WidgetCollectionState::default())
+        .manage(states::WidgetConfigCollectionState::default())
         // Register internal command handlers
         .invoke_handler(generate_handler![
             commands::bundle_widget,

@@ -2,8 +2,8 @@
 
 use crate::{
     bundler::bundle,
-    config::{read_widget_config, WidgetCollection},
-    states::{WidgetBaseDirectoryState, WidgetCollectionState},
+    config::{read_widget_config, WidgetConfigCollection},
+    states::{WidgetBaseDirectoryState, WidgetConfigCollectionState},
 };
 use anyhow::{Context, Error};
 use std::{collections::HashMap, fs::read_dir};
@@ -81,7 +81,7 @@ macro_rules! cmdbail {
 #[command]
 pub(crate) fn refresh_widget_collection(
     app_handle: AppHandle,
-) -> CommandOut<WidgetCollection> {
+) -> CommandOut<WidgetConfigCollection> {
     let widget_base = &app_handle.state::<WidgetBaseDirectoryState>().0;
     let mut new_widget_collection = HashMap::new();
 
@@ -126,7 +126,7 @@ pub(crate) fn refresh_widget_collection(
     }
 
     // Update the widget collection state
-    let widget_collection = app_handle.state::<WidgetCollectionState>();
+    let widget_collection = app_handle.state::<WidgetConfigCollectionState>();
     *widget_collection.0.lock().unwrap() = new_widget_collection.clone();
     Ok(new_widget_collection)
 }
@@ -152,7 +152,7 @@ pub(crate) fn bundle_widget(
     widget_id: String,
     apis_blob_url: String,
 ) -> CommandOut<String> {
-    let widget_collection_state = &app_handle.state::<WidgetCollectionState>();
+    let widget_collection_state = &app_handle.state::<WidgetConfigCollectionState>();
     let widget_collection = widget_collection_state.0.lock().unwrap();
 
     if let Some(widget_config) = widget_collection.get(&widget_id) {

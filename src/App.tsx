@@ -3,7 +3,7 @@ import RefreshIcon from "@mui/icons-material/Refresh";
 import { invoke } from "@tauri-apps/api";
 import { emit } from "@tauri-apps/api/event";
 import { useEffect, useState } from "react";
-import { WidgetConfig, WidgetState } from "./types";
+import { Result, WidgetCollection, WidgetConfig, WidgetState } from "./types";
 import { createWidgetApisBlob } from "./utils";
 
 export default function App() {
@@ -25,7 +25,7 @@ export default function App() {
    * React actually re-renders the component). It returns `null` if the operation fails.
    */
   async function rescanWidgetBase() {
-    return await invoke<Record<string, WidgetConfig>>("refresh_widget_collection")
+    return await invoke<WidgetCollection>("refresh_widget_collection")
       .then(async (widgetConfigs) => {
         const cleanupRemovedWidgets = (removedIds: string[]) => {
           // Revoke the API blob URLs of removed widgets for optimal performance and
@@ -43,7 +43,7 @@ export default function App() {
 
         const createWidgetState = async (
           widgetId: string,
-          config: WidgetConfig,
+          config: Result<WidgetConfig, string>,
         ): Promise<[string, WidgetState]> => {
           // Reuse the blob URL of widget APIs if the widget state previously exists;
           // create a new one otherwise
@@ -128,7 +128,11 @@ export default function App() {
               }
             >
               <ListItemText
-                primary={widgetState.config.deskulptConf.name}
+                primary={
+                  "Ok" in widgetState.config
+                    ? widgetState.config.Ok.deskulptConf.name
+                    : "???"
+                }
                 secondary={widgetId}
               />
             </ListItem>
