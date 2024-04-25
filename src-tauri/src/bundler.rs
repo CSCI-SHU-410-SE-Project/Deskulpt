@@ -4,22 +4,21 @@
 //! the use case of bundling Deskulpt widgets which has a custom set of dependency
 //! rules and are (at least recommended to be) small.
 
+use anyhow::{bail, Context, Error};
+use path_clean::PathClean;
 use std::{
     collections::{HashMap, HashSet},
     fs::File,
     io::Read,
     path::{Component, Path, PathBuf},
 };
-
-use anyhow::{bail, Context, Error};
-use path_clean::PathClean;
 use swc_atoms::Atom;
 use swc_bundler::{Bundler, Hook, Load, ModuleData, ModuleRecord, Resolve};
 use swc_common::{
     comments::SingleThreadedComments, errors::Handler, pass::Repeat, sync::Lrc,
     FileName, FilePathMapping, Globals, Mark, SourceMap, Span, GLOBALS,
 };
-use swc_ecma_ast::KeyValueProp;
+use swc_ecma_ast::{KeyValueProp, ModuleDecl};
 use swc_ecma_codegen::{
     text_writer::{JsWriter, WriteJs},
     Emitter,
@@ -28,7 +27,9 @@ use swc_ecma_loader::resolve::Resolution;
 use swc_ecma_parser::{parse_file_as_module, EsConfig, Syntax};
 use swc_ecma_transforms_optimization::simplify::dce;
 use swc_ecma_transforms_react::jsx;
-use swc_ecma_visit::FoldWith;
+use swc_ecma_visit::{
+    as_folder, noop_visit_mut_type, FoldWith, VisitMut, VisitMutWith,
+};
 use tempfile::NamedTempFile;
 
 /// The file extensions to try when an import is given without an extension
@@ -44,7 +45,8 @@ static EXTENSIONS: &[&str] = &["js", "jsx", "ts", "tsx"];
 pub(crate) fn bundle(
     root: &Path,
     target: &Path,
-    dependency_map: Option<&HashMap<String, String>>,
+    apis_blob_url: String,
+    dependency_map: &HashMap<String, String>,
 ) -> Result<String, Error> {
     let globals = Globals::default();
     let cm = Lrc::new(SourceMap::new(FilePathMapping::empty()));
@@ -52,10 +54,11 @@ pub(crate) fn bundle(
     // Get the list of external modules not to resolve; this should include default
     // dependencies and (if any) external dependencies obtained from the dependency map
     let external_modules = {
-        let mut dependencies = HashSet::from([Atom::from("@deskulpt-test/react")]);
-        if let Some(map) = dependency_map {
-            dependencies.extend(map.keys().map(|k| Atom::from(k.clone())));
-        }
+        let mut dependencies = HashSet::from([
+            Atom::from("@deskulpt-test/react"),
+            Atom::from("@deskulpt-test/apis"),
+        ]);
+        dependencies.extend(dependency_map.keys().map(|k| Atom::from(k.clone())));
         Vec::from_iter(dependencies)
     };
 
@@ -117,9 +120,20 @@ pub(crate) fn bundle(
             Mark::new(),        // unresolved mark
         );
 
+        // We need to rename the imports of `@deskulpt-test/apis` to the blob URL which
+        // wraps the widget APIs to avoid exposing the raw APIs that allow specifying
+        // widget IDs; note that this transform should be done last to avoid messing up
+        // with import resolution
+        let mut wrap_apis = as_folder(ImportRenamer(
+            [("@deskulpt-test/apis".to_string(), apis_blob_url)].into(),
+        ));
+
         // Apply the module transformations
         // @Charlie-XIAO: chain more transforms e.g. TypeScript
-        let module = module.fold_with(&mut tree_shaking).fold_with(&mut jsx_transform);
+        let module = module
+            .fold_with(&mut tree_shaking)
+            .fold_with(&mut jsx_transform)
+            .fold_with(&mut wrap_apis);
 
         // Emit the bundled module as string into a buffer
         let mut buf = vec![];
@@ -137,6 +151,26 @@ pub(crate) fn bundle(
     });
 
     Ok(code)
+}
+
+/// An AST transformer that renames import module specifiers.
+///
+/// This should be wrapped within [`as_folder`].
+struct ImportRenamer(HashMap<String, String>);
+
+impl VisitMut for ImportRenamer {
+    noop_visit_mut_type!();
+
+    fn visit_mut_module_decl(&mut self, n: &mut ModuleDecl) {
+        n.visit_mut_children_with(self);
+
+        if let ModuleDecl::Import(import_decl) = n {
+            let src = import_decl.src.value.to_string();
+            if let Some(new_src) = self.0.get(&src) {
+                import_decl.src.value = Atom::from(new_src.clone());
+            }
+        }
+    }
 }
 
 /// Deskulpt-customized path loader for SWC bundler.
@@ -371,8 +405,13 @@ mod tests {
     fn test_bundle_ok(#[case] case: &str) {
         let case_dir = fixture_dir().join(case);
         let bundle_root = case_dir.join("input");
-        let result = bundle(&bundle_root, &bundle_root.join("index.jsx"), None)
-            .expect("Expected bundling to succeed");
+        let result = bundle(
+            &bundle_root,
+            &bundle_root.join("index.jsx"),
+            Default::default(),
+            &Default::default(),
+        )
+        .expect("Expected bundling to succeed");
 
         let expected = read_to_string(case_dir.join("output.js")).unwrap();
         self::assert_eq!(result, expected);
@@ -398,8 +437,13 @@ mod tests {
     fn test_bundle_error(#[case] case: &str, #[case] expected_error: Vec<ChainReason>) {
         let case_dir = fixture_dir().join(case);
         let bundle_root = case_dir.join("input");
-        let error = bundle(&bundle_root, &bundle_root.join("index.jsx"), None)
-            .expect_err("Expected bundling error");
+        let error = bundle(
+            &bundle_root,
+            &bundle_root.join("index.jsx"),
+            Default::default(),
+            &Default::default(),
+        )
+        .expect_err("Expected bundling error");
         assert_err_eq(error, expected_error);
     }
 
@@ -419,8 +463,9 @@ mod tests {
         std::fs::write(&entry_path, format!("import {{ foo }} from {utils_path:?};"))
             .unwrap();
 
-        let error = bundle(&bundle_root, &entry_path, None)
-            .expect_err("Expected bundling error");
+        let error =
+            bundle(&bundle_root, &entry_path, Default::default(), &Default::default())
+                .expect_err("Expected bundling error");
         let expected_error = vec![
             ChainReason::Exact("load_transformed failed".to_string()),
             ChainReason::Exact("failed to analyze module".to_string()),

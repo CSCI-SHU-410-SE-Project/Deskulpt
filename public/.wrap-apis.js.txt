@@ -1,0 +1,1 @@
+import t from"@deskulpt-test/raw-apis";var o=function(t,o){const n={};for(const r in o){n[r]={};const s=o[r];for(const o in s){const c=s[o];"function"==typeof c&&(n[r][o]=(...o)=>c(t,...o))}}return n}("__DESKULPT_WIDGET_ID__",t);export{o as default};

@@ -1,15 +1,13 @@
 //! The module provides the commands used internally by Deskulpt.
 
-use std::{collections::HashMap, fs::read_dir};
-use tauri::{api, command, AppHandle, Manager};
-
-use anyhow::{Context, Error};
-
 use crate::{
     bundler::bundle,
     config::{read_widget_config, WidgetCollection},
     states::{WidgetBaseDirectoryState, WidgetCollectionState},
 };
+use anyhow::{Context, Error};
+use std::{collections::HashMap, fs::read_dir};
+use tauri::{api, command, AppHandle, Manager};
 
 /// Alias for `Result<T, String>`.
 ///
@@ -139,6 +137,9 @@ pub(crate) fn refresh_widget_collection(
 /// for the given widget ID. The widget will be bundled into a string of ESM code if the
 /// ID is found in the collection.
 ///
+/// The command also requires the URL of the APIs blob of the widget. This is used for
+/// replacing the imports of `@deskulpt-test/apis` by the actual URL to import from.
+///
 /// This command will fail if:
 ///
 /// - The widget ID is not found in the state of the widget collection.
@@ -149,6 +150,7 @@ pub(crate) fn refresh_widget_collection(
 pub(crate) fn bundle_widget(
     app_handle: AppHandle,
     widget_id: String,
+    apis_blob_url: String,
 ) -> CommandOut<String> {
     let widget_collection_state = &app_handle.state::<WidgetCollectionState>();
     let widget_collection = widget_collection_state.0.lock().unwrap();
@@ -159,13 +161,15 @@ pub(crate) fn bundle_widget(
             Err(e) => cmdbail!(e.clone()),
         };
         // Obtain the absolute path of the widget entry point
-        let widget_entry = widget_config.directory.join(&widget_config.deskulpt.entry);
+        let widget_entry =
+            &widget_config.directory.join(&widget_config.deskulpt_conf.entry);
 
         // Wrap the bundled code if success, otherwise let the error propagate
         return bundle(
             &widget_config.directory,
-            &widget_entry,
-            widget_config.node.as_ref().map(|package_json| &package_json.dependencies),
+            widget_entry,
+            apis_blob_url,
+            &widget_config.external_dependencies,
         )
         .context(format!("Failed to bundle widget (id={})", widget_id))
         .map_err(|e| cmderr!(e));
