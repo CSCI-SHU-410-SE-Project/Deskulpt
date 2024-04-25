@@ -112,10 +112,10 @@ export default function App() {
   async function rescanAndRender() {
     const states = await rescanWidgetBase();
     if (states !== null) {
-      const newStates = Object.fromEntries(
+      const addedStates = Object.fromEntries(
         Object.entries(states).filter(([widgetId]) => !(widgetId in widgetStates)),
       );
-      await renderWidgets(newStates);
+      await renderWidgets(addedStates);
     }
   }
 
