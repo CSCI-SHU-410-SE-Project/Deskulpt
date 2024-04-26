@@ -36,6 +36,13 @@ export interface RenderWidgetPayload {
 }
 
 /**
+ * The payload of the "remove-widgets" event.
+ */
+export interface RemoveWidgetsPayload {
+  removedIds: string[];
+}
+
+/**
  * The module obtained by dynamically importing the bundle of widget source code.
  */
 export interface WidgetModule {

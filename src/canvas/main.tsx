@@ -1,6 +1,11 @@
 import React from "react";
 import { Event as TauriEvent, listen } from "@tauri-apps/api/event";
-import { RenderWidgetPayload, WidgetModule, WidgetRecord } from "../types";
+import {
+  RenderWidgetPayload,
+  RemoveWidgetsPayload,
+  WidgetModule,
+  WidgetRecord,
+} from "../types";
 import { handleError, getDOMRoot, getWidgetModuleError } from "./utils";
 import { grabErrorInfo } from "../utils";
 import WidgetContainer from "../components/WidgetContainer";
@@ -85,6 +90,27 @@ listen("render-widget", (event: TauriEvent<RenderWidgetPayload>) => {
       );
     }
   }
+})
+  .then((unlisten) => {
+    window.addEventListener("beforeunload", unlisten);
+  })
+  .catch((err) => {
+    console.error(err);
+  });
+
+// Listen to the "remove-widgets" event, emitted by the manager
+listen("remove-widgets", (event: TauriEvent<RemoveWidgetsPayload>) => {
+  const { removedIds } = event.payload;
+
+  // Remove from canvas based on the received widget IDs and delete their records
+  removedIds.forEach((widgetId) => {
+    if (widgetId in widgetRecords) {
+      const widgetDOMRoot = widgetRecords[widgetId].root;
+      widgetDOMRoot.react.unmount();
+      widgetDOMRoot.html.remove();
+      delete widgetRecords[widgetId];
+    }
+  });
 })
   .then((unlisten) => {
     window.addEventListener("beforeunload", unlisten);

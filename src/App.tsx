@@ -27,19 +27,24 @@ export default function App() {
   async function rescanWidgetBase() {
     return await invoke<Record<string, WidgetConfig>>("refresh_widget_collection")
       .then(async (widgetConfigs) => {
-        const cleanupRemovedWidgets = (removedIds: string[]) => {
+        const cleanupRemovedWidgets = async (removedIds: string[]) => {
+          // Notify the canvas to cleanup resourced allocated for removed widgets
+          await emit("remove-widgets", { removedIds });
+
           // Revoke the API blob URLs of removed widgets for optimal performance and
           // memory usage as they will not be used anymore; even if the same widget ID
           // appears some time later, the blob URL will be recreated rather than reused
           removedIds.forEach((id) => URL.revokeObjectURL(widgetStates[id].apisBlobUrl));
         };
 
-        // If a widget exists in the previous states but does not exist in the newly
+        // If a widget exists in the previous states but does not exist in the new
         // scanning result, we consider it as removed and perform cleanup
         const removedIds = Object.keys(widgetStates).filter(
           (id) => !(id in widgetConfigs),
         );
-        cleanupRemovedWidgets(removedIds);
+        if (removedIds.length > 0) {
+          await cleanupRemovedWidgets(removedIds);
+        }
 
         const createWidgetState = async (
           widgetId: string,
@@ -98,15 +103,24 @@ export default function App() {
     );
   }
 
+  /**
+   * Rescan the widget base directory and render newly added widgets.
+   *
+   * Newly added widgets are those that exist in the new scanning result but does not
+   * exist in the previous states.
+   */
+  async function rescanAndRender() {
+    const states = await rescanWidgetBase();
+    if (states !== null) {
+      const addedStates = Object.fromEntries(
+        Object.entries(states).filter(([widgetId]) => !(widgetId in widgetStates)),
+      );
+      await renderWidgets(addedStates);
+    }
+  }
+
   useEffect(() => {
-    // Scan widget base directory and render all on mount
-    rescanWidgetBase()
-      .then(async (states) => {
-        if (states !== null) {
-          await renderWidgets(states);
-        }
-      })
-      .catch(console.error);
+    rescanAndRender().catch(console.error);
   }, []);
 
   return (
@@ -134,14 +148,14 @@ export default function App() {
             </ListItem>
           ))}
       </List>
-      <Button variant="outlined" onClick={rescanWidgetBase}>
+      <Button variant="outlined" onClick={rescanAndRender}>
         Rescan
       </Button>
       <Button variant="outlined" onClick={() => renderWidgets(widgetStates)}>
         Render All
       </Button>
       <Button variant="outlined" onClick={openWidgetBase}>
-        Open Widget Base Directory
+        View Widgets
       </Button>
     </Box>
   );
