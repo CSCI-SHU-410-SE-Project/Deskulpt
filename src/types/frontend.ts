@@ -3,6 +3,7 @@
  * without corresponding backend implementations.
  */
 
+import { ReactNode } from "react";
 import { Widget } from ".";
 import { Result, WidgetConfig, WidgetInternal } from "./backend";
 
@@ -31,7 +32,7 @@ export interface WidgetCanvasState {
   /** The internals of the widget. */
   internal: WidgetInternal;
   /** The rendered widget component or the error component to display. */
-  display: React.ReactNode;
+  display: ReactNode;
 }
 
 /**

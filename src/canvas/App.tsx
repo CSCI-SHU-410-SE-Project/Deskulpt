@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
   RemoveWidgetsPayload,
   RenderWidgetPayload,
@@ -17,7 +17,7 @@ export default function App(props: {
   initialInternals: Record<string, WidgetInternal>;
 }) {
   const { initialInternals } = props;
-  const [widgetCanvasStates, setWidgetCanvasStates] = React.useState<
+  const [widgetCanvasStates, setWidgetCanvasStates] = useState<
     Record<string, WidgetCanvasState>
   >({});
 

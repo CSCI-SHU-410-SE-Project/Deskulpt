@@ -1,6 +1,6 @@
 import { Box, Tooltip } from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
-import React from "react";
+import { ReactNode, useRef } from "react";
 import Draggable, { DraggableData, DraggableEvent } from "react-draggable";
 import { ErrorBoundary } from "react-error-boundary";
 import ErrorDisplay from "../ErrorDisplay";
@@ -16,10 +16,10 @@ export default function WidgetContainer(props: {
   id: string;
   internal: WidgetInternal;
   setInternal: (internal: WidgetInternal) => void;
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
   const { id, internal, setInternal, children } = props;
-  const containerRef = React.useRef(null);
+  const containerRef = useRef(null);
 
   /**
    * Update the container internal according to transform data.
