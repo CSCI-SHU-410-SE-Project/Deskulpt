@@ -2,8 +2,8 @@
 
 use crate::{
     bundler::bundle,
-    config::{read_widget_config, WidgetConfig},
-    states::{WidgetBaseDirectoryState, WidgetCollectionState},
+    config::{read_widget_config, WidgetConfigCollection},
+    states::{WidgetBaseDirectoryState, WidgetConfigCollectionState},
 };
 use anyhow::{Context, Error};
 use std::{collections::HashMap, fs::read_dir};
@@ -69,15 +69,19 @@ macro_rules! cmdbail {
 /// widget collection, intended to be used by the frontend to refresh the rendering of
 /// the widgets.
 ///
-/// This command will break early and return the `Failure` variant if:
+/// This command will fail if:
 ///
-/// - There is an error when reading the widget base directory.
-/// - There is an error when loading the widget configuration.
-/// - There is an error implying the widget ID from its path.
+/// - There is an error reading the widget base directory.
+/// - There is an error getting some entry in the widget base directory.
+/// - There is an error inferring the widget ID from the path of the entry.
+///
+/// Note that failure to load a widget configuration will not lead to an overall failure
+/// of the command. Instead, the widget ID will correspond to an error message instead
+/// of a widget configuration.
 #[command]
 pub(crate) fn refresh_widget_collection(
     app_handle: AppHandle,
-) -> CommandOut<HashMap<String, WidgetConfig>> {
+) -> CommandOut<WidgetConfigCollection> {
     let widget_base = &app_handle.state::<WidgetBaseDirectoryState>().0;
     let mut new_widget_collection = HashMap::new();
 
@@ -97,28 +101,32 @@ pub(crate) fn refresh_widget_collection(
         if !path.is_dir() {
             continue; // Non-directory entries are not widgets, skip
         }
+        let widget_id = match path.file_name() {
+            Some(file_name) => file_name.to_string_lossy().to_string(),
+            None => cmdbail!("Cannot infer widget ID from '{}'", path.display()),
+        };
 
         // Load the widget configuration and raise on error
         let widget_config = match read_widget_config(&path) {
             Ok(widget_config) => widget_config,
-            Err(e) => cmdbail!(e),
+            Err(e) => {
+                // We should not fail the whole command if some widget configuration
+                // fails to be loaded; instead we record the error corresponding to the
+                // widget ID
+                new_widget_collection.insert(widget_id, Err(cmderr!(e)));
+                continue;
+            },
         };
 
         // Widget configuration being `None` means that the directory is not a widget
         // that is meant to be rendered
         if let Some(widget_config) = widget_config {
-            let widget_id = match path.file_name() {
-                Some(file_name) => file_name.to_string_lossy().to_string(),
-                None => cmdbail!("Failed to get file name"),
-            };
-
-            // All checks passed, insert into the new widget collection
-            new_widget_collection.insert(widget_id, widget_config);
+            new_widget_collection.insert(widget_id, Ok(widget_config));
         }
     }
 
     // Update the widget collection state
-    let widget_collection = app_handle.state::<WidgetCollectionState>();
+    let widget_collection = app_handle.state::<WidgetConfigCollectionState>();
     *widget_collection.0.lock().unwrap() = new_widget_collection.clone();
     Ok(new_widget_collection)
 }
@@ -132,9 +140,11 @@ pub(crate) fn refresh_widget_collection(
 /// The command also requires the URL of the APIs blob of the widget. This is used for
 /// replacing the imports of `@deskulpt-test/apis` by the actual URL to import from.
 ///
-/// This command will return the `Failure` variant if:
+/// This command will fail if:
 ///
 /// - The widget ID is not found in the state of the widget collection.
+/// - The widget collection state corresponding to the widget ID is an error message
+///   instead of a widget configuration.
 /// - There is an error when bundling the widget.
 #[command]
 pub(crate) fn bundle_widget(
@@ -142,10 +152,14 @@ pub(crate) fn bundle_widget(
     widget_id: String,
     apis_blob_url: String,
 ) -> CommandOut<String> {
-    let widget_collection_state = &app_handle.state::<WidgetCollectionState>();
+    let widget_collection_state = &app_handle.state::<WidgetConfigCollectionState>();
     let widget_collection = widget_collection_state.0.lock().unwrap();
 
     if let Some(widget_config) = widget_collection.get(&widget_id) {
+        let widget_config = match widget_config.as_ref() {
+            Ok(widget_config) => widget_config,
+            Err(e) => cmdbail!(e.clone()),
+        };
         // Obtain the absolute path of the widget entry point
         let widget_entry =
             &widget_config.directory.join(&widget_config.deskulpt_conf.entry);
@@ -167,8 +181,8 @@ pub(crate) fn bundle_widget(
 
 /// Command for opening the widget base directory.
 ///
-/// This command will return the `Failure` variant if Tauri fails to open the widget
-/// base directory, most likely because a misconfigured allow list.
+/// This command will fail if Tauri fails to open the widget base directory, most likely
+/// because of a misconfigured allow list.
 #[command]
 pub(crate) fn open_widget_base(app_handle: AppHandle) -> CommandOut<()> {
     let widget_base = &app_handle.state::<WidgetBaseDirectoryState>().0;

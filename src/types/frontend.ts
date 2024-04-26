@@ -5,7 +5,7 @@
 
 import ReactDOM from "react-dom/client";
 import { Widget } from ".";
-import { WidgetConfig } from "./backend";
+import { Result, WidgetConfig } from "./backend";
 
 /**
  * The state of a widget.
@@ -20,7 +20,7 @@ import { WidgetConfig } from "./backend";
  */
 export interface WidgetState {
   /** [SHARED] Widget configuration. */
-  config: WidgetConfig;
+  config: Result<WidgetConfig, string>;
   /** [FRONTEND] Import URL of the widget APIs. */
   apisBlobUrl: string;
 }

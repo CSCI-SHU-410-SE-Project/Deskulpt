@@ -8,6 +8,9 @@ use std::{
     path::{Path, PathBuf},
 };
 
+/// The collection of widget configurations or errors.
+pub(crate) type WidgetConfigCollection = HashMap<String, Result<WidgetConfig, String>>;
+
 /// Full configuration of a widget.
 #[derive(Clone, Serialize)]
 #[cfg_attr(test, derive(PartialEq, Debug))]
