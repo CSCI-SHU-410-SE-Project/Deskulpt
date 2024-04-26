@@ -111,7 +111,7 @@ pub(crate) fn bundle(
         // this module is not available when runnning the bundled code in the browser,
         // so we have to use the "classic" transform instead. The "classic" transform
         // requires `React` to be in scope, which we can require users to bring into
-        // scope by assigning `const React = window.__DESKULPT__.React`.
+        // scope by importing `import React from "@deskulpt-test/react";`.
         let mut jsx_transform = jsx::<SingleThreadedComments>(
             cm.clone(),
             None,

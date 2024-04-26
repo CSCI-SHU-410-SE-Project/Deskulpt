@@ -1,4 +1,3 @@
-import React from "react";
 import { Event as TauriEvent, listen } from "@tauri-apps/api/event";
 import {
   RenderWidgetPayload,
@@ -9,8 +8,6 @@ import {
 import { handleError, getDOMRoot, getWidgetModuleError } from "./utils";
 import { grabErrorInfo } from "../utils";
 import WidgetContainer from "../components/WidgetContainer";
-
-window.__DESKULPT__ = { defaultDeps: { React } };
 
 const canvas = document.getElementById("canvas")!;
 const widgetRecords: Record<string, WidgetRecord> = {};
