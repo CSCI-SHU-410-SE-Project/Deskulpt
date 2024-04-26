@@ -1,9 +1,36 @@
 //! The module configures the system tray of Deskulpt.
 
 use tauri::{
-    AppHandle, CustomMenuItem, GlobalWindowEvent, Manager, SystemTray, SystemTrayEvent,
-    SystemTrayMenu, WindowBuilder, WindowEvent,
+    App, AppHandle, CustomMenuItem, GlobalWindowEvent, Manager, SystemTray,
+    SystemTrayEvent, SystemTrayMenu, WindowBuilder, WindowEvent, WindowUrl,
 };
+
+#[cfg(target_os = "macos")]
+use objc::{msg_send, runtime::Object, sel, sel_impl};
+
+#[cfg(target_os = "macos")]
+extern "C" {
+    fn CGWindowLevelForKey(key: i32) -> i32;
+}
+
+pub(crate) fn create_canvas(app: &mut App) -> Result<(), Box<dyn std::error::Error>> {
+    let canvas =
+        WindowBuilder::new(app, "canvas", WindowUrl::App("views/canvas.html".into()))
+            .maximized(true)
+            .transparent(true)
+            .decorations(false)
+            .build()?;
+
+    #[cfg(target_os = "macos")]
+    {
+        let ns_window = canvas.ns_window()? as *mut Object;
+        unsafe {
+            let () = msg_send![ns_window, setLevel:CGWindowLevelForKey(18)];
+        }
+    }
+
+    Ok(())
+}
 
 /// Listen to global window events.
 ///
@@ -28,6 +55,7 @@ pub(crate) fn listen_to_windows(e: GlobalWindowEvent) {
 pub(crate) fn get_system_tray() -> SystemTray {
     let tray_menu = SystemTrayMenu::new()
         .add_item(CustomMenuItem::new("manage", "Manage"))
+        .add_item(CustomMenuItem::new("focus", "Focus"))
         .add_item(CustomMenuItem::new("exit", "Exit"));
     SystemTray::new().with_menu(tray_menu)
 }
@@ -45,11 +73,12 @@ pub(crate) fn listen_to_system_tray(app_handle: &AppHandle, event: SystemTrayEve
     match event {
         SystemTrayEvent::MenuItemClick { id, .. } => match id.as_str() {
             "manage" => show_manager_window(app_handle),
+            "focus" => focus_canvas_window(app_handle),
             "exit" => app_handle.exit(0),
             _ => {},
         },
         SystemTrayEvent::LeftClick { .. } => {
-            show_manager_window(app_handle);
+            focus_canvas_window(app_handle);
         },
         _ => {},
     }
@@ -64,11 +93,17 @@ fn show_manager_window(app_handle: &AppHandle) {
         // Failed to get the manager window; we create a new one from the existing
         // configuration instead; note that the manager window is the second item in
         // the window list in `tauri.conf.json5`
-        let config = app_handle.config().tauri.windows.get(1).unwrap().clone();
+        let config = app_handle.config().tauri.windows.get(0).unwrap().clone();
         // Discard any error if the window fails to be built, because this likely means
         // that the manager window is still there
         WindowBuilder::from_config(app_handle, config.clone()).build().ok()
     }) {
         let _ = manager.show(); // Discard any error
     }
+}
+
+fn focus_canvas_window(app_handle: &AppHandle) {
+    let canvas =
+        app_handle.get_window("canvas").expect("Failed to get the canvas window");
+    canvas.set_focus().expect("Failed to focus on the canvas window");
 }

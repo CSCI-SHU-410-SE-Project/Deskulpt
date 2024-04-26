@@ -4,10 +4,30 @@ import { RenderWidgetPayload, WidgetModule, WidgetRecord } from "../types";
 import { handleError, getDOMRoot, getWidgetModuleError } from "./utils";
 import { grabErrorInfo } from "../utils";
 import WidgetContainer from "../components/WidgetContainer";
+import { appWindow } from "@tauri-apps/api/window";
 
 window.__DESKULPT__ = { defaultDeps: { React } };
 
+let timer: NodeJS.Timeout;
 const canvas = document.getElementById("canvas")!;
+
+window.addEventListener("mousemove", (e) => {
+  if (e.target === document.documentElement || e.target === canvas) {
+    console.log("[IGNORE b/c TARGET]");
+    void appWindow.setIgnoreCursorEvents(true);
+    if (timer) {
+      clearTimeout(timer);
+    }
+    timer = setTimeout(() => {
+      console.log("[UNIGNORE b/c TIMEOUT]");
+      void appWindow.setIgnoreCursorEvents(false);
+    }, 100);
+  } else {
+    console.log("[UNIGNORE b/c EMPTY]");
+    void appWindow.setIgnoreCursorEvents(false);
+  }
+});
+
 const widgetRecords: Record<string, WidgetRecord> = {};
 
 // Listen to the "render-widget" event, emitted by the manager

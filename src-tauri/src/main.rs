@@ -27,6 +27,10 @@ fn main() {
 
     Builder::default()
         // Additional application setup
+        .setup(|app| {
+            setup::create_canvas(app)?;
+            Ok(())
+        })
         .system_tray(setup::get_system_tray())
         .on_system_tray_event(setup::listen_to_system_tray)
         .on_window_event(setup::listen_to_windows)

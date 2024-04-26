@@ -10,6 +10,7 @@
     version: "0.0.0",
   },
   tauri: {
+    macOSPrivateApi: true,
     allowlist: {
       all: false,
       shell: {
@@ -19,13 +20,12 @@
         // https://discordapp.com/channels/616186924390023171/1224276907215028325
         open: ".+",
       },
+      window: {
+        all: false,
+        setIgnoreCursorEvents: true,
+      },
     },
     windows: [
-      {
-        label: "canvas",
-        title: "Deskulpt Canvas",
-        url: "views/canvas.html",
-      },
       {
         label: "manager",
         title: "Deskulpt Manager",
