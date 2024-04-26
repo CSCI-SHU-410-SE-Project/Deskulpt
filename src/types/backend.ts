@@ -21,3 +21,9 @@ export interface DeskulptConf {
   entry: string;
   ignore: boolean;
 }
+
+/** See `states.rs` for its backend counterpart. */
+export interface WidgetInternal {
+  x: number;
+  y: number;
+}

@@ -22,5 +22,5 @@ export interface Widget {
    *
    * @returns The React element to render.
    */
-  render: () => React.ReactElement;
+  render: () => React.ReactNode;
 }

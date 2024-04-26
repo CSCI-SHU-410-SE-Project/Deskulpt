@@ -1,58 +1,72 @@
 import { Box, Tooltip } from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
 import React from "react";
-import Draggable from "react-draggable";
+import Draggable, { DraggableData, DraggableEvent } from "react-draggable";
 import { ErrorBoundary } from "react-error-boundary";
 import ErrorDisplay from "../ErrorDisplay";
 import { grabErrorInfo } from "../../utils";
+import { WidgetInternal } from "../../types";
 
 /**
  * The widget container component.
  *
- * It is wrapped in `React.StrictMode` and should be rendered directly under the DOM
- * root. It requires the following `props`:
- *
- * - `id`: The ID of the widget to render.
- * - `inner`: The JSX element to render inside the container.
+ * It is a draggable and styled container that wraps the component to be displayed.
  */
 export default function WidgetContainer(props: {
   id: string;
-  inner: React.ReactElement;
+  internal: WidgetInternal;
+  setInternal: (internal: WidgetInternal) => void;
+  children: React.ReactNode;
 }) {
+  const { id, internal, setInternal, children } = props;
   const containerRef = React.useRef(null);
-  const { id, inner } = props;
+
+  /**
+   * Update the container internal according to transform data.
+   *
+   * By default the `Draggable` component uses `transform` to move the container. This,
+   * however, causes mouse events to be misaligned with the actual position of the
+   * container. The workaround is to force zero `transform` and manually update the
+   * aboluste position of the container according to the data reported by `Draggable`.
+   */
+  function updateContainerPos(_: DraggableEvent, data: DraggableData) {
+    setInternal({ x: internal.x + data.x, y: internal.y + data.y });
+  }
 
   return (
-    <React.StrictMode>
-      <Draggable nodeRef={containerRef}>
-        <Box
-          ref={containerRef}
-          sx={{
-            px: 2,
-            py: 1,
-            m: 1,
-            borderRadius: 1,
-            border: "2px solid black",
-            bgcolor: "rgba(0, 0, 0, 0.2)",
-          }}
-        >
-          <Tooltip title={id} placement="left">
-            <InfoIcon
-              sx={{
-                position: "absolute",
-                top: 5,
-                right: 5,
-                zIndex: 2000,
-                fontSize: 15,
-              }}
-            />
-          </Tooltip>
-          <ErrorBoundary fallbackRender={(props) => FallBack(id, props)}>
-            {inner}
-          </ErrorBoundary>
-        </Box>
-      </Draggable>
-    </React.StrictMode>
+    <Draggable
+      nodeRef={containerRef}
+      position={{ x: 0, y: 0 }}
+      onStop={updateContainerPos}
+    >
+      <Box
+        ref={containerRef}
+        sx={{
+          padding: 1,
+          borderRadius: 1,
+          border: "2px solid black",
+          backgroundColor: "rgba(0, 0, 0, 0.2)",
+          position: "absolute",
+          left: internal.x,
+          top: internal.y,
+        }}
+      >
+        <Tooltip title={id} placement="left">
+          <InfoIcon
+            sx={{
+              position: "absolute",
+              top: 5,
+              right: 5,
+              zIndex: 2000,
+              fontSize: 15,
+            }}
+          />
+        </Tooltip>
+        <ErrorBoundary fallbackRender={(props) => FallBack(id, props)}>
+          {children}
+        </ErrorBoundary>
+      </Box>
+    </Draggable>
   );
 }
 

@@ -3,10 +3,17 @@
 use crate::{
     bundler::bundle,
     config::{read_widget_config, WidgetConfigCollection},
-    states::{WidgetBaseDirectoryState, WidgetConfigCollectionState},
+    states::{
+        WidgetBaseDirectoryState, WidgetConfigCollectionState, WidgetInternal,
+        WidgetInternalsState,
+    },
 };
 use anyhow::{Context, Error};
-use std::{collections::HashMap, fs::read_dir};
+use std::{
+    collections::HashMap,
+    fs::{read_dir, File},
+    io::BufWriter,
+};
 use tauri::{api, command, AppHandle, Manager};
 
 /// Alias for `Result<T, String>`.
@@ -189,4 +196,38 @@ pub(crate) fn open_widget_base(app_handle: AppHandle) -> CommandOut<()> {
 
     api::shell::open(&app_handle.shell_scope(), widget_base.to_string_lossy(), None)
         .map_err(|e| cmderr!(e))
+}
+
+/// Command for requesting the widget internals state.
+#[command]
+pub(crate) fn get_widget_internals(
+    app_handle: AppHandle,
+) -> CommandOut<HashMap<String, WidgetInternal>> {
+    let widget_internals = &app_handle.state::<WidgetInternalsState>().0;
+    Ok(widget_internals.clone())
+}
+
+/// Command for exiting the application.
+///
+/// This command will write the widget internals as JSON for persistence and then exit
+/// the application. This could fail in rare cases but we do not really care.
+#[command]
+pub(crate) fn exit_app(
+    app_handle: AppHandle,
+    widget_internals: HashMap<String, WidgetInternal>,
+) -> CommandOut<()> {
+    let internals_path = match app_handle.path_resolver().app_config_dir() {
+        Some(app_config_dir) => app_config_dir.join(".deskulpt.json"),
+        None => cmdbail!("Failed to get app config directory"),
+    };
+
+    // We do not care about previous internals, so we overwrite the whole file
+    let internals_file = File::create(internals_path).map_err(|e| cmderr!(e))?;
+    let internals_writer = BufWriter::new(internals_file);
+    serde_json::to_writer(internals_writer, &widget_internals)
+        .map_err(|e| cmderr!(e))?;
+
+    // Exit the application
+    app_handle.exit(0);
+    Ok(())
 }

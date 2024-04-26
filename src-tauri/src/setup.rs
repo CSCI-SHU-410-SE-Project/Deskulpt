@@ -10,7 +10,8 @@ use tauri::{
 /// This is to be initialized with `builder.on_window_event(listen_to_windows)` on the
 /// application builder instance. It does the following:
 ///
-/// - Prevent the manager window from closing when the close button is clicked.
+/// - Prevent the manager window from closing when the close button is clicked but hide
+///   it instead.
 pub(crate) fn listen_to_windows(e: GlobalWindowEvent) {
     if let WindowEvent::CloseRequested { api, .. } = e.event() {
         let window = e.window();
@@ -40,12 +41,13 @@ pub(crate) fn get_system_tray() -> SystemTray {
 /// - When left-clicking the tray icon or clicking the "manage" menu item, show the
 ///   manager window. Note that left-clicking is unsupported on Linux, so the "manage"
 ///   menu item is present as a workaround.
-/// - When clicking the "exit" menu item, exit the application (with cleanup).
+/// - When clicking the "exit" menu item, exit the application (with cleanup). This
+///   should, in production, be the only normal way to exit the application.
 pub(crate) fn listen_to_system_tray(app_handle: &AppHandle, event: SystemTrayEvent) {
     match event {
         SystemTrayEvent::MenuItemClick { id, .. } => match id.as_str() {
             "manage" => show_manager_window(app_handle),
-            "exit" => app_handle.exit(0),
+            "exit" => on_app_exit(app_handle),
             _ => {},
         },
         SystemTrayEvent::LeftClick { .. } => {
@@ -70,5 +72,21 @@ fn show_manager_window(app_handle: &AppHandle) {
         WindowBuilder::from_config(app_handle, config.clone()).build().ok()
     }) {
         let _ = manager.show(); // Discard any error
+    }
+}
+
+/// The cleanup function to be called on application exit.
+fn on_app_exit(app_handle: &AppHandle) {
+    if app_handle.get_window("canvas").is_none() {
+        // Exit immediately if the canvas window does not exist
+        app_handle.exit(0);
+    };
+
+    // Emit the "exit-app" event to the canvas window so that it can save the widget
+    // internals to a file before the application exists; it will be in charge of
+    // exiting the application
+    if app_handle.emit_to("canvas", "exit-app", ()).is_err() {
+        // Exit immediately if the event fails to be emitted
+        app_handle.exit(0);
     }
 }

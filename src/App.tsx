@@ -82,7 +82,9 @@ export default function App() {
    * corresponding "render-widget" event. The canvas will listen to this event and
    * manage the actual rendering.
    */
-  async function renderWidget(widgetId: string, apisBlobUrl: string) {
+  async function renderWidget(widgetId: string, state: WidgetState) {
+    const { apisBlobUrl } = state;
+
     await invoke<string>("bundle_widget", { widgetId, apisBlobUrl })
       .then(async (bundlerOutput) => {
         await emit("render-widget", { widgetId, bundlerOutput, success: true });
@@ -98,7 +100,7 @@ export default function App() {
   async function renderWidgets(states: Record<string, WidgetState>) {
     await Promise.all(
       Object.entries(states).map(([widgetId, widgetState]) =>
-        renderWidget(widgetId, widgetState.apisBlobUrl),
+        renderWidget(widgetId, widgetState),
       ),
     );
   }
@@ -133,9 +135,7 @@ export default function App() {
               key={widgetId}
               secondaryAction={
                 <IconButton
-                  onClick={() =>
-                    renderWidget(widgetId, widgetStates[widgetId].apisBlobUrl)
-                  }
+                  onClick={() => renderWidget(widgetId, widgetStates[widgetId])}
                 >
                   <RefreshIcon />
                 </IconButton>
