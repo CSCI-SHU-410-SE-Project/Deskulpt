@@ -25,13 +25,12 @@ fn main() {
         .on_window_event(setup::listen_to_windows)
         // Initialize state management
         .manage(states::WidgetBaseDirectoryState::init(config))
-        .manage(states::WidgetInternalsState::init(config))
         .manage(states::WidgetConfigCollectionState::default())
         // Register internal command handlers
         .invoke_handler(generate_handler![
             commands::bundle_widget,
             commands::exit_app,
-            commands::get_widget_internals,
+            commands::init_widget_internals,
             commands::open_widget_base,
             commands::refresh_widget_collection,
         ])

@@ -1,5 +1,7 @@
 //! The module configures the system tray of Deskulpt.
 
+use std::{thread::sleep, time::Duration};
+
 use tauri::{
     AppHandle, CustomMenuItem, GlobalWindowEvent, Manager, SystemTray, SystemTrayEvent,
     SystemTrayMenu, WindowBuilder, WindowEvent,
@@ -89,4 +91,9 @@ fn on_app_exit(app_handle: &AppHandle) {
         // Exit immediately if the event fails to be emitted
         app_handle.exit(0);
     }
+
+    // This is a safeguard to ensure that the application exists in case the canvas
+    // window fails to do so; we give it 5 seconds to exit
+    sleep(Duration::from_secs(5));
+    app_handle.exit(0);
 }

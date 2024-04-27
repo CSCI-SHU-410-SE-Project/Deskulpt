@@ -3,15 +3,13 @@
 use crate::{
     bundler::bundle,
     config::{read_widget_config, WidgetConfigCollection},
-    states::{
-        WidgetBaseDirectoryState, WidgetConfigCollectionState, WidgetInternal,
-        WidgetInternalsState,
-    },
+    states::{WidgetBaseDirectoryState, WidgetConfigCollectionState},
 };
 use anyhow::{Context, Error};
+use serde::{Deserialize, Serialize};
 use std::{
     collections::HashMap,
-    fs::{read_dir, File},
+    fs::{read_dir, read_to_string, File},
     io::BufWriter,
 };
 use tauri::{api, command, AppHandle, Manager};
@@ -198,13 +196,42 @@ pub(crate) fn open_widget_base(app_handle: AppHandle) -> CommandOut<()> {
         .map_err(|e| cmderr!(e))
 }
 
-/// Command for requesting the widget internals state.
+/// The internals of widgets.
+///
+/// The internals of widgets refer to configurations that are not controlled by the
+/// configuration file but rather controlled by the frontend. They should initially be
+/// loaded from a `.deskulpt.json` file on app startup, managed by the frontend during
+/// the runtime of the app, and saved back to the file before app shutdown.
+#[derive(Clone, Deserialize, Serialize)]
+pub(crate) struct WidgetInternal {
+    x: i32,
+    y: i32,
+}
+
+/// Command for initializing the widget internals state.
+///
+/// This command tries to load the previously stored widget internals located at
+/// `$APPCONFIG/.deskulpt.json`. This command never fails, but instead returns an empty
+/// widget internals mapping whenever there is an error loading the file.
 #[command]
-pub(crate) fn get_widget_internals(
+pub(crate) fn init_widget_internals(
     app_handle: AppHandle,
 ) -> CommandOut<HashMap<String, WidgetInternal>> {
-    let widget_internals = &app_handle.state::<WidgetInternalsState>().0;
-    Ok(widget_internals.clone())
+    let app_config_dir = match app_handle.path_resolver().app_config_dir() {
+        Some(app_config_dir) => app_config_dir,
+        None => return Ok(Default::default()),
+    };
+
+    let internals_path = app_config_dir.join(".deskulpt.json");
+    if !internals_path.exists() {
+        return Ok(Default::default());
+    }
+
+    let internals = match read_to_string(&internals_path) {
+        Ok(content) => serde_json::from_str(&content).unwrap_or_default(),
+        Err(_) => Default::default(),
+    };
+    Ok(internals)
 }
 
 /// Command for exiting the application.
@@ -227,7 +254,6 @@ pub(crate) fn exit_app(
     serde_json::to_writer(internals_writer, &widget_internals)
         .map_err(|e| cmderr!(e))?;
 
-    // Exit the application
     app_handle.exit(0);
     Ok(())
 }
