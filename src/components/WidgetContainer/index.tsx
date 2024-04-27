@@ -25,9 +25,10 @@ export default function WidgetContainer(props: {
    * Update the container internal according to transform data.
    *
    * By default the `Draggable` component uses `transform` to move the container. This,
-   * however, causes mouse events to be misaligned with the actual position of the
-   * container. The workaround is to force zero `transform` and manually update the
-   * aboluste position of the container according to the data reported by `Draggable`.
+   * however, makes it impossible to obtain the actual position of the container, and
+   * can cause mouse events to be misaligned with the actual position of the container.
+   * The solution is to force zero `transform` and manually update the absolute position
+   * of the container on dragging termination based on data reported by `Draggable`.
    */
   function updateContainerPos(_: DraggableEvent, data: DraggableData) {
     setInternal({ x: internal.x + data.x, y: internal.y + data.y });
