@@ -2,16 +2,14 @@
 
 use crate::{
     bundler::bundle,
-    config::{read_widget_config, WidgetConfigCollection},
+    config::{
+        read_widget_config, read_widget_internals, write_widget_internals,
+        WidgetConfigCollection, WidgetInternal,
+    },
     states::{WidgetBaseDirectoryState, WidgetConfigCollectionState},
 };
 use anyhow::{Context, Error};
-use serde::{Deserialize, Serialize};
-use std::{
-    collections::HashMap,
-    fs::{read_dir, read_to_string, File},
-    io::BufWriter,
-};
+use std::{collections::HashMap, fs::read_dir};
 use tauri::{api, command, AppHandle, Manager};
 
 /// Alias for `Result<T, String>`.
@@ -196,23 +194,10 @@ pub(crate) fn open_widget_base(app_handle: AppHandle) -> CommandOut<()> {
         .map_err(|e| cmderr!(e))
 }
 
-/// The internals of widgets.
-///
-/// The internals of widgets refer to configurations that are not controlled by the
-/// configuration file but rather controlled by the frontend. They should initially be
-/// loaded from a `.deskulpt.json` file on app startup, managed by the frontend during
-/// the runtime of the app, and saved back to the file before app shutdown.
-#[derive(Clone, Deserialize, Serialize)]
-pub(crate) struct WidgetInternal {
-    x: i32,
-    y: i32,
-}
-
 /// Command for initializing the widget internals state.
 ///
-/// This command tries to load the previously stored widget internals located at
-/// `$APPCONFIG/.deskulpt.json`. This command never fails, but instead returns an empty
-/// widget internals mapping whenever there is an error loading the file.
+/// This command tries to load the previously stored widget internals located at. It
+/// never fails, but instead returns an empty widget internals mapping upon any error.
 #[command]
 pub(crate) fn init_widget_internals(
     app_handle: AppHandle,
@@ -221,39 +206,27 @@ pub(crate) fn init_widget_internals(
         Some(app_config_dir) => app_config_dir,
         None => return Ok(Default::default()),
     };
-
-    let internals_path = app_config_dir.join(".deskulpt.json");
-    if !internals_path.exists() {
-        return Ok(Default::default());
-    }
-
-    let internals = match read_to_string(&internals_path) {
-        Ok(content) => serde_json::from_str(&content).unwrap_or_default(),
-        Err(_) => Default::default(),
-    };
-    Ok(internals)
+    Ok(read_widget_internals(&app_config_dir))
 }
 
-/// Command for exiting the application.
+/// Command for cleaning up and exiting the application.
 ///
-/// This command will write the widget internals as JSON for persistence and then exit
-/// the application. This could fail in rare cases but we do not really care.
+/// This command will try to save the widget internals for persistence before exiting
+/// the application, but failure to do so will not prevent the application from exiting.
 #[command]
 pub(crate) fn exit_app(
     app_handle: AppHandle,
     widget_internals: HashMap<String, WidgetInternal>,
 ) -> CommandOut<()> {
-    let internals_path = match app_handle.path_resolver().app_config_dir() {
-        Some(app_config_dir) => app_config_dir.join(".deskulpt.json"),
-        None => cmdbail!("Failed to get app config directory"),
+    let app_config_dir = match app_handle.path_resolver().app_config_dir() {
+        Some(app_config_dir) => app_config_dir,
+        None => {
+            app_handle.exit(0);
+            return Ok(());
+        },
     };
 
-    // We do not care about previous internals, so we overwrite the whole file
-    let internals_file = File::create(internals_path).map_err(|e| cmderr!(e))?;
-    let internals_writer = BufWriter::new(internals_file);
-    serde_json::to_writer(internals_writer, &widget_internals)
-        .map_err(|e| cmderr!(e))?;
-
+    let _ = write_widget_internals(&app_config_dir, &widget_internals);
     app_handle.exit(0);
     Ok(())
 }
