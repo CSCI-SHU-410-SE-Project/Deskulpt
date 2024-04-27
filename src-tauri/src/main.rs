@@ -41,6 +41,7 @@ fn main() {
         ])
         // Register widget API plugins
         .plugin(widget_api::fs::init())
+        .plugin(widget_api::sys::init())
         .run(context)
         .expect("Error running the Deskulpt application");
 }
