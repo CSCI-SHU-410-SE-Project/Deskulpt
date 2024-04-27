@@ -34,6 +34,7 @@ fn main() {
         ])
         // Initialize widget apis
         .plugin(widget_api::fs::init())
+        .plugin(widget_api::sys::init())
         .run(context)
         .expect("FATAL");
 }

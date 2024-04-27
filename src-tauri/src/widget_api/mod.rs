@@ -5,3 +5,4 @@
 //! `invoke("plugin:widget_api.fs|read_file", ...)`.
 
 pub(crate) mod fs;
+pub(crate) mod sys;
