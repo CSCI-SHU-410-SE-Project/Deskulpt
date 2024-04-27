@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, ReactNode } from "react";
 import {
   RemoveWidgetsPayload,
   RenderWidgetPayload,
@@ -40,6 +40,21 @@ export default function App(props: {
   }
 
   /**
+   * Set the canvas state of a specific widget.
+   *
+   * The internals will be obtained with the `getWidgetInternal` function.
+   */
+  function setWidgetCanvasState(widgetId: string, display: ReactNode) {
+    setWidgetCanvasStates((prev) => ({
+      ...prev,
+      [widgetId]: {
+        internal: getWidgetInternal(widgetId),
+        display,
+      },
+    }));
+  }
+
+  /**
    * Set the internals of a specific widget.
    */
   function setWidgetInternal(widgetId: string, internal: WidgetInternal) {
@@ -70,59 +85,38 @@ export default function App(props: {
               // Early return before rendering if there are known errors in the widget
               const widgetModuleError = getWidgetModuleError(module);
               if (widgetModuleError !== null) {
-                setWidgetCanvasStates((prev) => ({
-                  ...prev,
-                  [widgetId]: {
-                    internal: getWidgetInternal(widgetId),
-                    display: (
-                      <ErrorDisplay
-                        title={`Error in '${widgetId}': invalid widget module`}
-                        error={widgetModuleError}
-                      />
-                    ),
-                  },
-                }));
+                setWidgetCanvasState(
+                  widgetId,
+                  <ErrorDisplay
+                    title={`Error in '${widgetId}': invalid widget module`}
+                    error={widgetModuleError}
+                  />,
+                );
                 return;
               }
 
               // We have validated the module and can call the `render` function safely
               const widget = module.default;
-              setWidgetCanvasStates((prev) => ({
-                ...prev,
-                [widgetId]: {
-                  internal: getWidgetInternal(widgetId),
-                  display: widget.render(),
-                },
-              }));
+              setWidgetCanvasState(widgetId, widget.render());
             })
             .catch((err) => {
-              setWidgetCanvasStates((prev) => ({
-                ...prev,
-                [widgetId]: {
-                  internal: getWidgetInternal(widgetId),
-                  display: (
-                    <ErrorDisplay
-                      title={`Error in '${widgetId}': widget module failed to be imported`}
-                      error={grabErrorInfo(err)}
-                    />
-                  ),
-                },
-              }));
+              setWidgetCanvasState(
+                widgetId,
+                <ErrorDisplay
+                  title={`Error in '${widgetId}': widget module failed to be imported`}
+                  error={grabErrorInfo(err)}
+                />,
+              );
             });
         } else {
           // In this case the bundler output is the error message
-          setWidgetCanvasStates((prev) => ({
-            ...prev,
-            [widgetId]: {
-              internal: getWidgetInternal(widgetId),
-              display: (
-                <ErrorDisplay
-                  title={`Error in '${widgetId}': widget failed to be bundled`}
-                  error={bundlerOutput}
-                />
-              ),
-            },
-          }));
+          setWidgetCanvasState(
+            widgetId,
+            <ErrorDisplay
+              title={`Error in '${widgetId}': widget failed to be bundled`}
+              error={bundlerOutput}
+            />,
+          );
         }
       },
     );
