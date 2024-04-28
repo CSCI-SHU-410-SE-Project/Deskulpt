@@ -7,20 +7,46 @@ use tauri::{
     App, AppHandle, Manager, WebviewUrl, WebviewWindowBuilder, Window, WindowEvent,
 };
 
+#[cfg(target_os = "macos")]
+use objc::{
+    msg_send,
+    runtime::{Object, NO},
+    sel, sel_impl,
+};
+
 /// Create the canvas window.
 pub(crate) fn create_canvas(app: &App) -> Result<(), Box<dyn std::error::Error>> {
-    let canvas = WebviewWindowBuilder::new(app, "canvas", WebviewUrl::App("views/canvas.html".into()))
-        .maximized(true)
-        .transparent(true)
-        .decorations(false)
-        .always_on_bottom(true)
-        .skip_taskbar(true) // Do not show in taskbar
-        .visible(false)
-        .build()?;
+    let builder = WebviewWindowBuilder::new(
+        app,
+        "canvas",
+        WebviewUrl::App("views/canvas.html".into()),
+    )
+    .maximized(true)
+    .transparent(true)
+    .decorations(false)
+    .always_on_bottom(true)
+    .skip_taskbar(true);
 
-    // On Windows, `always_on_bottom` fails to set the window to bottom on launch; this
-    // is a dirty workaround, though it causes flickering on launch
+    #[cfg(target_os = "windows")]
+    // The TAO implementation of always-on-bottom fails to set the window to bottom
+    // upon creation; interestingly hiding and showing the window solves this issue,
+    // though sometimes with flickering
+    builder.visible(false);
+
+    // Build the canvas window
+    let canvas = builder.build()?;
+
+    #[cfg(target_os = "windows")]
     canvas.show()?;
+
+    #[cfg(target_os = "macos")]
+    // Disable the window shadow on macOS; there will be shadows left on movement for
+    // transparent and undecorated windows that we are using; it seems that disabling
+    // shadows does not have significant visual impacts
+    unsafe {
+        let ns_window = canvas.ns_window()? as *mut Object;
+        let () = msg_send![ns_window, setHasShadow:NO];
+    }
 
     // Be consistent with the default of `CanvasClickThroughState`
     canvas.set_ignore_cursor_events(true)?;
