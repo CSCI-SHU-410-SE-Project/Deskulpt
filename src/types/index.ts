@@ -2,7 +2,7 @@
  * This file contains definitions of all types and interfaces.
  */
 
-import React from "react";
+import { ReactNode } from "react";
 
 export * from "./backend";
 export * from "./frontend";
@@ -22,5 +22,5 @@ export interface Widget {
    *
    * @returns The React element to render.
    */
-  render: () => React.ReactElement;
+  render: () => ReactNode;
 }
