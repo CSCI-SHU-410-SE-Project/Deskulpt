@@ -31,7 +31,7 @@ pub(crate) fn create_canvas(app: &App) -> Result<(), Box<dyn std::error::Error>>
     // The TAO implementation of always-on-bottom fails to set the window to bottom
     // upon creation; interestingly hiding and showing the window solves this issue,
     // though sometimes with flickering
-    builder.visible(false);
+    let builder = builder.visible(false);
 
     // Build the canvas window
     let canvas = builder.build()?;
