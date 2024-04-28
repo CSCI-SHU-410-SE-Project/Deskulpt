@@ -9,6 +9,7 @@
     "frontendDist": "../dist"
   },
   "app": {
+    "macOSPrivateApi": true,
     "windows": [
       {
         "label": "manager",
@@ -25,7 +26,7 @@
       "id": "deskulpt-tray",
       "iconPath": "icons/icon.png",
       "iconAsTemplate": true,
-      "title": "Deskulpt",
+      "menuOnLeftClick": false,
       "tooltip": "Deskulpt"
     },
     "security": {
