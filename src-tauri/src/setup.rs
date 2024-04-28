@@ -128,7 +128,7 @@ fn show_manager_window(app_handle: &AppHandle) {
         // Failed to get the manager window; we create a new one from the existing
         // configuration instead; note that the manager window is the first item in the
         // window list in `tauri.conf.json`
-        let config = app_handle.config().app.windows.get(0).unwrap();
+        let config = app_handle.config().app.windows.first().unwrap();
         let manager = WebviewWindowBuilder::from_config(app_handle, config)?.build()?;
         manager.show()?;
         manager.set_focus()?;

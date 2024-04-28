@@ -11,7 +11,10 @@
     "format": "node ./maint_tools/format.js",
     "lint": "node ./maint_tools/lint.js",
     "test": "node ./maint_tools/test.js",
-    "prepare": "husky"
+    "prepare": "husky",
+    "setup:tooling:apis": "cd tooling/apis && npm install",
+    "setup:tooling:react": "cd tooling/react && npm install",
+    "setup": "npm install && npm run setup:tooling:apis && npm run setup:tooling:react"
   },
   "dependencies": {
     "@emotion/react": "^11.11.4",
