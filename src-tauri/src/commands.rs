@@ -7,11 +7,10 @@ use crate::{
 };
 use anyhow::{Context, Error};
 use std::{collections::HashMap, fs::read_dir};
-use tauri::{api, command, AppHandle, Manager};
+use tauri::{command, AppHandle, Manager};
+use tauri_plugin_shell::ShellExt;
 
-/// Alias for `Result<T, String>`.
-///
-/// This is the type to use for the return value of Tauri commands in the project.
+/// The return type of all Tauri commands in Deskulpt.
 pub(crate) type CommandOut<T> = Result<T, String>;
 
 /// Stringify an [`Error`].
@@ -186,7 +185,5 @@ pub(crate) fn bundle_widget(
 #[command]
 pub(crate) fn open_widget_base(app_handle: AppHandle) -> CommandOut<()> {
     let widget_base = &app_handle.state::<WidgetBaseDirectoryState>().0;
-
-    api::shell::open(&app_handle.shell_scope(), widget_base.to_string_lossy(), None)
-        .map_err(|e| cmderr!(e))
+    app_handle.shell().open(widget_base.to_string_lossy(), None).map_err(|e| cmderr!(e))
 }

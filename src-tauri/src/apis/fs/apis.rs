@@ -1,10 +1,10 @@
-use crate::{cmderr, commands::CommandOut, widget_api::fs::utils};
+//! This file contains the commands for `@deskulpt-test/apis -> fs`.
+
+use super::utils;
+use crate::{cmderr, commands::CommandOut};
 use anyhow::Context;
 use std::io::Write;
 use tauri::{command, AppHandle, Runtime};
-
-// TODO: Write formatted string to files (now there is no way to break new lines)
-// TODO: Write auto-generated unit tests to cover more corner cases
 
 #[command]
 pub(crate) fn exists<R: Runtime>(

@@ -1,0 +1,13 @@
+[default]
+description = "Allow full permissions for the plugin."
+permissions = [
+    "allow-is-file",
+    "allow-is-dir",
+    "allow-exists",
+    "allow-read-file",
+    "allow-write-file",
+    "allow-append-file",
+    "allow-remove-file",
+    "allow-create-dir",
+    "allow-remove-dir",
+]

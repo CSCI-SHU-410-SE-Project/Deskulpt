@@ -1,0 +1,7 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "canvas-capabilities",
+  "local": true,
+  "windows": ["canvas"],
+  "permissions": ["event:allow-listen", "apis-fs:default"]
+}
