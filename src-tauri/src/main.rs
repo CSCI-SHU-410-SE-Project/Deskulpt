@@ -19,9 +19,6 @@ mod testing;
 /// Main entry point of Deskulpt.
 fn main() {
     Builder::default()
-        // State management
-        .manage(states::WidgetConfigCollectionState::default())
-        .manage(states::CanvasClickThroughState::default())
         // Additional application setup
         .setup(|app| {
             app.manage(states::WidgetBaseDirectoryState::init(app));
@@ -35,6 +32,7 @@ fn main() {
 
             Ok(())
         })
+        .manage(states::WidgetConfigCollectionState::default())
         .on_window_event(setup::listen_to_windows)
         // Register internal command handlers
         .invoke_handler(generate_handler![

@@ -1,10 +1,11 @@
 //! The module includes the setup utilities of Deskulpt.
 
-use crate::utils::toggle_click_through_state;
+use crate::{states::CanvasClickThroughState, utils::toggle_click_through_state};
 use tauri::{
     menu::{MenuBuilder, MenuItemBuilder},
     tray::ClickType,
-    App, AppHandle, Manager, WebviewUrl, WebviewWindowBuilder, Window, WindowEvent,
+    App, AppHandle, Manager, Runtime, WebviewUrl, WebviewWindowBuilder, Window,
+    WindowEvent,
 };
 
 #[cfg(target_os = "macos")]
@@ -84,6 +85,7 @@ pub(crate) fn init_system_tray(app: &App) -> Result<(), Box<dyn std::error::Erro
 
     // Be consistent with the default of `CanvasClickThroughState`
     let item_toggle = MenuItemBuilder::with_id("toggle", "Float canvas").build(app)?;
+    app.manage(CanvasClickThroughState::init(true, item_toggle.clone()));
 
     // Set up the tray menu
     let tray_menu = MenuBuilder::new(app)
@@ -98,13 +100,7 @@ pub(crate) fn init_system_tray(app: &App) -> Result<(), Box<dyn std::error::Erro
     // Register event handler for the tray menu
     deskulpt_tray.on_menu_event(move |app_handle, event| match event.id().as_ref() {
         "toggle" => {
-            let is_click_through = match toggle_click_through_state(app_handle) {
-                Ok(is_click_through) => is_click_through,
-                Err(_) => return, // Consume potential error
-            };
-            // Update the text of the menu item
-            let behavior = if is_click_through { "Float" } else { "Sink" };
-            let _ = item_toggle.set_text(format!("{behavior} canvas"));
+            let _ = toggle_click_through_state(app_handle); // Consume potential error
         },
         "manage" => show_manager_window(app_handle),
         "exit" => app_handle.exit(0),

@@ -183,15 +183,14 @@ pub(crate) fn bundle_widget(
 ///
 /// This will toggle whether the canvas window ignores cursor events and update the
 /// state accordingly. If the canvas is toggled to not click-through, it will try to
-/// regain focus automatically. If successful, it returns whether the canvas is now
-/// click-through after the toggle.
+/// regain focus automatically.
 ///
 /// This command will fail if:
 ///
 /// - The canvas window is not found.
 /// - Fails to set the canvas to ignore/unignore cursor events.
 #[command]
-pub(crate) fn toggle_click_through(app_handle: AppHandle) -> CommandOut<bool> {
+pub(crate) fn toggle_click_through(app_handle: AppHandle) -> CommandOut<()> {
     toggle_click_through_state(&app_handle).map_err(|e| cmderr!(e))
 }
 
