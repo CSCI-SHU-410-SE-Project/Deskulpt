@@ -24,12 +24,6 @@ fn main() {
             app.manage(states::WidgetBaseDirectoryState::init(app));
             setup::init_system_tray(app)?;
             setup::create_canvas(app)?;
-
-            #[cfg(target_os = "macos")]
-            // Hide the application from the dock on macOS because hide-from-taskbar is
-            // not applicable for macOS
-            app.set_activation_policy(ActivationPolicy::Accessory);
-
             Ok(())
         })
         .manage(states::WidgetConfigCollectionState::default())

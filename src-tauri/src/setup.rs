@@ -16,7 +16,7 @@ use objc::{
 
 /// Create the canvas window.
 pub(crate) fn create_canvas(app: &App) -> Result<(), Box<dyn std::error::Error>> {
-    let builder = WebviewWindowBuilder::new(
+    let canvas = WebviewWindowBuilder::new(
         app,
         "canvas",
         WebviewUrl::App("views/canvas.html".into()),
@@ -25,28 +25,26 @@ pub(crate) fn create_canvas(app: &App) -> Result<(), Box<dyn std::error::Error>>
     .transparent(true)
     .decorations(false)
     .always_on_bottom(true)
-    .skip_taskbar(true);
-
-    #[cfg(target_os = "windows")]
-    // The TAO implementation of always-on-bottom fails to set the window to bottom
-    // upon creation; hiding and showing the window solves this issue, but sometimes
-    // with flickering; see https://github.com/tauri-apps/tauri/issues/9597
-    let builder = builder.visible(false);
-
-    // Build the canvas window
-    let canvas = builder.build()?;
-
-    #[cfg(target_os = "windows")]
-    canvas.show()?;
+    .visible(false) // TODO: https://github.com/tauri-apps/tauri/issues/9597
+    .skip_taskbar(true) // Windows and Linux; macOS see below for hiding from dock
+    .build()?;
 
     #[cfg(target_os = "macos")]
-    // Disable the window shadow on macOS; there will be shadows left on movement for
-    // transparent and undecorated windows that we are using; it seems that disabling
-    // shadows does not have significant visual impacts
-    unsafe {
+    {
+        // Hide the application from the dock on macOS because hide-from-taskbar is
+        // not applicable for macOS
+        app.set_activation_policy(ActivationPolicy::Accessory);
+
+        // Disable the window shadow on macOS; there will be shadows left on movement
+        // for transparent and undecorated windows that we are using; it seems that
+        // disabling shadows does not have significant visual impacts
         let ns_window = canvas.ns_window()? as *mut Object;
-        let () = msg_send![ns_window, setHasShadow:NO];
+        unsafe {
+            let () = msg_send![ns_window, setHasShadow:NO];
+        }
     }
+
+    canvas.show()?; // TODO: remove when `visible` is fixed
 
     // Be consistent with the default of `CanvasClickThroughState`
     canvas.set_ignore_cursor_events(true)?;
@@ -83,14 +81,14 @@ pub(crate) fn init_system_tray(app: &App) -> Result<(), Box<dyn std::error::Erro
     let deskulpt_tray = app.tray_by_id("deskulpt-tray").unwrap();
 
     // Be consistent with the default of `CanvasClickThroughState`
-    let item_toggle = MenuItemBuilder::with_id("toggle", "Float canvas").build(app)?;
+    let item_toggle = MenuItemBuilder::with_id("toggle", "Float").build(app)?;
     app.manage(CanvasClickThroughState::init(true, item_toggle.clone()));
 
     // Set up the tray menu
     let tray_menu = MenuBuilder::new(app)
         .items(&[
             &item_toggle,
-            &MenuItemBuilder::with_id("manage", "Open manager").build(app)?,
+            &MenuItemBuilder::with_id("manage", "Manage").build(app)?,
             &MenuItemBuilder::with_id("exit", "Exit").build(app)?,
         ])
         .build()?;

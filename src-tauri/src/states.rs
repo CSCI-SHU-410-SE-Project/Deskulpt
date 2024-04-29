@@ -50,9 +50,7 @@ impl CanvasClickThrough {
     /// worth panicking for such a minor thing.
     pub(crate) fn toggle(&mut self) {
         self.yes = !self.yes;
-        let _ = self
-            .menu_item
-            .set_text(format!("{} canvas", if self.yes { "Float" } else { "Sink" }));
+        let _ = self.menu_item.set_text(if self.yes { "Float" } else { "Sink" });
     }
 
     /// Get whether the canvas is click-through.
