@@ -8,13 +8,10 @@ use tauri::{
 };
 
 #[cfg(target_os = "macos")]
-use {
-    objc::{
-        msg_send,
-        runtime::{Object, NO},
-        sel, sel_impl,
-    },
-    tauri::ActivationPolicy,
+use objc::{
+    msg_send,
+    runtime::{Object, NO},
+    sel, sel_impl,
 };
 
 /// Create the canvas window.
@@ -33,18 +30,12 @@ pub(crate) fn create_canvas(app: &mut App) -> Result<(), Box<dyn std::error::Err
     .build()?;
 
     #[cfg(target_os = "macos")]
-    {
-        // Hide the application from the dock on macOS because hide-from-taskbar is
-        // not applicable for macOS
-        app.set_activation_policy(ActivationPolicy::Accessory);
-
-        // Disable the window shadow on macOS; there will be shadows left on movement
-        // for transparent and undecorated windows that we are using; it seems that
-        // disabling shadows does not have significant visual impacts
+    // Disable the window shadow on macOS; there will be shadows left on movement for
+    // transparent and undecorated windows that we are using; it seems that disabling
+    // shadows does not have significant visual impacts
+    unsafe {
         let ns_window = canvas.ns_window()? as *mut Object;
-        unsafe {
-            let () = msg_send![ns_window, setHasShadow:NO];
-        }
+        let () = msg_send![ns_window, setHasShadow:NO];
     }
 
     canvas.show()?; // TODO: remove when `visible` is fixed

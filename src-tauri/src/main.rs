@@ -2,6 +2,9 @@
 
 use tauri::{generate_handler, tauri_build_context, Builder, Manager};
 
+#[cfg(target_os = "macos")]
+use tauri::ActivationPolicy;
+
 mod apis;
 mod bundler;
 mod commands;
@@ -21,6 +24,13 @@ fn main() {
             app.manage(states::WidgetBaseDirectoryState::init(app));
             setup::init_system_tray(app)?;
             setup::create_canvas(app)?;
+
+            #[cfg(target_os = "macos")]
+            // Hide the application from the dock on macOS because hide-from-taskbar is
+            // not applicable for macOS; for Windows and Linux we have already hidden
+            // the canvas window in `create_canvas`
+            app.set_activation_policy(ActivationPolicy::Accessory);
+
             Ok(())
         })
         .manage(states::WidgetConfigCollectionState::default())
