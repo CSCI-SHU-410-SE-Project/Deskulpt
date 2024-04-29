@@ -4,8 +4,7 @@ use crate::{states::CanvasClickThroughState, utils::toggle_click_through_state};
 use tauri::{
     menu::{MenuBuilder, MenuItemBuilder},
     tray::ClickType,
-    App, AppHandle, Manager, Runtime, WebviewUrl, WebviewWindowBuilder, Window,
-    WindowEvent,
+    App, AppHandle, Manager, WebviewUrl, WebviewWindowBuilder, Window, WindowEvent,
 };
 
 #[cfg(target_os = "macos")]
