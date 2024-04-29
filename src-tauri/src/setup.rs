@@ -18,7 +18,7 @@ use {
 };
 
 /// Create the canvas window.
-pub(crate) fn create_canvas(app: &App) -> Result<(), Box<dyn std::error::Error>> {
+pub(crate) fn create_canvas(app: &mut App) -> Result<(), Box<dyn std::error::Error>> {
     let canvas = WebviewWindowBuilder::new(
         app,
         "canvas",
