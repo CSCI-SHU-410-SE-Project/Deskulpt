@@ -5,6 +5,7 @@ import { emitTo } from "@tauri-apps/api/event";
 import { useEffect, useState } from "react";
 import { Result, WidgetCollection, WidgetConfig, WidgetState } from "./types";
 import { createWidgetApisBlob } from "./utils";
+import { register, unregister } from "@tauri-apps/plugin-global-shortcut";
 
 export default function App() {
   const [widgetStates, setWidgetStates] = useState<Record<string, WidgetState>>({});
@@ -128,7 +129,17 @@ export default function App() {
   }
 
   useEffect(() => {
+    // Register a global shortcut to toggle click-through
+    register("CmdOrCtrl+Shift+H", () => {
+      invoke("toggle_click_through").catch(console.error);
+    }).catch(console.error);
+
+    // Rescan the widget base directory and render all on load
     rescanAndRender().catch(console.error);
+
+    return () => {
+      unregister("CmdOrCtrl+Shift+H").catch(console.error);
+    };
   }, []);
 
   return (

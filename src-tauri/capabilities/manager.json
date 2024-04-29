@@ -4,9 +4,12 @@
   "local": true,
   "windows": ["manager"],
   "permissions": [
-    "event:allow-emit-to",
     "allow-bundle-widget",
     "allow-open-widget-base",
-    "allow-refresh-widget-collection"
+    "allow-refresh-widget-collection",
+    "allow-toggle-click-through",
+    "event:allow-emit-to",
+    "global-shortcut:allow-register",
+    "global-shortcut:allow-unregister"
   ]
 }

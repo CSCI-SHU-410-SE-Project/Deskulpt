@@ -1,4 +1,4 @@
-//! The widget API plugin for `@deskulpt-test/apis -> fs`.
+//! The widget API plugin for `fs` in `@deskulpt-test/apis`..
 
 use tauri::{
     generate_handler,
@@ -9,6 +9,8 @@ use tauri::{
 mod apis;
 mod utils;
 
+/// Build the `fs` plugin for `@deskulpt-test/apis`.
+///
 /// The registered APIs can be invoked as `plugin:apis-fs|<api_name>`.
 pub(crate) fn init<R: Runtime>() -> TauriPlugin<R> {
     Builder::new("apis-fs")

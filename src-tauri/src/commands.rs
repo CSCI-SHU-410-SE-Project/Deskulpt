@@ -4,6 +4,7 @@ use crate::{
     bundler::bundle,
     config::{read_widget_config, WidgetConfigCollection},
     states::{WidgetBaseDirectoryState, WidgetConfigCollectionState},
+    utils::toggle_click_through_state,
 };
 use anyhow::{Context, Error};
 use std::{collections::HashMap, fs::read_dir};
@@ -176,6 +177,22 @@ pub(crate) fn bundle_widget(
 
     // Error out if the widget ID is not found in the collection
     cmdbail!("Widget '{widget_id}' is not found in the collection")
+}
+
+/// Attempt to toggle the click through state of the canvas window.
+///
+/// This will toggle whether the canvas window ignores cursor events and update the
+/// state accordingly. If the canvas is toggled to not click-through, it will try to
+/// regain focus automatically. If successful, it returns whether the canvas is now
+/// click-through after the toggle.
+///
+/// This command will fail if:
+///
+/// - The canvas window is not found.
+/// - Fails to set the canvas to ignore/unignore cursor events.
+#[command]
+pub(crate) fn toggle_click_through(app_handle: AppHandle) -> CommandOut<bool> {
+    toggle_click_through_state(&app_handle).map_err(|e| cmderr!(e))
 }
 
 /// Command for opening the widget base directory.

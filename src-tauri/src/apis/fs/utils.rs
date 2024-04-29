@@ -1,4 +1,4 @@
-//! This file contains the utilities for `@deskulpt-test/apis -> fs`.
+//! This module contains the utilities for `fs` in `@deskulpt-test/apis`.
 
 use crate::states::WidgetBaseDirectoryState;
 use anyhow::{bail, Context, Error};

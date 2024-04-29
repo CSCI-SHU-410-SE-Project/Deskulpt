@@ -11,6 +11,7 @@ mod commands;
 mod config;
 mod setup;
 mod states;
+mod utils;
 
 #[cfg(test)]
 mod testing;
@@ -40,9 +41,11 @@ fn main() {
             commands::bundle_widget,
             commands::open_widget_base,
             commands::refresh_widget_collection,
+            commands::toggle_click_through,
         ])
         // Register plugins
         .plugin(tauri_plugin_shell::init())
+        .plugin(tauri_plugin_global_shortcut::Builder::new().build())
         .plugin(apis::fs::init())
         .run(tauri_build_context!())
         .expect("Error running the Deskulpt application");

@@ -1,4 +1,4 @@
-//! This file contains the commands for `@deskulpt-test/apis -> fs`.
+//! This module implements the commands for `fs` in `@deskulpt-test/apis`.
 
 use super::utils;
 use crate::{cmderr, commands::CommandOut};
