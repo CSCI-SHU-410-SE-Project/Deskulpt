@@ -1,7 +1,7 @@
 {
   "name": "@deskulpt-test/apis",
-  "version": "0.0.9",
-  "description": "Typing supports for Deskulpt widget APIs.",
+  "version": "0.0.10",
+  "description": "Deskulpt widget APIs.",
   "type": "module",
   "types": "./dist/index.d.ts",
   "files": [
@@ -24,7 +24,7 @@
   },
   "homepage": "https://csci-shu-410-se-project.github.io/Deskulpt/",
   "dependencies": {
-    "@tauri-apps/api": "^1.5.3"
+    "@tauri-apps/api": "^2.0.0-beta.9"
   },
   "devDependencies": {
     "@rollup/plugin-replace": "^5.0.5",
