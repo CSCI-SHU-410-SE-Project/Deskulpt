@@ -2,9 +2,6 @@
 
 use tauri::{generate_handler, tauri_build_context, Builder, Manager};
 
-#[cfg(target_os = "macos")]
-use tauri::ActivationPolicy;
-
 mod apis;
 mod bundler;
 mod commands;

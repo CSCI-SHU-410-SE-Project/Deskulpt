@@ -8,10 +8,13 @@ use tauri::{
 };
 
 #[cfg(target_os = "macos")]
-use objc::{
-    msg_send,
-    runtime::{Object, NO},
-    sel, sel_impl,
+use {
+    objc::{
+        msg_send,
+        runtime::{Object, NO},
+        sel, sel_impl,
+    },
+    tauri::ActivationPolicy,
 };
 
 /// Create the canvas window.
