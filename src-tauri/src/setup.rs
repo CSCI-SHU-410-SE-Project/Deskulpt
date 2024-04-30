@@ -141,16 +141,14 @@ fn show_manager_window(app_handle: &AppHandle) {
 /// The cleanup function to be called on application exit.
 fn on_app_exit(app_handle: &AppHandle) {
     if app_handle.get_webview_window("canvas").is_none() {
-        // Exit immediately if the canvas window does not exist
-        app_handle.exit(0);
+        app_handle.exit(0); // Canvas window does not exist
     };
 
     // Emit the "exit-app" event to the canvas window so that it can save the widget
     // internals to a file before the application exists; it will be in charge of
     // exiting the application
     if app_handle.emit_to("canvas", "exit-app", ()).is_err() {
-        // Exit immediately if the event fails to be emitted
-        app_handle.exit(0);
+        app_handle.exit(0); // Event fails to be emitted
     }
 
     // This is a safeguard to ensure that the application exists in case the canvas

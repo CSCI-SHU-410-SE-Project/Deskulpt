@@ -209,8 +209,8 @@ pub(crate) fn open_widget_base(app_handle: AppHandle) -> CommandOut<()> {
 
 /// Command for initializing the widget internals state.
 ///
-/// This command tries to load the previously stored widget internals located at. It
-/// never fails, but instead returns an empty widget internals mapping upon any error.
+/// This command tries to load the previously stored widget internals. It never fails,
+/// but instead returns an empty widget internals mapping upon any error.
 #[command]
 pub(crate) fn init_widget_internals(
     app_handle: AppHandle,
@@ -238,7 +238,6 @@ pub(crate) fn exit_app(
             return Ok(());
         },
     };
-
     let _ = write_widget_internals(&app_config_dir, &widget_internals);
     app_handle.exit(0);
     Ok(())

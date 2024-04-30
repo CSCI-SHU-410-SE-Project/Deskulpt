@@ -1,4 +1,4 @@
-//! The module provides the types and initial values for state management in Tauri.
+//! The module provides the types for state management in Tauri.
 //!
 //! In Tauri, different states are distinguished by their unique types, thus we always
 //! use structs to mark the states.
