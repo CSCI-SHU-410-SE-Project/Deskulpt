@@ -2,7 +2,7 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { WidgetInternal } from "../types";
 import App from "./App";
-import { invoke } from "@tauri-apps/api";
+import { invoke } from "@tauri-apps/api/core";
 
 invoke<Record<string, WidgetInternal>>("init_widget_internals")
   .then((widgetInternals) => {

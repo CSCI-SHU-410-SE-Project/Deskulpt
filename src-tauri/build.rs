@@ -2,6 +2,8 @@ use tauri_build::{try_build, AppManifest, Attributes, CodegenContext, InlinedPlu
 
 const INTERNAL_COMMANDS: &[&str] = &[
     "bundle_widget",
+    "exit_app",
+    "init_widget_internals",
     "open_widget_base",
     "refresh_widget_collection",
     "toggle_click_through",

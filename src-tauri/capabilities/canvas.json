@@ -3,5 +3,11 @@
   "identifier": "canvas-capabilities",
   "local": true,
   "windows": ["canvas"],
-  "permissions": ["event:allow-listen", "apis-fs:default"]
+  "permissions": [
+    "allow-exit-app",
+    "allow-init-widget-internals",
+    "event:allow-listen",
+    "event:allow-unlisten",
+    "apis-fs:default"
+  ]
 }

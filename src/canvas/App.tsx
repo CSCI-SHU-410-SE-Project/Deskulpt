@@ -11,7 +11,7 @@ import { getWidgetModuleError } from "./utils";
 import ErrorDisplay from "../components/ErrorDisplay";
 import { grabErrorInfo } from "../utils";
 import WidgetContainer from "../components/WidgetContainer";
-import { invoke } from "@tauri-apps/api";
+import { invoke } from "@tauri-apps/api/core";
 
 export default function App(props: {
   initialInternals: Record<string, WidgetInternal>;
