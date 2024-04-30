@@ -1,10 +1,11 @@
 import { Box, Button, IconButton, List, ListItem, ListItemText } from "@mui/material";
 import RefreshIcon from "@mui/icons-material/Refresh";
-import { invoke } from "@tauri-apps/api";
-import { emit } from "@tauri-apps/api/event";
+import { invoke } from "@tauri-apps/api/core";
+import { emitTo } from "@tauri-apps/api/event";
 import { useEffect, useState } from "react";
 import { Result, WidgetCollection, WidgetConfig, WidgetState } from "./types";
 import { createWidgetApisBlob } from "./utils";
+import { register, unregister } from "@tauri-apps/plugin-global-shortcut";
 
 export default function App() {
   const [widgetStates, setWidgetStates] = useState<Record<string, WidgetState>>({});
@@ -29,7 +30,7 @@ export default function App() {
       .then(async (widgetConfigs) => {
         const cleanupRemovedWidgets = async (removedIds: string[]) => {
           // Notify the canvas to cleanup resourced allocated for removed widgets
-          await emit("remove-widgets", { removedIds });
+          await emitTo("canvas", "remove-widgets", { removedIds });
 
           // Revoke the API blob URLs of removed widgets for optimal performance and
           // memory usage as they will not be used anymore; even if the same widget ID
@@ -87,10 +88,18 @@ export default function App() {
 
     await invoke<string>("bundle_widget", { widgetId, apisBlobUrl })
       .then(async (bundlerOutput) => {
-        await emit("render-widget", { widgetId, bundlerOutput, success: true });
+        await emitTo("canvas", "render-widget", {
+          widgetId,
+          bundlerOutput,
+          success: true,
+        });
       })
       .catch(async (error: string) => {
-        await emit("render-widget", { widgetId, bundlerOutput: error, success: false });
+        await emitTo("canvas", "render-widget", {
+          widgetId,
+          bundlerOutput: error,
+          success: false,
+        });
       });
   }
 
@@ -122,7 +131,17 @@ export default function App() {
   }
 
   useEffect(() => {
+    // Register a global shortcut to toggle click-through
+    register("CmdOrCtrl+Shift+H", () => {
+      invoke("toggle_click_through").catch(console.error);
+    }).catch(console.error);
+
+    // Rescan the widget base directory and render all on load
     rescanAndRender().catch(console.error);
+
+    return () => {
+      unregister("CmdOrCtrl+Shift+H").catch(console.error);
+    };
   }, []);
 
   return (

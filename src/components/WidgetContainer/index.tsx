@@ -22,7 +22,7 @@ export default function WidgetContainer(props: {
   const containerRef = useRef(null);
 
   /**
-   * Update the container internal according to transform data.
+   * Update the container position according to transform data.
    *
    * By default the `Draggable` component uses `transform` to move the container. This,
    * however, makes it impossible to obtain the actual position of the container, and

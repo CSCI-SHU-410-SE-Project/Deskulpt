@@ -1,87 +1,146 @@
-//! The module configures the system tray of Deskulpt.
+//! The module includes the setup utilities of Deskulpt.
 
+use crate::{states::CanvasClickThroughState, utils::toggle_click_through_state};
 use std::{
     thread::{sleep, spawn},
     time::Duration,
 };
 use tauri::{
-    AppHandle, CustomMenuItem, GlobalWindowEvent, Manager, SystemTray, SystemTrayEvent,
-    SystemTrayMenu, WindowBuilder, WindowEvent,
+    menu::{MenuBuilder, MenuItemBuilder},
+    tray::ClickType,
+    App, AppHandle, Manager, WebviewUrl, WebviewWindowBuilder, Window, WindowEvent,
 };
 
-/// Listen to global window events.
+#[cfg(target_os = "macos")]
+use objc::{
+    msg_send,
+    runtime::{Object, NO},
+    sel, sel_impl,
+};
+
+/// Create the canvas window.
+pub(crate) fn create_canvas(app: &mut App) -> Result<(), Box<dyn std::error::Error>> {
+    let canvas = WebviewWindowBuilder::new(
+        app,
+        "canvas",
+        WebviewUrl::App("views/canvas.html".into()),
+    )
+    .maximized(true)
+    .transparent(true)
+    .decorations(false)
+    .always_on_bottom(true)
+    .visible(false) // TODO: https://github.com/tauri-apps/tauri/issues/9597
+    .skip_taskbar(true) // Windows and Linux; macOS see below for hiding from dock
+    .build()?;
+
+    #[cfg(target_os = "macos")]
+    // Disable the window shadow on macOS; there will be shadows left on movement for
+    // transparent and undecorated windows that we are using; it seems that disabling
+    // shadows does not have significant visual impacts
+    unsafe {
+        let ns_window = canvas.ns_window()? as *mut Object;
+        let () = msg_send![ns_window, setHasShadow:NO];
+    }
+
+    canvas.show()?; // TODO: remove when `visible` is fixed
+
+    // Be consistent with the default of `CanvasClickThroughState`
+    canvas.set_ignore_cursor_events(true)?;
+
+    Ok(())
+}
+
+/// Listen to window events.
 ///
 /// This is to be initialized with `builder.on_window_event(listen_to_windows)` on the
-/// application builder instance. It does the following:
-///
-/// - Prevent the manager window from closing when the close button is clicked but hide
-///   it instead.
-pub(crate) fn listen_to_windows(e: GlobalWindowEvent) {
-    if let WindowEvent::CloseRequested { api, .. } = e.event() {
-        let window = e.window();
-        if window.label() == "manager" {
+/// application builder instance. It prevents the manager window from closing when the
+/// close button is clicked, but only hide it instead.
+pub(crate) fn listen_to_windows(window: &Window, event: &WindowEvent) {
+    if window.label() == "manager" {
+        if let WindowEvent::CloseRequested { api, .. } = event {
             api.prevent_close();
             window.hide().unwrap();
         }
     }
 }
 
-/// Get the system tray of Deskulpt.
+/// Initialize the Deskulpt system tray.
 ///
-/// This is to be initialized with `builder.system_tray(get_system_tray())` on the
-/// application builder instance.
-pub(crate) fn get_system_tray() -> SystemTray {
-    let tray_menu = SystemTrayMenu::new()
-        .add_item(CustomMenuItem::new("manage", "Manage"))
-        .add_item(CustomMenuItem::new("exit", "Exit"));
-    SystemTray::new().with_menu(tray_menu)
-}
-
-/// Listen to system tray events.
+/// This binds the menu and event handlers to the system tray with ID "deskulpt-tray",
+/// see `tauri.conf.json`. This tray would be intialized with the following features:
 ///
-/// This is to be initialized with `builder.on_system_tray_event(listen_to_system_tray)`
-/// on the application builder instance. It does the following:
-///
-/// - When left-clicking the tray icon or clicking the "manage" menu item, show the
-///   manager window. Note that left-clicking is unsupported on Linux, so the "manage"
-///   menu item is present as a workaround.
+/// - When left-clicking the tray icon or clicking the "toggle" menu item, toggle the
+///   click-through state of the canvas window. Note that left-clicking is unsupported
+///   on Linux, so the "toggle" menu item is present as a workaround.
+/// - When clicking the "manage" menu item, show the manager window.
 /// - When clicking the "exit" menu item, exit the application (with cleanup). This
 ///   should, in production, be the only normal way to exit the application.
-pub(crate) fn listen_to_system_tray(app_handle: &AppHandle, event: SystemTrayEvent) {
-    match event {
-        SystemTrayEvent::MenuItemClick { id, .. } => match id.as_str() {
-            "manage" => show_manager_window(app_handle),
-            "exit" => on_app_exit(app_handle),
-            _ => {},
+pub(crate) fn init_system_tray(app: &App) -> Result<(), Box<dyn std::error::Error>> {
+    let deskulpt_tray = app.tray_by_id("deskulpt-tray").unwrap();
+
+    // Be consistent with the default of `CanvasClickThroughState`
+    let item_toggle = MenuItemBuilder::with_id("toggle", "Float").build(app)?;
+    app.manage(CanvasClickThroughState::init(true, item_toggle.clone()));
+
+    // Set up the tray menu
+    let tray_menu = MenuBuilder::new(app)
+        .items(&[
+            &item_toggle,
+            &MenuItemBuilder::with_id("manage", "Manage").build(app)?,
+            &MenuItemBuilder::with_id("exit", "Exit").build(app)?,
+        ])
+        .build()?;
+    deskulpt_tray.set_menu(Some(tray_menu))?;
+
+    // Register event handler for the tray menu
+    deskulpt_tray.on_menu_event(move |app_handle, event| match event.id().as_ref() {
+        "toggle" => {
+            let _ = toggle_click_through_state(app_handle); // Consume potential error
         },
-        SystemTrayEvent::LeftClick { .. } => {
-            show_manager_window(app_handle);
-        },
+        "manage" => show_manager_window(app_handle),
+        "exit" => on_app_exit(app_handle),
         _ => {},
-    }
+    });
+
+    // Register event handler for the tray icon itself
+    deskulpt_tray.on_tray_icon_event(|tray, event| {
+        if event.click_type == ClickType::Left {
+            let _ = toggle_click_through_state(tray.app_handle());
+        }
+    });
+
+    Ok(())
 }
 
 /// Attempt to show the manager window.
 ///
-/// If the manager window does not exist, create the window. If the window exists but
-/// fails to show, consume the error and do nothing.
+/// This will make the manager visible if it is not already, and set focus if it is not
+/// already focused. If the manager window does not exist, create the window. There is
+/// no guarantee that this operation will succeed, but it will try to do so.
 fn show_manager_window(app_handle: &AppHandle) {
-    if let Some(manager) = app_handle.get_window("manager").or_else(|| {
+    let inner = || -> Result<(), Box<dyn std::error::Error>> {
+        if let Some(manager) = app_handle.get_webview_window("manager") {
+            manager.show()?;
+            manager.set_focus()?;
+            return Ok(());
+        }
+
         // Failed to get the manager window; we create a new one from the existing
-        // configuration instead; note that the manager window is the second item in
-        // the window list in `tauri.conf.json5`
-        let config = app_handle.config().tauri.windows.get(1).unwrap().clone();
-        // Discard any error if the window fails to be built, because this likely means
-        // that the manager window is still there
-        WindowBuilder::from_config(app_handle, config.clone()).build().ok()
-    }) {
-        let _ = manager.show(); // Discard any error
-    }
+        // configuration instead; note that the manager window is the first item in the
+        // window list in `tauri.conf.json`
+        let config = app_handle.config().app.windows.first().unwrap();
+        let manager = WebviewWindowBuilder::from_config(app_handle, config)?.build()?;
+        manager.show()?;
+        manager.set_focus()?;
+        Ok(())
+    };
+
+    let _ = inner(); // Consume any error
 }
 
 /// The cleanup function to be called on application exit.
 fn on_app_exit(app_handle: &AppHandle) {
-    if app_handle.get_window("canvas").is_none() {
+    if app_handle.get_webview_window("canvas").is_none() {
         // Exit immediately if the canvas window does not exist
         app_handle.exit(0);
     };

@@ -18,7 +18,7 @@ export default defineConfig([
       format: "esm",
       file: "../../src/.scripts/raw-apis.js",
     },
-    external: ["@tauri-apps/api"],
+    external: ["@tauri-apps/api/core"],
     plugins: [typescript(), terser()],
     onwarn,
   },
@@ -32,7 +32,7 @@ export default defineConfig([
       format: "esm",
       file: "../../public/.wrap-apis.js.txt",
     },
-    external: ["@tauri-apps/api", "@deskulpt-test/raw-apis"],
+    external: ["@tauri-apps/api/core", "@deskulpt-test/raw-apis"],
     plugins: [
       replace({
         "./raw": "@deskulpt-test/raw-apis",
@@ -51,7 +51,7 @@ export default defineConfig([
       format: "esm",
       dir: "./dist",
     },
-    external: ["@tauri-apps/api"],
+    external: ["@tauri-apps/api/core"],
     plugins: [
       typescript({
         declaration: true,
