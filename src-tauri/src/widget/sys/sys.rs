@@ -1,6 +1,6 @@
 use crate::commands::CommandOut;
 use serde::{Deserialize, Serialize};
-use sysinfo::{Components, Disks, Networks, System};
+use sysinfo::{Disks, Networks, System};
 use tauri::{command, AppHandle, Runtime};
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -12,10 +12,19 @@ pub struct SystemInfo {
     pub os_version: Option<String>,
     pub host_name: Option<String>,
     pub cpu_count: usize,
+    pub cpu_info: Vec<CpuInfo>,
     pub disks: Vec<DiskInfo>,
     pub networks: Vec<NetworkInfo>,
     pub total_memory: u64,
     pub used_memory: u64,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct CpuInfo {
+    pub vendor_id: String,
+    pub brand: String,
+    pub frequency: u64,
+    pub total_cpu_usage: f32,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -25,6 +34,7 @@ pub struct DiskInfo {
     pub total_space: u64,
     pub mount_point: String,
 }
+
 #[derive(Debug, Serialize, Deserialize)]
 pub struct NetworkInfo {
     pub interface_name: String,
@@ -61,6 +71,17 @@ fn get_system() -> SystemInfo {
         })
         .collect();
 
+    let cpu_count = sys.cpus().len();
+    let mut cpu_info = Vec::with_capacity(cpu_count);
+    for cpu in sys.cpus() {
+        cpu_info.push(CpuInfo {
+            vendor_id: cpu.vendor_id().to_string(),
+            brand: cpu.brand().to_string(),
+            frequency: cpu.frequency(),
+            total_cpu_usage: cpu.cpu_usage(),
+        });
+    }
+
     SystemInfo {
         total_memory: sys.total_memory(),
         used_memory: sys.used_memory(),
@@ -70,7 +91,8 @@ fn get_system() -> SystemInfo {
         kernel_version: System::kernel_version(),
         os_version: System::os_version(),
         host_name: System::host_name(),
-        cpu_count: sys.cpus().len(),
+        cpu_count,
+        cpu_info,
         disks: disks_info,
         networks: networks_info,
     }
