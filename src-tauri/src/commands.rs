@@ -4,14 +4,14 @@ use crate::{
     bundler::bundle,
     config::{read_widget_config, WidgetConfigCollection},
     states::{WidgetBaseDirectoryState, WidgetConfigCollectionState},
+    utils::toggle_click_through_state,
 };
 use anyhow::{Context, Error};
 use std::{collections::HashMap, fs::read_dir};
-use tauri::{api, command, AppHandle, Manager};
+use tauri::{command, AppHandle, Manager};
+use tauri_plugin_shell::ShellExt;
 
-/// Alias for `Result<T, String>`.
-///
-/// This is the type to use for the return value of Tauri commands in the project.
+/// The return type of all Tauri commands in Deskulpt.
 pub(crate) type CommandOut<T> = Result<T, String>;
 
 /// Stringify an [`Error`].
@@ -179,6 +179,21 @@ pub(crate) fn bundle_widget(
     cmdbail!("Widget '{widget_id}' is not found in the collection")
 }
 
+/// Attempt to toggle the click through state of the canvas window.
+///
+/// This will toggle whether the canvas window ignores cursor events and update the
+/// state accordingly. If the canvas is toggled to not click-through, it will try to
+/// regain focus automatically.
+///
+/// This command will fail if:
+///
+/// - The canvas window is not found.
+/// - Fails to set the canvas to ignore/unignore cursor events.
+#[command]
+pub(crate) fn toggle_click_through(app_handle: AppHandle) -> CommandOut<()> {
+    toggle_click_through_state(&app_handle).map_err(|e| cmderr!(e))
+}
+
 /// Command for opening the widget base directory.
 ///
 /// This command will fail if Tauri fails to open the widget base directory, most likely
@@ -186,7 +201,5 @@ pub(crate) fn bundle_widget(
 #[command]
 pub(crate) fn open_widget_base(app_handle: AppHandle) -> CommandOut<()> {
     let widget_base = &app_handle.state::<WidgetBaseDirectoryState>().0;
-
-    api::shell::open(&app_handle.shell_scope(), widget_base.to_string_lossy(), None)
-        .map_err(|e| cmderr!(e))
+    app_handle.shell().open(widget_base.to_string_lossy(), None).map_err(|e| cmderr!(e))
 }

@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-refresh-widget-collection"
+description = "Enables the refresh_widget_collection command without any pre-configured scope."
+commands.allow = ["refresh_widget_collection"]
+
+[[permission]]
+identifier = "deny-refresh-widget-collection"
+description = "Denies the refresh_widget_collection command without any pre-configured scope."
+commands.deny = ["refresh_widget_collection"]

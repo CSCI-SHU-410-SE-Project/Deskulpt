@@ -1,10 +1,10 @@
+//! This module contains the utilities for `fs` in `@deskulpt-test/apis`.
+
 use crate::states::WidgetBaseDirectoryState;
 use anyhow::{bail, Context, Error};
 use path_clean::PathClean;
 use std::path::PathBuf;
 use tauri::{AppHandle, Manager, Runtime};
-
-// TODO: Write auto-generated unittests to cover more corner cases
 
 /// Validate if the widget ID corresponds to a direct folder in the widget base folder。
 ///
