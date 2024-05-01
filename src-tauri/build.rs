@@ -12,11 +12,17 @@ const WIDGET_APIS_FS_COMMANDS: &[&str] = &[
     "remove_file", "create_dir", "remove_dir",
 ];
 
+const WIDGET_APIS_SYS_COMMANDS: &[&str] = &["get_system_info"];
+
 fn main() {
     try_build(
         Attributes::new()
             .codegen(CodegenContext::new())
             .plugin("apis-fs", InlinedPlugin::new().commands(WIDGET_APIS_FS_COMMANDS))
+            .plugin(
+                "widget-sys",
+                InlinedPlugin::new().commands(WIDGET_APIS_SYS_COMMANDS),
+            )
             .app_manifest(AppManifest::new().commands(INTERNAL_COMMANDS)),
     )
     .expect("Failed to run tauri-build");

@@ -39,7 +39,7 @@ swc_ecma_parser = "0.143.8"
 swc_ecma_transforms_optimization = "0.198.18"
 swc_ecma_transforms_react = "0.183.13"
 swc_ecma_visit = "0.98.6"
-sysinfo = "0.30.10"
+sysinfo = "0.30.11"
 
 [target."cfg(target_os = \"macos\")".dependencies]
 objc = "0.2.7"

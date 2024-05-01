@@ -1,6 +1,7 @@
+use crate::commands::CommandOut;
 use serde::{Deserialize, Serialize};
 use sysinfo::{Components, Disks, Networks, System};
-use tauri::{command, AppHandle, InvokeError, Runtime};
+use tauri::{command, AppHandle, Runtime};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct SystemInfo {
@@ -35,7 +36,7 @@ pub struct NetworkInfo {
 pub(crate) fn get_system_info<R: Runtime>(
     app_handle: AppHandle<R>,
     widget_id: String,
-) -> Result<SystemInfo, InvokeError> {
+) -> CommandOut<SystemInfo> {
     Ok(get_system())
 }
 
