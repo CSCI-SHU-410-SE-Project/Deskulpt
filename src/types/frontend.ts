@@ -5,51 +5,30 @@
 
 import { ReactNode } from "react";
 import { Widget } from ".";
-import { Result, WidgetConfig, WidgetInternal } from "./backend";
+import { Result, WidgetConfig, WidgetSetting } from "./backend";
 
 /**
- * The state of a widget.
- *
- * We cannot manage widget states purely in the backend or in the frontend. Managing
- * purely in the backend may cause too frequent communication when the frontend needs
- * information. Managing purely in the frontend would cause use to send large objects
- * to the backend when sometimes we can just send the widget ID.
- *
- * The frontend widget state thus consists of (1) a shared part that is synced with the
- * backend at times, and (2) a frontend part that does not bother the backend.
+ * The state of a widget in the manager.
  */
-export interface WidgetState {
-  /** [SHARED] Widget configuration. */
+export interface ManagerWidgetState {
+  /** Configuration or configuration error of the widget. */
   config: Result<WidgetConfig, string>;
-  /** [FRONTEND] Import URL of the widget APIs. */
-  apisBlobUrl: string;
+  /** Setting of the widget. */
+  setting: WidgetSetting;
 }
 
 /**
  * The state of a widget on the canvas.
  */
-export interface WidgetCanvasState {
-  /** The internals of the widget. */
-  internal: WidgetInternal;
+export interface CanvasWidgetState {
   /** The rendered widget component or the error component to display. */
   display: ReactNode;
-}
-
-/**
- * The payload of the "render-widget" event.
- */
-export interface RenderWidgetPayload {
-  widgetId: string;
-  success: boolean;
-  /** The bundled code if `success` is `true` or the bundler error. */
-  bundlerOutput: string;
-}
-
-/**
- * The payload of the "remove-widgets" event.
- */
-export interface RemoveWidgetsPayload {
-  removedIds: string[];
+  /** Setting of the widget. */
+  setting: WidgetSetting;
+  /** The URL of the blob of widget APIs. */
+  apisBlobUrl: string;
+  /** The URL of the blob of the widget module. */
+  moduleBlobUrl: string | null;
 }
 
 /**
@@ -58,4 +37,27 @@ export interface RemoveWidgetsPayload {
 export interface WidgetModule {
   /** The default export of the entry file of a user-defined widget. */
   default: Widget;
+}
+
+/**
+ * =====================================================================================
+ *
+ *    EVENT PAYLOAD TYPES
+ *
+ * =====================================================================================
+ */
+
+export interface RenderWidgetPayload {
+  widgetId: string;
+  bundle: true;
+  setting: WidgetSetting;
+}
+
+export interface RemoveWidgetsPayload {
+  removedIds: string[];
+}
+
+export interface UpdateSettingPayload {
+  widgetId: string;
+  setting: WidgetSetting;
 }

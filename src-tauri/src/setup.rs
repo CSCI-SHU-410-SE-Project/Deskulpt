@@ -140,19 +140,19 @@ fn show_manager_window(app_handle: &AppHandle) {
 
 /// The cleanup function to be called on application exit.
 fn on_app_exit(app_handle: &AppHandle) {
-    if app_handle.get_webview_window("canvas").is_none() {
-        app_handle.exit(0); // Canvas window does not exist
+    if app_handle.get_webview_window("manager").is_none() {
+        app_handle.exit(0); // Manager window does not exist; should not happen
     };
 
-    // Emit the "exit-app" event to the canvas window so that it can save the widget
-    // internals to a file before the application exists; it will be in charge of
+    // Emit the "exit-app" event to the manager window so that it can save the global
+    // settings to a file before the application exits; it will then be in charge of
     // exiting the application
-    if app_handle.emit_to("canvas", "exit-app", ()).is_err() {
+    if app_handle.emit_to("manager", "exit-app", ()).is_err() {
         app_handle.exit(0); // Event fails to be emitted
     }
 
-    // This is a safeguard to ensure that the application exists in case the canvas
-    // window fails to do so; we give it 5 seconds to exit
+    // This is a safeguard to ensure that the application exits in case the manager
+    // window fails to do so; we give it a 5-second timeout
     let app_handle = app_handle.clone();
     spawn(move || {
         sleep(Duration::from_secs(5));

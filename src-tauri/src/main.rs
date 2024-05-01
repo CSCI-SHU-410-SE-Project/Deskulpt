@@ -9,6 +9,7 @@ mod apis;
 mod bundler;
 mod commands;
 mod config;
+mod settings;
 mod setup;
 mod states;
 mod utils;
@@ -39,7 +40,7 @@ fn main() {
         .invoke_handler(generate_handler![
             commands::bundle_widget,
             commands::exit_app,
-            commands::init_widget_internals,
+            commands::init_settings,
             commands::open_widget_base,
             commands::refresh_widget_collection,
             commands::toggle_click_through,

@@ -1,13 +1,8 @@
 {
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "canvas-capabilities",
+  "description": "Capabilities of the canvas in addition to the common capabilities",
   "local": true,
   "windows": ["canvas"],
-  "permissions": [
-    "allow-exit-app",
-    "allow-init-widget-internals",
-    "event:allow-listen",
-    "event:allow-unlisten",
-    "apis-fs:default"
-  ]
+  "permissions": ["allow-bundle-widget", "apis-fs:default"]
 }

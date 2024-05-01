@@ -2,10 +2,8 @@
 
 use crate::{
     bundler::bundle,
-    config::{
-        read_widget_config, read_widget_internals, write_widget_internals,
-        WidgetConfigCollection, WidgetInternal,
-    },
+    config::{read_widget_config, WidgetConfigCollection},
+    settings::{read_settings, write_settings, Settings},
     states::{WidgetBaseDirectoryState, WidgetConfigCollectionState},
     utils::toggle_click_through_state,
 };
@@ -172,7 +170,7 @@ pub(crate) fn bundle_widget(
             &widget_config.directory,
             widget_entry,
             apis_blob_url,
-            &widget_config.external_dependencies,
+            &widget_config.external_deps,
         )
         .context(format!("Failed to bundle widget (id={})", widget_id))
         .map_err(|e| cmderr!(e));
@@ -207,19 +205,17 @@ pub(crate) fn open_widget_base(app_handle: AppHandle) -> CommandOut<()> {
     app_handle.shell().open(widget_base.to_string_lossy(), None).map_err(|e| cmderr!(e))
 }
 
-/// Command for initializing the widget internals state.
+/// Command for initializing the settings.
 ///
-/// This command tries to load the previously stored widget internals. It never fails,
-/// but instead returns an empty widget internals mapping upon any error.
+/// This command tries to load the previously stored settings. It never fails, but
+/// instead returns the default settings upon any error.
 #[command]
-pub(crate) fn init_widget_internals(
-    app_handle: AppHandle,
-) -> CommandOut<HashMap<String, WidgetInternal>> {
+pub(crate) fn init_settings(app_handle: AppHandle) -> CommandOut<Settings> {
     let app_config_dir = match app_handle.path().app_config_dir() {
         Ok(app_config_dir) => app_config_dir,
         Err(_) => return Ok(Default::default()),
     };
-    Ok(read_widget_internals(&app_config_dir))
+    Ok(read_settings(&app_config_dir))
 }
 
 /// Command for cleaning up and exiting the application.
@@ -227,10 +223,7 @@ pub(crate) fn init_widget_internals(
 /// This command will try to save the widget internals for persistence before exiting
 /// the application, but failure to do so will not prevent the application from exiting.
 #[command]
-pub(crate) fn exit_app(
-    app_handle: AppHandle,
-    widget_internals: HashMap<String, WidgetInternal>,
-) -> CommandOut<()> {
+pub(crate) fn exit_app(app_handle: AppHandle, settings: Settings) -> CommandOut<()> {
     let app_config_dir = match app_handle.path().app_config_dir() {
         Ok(app_config_dir) => app_config_dir,
         Err(_) => {
@@ -238,7 +231,8 @@ pub(crate) fn exit_app(
             return Ok(());
         },
     };
-    let _ = write_widget_internals(&app_config_dir, &widget_internals);
+
+    let _ = write_settings(&app_config_dir, &settings);
     app_handle.exit(0);
     Ok(())
 }

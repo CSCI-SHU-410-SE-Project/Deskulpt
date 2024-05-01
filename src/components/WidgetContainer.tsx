@@ -1,11 +1,12 @@
 import { Box, Tooltip } from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
-import { ReactNode, useRef } from "react";
+import DragHandleIcon from "@mui/icons-material/DragHandle";
+import { ReactNode, useMemo, useRef } from "react";
 import Draggable, { DraggableData, DraggableEvent } from "react-draggable";
 import { ErrorBoundary } from "react-error-boundary";
-import ErrorDisplay from "../ErrorDisplay";
-import { grabErrorInfo } from "../../utils";
-import { WidgetInternal } from "../../types";
+import ErrorDisplay from "./ErrorDisplay";
+import { grabErrorInfo } from "../utils";
+import { WidgetSetting } from "../types";
 
 /**
  * The widget container component.
@@ -14,31 +15,29 @@ import { WidgetInternal } from "../../types";
  */
 export default function WidgetContainer(props: {
   id: string;
-  internal: WidgetInternal;
-  setInternal: (internal: WidgetInternal) => void;
+  setting: WidgetSetting;
+  setSetting: (setting: WidgetSetting) => void;
   children: ReactNode;
 }) {
-  const { id, internal, setInternal, children } = props;
+  const { id, setting, setSetting, children } = props;
   const containerRef = useRef(null);
+
+  // Use an empty dependency array so that `useMemo` will evaluate only once, and the
+  // resulting value would be the initial setting
+  const initialSetting = useMemo(() => setting, []);
 
   /**
    * Update the container position according to transform data.
-   *
-   * By default the `Draggable` component uses `transform` to move the container. This,
-   * however, makes it impossible to obtain the actual position of the container, and
-   * can cause mouse events to be misaligned with the actual position of the container.
-   * The solution is to force zero `transform` and manually update the absolute position
-   * of the container on dragging termination based on data reported by `Draggable`.
    */
   function updateContainerPos(_: DraggableEvent, data: DraggableData) {
-    setInternal({ x: internal.x + data.x, y: internal.y + data.y });
+    setSetting({ x: setting.x + data.x, y: setting.y + data.y });
   }
 
   return (
     <Draggable
       nodeRef={containerRef}
-      position={{ x: 0, y: 0 }}
       onStop={updateContainerPos}
+      handle=".draggable-handle"
     >
       <Box
         ref={containerRef}
@@ -48,8 +47,8 @@ export default function WidgetContainer(props: {
           border: "2px solid black",
           backgroundColor: "rgba(0, 0, 0, 0.2)",
           position: "absolute",
-          left: internal.x,
-          top: internal.y,
+          left: initialSetting.x,
+          top: initialSetting.y,
         }}
       >
         <Tooltip title={id} placement="left">
@@ -57,13 +56,23 @@ export default function WidgetContainer(props: {
             sx={{
               position: "absolute",
               top: 5,
-              right: 5,
+              right: 25,
               zIndex: 2000,
               fontSize: 15,
             }}
           />
         </Tooltip>
-        <ErrorBoundary fallbackRender={(props) => FallBack(id, props)}>
+        <DragHandleIcon
+          className="draggable-handle"
+          sx={{
+            position: "absolute",
+            top: 5,
+            right: 5,
+            zIndex: 2000,
+            fontSize: 15,
+          }}
+        />
+        <ErrorBoundary fallbackRender={({ error }) => FallBack(id, error)}>
           {children}
         </ErrorBoundary>
       </Box>
@@ -72,14 +81,12 @@ export default function WidgetContainer(props: {
 }
 
 /**
- * The fallback component if the user widget fails to render.
+ * The fallback component of the error boundary.
  */
-function FallBack(id: string, props: { error: unknown }) {
-  const { error } = props;
-
+function FallBack(id: string, error: unknown) {
   return (
     <ErrorDisplay
-      title={`Error in '${id}': widget rendering failed (likely a problem with the React component returned by the \`render\` function)`}
+      title={`Error in '${id}': potential issues with the \`render\` function)`}
       error={grabErrorInfo(error)}
     />
   );

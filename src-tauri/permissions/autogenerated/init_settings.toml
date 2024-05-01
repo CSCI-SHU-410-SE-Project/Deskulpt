@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-init-settings"
+description = "Enables the init_settings command without any pre-configured scope."
+commands.allow = ["init_settings"]
+
+[[permission]]
+identifier = "deny-init-settings"
+description = "Denies the init_settings command without any pre-configured scope."
+commands.deny = ["init_settings"]

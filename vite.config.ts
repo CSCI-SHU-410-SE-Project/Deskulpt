@@ -23,7 +23,7 @@ export default defineConfig(({ command }) => ({
   build: {
     rollupOptions: {
       input: {
-        main: resolve(__dirname, "views/index.html"),
+        manager: resolve(__dirname, "views/manager.html"),
         canvas: resolve(__dirname, "views/canvas.html"),
       },
       output: {
