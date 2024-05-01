@@ -4,7 +4,7 @@ import { invokeExitApp } from "../commands";
 import { ManagerWidgetState } from "../types";
 
 export function useExitAppListener(
-  toggleShortcut: string,
+  toggleShortcut: string | null,
   managerWidgetStates: Record<string, ManagerWidgetState>,
 ) {
   useEffect(() => {
@@ -15,7 +15,6 @@ export function useExitAppListener(
           setting,
         ]),
       );
-      console.log("Exiting app with settings:", widgetSettings);
       invokeExitApp({ toggleShortcut, widgetSettings }).catch(console.error);
     });
 

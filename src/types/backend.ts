@@ -24,7 +24,7 @@ export interface DeskulptConf {
 
 /** See `settings.rs` for its backend counterpart. */
 export interface Settings {
-  toggleShortcut: string;
+  toggleShortcut: string | null;
   widgetSettings: Record<string, WidgetSetting>;
 }
 

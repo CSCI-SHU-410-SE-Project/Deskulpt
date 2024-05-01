@@ -7,6 +7,7 @@ import { Settings } from "../types";
 import { useToggleShortcut } from "../hooks/useToggleShortcut";
 import { getNewManagerWidgetStates, renderWidgets } from "./utils";
 import { useExitAppListener } from "../hooks/useExitAppListener";
+import { useUpdateSettingListener } from "../hooks/useUpdateSettingListener";
 
 export default function App(props: { initialSettings: Settings }) {
   const { initialSettings } = props;
@@ -18,6 +19,7 @@ export default function App(props: { initialSettings: Settings }) {
   >({});
 
   useExitAppListener(toggleShortcut, managerWidgetStates);
+  useUpdateSettingListener(setManagerWidgetStates);
 
   /**
    * Rescan the widget base directory and render newly added widgets.
@@ -87,7 +89,7 @@ export default function App(props: { initialSettings: Settings }) {
       >
         View Widgets
       </Button>
-      <Button variant="outlined" onClick={() => setToggleShortcut("CmdorCtrl+Shift+G")}>
+      <Button variant="outlined" onClick={() => setToggleShortcut("CmdorCtrl+Shift+8")}>
         Change Shortcut
       </Button>
       <Box>Current shortcut: {toggleShortcut}</Box>

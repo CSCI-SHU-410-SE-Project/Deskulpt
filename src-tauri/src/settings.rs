@@ -12,7 +12,7 @@ use std::{
 pub(crate) struct Settings {
     /// The keyboard shortcut for toggling the canvas.
     #[serde(rename = "toggleShortcut")]
-    toggle_shorcut: String,
+    toggle_shorcut: Option<String>,
     /// The collection of per-widget settings.
     #[serde(rename = "widgetSettings")]
     widget_settings: HashMap<String, WidgetSetting>,
@@ -20,10 +20,7 @@ pub(crate) struct Settings {
 
 impl Default for Settings {
     fn default() -> Self {
-        Self {
-            toggle_shorcut: "CmdorCtrl+Shift+H".to_string(),
-            widget_settings: Default::default(),
-        }
+        Self { toggle_shorcut: None, widget_settings: Default::default() }
     }
 }
 
