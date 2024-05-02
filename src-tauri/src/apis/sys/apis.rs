@@ -45,9 +45,8 @@ pub struct NetworkInfo {
 #[command]
 pub(crate) fn get_system_info<R: Runtime>(
     app_handle: AppHandle<R>,
-    widget_id: String,
 ) -> CommandOut<SystemInfo> {
-    crate::widget::sys::utils::get_resource_path(&app_handle, &widget_id, "");
+    crate::apis::sys::utils::get_widget_base(&app_handle);
     Ok(get_system())
 }
 

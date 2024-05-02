@@ -19,10 +19,7 @@ fn main() {
         Attributes::new()
             .codegen(CodegenContext::new())
             .plugin("apis-fs", InlinedPlugin::new().commands(WIDGET_APIS_FS_COMMANDS))
-            .plugin(
-                "widget-sys",
-                InlinedPlugin::new().commands(WIDGET_APIS_SYS_COMMANDS),
-            )
+            .plugin("apis-sys", InlinedPlugin::new().commands(WIDGET_APIS_SYS_COMMANDS))
             .app_manifest(AppManifest::new().commands(INTERNAL_COMMANDS)),
     )
     .expect("Failed to run tauri-build");

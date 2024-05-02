@@ -3,5 +3,5 @@
   "identifier": "canvas-capabilities",
   "local": true,
   "windows": ["canvas"],
-  "permissions": ["event:allow-listen", "apis-fs:default", "widget-sys:default"]
+  "permissions": ["event:allow-listen", "apis-fs:default", "apis-sys:default"]
 }
