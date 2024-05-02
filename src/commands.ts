@@ -15,3 +15,7 @@ export async function invokeBundleWidget(widgetId: string, apisBlobUrl: string) 
 export async function invokeExitApp(settings: Settings) {
   return invoke<null>("exit_app", { settings });
 }
+
+export async function invokeOpenWidgetBase() {
+  return invoke<null>("open_widget_base", {});
+}

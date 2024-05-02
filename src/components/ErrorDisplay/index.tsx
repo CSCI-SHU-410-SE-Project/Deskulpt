@@ -1,4 +1,4 @@
-import { Box } from "@mui/material";
+import { ErrorBody, ErrorTitle, ScrollArea } from "./styled";
 
 /**
  * The error display component.
@@ -13,23 +13,9 @@ export default function ErrorDisplay(props: { title: string; error: string }) {
   const { title, error } = props;
 
   return (
-    <Box>
-      <Box
-        sx={{
-          fontWeight: "bold",
-          color: "darkred",
-        }}
-      >
-        {title}
-      </Box>
-      <Box
-        sx={{
-          whiteSpace: "pre-wrap",
-          fontFamily: "monospace",
-        }}
-      >
-        {error}
-      </Box>
-    </Box>
+    <ScrollArea>
+      <ErrorTitle>{title}</ErrorTitle>
+      <ErrorBody>{error}</ErrorBody>
+    </ScrollArea>
   );
 }

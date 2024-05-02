@@ -1,12 +1,10 @@
-import { Box, Tooltip } from "@mui/material";
-import InfoIcon from "@mui/icons-material/Info";
-import DragHandleIcon from "@mui/icons-material/DragHandle";
-import { ReactNode, useMemo, useRef } from "react";
+import { ReactNode, useRef } from "react";
 import Draggable, { DraggableData, DraggableEvent } from "react-draggable";
 import { ErrorBoundary } from "react-error-boundary";
-import ErrorDisplay from "./ErrorDisplay";
-import { grabErrorInfo } from "../utils";
-import { WidgetSetting } from "../types";
+import ErrorDisplay from "../ErrorDisplay";
+import { grabErrorInfo } from "../../utils";
+import { WidgetSetting } from "../../types";
+import { DragHandle, Wrapper } from "./styled";
 
 /**
  * The widget container component.
@@ -22,10 +20,6 @@ export default function WidgetContainer(props: {
   const { id, setting, setSetting, children } = props;
   const containerRef = useRef(null);
 
-  // Use an empty dependency array so that `useMemo` will evaluate only once, and the
-  // resulting value would be the initial setting
-  const initialSetting = useMemo(() => setting, []);
-
   /**
    * Update the container position according to transform data.
    */
@@ -37,45 +31,25 @@ export default function WidgetContainer(props: {
     <Draggable
       nodeRef={containerRef}
       onStop={updateContainerPos}
+      bounds="body"
       handle=".draggable-handle"
+      position={{ x: 0, y: 0 }}
     >
-      <Box
+      <Wrapper
         ref={containerRef}
-        sx={{
-          padding: 1,
-          borderRadius: 1,
-          border: "2px solid black",
-          backgroundColor: "rgba(0, 0, 0, 0.2)",
+        style={{
           position: "absolute",
-          left: initialSetting.x,
-          top: initialSetting.y,
+          left: setting.x,
+          top: setting.y,
+          width: 300,
+          height: 100,
         }}
       >
-        <Tooltip title={id} placement="left">
-          <InfoIcon
-            sx={{
-              position: "absolute",
-              top: 5,
-              right: 25,
-              zIndex: 2000,
-              fontSize: 15,
-            }}
-          />
-        </Tooltip>
-        <DragHandleIcon
-          className="draggable-handle"
-          sx={{
-            position: "absolute",
-            top: 5,
-            right: 5,
-            zIndex: 2000,
-            fontSize: 15,
-          }}
-        />
+        <DragHandle className="draggable-handle" />
         <ErrorBoundary fallbackRender={({ error }) => FallBack(id, error)}>
           {children}
         </ErrorBoundary>
-      </Box>
+      </Wrapper>
     </Draggable>
   );
 }

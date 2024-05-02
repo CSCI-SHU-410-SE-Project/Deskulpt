@@ -20,11 +20,16 @@ export default function App() {
    * notifies the manager to update the widget-specific setting as well.
    */
   async function setSettingForWidget(widgetId: string, setting: WidgetSetting) {
-    await emitUpdateSettingToManager({ widgetId, setting });
+    // This step must be done first, otherwise there will be a visible delay between
+    // the transform change and the absolute position change, causing an undesirable
+    // visual effect; TODO: figure out a way that do not use absolute position per
+    // drag termination but still be able to keep the two-way control of position
+    // between the manager and the canvas
     setCanvasWidgetStates((prev) => ({
       ...prev,
       [widgetId]: { ...prev[widgetId], setting },
     }));
+    await emitUpdateSettingToManager({ widgetId, setting });
   }
 
   return Object.entries(canvasWidgetStates).map(([widgetId, state]) => (

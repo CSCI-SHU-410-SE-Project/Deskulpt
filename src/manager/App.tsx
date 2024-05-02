@@ -1,6 +1,3 @@
-import { Box, Button, IconButton, List, ListItem, ListItemText } from "@mui/material";
-import RefreshIcon from "@mui/icons-material/Refresh";
-import { invoke } from "@tauri-apps/api/core";
 import { useEffect, useState } from "react";
 import { ManagerWidgetState } from "../types";
 import { Settings } from "../types";
@@ -8,12 +5,16 @@ import { useToggleShortcut } from "../hooks/useToggleShortcut";
 import { getNewManagerWidgetStates, renderWidgets } from "./utils";
 import { useExitAppListener } from "../hooks/useExitAppListener";
 import { useUpdateSettingListener } from "../hooks/useUpdateSettingListener";
+import WidgetsTab from "../components/WidgetsTab";
+import SettingsTab from "../components/SettingsTab";
+import { FloatButton, Tabs } from "antd";
+import { FileScan, FolderOpen, Repeat } from "lucide-react";
+import { invokeOpenWidgetBase } from "../commands";
 
 export default function App(props: { initialSettings: Settings }) {
   const { initialSettings } = props;
-  const { toggleShortcut, setToggleShortcut } = useToggleShortcut(
-    initialSettings.toggleShortcut,
-  );
+  // TODO: `setToggleShortcut` and use it
+  const { toggleShortcut } = useToggleShortcut(initialSettings.toggleShortcut);
   const [managerWidgetStates, setManagerWidgetStates] = useState<
     Record<string, ManagerWidgetState>
   >({});
@@ -55,44 +56,46 @@ export default function App(props: { initialSettings: Settings }) {
   }, []);
 
   return (
-    <Box>
-      <List>
-        {Object.entries(managerWidgetStates)
-          .sort()
-          .map(([widgetId, state]) => (
-            <ListItem
-              key={widgetId}
-              secondaryAction={
-                <IconButton onClick={() => renderWidgets({ [widgetId]: state })}>
-                  <RefreshIcon />
-                </IconButton>
-              }
-            >
-              <ListItemText
-                primary={
-                  "Ok" in state.config ? state.config.Ok.deskulptConf.name : "???"
-                }
-                secondary={widgetId}
+    <>
+      <Tabs
+        defaultActiveKey="1"
+        type="card"
+        items={[
+          {
+            key: "1",
+            label: "Widgets",
+            children: (
+              <WidgetsTab
+                managerWidgetStates={managerWidgetStates}
+                setManagerWidgetStates={setManagerWidgetStates}
               />
-            </ListItem>
-          ))}
-      </List>
-      <Button variant="outlined" onClick={rescanAndRender}>
-        Rescan
-      </Button>
-      <Button variant="outlined" onClick={() => renderWidgets(managerWidgetStates)}>
-        Render All
-      </Button>
-      <Button
-        variant="outlined"
-        onClick={() => invoke("open_widget_base").catch(console.error)}
-      >
-        View Widgets
-      </Button>
-      <Button variant="outlined" onClick={() => setToggleShortcut("CmdorCtrl+Shift+8")}>
-        Change Shortcut
-      </Button>
-      <Box>Current shortcut: {toggleShortcut}</Box>
-    </Box>
+            ),
+          },
+          {
+            key: "2",
+            label: "Settings",
+            children: <SettingsTab />,
+          },
+        ]}
+      />
+      <FloatButton
+        style={{ bottom: "130px" }}
+        icon={<Repeat size={15} />}
+        tooltip="Re-render all widgets"
+        onClick={() => renderWidgets(managerWidgetStates)}
+      />
+      <FloatButton
+        style={{ bottom: "80px" }}
+        icon={<FileScan size={15} />}
+        tooltip="Rescan widgets"
+        onClick={rescanAndRender}
+      />
+      <FloatButton
+        style={{ bottom: "30px" }}
+        icon={<FolderOpen size={15} />}
+        tooltip="Open base directory"
+        onClick={invokeOpenWidgetBase}
+      />
+    </>
   );
 }

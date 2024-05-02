@@ -49,7 +49,7 @@ export interface WidgetModule {
 
 export interface RenderWidgetPayload {
   widgetId: string;
-  bundle: true;
+  bundle: boolean;
   setting: WidgetSetting;
 }
 
