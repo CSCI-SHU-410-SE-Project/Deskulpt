@@ -1,7 +1,6 @@
 //! This module implements the commands for `fs` in `@deskulpt-test/apis`.
 
-use super::utils;
-use crate::{cmderr, commands::CommandOut};
+use crate::{apis::utils, cmderr, commands::CommandOut};
 use anyhow::Context;
 use std::io::Write;
 use tauri::{command, AppHandle, Runtime};

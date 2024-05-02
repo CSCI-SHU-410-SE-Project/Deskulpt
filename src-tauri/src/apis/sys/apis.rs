@@ -1,4 +1,4 @@
-use crate::commands::CommandOut;
+use crate::{apis::utils, commands::CommandOut};
 use serde::{Deserialize, Serialize};
 use sysinfo::{Disks, Networks, System};
 use tauri::{command, AppHandle, Runtime};
@@ -46,7 +46,7 @@ pub struct NetworkInfo {
 pub(crate) fn get_system_info<R: Runtime>(
     app_handle: AppHandle<R>,
 ) -> CommandOut<SystemInfo> {
-    crate::apis::sys::utils::get_widget_base(&app_handle);
+    utils::get_widget_base(&app_handle);
     Ok(get_system())
 }
 

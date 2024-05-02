@@ -7,7 +7,6 @@ use tauri::{
 };
 
 mod apis;
-mod utils;
 
 /// Build the `fs` plugin for `@deskulpt-test/apis`.
 ///
