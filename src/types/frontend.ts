@@ -23,6 +23,10 @@ export interface ManagerWidgetState {
 export interface CanvasWidgetState {
   /** The rendered widget component or the error component to display. */
   display: ReactNode;
+  /** The width of the widget container, as exported from the widget module. */
+  width: number | string;
+  /** The height of the widget container, as exported from the widget module. */
+  height: number | string;
   /** Setting of the widget. */
   setting: WidgetSetting;
   /** The URL of the blob of widget APIs. */

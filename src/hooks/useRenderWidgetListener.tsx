@@ -5,6 +5,11 @@ import { invokeBundleWidget } from "../commands";
 import ErrorDisplay from "../components/ErrorDisplay";
 import { grabErrorInfo } from "../utils";
 
+// The default width and height of a widget container, used when the widget module
+// fails to be loaded correctly
+const defaultContainerWidth = 300;
+const defaultContainerHeight = 150;
+
 export function useRenderWidgetListener(
   canvasWidgetStates: Record<string, CanvasWidgetState>,
   setCanvasWidgetStates: Dispatch<SetStateAction<Record<string, CanvasWidgetState>>>,
@@ -75,6 +80,8 @@ export function useRenderWidgetListener(
               error={grabErrorInfo(err)}
             />
           ),
+          width: defaultContainerWidth,
+          height: defaultContainerHeight,
           moduleBlobUrl: null,
           setting,
           apisBlobUrl,
@@ -103,6 +110,8 @@ export function useRenderWidgetListener(
                 error={moduleError}
               />
             ),
+            width: defaultContainerWidth,
+            height: defaultContainerHeight,
             moduleBlobUrl,
             setting,
             apisBlobUrl,
@@ -116,6 +125,8 @@ export function useRenderWidgetListener(
         ...prev,
         [widgetId]: {
           display: module.default.render(),
+          width: module.default.width,
+          height: module.default.height,
           moduleBlobUrl,
           setting,
           apisBlobUrl,
@@ -131,6 +142,8 @@ export function useRenderWidgetListener(
               error={grabErrorInfo(err)}
             />
           ),
+          width: defaultContainerWidth,
+          height: defaultContainerHeight,
           moduleBlobUrl,
           setting,
           apisBlobUrl,
@@ -170,6 +183,9 @@ function getWidgetModuleError(module: WidgetModule) {
   }
   if (typeof widget.render !== "function") {
     return "The `render` key of the default export must be a function.";
+  }
+  if (widget.width === undefined || widget.height === undefined) {
+    return "The widget must provide `width` and `height` properties.";
   }
   return null;
 }

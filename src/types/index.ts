@@ -20,4 +20,16 @@ export interface Widget {
    * @returns The React element to render.
    */
   render: () => ReactNode;
+  /**
+   * The width of the widget.
+   *
+   * This can be a number in pixels, or a string that is accepted in CSS.
+   */
+  width: number | string;
+  /**
+   * The height of the widget.
+   *
+   * This can be a number in pixels, or a string that is accepted in CSS.
+   */
+  height: number | string;
 }

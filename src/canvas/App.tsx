@@ -32,14 +32,17 @@ export default function App() {
     await emitUpdateSettingToManager({ widgetId, setting });
   }
 
-  return Object.entries(canvasWidgetStates).map(([widgetId, state]) => (
-    <WidgetContainer
-      key={widgetId}
-      id={widgetId}
-      setting={state.setting}
-      setSetting={(setting) => setSettingForWidget(widgetId, setting)}
-    >
-      {state.display}
-    </WidgetContainer>
-  ));
+  return Object.entries(canvasWidgetStates).map(
+    ([widgetId, { display, width, height, setting }]) => (
+      <WidgetContainer
+        key={widgetId}
+        id={widgetId}
+        setting={setting}
+        setSetting={(setting) => setSettingForWidget(widgetId, setting)}
+        containerProps={{ width, height }}
+      >
+        {display}
+      </WidgetContainer>
+    ),
+  );
 }

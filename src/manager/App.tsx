@@ -7,6 +7,8 @@ import { useExitAppListener } from "../hooks/useExitAppListener";
 import { useUpdateSettingListener } from "../hooks/useUpdateSettingListener";
 import WidgetsTab from "../components/WidgetsTab";
 import SettingsTab from "../components/SettingsTab";
+import LogsTab from "../components/LogsTab";
+import AboutTab from "../components/AboutTab";
 import { FloatButton, Tabs } from "antd";
 import { FileScan, FolderOpen, Repeat } from "lucide-react";
 import { invokeOpenWidgetBase } from "../commands";
@@ -75,6 +77,16 @@ export default function App(props: { initialSettings: Settings }) {
             key: "2",
             label: "Settings",
             children: <SettingsTab />,
+          },
+          {
+            key: "3",
+            label: "Logs",
+            children: <LogsTab />,
+          },
+          {
+            key: "4",
+            label: "About",
+            children: <AboutTab />,
           },
         ]}
       />

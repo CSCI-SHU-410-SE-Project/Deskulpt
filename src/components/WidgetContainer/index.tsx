@@ -16,8 +16,9 @@ export default function WidgetContainer(props: {
   setting: WidgetSetting;
   setSetting: (setting: WidgetSetting) => void;
   children: ReactNode;
+  containerProps: { width: number | string; height: number | string };
 }) {
-  const { id, setting, setSetting, children } = props;
+  const { id, setting, setSetting, children, containerProps } = props;
   const containerRef = useRef(null);
 
   /**
@@ -41,8 +42,8 @@ export default function WidgetContainer(props: {
           position: "absolute",
           left: setting.x,
           top: setting.y,
-          width: 300,
-          height: 100,
+          width: containerProps.width,
+          height: containerProps.height,
         }}
       >
         <DragHandle className="draggable-handle" />
