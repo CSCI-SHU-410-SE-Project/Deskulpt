@@ -1,3 +1,5 @@
+//! This module invludes the global and per-widget settings and relevant utilities.
+
 use anyhow::Error;
 use serde::{Deserialize, Serialize};
 use std::{
@@ -23,9 +25,9 @@ pub(crate) struct Settings {
 /// controlled directly by the frontend.
 #[derive(Deserialize, Serialize)]
 pub(crate) struct WidgetSetting {
-    /// The x-coordinate of the widget.
+    /// The x-coordinate of the widget in pixels.
     x: i32,
-    /// The y-coordinate of the widget.
+    /// The y-coordinate of the widget in pixels.
     y: i32,
     /// The opacity of the widget in percentage.
     opacity: i32,

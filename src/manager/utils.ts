@@ -38,7 +38,7 @@ export async function getNewManagerWidgetStates(
         setting = initialWidgetSettings[widgetId];
       } else {
         // Fall back to the default setting
-        setting = { x: 0, y: 0, opacity: 1 };
+        setting = { x: 0, y: 0, opacity: 100 };
       }
       return [widgetId, { config, setting }];
     }),
