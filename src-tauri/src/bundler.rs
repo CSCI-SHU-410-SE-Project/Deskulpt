@@ -4,15 +4,14 @@
 //! the use case of bundling Deskulpt widgets which has a custom set of dependency
 //! rules and are (at least recommended to be) small.
 
+use anyhow::{bail, Context, Error};
+use path_clean::PathClean;
 use std::{
     collections::{HashMap, HashSet},
     fs::File,
     io::Read,
     path::{Component, Path, PathBuf},
 };
-
-use anyhow::{bail, Context, Error};
-use path_clean::PathClean;
 use swc_atoms::Atom;
 use swc_bundler::{Bundler, Hook, Load, ModuleData, ModuleRecord, Resolve};
 use swc_common::{
@@ -48,8 +47,12 @@ pub(crate) fn bundle(
     root: &Path,
     target: &Path,
     apis_blob_url: String,
-    dependency_map: Option<&HashMap<String, String>>,
+    dependency_map: &HashMap<String, String>,
 ) -> Result<String, Error> {
+    if !target.exists() {
+        bail!("Entry point does not exist: '{}'", target.display());
+    }
+
     let globals = Globals::default();
     let cm = Lrc::new(SourceMap::new(FilePathMapping::empty()));
 
@@ -60,9 +63,7 @@ pub(crate) fn bundle(
             Atom::from("@deskulpt-test/react"),
             Atom::from("@deskulpt-test/apis"),
         ]);
-        if let Some(map) = dependency_map {
-            dependencies.extend(map.keys().map(|k| Atom::from(k.clone())));
-        }
+        dependencies.extend(dependency_map.keys().map(|k| Atom::from(k.clone())));
         Vec::from_iter(dependencies)
     };
 
@@ -118,7 +119,7 @@ pub(crate) fn bundle(
         // this module is not available when runnning the bundled code in the browser,
         // so we have to use the "classic" transform instead. The "classic" transform
         // requires `React` to be in scope, which we can require users to bring into
-        // scope by assigning `const React = window.__DESKULPT__.React`.
+        // scope by importing `import React from "@deskulpt-test/react";`.
         let mut jsx_transform = jsx::<SingleThreadedComments>(
             cm.clone(),
             None,
@@ -455,7 +456,7 @@ mod tests {
             &bundle_root,
             &bundle_root.join("index.jsx"),
             Default::default(),
-            None,
+            &Default::default(),
         )
         .expect("Expected bundling to succeed");
 
@@ -480,6 +481,19 @@ mod tests {
             )),
         ]
     )]
+    #[case::entry_not_exist(
+        "entry_not_exist",
+        vec![
+            ChainReason::Exact(format!(
+                "Entry point does not exist: '{}'",
+                fixture_dir()
+                    .join("entry_not_exist")
+                    .join("input")
+                    .join("index.jsx")
+                    .display()
+            ))
+        ]
+    )]
     fn test_bundle_error(#[case] case: &str, #[case] expected_error: Vec<ChainReason>) {
         let case_dir = fixture_dir().join(case);
         let bundle_root = case_dir.join("input");
@@ -487,7 +501,7 @@ mod tests {
             &bundle_root,
             &bundle_root.join("index.jsx"),
             Default::default(),
-            None,
+            &Default::default(),
         )
         .expect_err("Expected bundling error");
         assert_err_eq(error, expected_error);
@@ -509,8 +523,9 @@ mod tests {
         std::fs::write(&entry_path, format!("import {{ foo }} from {utils_path:?};"))
             .unwrap();
 
-        let error = bundle(&bundle_root, &entry_path, Default::default(), None)
-            .expect_err("Expected bundling error");
+        let error =
+            bundle(&bundle_root, &entry_path, Default::default(), &Default::default())
+                .expect_err("Expected bundling error");
         let expected_error = vec![
             ChainReason::Exact("load_transformed failed".to_string()),
             ChainReason::Exact("failed to analyze module".to_string()),

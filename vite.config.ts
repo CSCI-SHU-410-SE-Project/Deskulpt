@@ -6,7 +6,12 @@ const buildAssets = "assets";
 
 export default defineConfig(({ command }) => ({
   plugins: [
-    react(),
+    react({
+      jsxImportSource: "@emotion/react",
+      babel: {
+        plugins: ["@emotion/babel-plugin"],
+      },
+    }),
     importmapPlugin(command, {
       "@deskulpt-test/react": "src/.scripts/react.js",
       "@deskulpt-test/raw-apis": "src/.scripts/raw-apis.js",
@@ -23,7 +28,7 @@ export default defineConfig(({ command }) => ({
   build: {
     rollupOptions: {
       input: {
-        main: resolve(__dirname, "views/index.html"),
+        manager: resolve(__dirname, "views/manager.html"),
         canvas: resolve(__dirname, "views/canvas.html"),
       },
       output: {

@@ -1,1 +1,1 @@
-const React=window.__DESKULPT__.defaultDeps.React;const __default={render(){return React.createElement("div",null,"Hello, world!");}};export{__default as default};
+import React from"@deskulpt-test/react";const __default={render(){return React.createElement("div",null,"Hello, world!");}};export{__default as default};

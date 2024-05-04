@@ -1,0 +1,15 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "manager-capabilities",
+  "description": "Capabilities of the manager in addition to the common capabilities",
+  "local": true,
+  "windows": ["manager"],
+  "permissions": [
+    "allow-exit-app",
+    "allow-init-settings",
+    "allow-open-widget-directory",
+    "allow-refresh-widget-collection",
+    "allow-register-toggle-shortcut",
+    "shell:allow-open"
+  ]
+}

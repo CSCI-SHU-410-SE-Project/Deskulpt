@@ -16,23 +16,3 @@ export function grabErrorInfo(err: unknown) {
   }
   return "Unknown error caught that is neither a string nor an Error";
 }
-
-/**
- * Create a blob for widget APIs.
- *
- * This function fetches the template of widget APIs and replaces the placeholder with
- * the actual widget ID. The template essentially refers to raw APIs, converts them to
- * widget-specific APIs, and exports them. The blob is meant to be wrapped in a URL for
- * dynamic import using `createObjectURL`.
- *
- * @param widgetId The ID of the widget to create APIs for.
- * @returns The blob object wrapping the widget APIs.
- */
-export async function createWidgetApisBlob(widgetId: string) {
-  // The template is in the public directory, bundled from `tooling/apis`
-  const response = await fetch("/.wrap-apis.js.txt");
-  const template = await response.text();
-  return new Blob([template.replace("__DESKULPT_WIDGET_ID__", widgetId)], {
-    type: "application/javascript",
-  });
-}
