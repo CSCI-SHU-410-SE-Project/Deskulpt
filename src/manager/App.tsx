@@ -98,6 +98,7 @@ export default function App(props: { initialSettings: Settings }) {
       defaultActiveKey="1"
       type="card"
       items={tabItems}
+      size="small"
       css={{
         "& > .ant-tabs-nav > .ant-tabs-nav-wrap > .ant-tabs-nav-list > .ant-tabs-tab": {
           width: "100px",

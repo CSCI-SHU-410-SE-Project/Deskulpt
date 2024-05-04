@@ -31,5 +31,12 @@ pub(crate) fn toggle_click_through_state(app_handle: &AppHandle) -> Result<(), E
     if prev_can_click_through {
         let _ = canvas.set_focus(); // Consume any error because this is not critical
     }
+
+    // Try to let canvas show the toast message
+    let _ = app_handle.emit_to(
+        "canvas",
+        "show-toast",
+        format!("Canvas {}", if prev_can_click_through { "floated" } else { "sunk" }),
+    );
     Ok(())
 }

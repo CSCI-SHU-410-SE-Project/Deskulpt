@@ -41,7 +41,7 @@ fn main() {
             commands::bundle_widget,
             commands::exit_app,
             commands::init_settings,
-            commands::open_widget_base,
+            commands::open_widget_directory,
             commands::refresh_widget_collection,
             commands::register_toggle_shortcut,
         ])

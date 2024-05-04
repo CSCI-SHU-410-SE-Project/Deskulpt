@@ -4,6 +4,7 @@ import WidgetContainer from "../components/WidgetContainer";
 import { useRenderWidgetListener } from "../hooks/useRenderWidgetListener";
 import { useRemoveWidgetsListener } from "../hooks/useRemoveWidgetsListener";
 import { emitUpdateSettingToManager } from "../events";
+import { useShowToastListener } from "../hooks/useShowToastListener";
 
 /**
  * The main component of the canvas window.
@@ -13,6 +14,7 @@ export default function App() {
     Record<string, CanvasWidgetState>
   >({});
 
+  const contextHolder = useShowToastListener();
   useRenderWidgetListener(canvasWidgetStates, setCanvasWidgetStates);
   useRemoveWidgetsListener(canvasWidgetStates, setCanvasWidgetStates);
 
@@ -35,17 +37,22 @@ export default function App() {
     await emitUpdateSettingToManager({ widgetId, setting });
   }
 
-  return Object.entries(canvasWidgetStates).map(
-    ([widgetId, { display, width, height, setting }]) => (
-      <WidgetContainer
-        key={widgetId}
-        id={widgetId}
-        setting={setting}
-        setSetting={(setting) => setSettingForWidget(widgetId, setting)}
-        containerProps={{ width, height }}
-      >
-        {display}
-      </WidgetContainer>
-    ),
+  return (
+    <>
+      {contextHolder}
+      {Object.entries(canvasWidgetStates).map(
+        ([widgetId, { display, width, height, setting }]) => (
+          <WidgetContainer
+            key={widgetId}
+            id={widgetId}
+            setting={setting}
+            setSetting={(setting) => setSettingForWidget(widgetId, setting)}
+            containerProps={{ width, height }}
+          >
+            {display}
+          </WidgetContainer>
+        ),
+      )}
+    </>
   );
 }

@@ -3,33 +3,52 @@ import Logo from "/deskulpt.svg";
 /**
  * The about tab in the manager.
  */
-
 export default function AboutTab() {
   return (
-    <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
-      <div style={{ marginRight: "20px" }}>
-        <img
-          src={Logo}
-          alt="Software Logo"
-          style={{ width: "150px", height: "auto" }}
-        />
+    <div
+      css={{
+        height: "300px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      <div css={{ flex: 1 }}>
+        <div css={{ textAlign: "center" }}>
+          <img src={Logo} alt="Deskulpt" width={150} />
+        </div>
       </div>
-      <div style={{ textAlign: "left" }}>
-        <h1 style={{ fontSize: "24px", marginBottom: "10px" }}>Deskulpt v1.0.0</h1>
-        <p style={{ fontSize: "16px", marginBottom: "10px" }}>
-          Created by: Xinyu Li, Yao Xiao, Yuchen Zhou, Runkai Zhu
+      <div css={{ flex: 2 }}>
+        <div css={{ fontWeight: "bold", fontSize: "1.2rem" }}>Deskulpt v1.0.0</div>
+        <div>A Cross-platform Desktop Customization Tool</div>
+        <p>
+          <div>
+            <strong>Version:</strong> 0.0.0 (Under Development)
+          </div>
+          <div>
+            <strong>Authors:</strong> Xinyu Li, Yao Xiao, Yuchen Zhou, Runkai Zhu
+          </div>
+          <div>
+            <strong>Repository:</strong>{" "}
+            <a
+              href="https://github.com/CSCI-SHU-410-SE-Project/Deskulpt"
+              target="_blank"
+              rel="noreferrer"
+            >
+              https://github.com/CSCI-SHU-410-SE-Project/Deskulpt
+            </a>
+          </div>
+          <div>
+            <strong>Documentation:</strong>{" "}
+            <a
+              href="https://csci-shu-410-se-project.github.io/Deskulpt/"
+              target="_blank"
+              rel="noreferrer"
+            >
+              https://csci-shu-410-se-project.github.io/Deskulpt/
+            </a>
+          </div>
         </p>
-        <p style={{ fontSize: "16px", marginBottom: "10px" }}>
-          A Cross-platform Desktop Customization Tool
-        </p>
-        <a
-          href={"https://csci-shu-410-se-project.github.io/Deskulpt/"}
-          target="_blank"
-          rel="noreferrer"
-          style={{ fontSize: "16px", textDecoration: "none", color: "#007bff" }}
-        >
-          Website Link not working
-        </a>
       </div>
     </div>
   );

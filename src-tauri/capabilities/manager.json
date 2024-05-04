@@ -7,8 +7,9 @@
   "permissions": [
     "allow-exit-app",
     "allow-init-settings",
-    "allow-open-widget-base",
+    "allow-open-widget-directory",
     "allow-refresh-widget-collection",
-    "allow-register-toggle-shortcut"
+    "allow-register-toggle-shortcut",
+    "shell:allow-open"
   ]
 }

@@ -213,14 +213,36 @@ pub(crate) fn register_toggle_shortcut(
     }
 }
 
-/// Command for opening the widget base directory.
+/// Command for opening a widget directory or the widget base directory.
 ///
-/// This command will fail if Tauri fails to open the widget base directory, most likely
-/// because of a misconfigured allow list.
+/// If the widget ID is `None`, this command will open the widget base directory.
+/// Otherwise, it checks whether the widget ID exists in the current widget collection
+/// and opens the corresponding widget directory.
+///
+/// This command will fail if:
+///
+/// - The given widget ID is not found in the widget collection.
+/// - Tauri fails to open the widget base directory, most likely due to misconfigured
+///   capabiblities.
 #[command]
-pub(crate) fn open_widget_base(app_handle: AppHandle) -> CommandOut<()> {
+pub(crate) fn open_widget_directory(
+    app_handle: AppHandle,
+    widget_id: Option<String>,
+) -> CommandOut<()> {
     let widget_base = &app_handle.state::<WidgetBaseDirectoryState>().0;
-    app_handle.shell().open(widget_base.to_string_lossy(), None).map_err(|e| cmderr!(e))
+
+    let open_path = match widget_id {
+        Some(widget_id) => {
+            let widget_collection = app_handle.state::<WidgetConfigCollectionState>();
+            if !widget_collection.0.lock().unwrap().contains_key(&widget_id) {
+                cmdbail!("Widget '{}' is not found in the collection", widget_id)
+            }
+            widget_base.join(widget_id)
+        },
+        None => widget_base.to_path_buf(),
+    };
+
+    app_handle.shell().open(open_path.to_string_lossy(), None).map_err(|e| cmderr!(e))
 }
 
 /// Command for initializing the settings.

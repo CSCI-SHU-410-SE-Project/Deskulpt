@@ -5,6 +5,7 @@ import ConfigPanel from "./ConfigPanel";
 import SettingPanel from "./SettingPanel";
 import * as styles from "./styles";
 import { css } from "@emotion/react";
+import { invokeOpenWidgetDirectory } from "../../commands";
 
 /**
  * The details of a widget in the widgets tab.
@@ -24,7 +25,7 @@ export default function Details(props: {
           <span>
             <strong>Configuration</strong> [{widgetId}]
           </span>
-          <Button size="small" onClick={() => console.log("To be done...")}>
+          <Button size="small" onClick={() => invokeOpenWidgetDirectory(widgetId)}>
             Edit
           </Button>
         </div>

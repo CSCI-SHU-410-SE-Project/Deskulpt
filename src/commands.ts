@@ -16,8 +16,8 @@ export async function invokeExitApp(settings: Settings) {
   return invoke<null>("exit_app", { settings });
 }
 
-export async function invokeOpenWidgetBase() {
-  return invoke<null>("open_widget_base");
+export async function invokeOpenWidgetDirectory(widgetId: string | null) {
+  return invoke<null>("open_widget_directory", { widgetId });
 }
 
 export async function invokeInitSettings() {

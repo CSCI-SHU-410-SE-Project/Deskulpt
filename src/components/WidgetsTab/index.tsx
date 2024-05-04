@@ -3,7 +3,7 @@ import { ManagerWidgetState, Result, WidgetConfig, WidgetSetting } from "../../t
 import WidgetInfoPanel from "./Details";
 import { Dispatch, SetStateAction } from "react";
 import { FileScan, FolderOpen, Repeat } from "lucide-react";
-import { invokeOpenWidgetBase } from "../../commands";
+import { invokeOpenWidgetDirectory } from "../../commands";
 import { renderWidgets } from "../../manager/utils";
 
 /**
@@ -67,7 +67,7 @@ export default function WidgetsTab(props: {
         css={{ bottom: "30px" }}
         icon={<FolderOpen size={15} />}
         tooltip="Open base directory"
-        onClick={invokeOpenWidgetBase}
+        onClick={() => invokeOpenWidgetDirectory(null)}
       />
     </>
   );
