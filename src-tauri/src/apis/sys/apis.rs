@@ -1,56 +1,55 @@
-use crate::{apis::utils, commands::CommandOut};
-use serde::{Deserialize, Serialize};
+//! This module implements the commands for `fs` in `@deskulpt-test/apis`.
+
+use crate::commands::CommandOut;
+use serde::Serialize;
 use sysinfo::{Disks, Networks, System};
-use tauri::{command, AppHandle, Runtime};
+use tauri::command;
 
-#[derive(Debug, Serialize, Deserialize)]
-pub struct SystemInfo {
-    pub total_swap: u64,
-    pub used_swap: u64,
-    pub system_name: Option<String>,
-    pub kernel_version: Option<String>,
-    pub os_version: Option<String>,
-    pub host_name: Option<String>,
-    pub cpu_count: usize,
-    pub cpu_info: Vec<CpuInfo>,
-    pub disks: Vec<DiskInfo>,
-    pub networks: Vec<NetworkInfo>,
-    pub total_memory: u64,
-    pub used_memory: u64,
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct SystemInfo {
+    total_swap: u64,
+    used_swap: u64,
+    system_name: Option<String>,
+    kernel_version: Option<String>,
+    os_version: Option<String>,
+    host_name: Option<String>,
+    cpu_count: usize,
+    cpu_info: Vec<CpuInfo>,
+    disks: Vec<DiskInfo>,
+    networks: Vec<NetworkInfo>,
+    total_memory: u64,
+    used_memory: u64,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
-pub struct CpuInfo {
-    pub vendor_id: String,
-    pub brand: String,
-    pub frequency: u64,
-    pub total_cpu_usage: f32,
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct CpuInfo {
+    vendor_id: String,
+    brand: String,
+    frequency: u64,
+    total_cpu_usage: f32,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
-pub struct DiskInfo {
-    pub name: String,
-    pub available_space: u64,
-    pub total_space: u64,
-    pub mount_point: String,
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct DiskInfo {
+    name: String,
+    available_space: u64,
+    total_space: u64,
+    mount_point: String,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
-pub struct NetworkInfo {
-    pub interface_name: String,
-    pub total_received: u64,
-    pub total_transmitted: u64,
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct NetworkInfo {
+    interface_name: String,
+    total_received: u64,
+    total_transmitted: u64,
 }
 
 #[command]
-pub(crate) fn get_system_info<R: Runtime>(
-    app_handle: AppHandle<R>,
-) -> CommandOut<SystemInfo> {
-    utils::get_widget_base(&app_handle);
-    Ok(get_system())
-}
-
-fn get_system() -> SystemInfo {
+pub(crate) fn get_system_info() -> CommandOut<SystemInfo> {
     let mut sys = System::new_all();
     sys.refresh_all();
     let disks_info: Vec<DiskInfo> = Disks::new_with_refreshed_list()
@@ -82,7 +81,7 @@ fn get_system() -> SystemInfo {
         });
     }
 
-    SystemInfo {
+    Ok(SystemInfo {
         total_memory: sys.total_memory(),
         used_memory: sys.used_memory(),
         total_swap: sys.total_swap(),
@@ -95,5 +94,5 @@ fn get_system() -> SystemInfo {
         cpu_info,
         disks: disks_info,
         networks: networks_info,
-    }
+    })
 }

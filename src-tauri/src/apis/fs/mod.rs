@@ -1,4 +1,4 @@
-//! The widget API plugin for `fs` in `@deskulpt-test/apis`..
+//! The widget API plugin for `fs` in `@deskulpt-test/apis`.
 
 use tauri::{
     generate_handler,
@@ -7,6 +7,7 @@ use tauri::{
 };
 
 mod apis;
+mod utils;
 
 /// Build the `fs` plugin for `@deskulpt-test/apis`.
 ///
