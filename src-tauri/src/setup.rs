@@ -1,6 +1,10 @@
 //! The module includes the setup utilities of Deskulpt.
 
 use crate::{states::CanvasClickThroughState, utils::toggle_click_through_state};
+use std::{
+    thread::{sleep, spawn},
+    time::Duration,
+};
 use tauri::{
     menu::{MenuBuilder, MenuItemBuilder},
     tray::ClickType,
@@ -94,7 +98,7 @@ pub(crate) fn init_system_tray(app: &App) -> Result<(), Box<dyn std::error::Erro
             let _ = toggle_click_through_state(app_handle); // Consume potential error
         },
         "manage" => show_manager_window(app_handle),
-        "exit" => app_handle.exit(0),
+        "exit" => on_app_exit(app_handle),
         _ => {},
     });
 
@@ -132,4 +136,26 @@ fn show_manager_window(app_handle: &AppHandle) {
     };
 
     let _ = inner(); // Consume any error
+}
+
+/// The cleanup function to be called on application exit.
+fn on_app_exit(app_handle: &AppHandle) {
+    if app_handle.get_webview_window("manager").is_none() {
+        app_handle.exit(0); // Manager window does not exist; should not happen
+    };
+
+    // Emit the "exit-app" event to the manager window so that it can save the global
+    // settings to a file before the application exits; it will then be in charge of
+    // exiting the application
+    if app_handle.emit_to("manager", "exit-app", ()).is_err() {
+        app_handle.exit(0); // Event fails to be emitted
+    }
+
+    // This is a safeguard to ensure that the application exits in case the manager
+    // window fails to do so; we give it a 5-second timeout
+    let app_handle = app_handle.clone();
+    spawn(move || {
+        sleep(Duration::from_secs(5));
+        app_handle.exit(0);
+    });
 }

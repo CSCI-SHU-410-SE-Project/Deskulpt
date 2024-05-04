@@ -14,13 +14,12 @@ pub(crate) type WidgetConfigCollection = HashMap<String, Result<WidgetConfig, St
 /// Full configuration of a widget.
 #[derive(Clone, Serialize)]
 #[cfg_attr(test, derive(PartialEq, Debug))]
+#[serde(rename_all = "camelCase")]
 pub(crate) struct WidgetConfig {
     /// Deskulpt configuration [`DeskulptConf`].
-    #[serde(rename = "deskulptConf")]
     pub(crate) deskulpt_conf: DeskulptConf,
     /// External dependencies, empty if None.
-    #[serde(rename = "externalDependencies")]
-    pub(crate) external_dependencies: HashMap<String, String>,
+    pub(crate) external_deps: HashMap<String, String>,
     /// Absolute path to the widget directory.
     ///
     /// It is absolute so that we do not need to query the widget base directory state
@@ -93,7 +92,7 @@ pub(crate) fn read_widget_config(path: &Path) -> Result<Option<WidgetConfig>, Er
     }
 
     let package_json_path = path.join("package.json");
-    let external_dependencies = if package_json_path.exists() {
+    let external_deps = if package_json_path.exists() {
         let package_json_str =
             read_to_string(package_json_path).context("Failed to read package.json")?;
         let package_json: PackageJson = serde_json::from_str(&package_json_str)
@@ -106,7 +105,7 @@ pub(crate) fn read_widget_config(path: &Path) -> Result<Option<WidgetConfig>, Er
     Ok(Some(WidgetConfig {
         directory: path.to_path_buf(),
         deskulpt_conf,
-        external_dependencies,
+        external_deps,
     }))
 }
 
@@ -140,9 +139,7 @@ mod tests {
         Some(WidgetConfig {
             directory: fixture_dir().join("standard"),
             deskulpt_conf: get_standard_deskulpt_conf(),
-            external_dependencies: [
-                ("express".to_string(), "^4.17.1".to_string())
-            ].into(),
+            external_deps: [("express".to_string(), "^4.17.1".to_string())].into(),
         }),
     )]
     // A standard configuration with `deskulpt.conf.json` but no `package.json`
@@ -151,7 +148,7 @@ mod tests {
         Some(WidgetConfig {
             directory: fixture_dir().join("no_package_json"),
             deskulpt_conf: get_standard_deskulpt_conf(),
-            external_dependencies: HashMap::new(),
+            external_deps: HashMap::new(),
         }),
     )]
     // `package.json` does not contain `dependencies` field
@@ -160,7 +157,7 @@ mod tests {
         Some(WidgetConfig {
             directory: fixture_dir().join("package_json_no_dependencies"),
             deskulpt_conf: get_standard_deskulpt_conf(),
-            external_dependencies: HashMap::new(),
+            external_deps: HashMap::new(),
         }),
     )]
     // No configuration file, should not be treated as a widget

@@ -1,7 +1,8 @@
 {
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "common-capabilities",
+  "description": "Common capabilities for the manager and the canvas.",
   "local": true,
   "windows": ["canvas", "manager"],
-  "permissions": []
+  "permissions": ["event:allow-emit-to", "event:allow-listen", "event:allow-unlisten"]
 }

@@ -2,9 +2,11 @@ use tauri_build::{try_build, AppManifest, Attributes, CodegenContext, InlinedPlu
 
 const INTERNAL_COMMANDS: &[&str] = &[
     "bundle_widget",
-    "open_widget_base",
+    "exit_app",
+    "init_settings",
+    "open_widget_directory",
     "refresh_widget_collection",
-    "toggle_click_through",
+    "register_toggle_shortcut",
 ];
 
 const WIDGET_APIS_FS_COMMANDS: &[&str] = &[

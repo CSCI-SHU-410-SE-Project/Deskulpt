@@ -14,11 +14,13 @@
       {
         "label": "manager",
         "title": "Deskulpt Manager",
-        "url": "views/index.html",
+        "url": "views/manager.html",
         "width": 750,
         "height": 500,
         "center": true,
         "resizable": false,
+        "maximizable": false,
+        "minimizable": false,
         "visible": false
       }
     ],

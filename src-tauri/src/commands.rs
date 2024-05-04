@@ -3,12 +3,14 @@
 use crate::{
     bundler::bundle,
     config::{read_widget_config, WidgetConfigCollection},
+    settings::{read_settings, write_settings, Settings},
     states::{WidgetBaseDirectoryState, WidgetConfigCollectionState},
     utils::toggle_click_through_state,
 };
 use anyhow::{Context, Error};
 use std::{collections::HashMap, fs::read_dir};
 use tauri::{command, AppHandle, Manager};
+use tauri_plugin_global_shortcut::{GlobalShortcutExt, ShortcutState};
 use tauri_plugin_shell::ShellExt;
 
 /// The return type of all Tauri commands in Deskulpt.
@@ -169,7 +171,7 @@ pub(crate) fn bundle_widget(
             &widget_config.directory,
             widget_entry,
             apis_blob_url,
-            &widget_config.external_dependencies,
+            &widget_config.external_deps,
         )
         .context(format!("Failed to bundle widget (id={})", widget_id))
         .map_err(|e| cmderr!(e));
@@ -179,27 +181,108 @@ pub(crate) fn bundle_widget(
     cmdbail!("Widget '{widget_id}' is not found in the collection")
 }
 
-/// Attempt to toggle the click through state of the canvas window.
+/// Register or unregister a global shortcut for toggling the click-through state.
 ///
-/// This will toggle whether the canvas window ignores cursor events and update the
-/// state accordingly. If the canvas is toggled to not click-through, it will try to
-/// regain focus automatically.
+/// If `reverse` this will register the shortcut, otherwise it will unregister it.
 ///
 /// This command will fail if:
 ///
-/// - The canvas window is not found.
-/// - Fails to set the canvas to ignore/unignore cursor events.
+/// - The shortcut is already registered but we are registering it again.
+/// - The shortcut is not registered yet but we want to unregister it.
+/// - There is an error registering or unregistering the shortcut.
 #[command]
-pub(crate) fn toggle_click_through(app_handle: AppHandle) -> CommandOut<()> {
-    toggle_click_through_state(&app_handle).map_err(|e| cmderr!(e))
+pub(crate) fn register_toggle_shortcut(
+    app_handle: AppHandle,
+    shortcut: String,
+    reverse: bool,
+) -> CommandOut<()> {
+    let manager = app_handle.global_shortcut();
+    let shortcut = shortcut.as_str();
+
+    if reverse {
+        // We want to unregister
+        if !manager.is_registered(shortcut) {
+            cmdbail!("'{shortcut}' is not registered and cannot be unregistered");
+        }
+        manager.unregister(shortcut).map_err(|e| cmderr!(e))
+    } else {
+        // We want to register
+        if manager.is_registered(shortcut) {
+            cmdbail!("'{shortcut}' is registered and cannot be registered again");
+        }
+        manager
+            .on_shortcut(shortcut, |handle, _, event| {
+                if event.state == ShortcutState::Pressed {
+                    // We must only react to press events, otherwise we would toggle
+                    // again on release; also consume errors because they are not
+                    // allowed to propagate
+                    let _ = toggle_click_through_state(handle);
+                }
+            })
+            .map_err(|e| cmderr!(e))
+    }
 }
 
-/// Command for opening the widget base directory.
+/// Command for opening a widget directory or the widget base directory.
 ///
-/// This command will fail if Tauri fails to open the widget base directory, most likely
-/// because of a misconfigured allow list.
+/// If the widget ID is `None`, this command will open the widget base directory.
+/// Otherwise, it checks whether the widget ID exists in the current widget collection
+/// and opens the corresponding widget directory.
+///
+/// This command will fail if:
+///
+/// - The given widget ID is not found in the widget collection.
+/// - Tauri fails to open the widget base directory, most likely due to misconfigured
+///   capabiblities.
 #[command]
-pub(crate) fn open_widget_base(app_handle: AppHandle) -> CommandOut<()> {
+pub(crate) fn open_widget_directory(
+    app_handle: AppHandle,
+    widget_id: Option<String>,
+) -> CommandOut<()> {
     let widget_base = &app_handle.state::<WidgetBaseDirectoryState>().0;
-    app_handle.shell().open(widget_base.to_string_lossy(), None).map_err(|e| cmderr!(e))
+
+    let open_path = match widget_id {
+        Some(widget_id) => {
+            let widget_collection = app_handle.state::<WidgetConfigCollectionState>();
+            if !widget_collection.0.lock().unwrap().contains_key(&widget_id) {
+                cmdbail!("Widget '{}' is not found in the collection", widget_id)
+            }
+            widget_base.join(widget_id)
+        },
+        None => widget_base.to_path_buf(),
+    };
+
+    app_handle.shell().open(open_path.to_string_lossy(), None).map_err(|e| cmderr!(e))
+}
+
+/// Command for initializing the settings.
+///
+/// This command tries to load the previously stored settings. It never fails, but
+/// instead returns the default settings upon any error.
+#[command]
+pub(crate) fn init_settings(app_handle: AppHandle) -> CommandOut<Settings> {
+    let app_config_dir = match app_handle.path().app_config_dir() {
+        Ok(app_config_dir) => app_config_dir,
+        Err(_) => return Ok(Default::default()),
+    };
+    Ok(read_settings(&app_config_dir))
+}
+
+/// Command for cleaning up and exiting the application.
+///
+/// This command will try to save the widget internals for persistence before exiting
+/// the application, but failure to do so will not prevent the application from exiting.
+#[command]
+pub(crate) fn exit_app(app_handle: AppHandle, settings: Settings) -> CommandOut<()> {
+    let app_config_dir = match app_handle.path().app_config_dir() {
+        Ok(app_config_dir) => app_config_dir,
+        Err(_) => {
+            app_handle.exit(0);
+            return Ok(());
+        },
+    };
+
+    let _ = write_settings(&app_config_dir, &settings);
+    app_handle.exit(0);
+    Ok(())
 }

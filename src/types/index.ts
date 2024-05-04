@@ -15,12 +15,21 @@ export * from "./frontend";
  */
 export interface Widget {
   /**
-   * The function that defined the widget element to render.
-   *
-   * This function will be evaluated on widget load or refresh, where its output will
-   * be wrapped within `React.StrictMode` to render on the desktop.
+   * The function that defines the widget element to render.
    *
    * @returns The React element to render.
    */
   render: () => ReactNode;
+  /**
+   * The width of the widget.
+   *
+   * This can be a number in pixels, or a string that is accepted in CSS.
+   */
+  width: number | string;
+  /**
+   * The height of the widget.
+   *
+   * This can be a number in pixels, or a string that is accepted in CSS.
+   */
+  height: number | string;
 }
