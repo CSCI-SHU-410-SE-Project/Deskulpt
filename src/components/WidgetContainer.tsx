@@ -7,9 +7,7 @@ import { WidgetSetting } from "../types";
 import { GripVertical } from "lucide-react";
 
 /**
- * The widget container component.
- *
- * It is a draggable and styled container that wraps the component to be displayed.
+ * The widget container component that wraps around each user widget.
  */
 export default function WidgetContainer(props: {
   id: string;
@@ -68,22 +66,17 @@ export default function WidgetContainer(props: {
             },
           }}
         />
-        <ErrorBoundary fallbackRender={({ error }) => FallBack(id, error)}>
+        <ErrorBoundary
+          fallbackRender={({ error }) => (
+            <ErrorDisplay
+              title={`Error in '${id}': potential issues with the \`render\` function)`}
+              error={grabErrorInfo(error)}
+            />
+          )}
+        >
           {children}
         </ErrorBoundary>
       </div>
     </Draggable>
-  );
-}
-
-/**
- * The fallback component of the error boundary.
- */
-function FallBack(id: string, error: unknown) {
-  return (
-    <ErrorDisplay
-      title={`Error in '${id}': potential issues with the \`render\` function)`}
-      error={grabErrorInfo(error)}
-    />
   );
 }

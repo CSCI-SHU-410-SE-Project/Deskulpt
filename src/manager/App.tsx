@@ -13,6 +13,9 @@ import { FloatButton, Tabs } from "antd";
 import { FileScan, FolderOpen, Repeat } from "lucide-react";
 import { invokeOpenWidgetBase } from "../commands";
 
+/**
+ * The main component of the widget manager window.
+ */
 export default function App(props: { initialSettings: Settings }) {
   const { initialSettings } = props;
   const { toggleShortcut } = useToggleShortcut(initialSettings.toggleShortcut);
@@ -86,7 +89,17 @@ export default function App(props: { initialSettings: Settings }) {
 
   return (
     <>
-      <Tabs defaultActiveKey="1" type="card" items={tabItems} />
+      <Tabs
+        defaultActiveKey="1"
+        type="card"
+        items={tabItems}
+        css={{
+          "&.ant-tabs-tab": {
+            width: "100px",
+            justifyContent: "center",
+          },
+        }}
+      />
       <FloatButton
         css={{ bottom: "130px" }}
         icon={<Repeat size={15} />}

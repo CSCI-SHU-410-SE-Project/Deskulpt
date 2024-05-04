@@ -5,6 +5,9 @@ import { useRenderWidgetListener } from "../hooks/useRenderWidgetListener";
 import { useRemoveWidgetsListener } from "../hooks/useRemoveWidgetsListener";
 import { emitUpdateSettingToManager } from "../events";
 
+/**
+ * The main component of the canvas window.
+ */
 export default function App() {
   const [canvasWidgetStates, setCanvasWidgetStates] = useState<
     Record<string, CanvasWidgetState>

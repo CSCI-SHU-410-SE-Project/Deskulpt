@@ -14,12 +14,11 @@ pub(crate) type WidgetConfigCollection = HashMap<String, Result<WidgetConfig, St
 /// Full configuration of a widget.
 #[derive(Clone, Serialize)]
 #[cfg_attr(test, derive(PartialEq, Debug))]
+#[serde(rename_all = "camelCase")]
 pub(crate) struct WidgetConfig {
     /// Deskulpt configuration [`DeskulptConf`].
-    #[serde(rename = "deskulptConf")]
     pub(crate) deskulpt_conf: DeskulptConf,
     /// External dependencies, empty if None.
-    #[serde(rename = "externalDeps")]
     pub(crate) external_deps: HashMap<String, String>,
     /// Absolute path to the widget directory.
     ///

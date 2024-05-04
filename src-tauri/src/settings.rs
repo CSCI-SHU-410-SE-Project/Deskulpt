@@ -9,12 +9,11 @@ use std::{
 
 /// The global settings.
 #[derive(Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub(crate) struct Settings {
     /// The keyboard shortcut for toggling the canvas.
-    #[serde(rename = "toggleShortcut")]
     toggle_shorcut: Option<String>,
     /// The collection of per-widget settings.
-    #[serde(rename = "widgetSettings")]
     widget_settings: HashMap<String, WidgetSetting>,
 }
 
