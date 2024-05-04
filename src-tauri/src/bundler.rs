@@ -18,15 +18,16 @@ use swc_common::{
     comments::SingleThreadedComments, errors::Handler, pass::Repeat, sync::Lrc,
     FileName, FilePathMapping, Globals, Mark, SourceMap, Span, GLOBALS,
 };
-use swc_ecma_ast::{KeyValueProp, ModuleDecl};
+use swc_ecma_ast::{KeyValueProp, Module, ModuleDecl, Program};
 use swc_ecma_codegen::{
     text_writer::{JsWriter, WriteJs},
     Emitter,
 };
 use swc_ecma_loader::resolve::Resolution;
-use swc_ecma_parser::{parse_file_as_module, EsConfig, Syntax};
+use swc_ecma_parser::{parse_file_as_module, EsConfig, Syntax, TsConfig};
 use swc_ecma_transforms_optimization::simplify::dce;
 use swc_ecma_transforms_react::jsx;
+use swc_ecma_transforms_typescript::typescript;
 use swc_ecma_visit::{
     as_folder, noop_visit_mut_type, FoldWith, VisitMut, VisitMutWith,
 };
@@ -100,12 +101,15 @@ pub(crate) fn bundle(
     let module = bundles.pop().unwrap().module;
 
     let code = GLOBALS.set(&globals, || {
+        let top_level_mark = Mark::new();
+        let unresolved_mark = Mark::new();
+
         // Tree-shaking optimization in the bundler is disabled, so we need to manually
         // apply the transform; we need to retain the top level mark `React` because it
         // is needed by the JSX transform even if not explicitly used in the code
         let mut tree_shaking = Repeat::new(dce::dce(
             dce::Config { top_retain: vec![Atom::from("React")], ..Default::default() },
-            Mark::new(),
+            unresolved_mark,
         ));
 
         // There are two types of JSX transforms ("classic" and "automatic"), see
@@ -120,8 +124,16 @@ pub(crate) fn bundle(
             cm.clone(),
             None,
             Default::default(), // options, where runtime defaults to "classic"
-            Mark::new(),        // top level mark
-            Mark::new(),        // unresolved mark
+            top_level_mark,
+            unresolved_mark,
+        );
+
+        // Transform that removes TypeScript types; weirdly, this must be applied on a
+        // program rather than a module; note that we use the verbatim module syntax to
+        // avoid removing unused import statements (particularly the `React` import)
+        let mut ts_transform = typescript::typescript(
+            typescript::Config { verbatim_module_syntax: true, ..Default::default() },
+            top_level_mark,
         );
 
         // We need to rename the imports of `@deskulpt-test/apis` to the blob URL which
@@ -133,8 +145,10 @@ pub(crate) fn bundle(
         ));
 
         // Apply the module transformations
-        // @Charlie-XIAO: chain more transforms e.g. TypeScript
         let module = module
+            .into_program()
+            .fold_with(&mut ts_transform)
+            .expect_module()
             .fold_with(&mut tree_shaking)
             .fold_with(&mut jsx_transform)
             .fold_with(&mut wrap_apis);
@@ -186,13 +200,18 @@ struct PathLoader(Lrc<SourceMap>);
 
 impl Load for PathLoader {
     fn load(&self, file: &FileName) -> Result<ModuleData, Error> {
-        let fm = match file {
-            FileName::Real(path) => self.0.load_file(path)?,
+        let path = match file {
+            FileName::Real(path) => path,
             _ => unreachable!(),
         };
+        let fm = self.0.load_file(path)?;
 
-        // @Charlie-XIAO: maybe need to use Syntax::TypeScript based on file extension
-        let syntax = Syntax::Es(EsConfig { jsx: true, ..Default::default() });
+        let syntax = match path.extension() {
+            Some(ext) if ext == "ts" || ext == "tsx" => {
+                Syntax::Typescript(TsConfig { tsx: true, ..Default::default() })
+            },
+            _ => Syntax::Es(EsConfig { jsx: true, ..Default::default() }),
+        };
 
         // Parse the file as a module; note that transformations are not applied here,
         // because per-file transformations may lead to unexpected results when bundled
@@ -358,6 +377,30 @@ impl Hook for NoopHook {
         _: &ModuleRecord,
     ) -> Result<Vec<KeyValueProp>, Error> {
         unimplemented!();
+    }
+}
+
+/// Trait for converting an object into a [`Program`].
+///
+/// Some transforms requires a [`Program`] as input, so this trait is for providing a
+/// better syntax for chaining the transforms, for instance:
+///
+/// ```ignore
+/// module
+///     .fold_with(&mut transform1)
+///     .into_program()
+///     .fold_with(&mut transform2) // `transform2` requires a `Program`
+///     .expect_module()
+///     .fold_with(&mut transform3)
+/// ```
+trait IntoProgram {
+    /// Return a [`Program`] wrapping the object itself.
+    fn into_program(self) -> Program;
+}
+
+impl IntoProgram for Module {
+    fn into_program(self) -> Program {
+        Program::Module(self)
     }
 }
 
