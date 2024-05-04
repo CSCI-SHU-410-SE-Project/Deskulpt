@@ -9,8 +9,6 @@
     "allow-init-settings",
     "allow-open-widget-base",
     "allow-refresh-widget-collection",
-    "allow-toggle-click-through",
-    "global-shortcut:allow-register",
-    "global-shortcut:allow-unregister"
+    "allow-register-toggle-shortcut"
   ]
 }

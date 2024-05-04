@@ -8,19 +8,13 @@ use std::{
 };
 
 /// The global settings.
-#[derive(Deserialize, Serialize)]
+#[derive(Default, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub(crate) struct Settings {
     /// The keyboard shortcut for toggling the canvas.
-    toggle_shorcut: Option<String>,
+    toggle_shortcut: Option<String>,
     /// The collection of per-widget settings.
     widget_settings: HashMap<String, WidgetSetting>,
-}
-
-impl Default for Settings {
-    fn default() -> Self {
-        Self { toggle_shorcut: None, widget_settings: Default::default() }
-    }
 }
 
 /// The per-widget settings.

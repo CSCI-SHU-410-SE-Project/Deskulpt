@@ -1,6 +1,5 @@
-import { invoke } from "@tauri-apps/api/core";
-import { register, unregister } from "@tauri-apps/plugin-global-shortcut";
 import { useEffect, useState } from "react";
+import { invokeRegisterToggleShortcut } from "../commands";
 
 export function useToggleShortcut(initialToggleShortcut: string | null) {
   const [toggleShortcut, setToggleShortcut] = useState<string | null>(
@@ -12,15 +11,14 @@ export function useToggleShortcut(initialToggleShortcut: string | null) {
       return;
     }
 
-    register(toggleShortcut, () => {
-      invoke<null>("toggle_click_through").catch(console.error);
-    }).catch((err) => {
-      console.error(err);
-      setToggleShortcut(null); // Reset to null if shortcut registration fails
-    });
+    invokeRegisterToggleShortcut(toggleShortcut, false).catch(console.error);
+    console.log("Registered shortcut", toggleShortcut);
 
     return () => {
-      unregister(toggleShortcut).catch(console.error);
+      if (toggleShortcut !== null) {
+        console.log("Unregistering shortcut", toggleShortcut);
+        invokeRegisterToggleShortcut(toggleShortcut, true).catch(console.error);
+      }
     };
   }, [toggleShortcut]);
 

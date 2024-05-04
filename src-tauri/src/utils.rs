@@ -6,7 +6,12 @@ use tauri::{AppHandle, Manager};
 
 /// Toggle the click-through state of the canvas window.
 ///
-/// See [`crate::commands::toggle_click_through`] for documentation.
+/// This will toggle whether the canvas window ignores cursor events and update the
+/// state accordingly. If the canvas is toggled to not click-through, it will try to
+/// regain focus automatically. The function will fail if:
+///
+/// - The canvas window is not found.
+/// - Fails to set the canvas to ignore/unignore cursor events.
 pub(crate) fn toggle_click_through_state(app_handle: &AppHandle) -> Result<(), Error> {
     let canvas = match app_handle.get_webview_window("canvas") {
         Some(canvas) => canvas,

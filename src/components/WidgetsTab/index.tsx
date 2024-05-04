@@ -1,7 +1,10 @@
-import { Badge, Tabs } from "antd";
+import { Badge, FloatButton, Tabs } from "antd";
 import { ManagerWidgetState, Result, WidgetConfig, WidgetSetting } from "../../types";
 import WidgetInfoPanel from "./Details";
 import { Dispatch, SetStateAction } from "react";
+import { FileScan, FolderOpen, Repeat } from "lucide-react";
+import { invokeOpenWidgetBase } from "../../commands";
+import { renderWidgets } from "../../manager/utils";
 
 /**
  * The widgets tab in the manager.
@@ -9,8 +12,9 @@ import { Dispatch, SetStateAction } from "react";
 export default function WidgetsTab(props: {
   managerWidgetStates: Record<string, ManagerWidgetState>;
   setManagerWidgetStates: Dispatch<SetStateAction<Record<string, ManagerWidgetState>>>;
+  rescanAndRender: () => Promise<void>;
 }) {
-  const { managerWidgetStates, setManagerWidgetStates } = props;
+  const { managerWidgetStates, setManagerWidgetStates, rescanAndRender } = props;
 
   function setSetting(widgetId: string, setting: WidgetSetting) {
     setManagerWidgetStates((prev) => ({
@@ -35,17 +39,37 @@ export default function WidgetsTab(props: {
   );
 
   return (
-    <Tabs
-      defaultActiveKey="1"
-      tabPosition="left"
-      items={tabItems}
-      css={{
-        height: "420px",
-        ".ant-tabs-nav": {
-          width: "180px",
-        },
-      }}
-    />
+    <>
+      <Tabs
+        defaultActiveKey="1"
+        tabPosition="left"
+        items={tabItems}
+        css={{
+          height: "420px",
+          ".ant-tabs-nav": {
+            width: "180px",
+          },
+        }}
+      />
+      <FloatButton
+        css={{ bottom: "130px" }}
+        icon={<Repeat size={15} />}
+        tooltip="Re-render all widgets"
+        onClick={() => renderWidgets(managerWidgetStates)}
+      />
+      <FloatButton
+        css={{ bottom: "80px" }}
+        icon={<FileScan size={15} />}
+        tooltip="Rescan widgets"
+        onClick={rescanAndRender}
+      />
+      <FloatButton
+        css={{ bottom: "30px" }}
+        icon={<FolderOpen size={15} />}
+        tooltip="Open base directory"
+        onClick={invokeOpenWidgetBase}
+      />
+    </>
   );
 }
 

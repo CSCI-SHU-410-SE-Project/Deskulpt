@@ -43,7 +43,7 @@ fn main() {
             commands::init_settings,
             commands::open_widget_base,
             commands::refresh_widget_collection,
-            commands::toggle_click_through,
+            commands::register_toggle_shortcut,
         ])
         // Register plugins
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())

@@ -6,7 +6,7 @@
  */
 
 import { invoke } from "@tauri-apps/api/core";
-import { Settings } from "./types";
+import { Settings, WidgetConfigCollection } from "./types";
 
 export async function invokeBundleWidget(widgetId: string, apisBlobUrl: string) {
   return invoke<string>("bundle_widget", { widgetId, apisBlobUrl });
@@ -17,5 +17,17 @@ export async function invokeExitApp(settings: Settings) {
 }
 
 export async function invokeOpenWidgetBase() {
-  return invoke<null>("open_widget_base", {});
+  return invoke<null>("open_widget_base");
+}
+
+export async function invokeInitSettings() {
+  return invoke<Settings>("init_settings");
+}
+
+export async function invokeRefreshWidgetCollection() {
+  return invoke<WidgetConfigCollection>("refresh_widget_collection");
+}
+
+export async function invokeRegisterToggleShortcut(shortcut: string, reverse: boolean) {
+  return invoke<null>("register_toggle_shortcut", { shortcut, reverse });
 }

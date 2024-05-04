@@ -1,6 +1,6 @@
-import { invoke } from "@tauri-apps/api/core";
-import { ManagerWidgetState, WidgetConfigCollection, WidgetSetting } from "../types";
+import { ManagerWidgetState, WidgetSetting } from "../types";
 import { emitRemoveWidgetsToCanvas, emitRenderWidgetToCanvas } from "../events";
+import { invokeRefreshWidgetCollection } from "../commands";
 
 /**
  * Get the new widget states in the manager.
@@ -13,9 +13,7 @@ export async function getNewManagerWidgetStates(
   managerWidgetStates: Record<string, ManagerWidgetState>,
   initialWidgetSettings: Record<string, WidgetSetting>,
 ): Promise<Record<string, ManagerWidgetState>> {
-  const detectedConfigs = await invoke<WidgetConfigCollection>(
-    "refresh_widget_collection",
-  );
+  const detectedConfigs = await invokeRefreshWidgetCollection();
 
   // If a widget exists in the previous states but does not exist in the new detected
   // configurations, we consider it as removed from the collection

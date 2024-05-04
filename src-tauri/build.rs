@@ -6,7 +6,7 @@ const INTERNAL_COMMANDS: &[&str] = &[
     "init_settings",
     "open_widget_base",
     "refresh_widget_collection",
-    "toggle_click_through",
+    "register_toggle_shortcut",
 ];
 
 const WIDGET_APIS_FS_COMMANDS: &[&str] = &[

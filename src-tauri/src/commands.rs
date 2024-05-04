@@ -10,6 +10,7 @@ use crate::{
 use anyhow::{Context, Error};
 use std::{collections::HashMap, fs::read_dir};
 use tauri::{command, AppHandle, Manager};
+use tauri_plugin_global_shortcut::{GlobalShortcutExt, ShortcutState};
 use tauri_plugin_shell::ShellExt;
 
 /// The return type of all Tauri commands in Deskulpt.
@@ -128,7 +129,7 @@ pub(crate) fn refresh_widget_collection(
 
     // Update the widget collection state
     let widget_collection = app_handle.state::<WidgetConfigCollectionState>();
-    *widget_collection.0.lock().unwrap() = new_widget_collection.clone();
+    widget_collection.0.lock().unwrap().clone_from(&new_widget_collection);
     Ok(new_widget_collection)
 }
 
@@ -180,19 +181,36 @@ pub(crate) fn bundle_widget(
     cmdbail!("Widget '{widget_id}' is not found in the collection")
 }
 
-/// Attempt to toggle the click through state of the canvas window.
+/// Register or unregister a global shortcut for toggling the click-through state.
 ///
-/// This will toggle whether the canvas window ignores cursor events and update the
-/// state accordingly. If the canvas is toggled to not click-through, it will try to
-/// regain focus automatically.
-///
-/// This command will fail if:
-///
-/// - The canvas window is not found.
-/// - Fails to set the canvas to ignore/unignore cursor events.
+/// If `reverse` this will register the shortcut, otherwise it will unregister it. This
+/// command will fail if the shortcut (un)registration fails, but any error in the
+/// registered callback will be ignored, i.e., it is not guaranteed that the toggling
+/// will succeed on the shortcut.
 #[command]
-pub(crate) fn toggle_click_through(app_handle: AppHandle) -> CommandOut<()> {
-    toggle_click_through_state(&app_handle).map_err(|e| cmderr!(e))
+pub(crate) fn register_toggle_shortcut(
+    app_handle: AppHandle,
+    shortcut: String,
+    reverse: bool,
+) -> CommandOut<()> {
+    if reverse {
+        app_handle
+            .global_shortcut()
+            .unregister(shortcut.as_str())
+            .map_err(|e| cmderr!(e))
+    } else {
+        app_handle
+            .global_shortcut()
+            .on_shortcut(shortcut.as_str(), |inner_app_handle, _, event| {
+                if event.state == ShortcutState::Pressed {
+                    // We must only react to press events, otherwise we would toggle
+                    // again on release; also consume errors because they are not
+                    // allowed to propagate
+                    let _ = toggle_click_through_state(inner_app_handle);
+                }
+            })
+            .map_err(|e| cmderr!(e))
+    }
 }
 
 /// Command for opening the widget base directory.

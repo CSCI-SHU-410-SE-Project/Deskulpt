@@ -1,10 +1,9 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
+import { invokeInitSettings } from "../commands";
 import App from "./App";
-import { invoke } from "@tauri-apps/api/core";
-import { Settings } from "../types";
 
-invoke<Settings>("init_settings")
+invokeInitSettings()
   .then((settings) => {
     createRoot(document.getElementById("root")!).render(
       <StrictMode>

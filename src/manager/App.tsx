@@ -9,16 +9,16 @@ import WidgetsTab from "../components/WidgetsTab";
 import SettingsTab from "../components/SettingsTab";
 import LogsTab from "../components/LogsTab";
 import AboutTab from "../components/AboutTab";
-import { FloatButton, Tabs } from "antd";
-import { FileScan, FolderOpen, Repeat } from "lucide-react";
-import { invokeOpenWidgetBase } from "../commands";
+import { Tabs } from "antd";
 
 /**
  * The main component of the widget manager window.
  */
 export default function App(props: { initialSettings: Settings }) {
   const { initialSettings } = props;
-  const { toggleShortcut } = useToggleShortcut(initialSettings.toggleShortcut);
+  const { toggleShortcut, setToggleShortcut } = useToggleShortcut(
+    initialSettings.toggleShortcut,
+  );
   const [managerWidgetStates, setManagerWidgetStates] = useState<
     Record<string, ManagerWidgetState>
   >({});
@@ -67,13 +67,19 @@ export default function App(props: { initialSettings: Settings }) {
         <WidgetsTab
           managerWidgetStates={managerWidgetStates}
           setManagerWidgetStates={setManagerWidgetStates}
+          rescanAndRender={rescanAndRender}
         />
       ),
     },
     {
       key: "2",
       label: "Settings",
-      children: <SettingsTab />,
+      children: (
+        <SettingsTab
+          toggleShortcut={toggleShortcut}
+          setToggleShortcut={setToggleShortcut}
+        />
+      ),
     },
     {
       key: "3",
@@ -88,36 +94,16 @@ export default function App(props: { initialSettings: Settings }) {
   ];
 
   return (
-    <>
-      <Tabs
-        defaultActiveKey="1"
-        type="card"
-        items={tabItems}
-        css={{
-          "&.ant-tabs-tab": {
-            width: "100px",
-            justifyContent: "center",
-          },
-        }}
-      />
-      <FloatButton
-        css={{ bottom: "130px" }}
-        icon={<Repeat size={15} />}
-        tooltip="Re-render all widgets"
-        onClick={() => renderWidgets(managerWidgetStates)}
-      />
-      <FloatButton
-        css={{ bottom: "80px" }}
-        icon={<FileScan size={15} />}
-        tooltip="Rescan widgets"
-        onClick={rescanAndRender}
-      />
-      <FloatButton
-        css={{ bottom: "30px" }}
-        icon={<FolderOpen size={15} />}
-        tooltip="Open base directory"
-        onClick={invokeOpenWidgetBase}
-      />
-    </>
+    <Tabs
+      defaultActiveKey="1"
+      type="card"
+      items={tabItems}
+      css={{
+        "& > .ant-tabs-nav > .ant-tabs-nav-wrap > .ant-tabs-nav-list > .ant-tabs-tab": {
+          width: "100px",
+          justifyContent: "center",
+        },
+      }}
+    />
   );
 }
