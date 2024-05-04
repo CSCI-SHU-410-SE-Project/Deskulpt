@@ -6,7 +6,12 @@ const buildAssets = "assets";
 
 export default defineConfig(({ command }) => ({
   plugins: [
-    react(),
+    react({
+      jsxImportSource: "@emotion/react",
+      babel: {
+        plugins: ["@emotion/babel-plugin"],
+      },
+    }),
     importmapPlugin(command, {
       "@deskulpt-test/react": "src/.scripts/react.js",
       "@deskulpt-test/raw-apis": "src/.scripts/raw-apis.js",

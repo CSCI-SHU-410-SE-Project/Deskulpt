@@ -1,10 +1,10 @@
 import { ReactNode, useRef } from "react";
 import Draggable, { DraggableData, DraggableEvent } from "react-draggable";
 import { ErrorBoundary } from "react-error-boundary";
-import ErrorDisplay from "../ErrorDisplay";
-import { grabErrorInfo } from "../../utils";
-import { WidgetSetting } from "../../types";
-import { DragHandle, Wrapper } from "./styled";
+import ErrorDisplay from "./ErrorDisplay";
+import { grabErrorInfo } from "../utils";
+import { WidgetSetting } from "../types";
+import { GripVertical } from "lucide-react";
 
 /**
  * The widget container component.
@@ -36,9 +36,15 @@ export default function WidgetContainer(props: {
       handle=".draggable-handle"
       position={{ x: 0, y: 0 }}
     >
-      <Wrapper
+      <div
         ref={containerRef}
-        style={{
+        css={{
+          overflow: "hidden",
+          borderRadius: "5px",
+          padding: "5px 10px",
+          backgroundColor: "rgba(0, 0, 0, 0.7)",
+          color: "#cccccc",
+          boxShadow: "0 0 2px #888888",
           position: "absolute",
           left: setting.x,
           top: setting.y,
@@ -46,11 +52,26 @@ export default function WidgetContainer(props: {
           height: containerProps.height,
         }}
       >
-        <DragHandle className="draggable-handle" />
+        <GripVertical
+          className="draggable-handle"
+          css={{
+            position: "absolute",
+            top: "5px",
+            right: "5px",
+            width: "20px",
+            height: "20px",
+            cursor: "grab",
+            opacity: "0",
+            transition: "opacity 0.3s ease-in-out",
+            "&:hover": {
+              opacity: "1",
+            },
+          }}
+        />
         <ErrorBoundary fallbackRender={({ error }) => FallBack(id, error)}>
           {children}
         </ErrorBoundary>
-      </Wrapper>
+      </div>
     </Draggable>
   );
 }

@@ -1,6 +1,6 @@
 import { Badge, Tabs } from "antd";
-import { ManagerWidgetState, Result, WidgetConfig, WidgetSetting } from "../../types";
-import WidgetInfoPanel from "../WidgetInfoPanel";
+import { ManagerWidgetState, Result, WidgetConfig, WidgetSetting } from "../types";
+import WidgetInfoPanel from "./WidgetInfoPanel";
 import { Dispatch, SetStateAction } from "react";
 
 export default function WidgetsTab(props: {
@@ -21,7 +21,7 @@ export default function WidgetsTab(props: {
       defaultActiveKey="1"
       tabPosition="left"
       tabBarStyle={{ width: "180px" }}
-      style={{ height: "420px" }}
+      css={{ height: "420px" }}
       items={Object.entries(managerWidgetStates).map(
         ([widgetId, { config, setting }]) => ({
           key: widgetId,

@@ -1,7 +1,13 @@
 import { Button, InputNumber, Tooltip } from "antd";
-import { Result, WidgetConfig, WidgetSetting } from "../../types";
-import * as Styled from "./styled";
-import { emitRenderWidgetToCanvas } from "../../events";
+import { Result, WidgetConfig, WidgetSetting } from "../types";
+import { emitRenderWidgetToCanvas } from "../events";
+import { css } from "@emotion/react";
+
+const panelWidth = "510px";
+const tableCaptionStyle = css({
+  padding: "0 20px 0 0",
+  color: "gray",
+});
 
 export default function WidgetInfoPanel(props: {
   widgetId: string;
@@ -13,22 +19,59 @@ export default function WidgetInfoPanel(props: {
 
   return (
     <>
-      <Styled.UpperPanel>
-        <Styled.PanelSectionHeading>
+      <div
+        css={{
+          height: "160px",
+          width: panelWidth,
+          overflowX: "hidden",
+        }}
+      >
+        <div
+          css={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: "10px",
+          }}
+        >
           <span>
             <strong>Configuration</strong> [{widgetId}]
           </span>
           <Button size="small">Edit</Button>
-        </Styled.PanelSectionHeading>
+        </div>
         {"Ok" in config ? (
           <ConfigInfoPanel config={config.Ok} />
         ) : (
-          <Styled.ConfigErrorInfo>{config.Err}</Styled.ConfigErrorInfo>
+          <div
+            css={{
+              height: "120px",
+              paddingRight: "5px",
+              fontFamily: "monospace",
+              whiteSpace: "pre-wrap",
+              overflowY: "auto",
+              color: "red",
+            }}
+          >
+            {config.Err}
+          </div>
         )}
-      </Styled.UpperPanel>
-      <Styled.PanelDivider />
-      <Styled.LowerPanel>
-        <Styled.PanelSectionHeading>
+      </div>
+      <hr css={{ width: panelWidth, margin: "10px 0" }} />
+      <div
+        css={{
+          height: "240px",
+          width: panelWidth,
+          overflowX: "hidden",
+        }}
+      >
+        <div
+          css={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: "10px",
+          }}
+        >
           <strong>Settings</strong>
           <Button
             size="small"
@@ -38,7 +81,7 @@ export default function WidgetInfoPanel(props: {
           >
             Re-render
           </Button>
-        </Styled.PanelSectionHeading>
+        </div>
         <SettingInfoPanel
           setting={setting}
           updateSetting={(partialSetting) => {
@@ -51,7 +94,7 @@ export default function WidgetInfoPanel(props: {
             }).catch(console.error);
           }}
         />
-      </Styled.LowerPanel>
+      </div>
     </>
   );
 }
@@ -65,17 +108,17 @@ function ConfigInfoPanel(props: { config: WidgetConfig }) {
     <table>
       <tbody>
         <tr>
-          <Styled.TableInfoCell>Name</Styled.TableInfoCell>
+          <td css={tableCaptionStyle}>Name</td>
           <td>{name}</td>
         </tr>
         <tr>
-          <Styled.TableInfoCell>Entry</Styled.TableInfoCell>
+          <td css={tableCaptionStyle}>Entry</td>
           <td>
             <code>{entry}</code>
           </td>
         </tr>
         <tr>
-          <Styled.TableInfoCell>Dependencies</Styled.TableInfoCell>
+          <td css={tableCaptionStyle}>Dependencies</td>
           <td>{getExternalDepsRepr(externalDeps)}</td>
         </tr>
       </tbody>
@@ -93,13 +136,20 @@ function getExternalDepsRepr(externalDeps: Record<string, string>) {
     <Tooltip
       placement="right"
       title={
-        <Styled.TooltipWrapper>
+        <div
+          css={{
+            maxHeight: "120px",
+            maxWidth: "300px",
+            overflow: "auto",
+            scrollbarWidth: "none",
+          }}
+        >
           {externalDepsEntries.map(([dep, version], index) => (
             <div key={index}>
               <code>{dep}</code> {version}
             </div>
           ))}
-        </Styled.TooltipWrapper>
+        </div>
       }
     >
       {externalDepsEntries.length}
@@ -116,7 +166,7 @@ function SettingInfoPanel(props: {
     <table>
       <tbody>
         <tr>
-          <Styled.TableInfoCell>Position</Styled.TableInfoCell>
+          <td css={tableCaptionStyle}>Position</td>
           <td>
             <InputNumber
               min={0}

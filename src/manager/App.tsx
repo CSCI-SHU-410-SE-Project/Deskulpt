@@ -15,7 +15,6 @@ import { invokeOpenWidgetBase } from "../commands";
 
 export default function App(props: { initialSettings: Settings }) {
   const { initialSettings } = props;
-  // TODO: `setToggleShortcut` and use it
   const { toggleShortcut } = useToggleShortcut(initialSettings.toggleShortcut);
   const [managerWidgetStates, setManagerWidgetStates] = useState<
     Record<string, ManagerWidgetState>
@@ -57,53 +56,51 @@ export default function App(props: { initialSettings: Settings }) {
     };
   }, []);
 
+  const tabItems = [
+    {
+      key: "1",
+      label: "Widgets",
+      children: (
+        <WidgetsTab
+          managerWidgetStates={managerWidgetStates}
+          setManagerWidgetStates={setManagerWidgetStates}
+        />
+      ),
+    },
+    {
+      key: "2",
+      label: "Settings",
+      children: <SettingsTab />,
+    },
+    {
+      key: "3",
+      label: "Logs",
+      children: <LogsTab />,
+    },
+    {
+      key: "4",
+      label: "About",
+      children: <AboutTab />,
+    },
+  ];
+
   return (
     <>
-      <Tabs
-        defaultActiveKey="1"
-        type="card"
-        items={[
-          {
-            key: "1",
-            label: "Widgets",
-            children: (
-              <WidgetsTab
-                managerWidgetStates={managerWidgetStates}
-                setManagerWidgetStates={setManagerWidgetStates}
-              />
-            ),
-          },
-          {
-            key: "2",
-            label: "Settings",
-            children: <SettingsTab />,
-          },
-          {
-            key: "3",
-            label: "Logs",
-            children: <LogsTab />,
-          },
-          {
-            key: "4",
-            label: "About",
-            children: <AboutTab />,
-          },
-        ]}
-      />
+      <Tabs defaultActiveKey="1" type="card" items={tabItems} />
       <FloatButton
-        style={{ bottom: "130px" }}
+        css={{ bottom: "130px" }}
         icon={<Repeat size={15} />}
         tooltip="Re-render all widgets"
         onClick={() => renderWidgets(managerWidgetStates)}
       />
       <FloatButton
-        style={{ bottom: "80px" }}
+        css={{ bottom: "80px" }}
         icon={<FileScan size={15} />}
         tooltip="Rescan widgets"
         onClick={rescanAndRender}
       />
       <FloatButton
-        style={{ bottom: "30px" }}
+        css={{ bottom: "30px" }}
         icon={<FolderOpen size={15} />}
         tooltip="Open base directory"
         onClick={invokeOpenWidgetBase}
