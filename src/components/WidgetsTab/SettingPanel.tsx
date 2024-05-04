@@ -41,6 +41,24 @@ export default function SettingPanel(props: {
             />
           </td>
         </tr>
+        <tr>
+          <td css={styles.tableCaption}>Opacity</td>
+          <td>
+            <InputNumber
+              min={1}
+              max={100}
+              value={setting.opacity}
+              formatter={(v) => `${v}%`}
+              size="small"
+              changeOnWheel
+              onChange={(v) => {
+                if (v !== null) {
+                  updateSetting({ opacity: v });
+                }
+              }}
+            />
+          </td>
+        </tr>
       </tbody>
     </table>
   );

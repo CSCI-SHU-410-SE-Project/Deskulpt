@@ -23,7 +23,7 @@ export default function WidgetContainer(props: {
    * Update the container position according to transform data.
    */
   function updateContainerPos(_: DraggableEvent, data: DraggableData) {
-    setSetting({ x: setting.x + data.x, y: setting.y + data.y });
+    setSetting({ ...setting, x: setting.x + data.x, y: setting.y + data.y });
   }
 
   return (
@@ -46,6 +46,7 @@ export default function WidgetContainer(props: {
           position: "absolute",
           left: setting.x,
           top: setting.y,
+          opacity: `${setting.opacity}%`,
           width: containerProps.width,
           height: containerProps.height,
         }}

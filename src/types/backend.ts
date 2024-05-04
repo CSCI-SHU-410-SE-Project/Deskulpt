@@ -32,4 +32,5 @@ export interface Settings {
 export interface WidgetSetting {
   x: number;
   y: number;
+  opacity: number;
 }

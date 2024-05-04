@@ -33,6 +33,8 @@ pub(crate) struct WidgetSetting {
     x: i32,
     /// The y-coordinate of the widget.
     y: i32,
+    /// The opacity of the widget in percentage.
+    opacity: i32,
 }
 
 /// Read the widget internals.

@@ -49,10 +49,10 @@ export default function App(props: { initialSettings: Settings }) {
   useEffect(() => {
     // The rescan is guaranteed to succeed because it triggers a command in the backend;
     // the rendering, however, mail fail due to the canvas not being ready to receive
-    // the rendering events; this should be rare with a 2-second timeout
+    // the rendering events; this should be rare with a 1.5-second timeout
     const timer = setTimeout(() => {
       rescanAndRender().catch(console.error);
-    }, 2000);
+    }, 1500);
 
     return () => {
       clearTimeout(timer);
