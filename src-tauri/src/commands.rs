@@ -183,30 +183,40 @@ pub(crate) fn bundle_widget(
 
 /// Register or unregister a global shortcut for toggling the click-through state.
 ///
-/// If `reverse` this will register the shortcut, otherwise it will unregister it. This
-/// command will fail if the shortcut (un)registration fails, but any error in the
-/// registered callback will be ignored, i.e., it is not guaranteed that the toggling
-/// will succeed on the shortcut.
+/// If `reverse` this will register the shortcut, otherwise it will unregister it.
+///
+/// This command will fail if:
+///
+/// - The shortcut is already registered but we are registering it again.
+/// - The shortcut is not registered yet but we want to unregister it.
+/// - There is an error registering or unregistering the shortcut.
 #[command]
 pub(crate) fn register_toggle_shortcut(
     app_handle: AppHandle,
     shortcut: String,
     reverse: bool,
 ) -> CommandOut<()> {
+    let manager = app_handle.global_shortcut();
+    let shortcut = shortcut.as_str();
+
     if reverse {
-        app_handle
-            .global_shortcut()
-            .unregister(shortcut.as_str())
-            .map_err(|e| cmderr!(e))
+        // We want to unregister
+        if !manager.is_registered(shortcut) {
+            cmdbail!("'{shortcut}' is not registered and cannot be unregistered");
+        }
+        manager.unregister(shortcut).map_err(|e| cmderr!(e))
     } else {
-        app_handle
-            .global_shortcut()
-            .on_shortcut(shortcut.as_str(), |inner_app_handle, _, event| {
+        // We want to register
+        if manager.is_registered(shortcut) {
+            cmdbail!("'{shortcut}' is registered and cannot be registered again");
+        }
+        manager
+            .on_shortcut(shortcut, |handle, _, event| {
                 if event.state == ShortcutState::Pressed {
                     // We must only react to press events, otherwise we would toggle
                     // again on release; also consume errors because they are not
                     // allowed to propagate
-                    let _ = toggle_click_through_state(inner_app_handle);
+                    let _ = toggle_click_through_state(handle);
                 }
             })
             .map_err(|e| cmderr!(e))

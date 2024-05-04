@@ -49,7 +49,7 @@ export async function listenToExitApp(handler: EventCallback<null>) {
 }
 
 // The "show-toast" event is emitted by the backend to the canvas, though possibly in
-// the future it might be emitted by the manager as well
+// the future it might be emitted by the manager or the canvas as well
 
 export async function listenToShowToast(handler: EventCallback<string>) {
   return listen("show-toast", handler);

@@ -13,11 +13,11 @@ export async function invokeBundleWidget(widgetId: string, apisBlobUrl: string) 
 }
 
 export async function invokeExitApp(settings: Settings) {
-  return invoke<null>("exit_app", { settings });
+  return invoke<void>("exit_app", { settings });
 }
 
 export async function invokeOpenWidgetDirectory(widgetId: string | null) {
-  return invoke<null>("open_widget_directory", { widgetId });
+  return invoke<void>("open_widget_directory", { widgetId });
 }
 
 export async function invokeInitSettings() {
@@ -29,5 +29,5 @@ export async function invokeRefreshWidgetCollection() {
 }
 
 export async function invokeRegisterToggleShortcut(shortcut: string, reverse: boolean) {
-  return invoke<null>("register_toggle_shortcut", { shortcut, reverse });
+  return invoke<void>("register_toggle_shortcut", { shortcut, reverse });
 }
