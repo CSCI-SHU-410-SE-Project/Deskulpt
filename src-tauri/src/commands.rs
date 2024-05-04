@@ -127,7 +127,7 @@ pub(crate) fn refresh_widget_collection(
 
     // Update the widget collection state
     let widget_collection = app_handle.state::<WidgetConfigCollectionState>();
-    *widget_collection.0.lock().unwrap() = new_widget_collection.clone();
+    widget_collection.0.lock().unwrap().clone_from(&new_widget_collection);
     Ok(new_widget_collection)
 }
 
