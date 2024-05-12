@@ -28,6 +28,7 @@ tempfile = "3.10.1"
 
 # APIs
 sysinfo = "0.30.11"
+lazy_static = "1.4.0"
 
 # SWC crates and related
 parking_lot = "0.12.1"  # Required by swc_ecma_loader

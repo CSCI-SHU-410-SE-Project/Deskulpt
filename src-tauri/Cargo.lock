@@ -748,6 +748,7 @@ version = "0.0.0"
 dependencies = [
  "anyhow",
  "cargo-llvm-cov",
+ "lazy_static",
  "objc",
  "parking_lot",
  "path-clean",
