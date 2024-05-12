@@ -59,6 +59,14 @@ const config: Config = {
           to: "/blog",
         },
         {
+          label: "Rust Doc",
+          to: "pathname:///rustdoc/deskulpt",
+        },
+        {
+          label: "TypeScript Doc",
+          to: "pathname:///tsdoc",
+        },
+        {
           href: "https://github.com/CSCI-SHU-410-SE-Project/Deskulpt",
           position: "right",
           className: "header-github-link",

@@ -43,6 +43,7 @@
     "lint-staged": "^15.2.2",
     "prettier": "^3.2.5",
     "shell-quote": "^1.8.1",
+    "typedoc": "^0.25.13",
     "typescript": "^5.4.5",
     "typescript-eslint": "^7.6.0",
     "vite": "^5.2.8"
