@@ -17,7 +17,22 @@ const config: Config = {
     locales: ["en"],
   },
 
-  plugins: ["docusaurus-plugin-sass"],
+  plugins: [
+    "docusaurus-plugin-sass",
+    [
+      "docusaurus-plugin-typedoc",
+      {
+        out: "./docs/tsdoc",
+        entryPoints: ["../src"],
+        entryPointStrategy: "expand",
+        tsconfig: "../tsconfig.json",
+        sidebar: {
+          autoConfiguration: false,
+        },
+        name: "Deskulpt TypeScript Doc",
+      },
+    ],
+  ],
 
   presets: [
     [
