@@ -1,5 +1,5 @@
 {
-  "out": "../website/static/ts-doc",
+  "out": "../website/static/tsdoc",
   "entryPoints": ["manager/main.tsx", "canvas/main.tsx"],
   "name": "Deskulpt TypeScript Doc"
 }
