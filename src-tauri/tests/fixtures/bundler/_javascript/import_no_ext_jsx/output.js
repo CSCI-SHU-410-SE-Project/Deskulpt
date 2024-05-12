@@ -1,0 +1,1 @@
+import React from"@deskulpt-test/react";function MessageInner(){return React.createElement("div",null,"This React component is successfully imported.");}import"@deskulpt-test/react";function Message(){return React.createElement("div",null,React.createElement(MessageInner,null));}const App={render:()=>React.createElement(Message,null),width:100,height:100};export{App as default};

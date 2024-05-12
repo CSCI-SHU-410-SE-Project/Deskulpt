@@ -432,8 +432,7 @@ mod tests {
     }
 
     #[rstest]
-    // Entry does not use the `React` variable; note that we require `React` to be
-    // brought into scope and the bundler should not removed it because of unused
+    // Entry does not use `React`, but we should not remove it
     #[case::no_react("no_react")]
     // Entry uses a `React` hook
     #[case::with_react_hook("with_react_hook")]
@@ -450,12 +449,72 @@ mod tests {
     // Entry does not define `React` but the imported JSX file does
     #[case::import_no_outer_react_def("import_no_outer_react_def")]
     fn test_bundle_ok(#[case] case: &str) {
-        let case_dir = fixture_dir().join(case);
+        let case_dir = fixture_dir().join("_javascript").join(case);
         let bundle_root = case_dir.join("input");
         let result = bundle(
             &bundle_root,
             &bundle_root.join("index.jsx"),
             Default::default(),
+            &Default::default(),
+        )
+        .expect("Expected bundling to succeed");
+
+        let expected = read_to_string(case_dir.join("output.js")).unwrap();
+        self::assert_eq!(result, expected);
+    }
+
+    #[rstest]
+    // Basic TypeScript syntax
+    #[case::types("types")]
+    // Entry does not use `React`, but we should not remove it
+    #[case::no_react("no_react")]
+    // Importing types
+    #[case::import_types("import_types")]
+    fn test_bundle_ok_typescript(#[case] case: &str) {
+        let case_dir = fixture_dir().join("_typescript").join(case);
+        let bundle_root = case_dir.join("input");
+        let result = bundle(
+            &bundle_root,
+            &bundle_root.join("index.tsx"),
+            Default::default(),
+            &Default::default(),
+        )
+        .expect("Expected bundling to succeed");
+
+        let expected = read_to_string(case_dir.join("output.js")).unwrap();
+        self::assert_eq!(result, expected);
+    }
+
+    #[rstest]
+    fn test_bundle_ignore_external_dependencies() {
+        // Test that specified external dependencies are left as is in the bundled code
+        let case_dir = fixture_dir().join("external_deps");
+        let bundle_root = case_dir.join("input");
+        let external_deps = HashMap::from([
+            ("os-name".to_string(), "^6.0.0".to_string()),
+            ("matcher".to_string(), "^5.0.0".to_string()),
+        ]);
+        let result = bundle(
+            &bundle_root,
+            &bundle_root.join("index.jsx"),
+            Default::default(),
+            &external_deps,
+        )
+        .expect("Expected bundling to succeed");
+
+        let expected = read_to_string(case_dir.join("output.js")).unwrap();
+        self::assert_eq!(result, expected);
+    }
+
+    #[rstest]
+    fn test_bundle_replace_apis_url() {
+        // Test that the renaming of `@deskulpt-test/apis` to the blob URL is done
+        let case_dir = fixture_dir().join("replace_apis");
+        let bundle_root = case_dir.join("input");
+        let result = bundle(
+            &bundle_root,
+            &bundle_root.join("index.jsx"),
+            "blob://dummy-url".to_string(),
             &Default::default(),
         )
         .expect("Expected bundling to succeed");
@@ -481,6 +540,7 @@ mod tests {
             )),
         ]
     )]
+    // Entry file does not exist
     #[case::entry_not_exist(
         "entry_not_exist",
         vec![
