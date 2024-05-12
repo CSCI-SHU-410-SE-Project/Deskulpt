@@ -1,24 +1,24 @@
 # Configuration file for automatically adding labels for PRs based on changed files, to
 # be used by `pull-request-labeler.yaml`; see https://github.com/actions/labeler
 
-frontend:
-  - changed-files:
-      - any-glob-to-any-file:
-          - src/**
-          - views/**
-
-backend:
-  - changed-files:
-      - any-glob-to-any-file:
-          - src-tauri/**
-
-documentation:
+"type:doc":
   - changed-files:
       - any-glob-to-any-file:
           - website/**
 
-maintenance:
+"type:maintenance":
   - changed-files:
       - any-glob-to-any-file:
           - .github/**
           - maint_tools/**
+
+"tooling:react":
+  - changed-files:
+      - any-glob-to-any-file:
+          - tooling/react/**
+
+"tooling:apis":
+  - changed-files:
+      - any-glob-to-any-file:
+          - tooling/apis/**
+          - src-tauri/src/apis/**
