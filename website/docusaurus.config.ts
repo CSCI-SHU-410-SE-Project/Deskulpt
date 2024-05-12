@@ -7,7 +7,7 @@ const config: Config = {
   tagline: "A cross-platform desktop customization tool.",
   favicon: "img/favicon.ico",
 
-  url: "https://CSCI-SHU-410-SE-Project.github.io/",
+  url: "https://CSCI-SHU-410-SE-Project.github.io",
   baseUrl: "/Deskulpt/",
   organizationName: "CSCI-SHU-410-SE-Project",
   projectName: "Deskulpt",
