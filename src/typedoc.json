@@ -1,5 +1,14 @@
 {
   "out": "../website/static/tsdoc",
-  "entryPoints": ["manager/main.tsx", "canvas/main.tsx"],
+  "entryPoints": [
+    "canvas/App.tsx",
+    "components/index.tsx",
+    "hooks/index.tsx",
+    "manager/App.tsx",
+    "types/index.ts",
+    "commands.ts",
+    "events.ts",
+    "utils.ts"
+  ],
   "name": "Deskulpt TypeScript Doc"
 }
