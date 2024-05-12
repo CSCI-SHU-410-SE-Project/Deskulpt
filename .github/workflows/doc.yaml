@@ -36,11 +36,6 @@ jobs:
           cd src-tauri
           cargo doc --no-deps
 
-      - name: Build TypeScript docs
-        run: |
-          cd src
-          npx typedoc
-
       - name: Node setup and cache
         uses: actions/setup-node@v4
         with:
@@ -52,6 +47,11 @@ jobs:
           npm install
           cd website
           npm install
+
+      - name: Build TypeScript docs
+        run: |
+          cd src
+          npx typedoc
 
       - name: Build docs
         run: |
