@@ -3,10 +3,11 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
+    "rustdoc": "cd ../src-tauri && cargo doc --no-deps --open",
     "start": "docusaurus start",
     "build": "docusaurus build",
     "serve": "docusaurus serve",
-    "clear": "docusaurus clear"
+    "clear": "docusaurus clear && rimraf docs/tsdoc"
   },
   "dependencies": {
     "@docusaurus/core": "^3.3.2",
@@ -14,13 +15,17 @@
     "@mdx-js/react": "^3.0.1",
     "clsx": "^2.1.0",
     "docusaurus-plugin-sass": "^0.2.5",
+    "docusaurus-plugin-typedoc": "^1.0.1",
     "prism-react-renderer": "^2.3.1",
-    "sass": "^1.75.0"
+    "sass": "^1.75.0",
+    "typedoc": "^0.25.13",
+    "typedoc-plugin-markdown": "^4.0.1"
   },
   "devDependencies": {
     "@docusaurus/module-type-aliases": "^3.3.2",
     "@docusaurus/tsconfig": "^3.3.2",
-    "@docusaurus/types": "^3.3.2"
+    "@docusaurus/types": "^3.3.2",
+    "rimraf": "^5.0.7"
   },
   "browserslist": {
     "production": [

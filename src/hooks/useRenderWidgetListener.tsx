@@ -1,6 +1,7 @@
 import { Dispatch, SetStateAction, useEffect } from "react";
 import { listenToRenderWidget } from "../events";
-import { CanvasWidgetState, WidgetModule, WidgetSetting } from "../types";
+import { CanvasWidgetState, WidgetModule } from "../types/frontend";
+import { WidgetSetting } from "../types/backend";
 import { invokeBundleWidget } from "../commands";
 import ErrorDisplay from "../components/ErrorDisplay";
 import { grabErrorInfo } from "../utils";

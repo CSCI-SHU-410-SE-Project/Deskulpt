@@ -4,8 +4,34 @@
  */
 
 import { ReactNode } from "react";
-import { Widget } from ".";
 import { Result, WidgetConfig, WidgetSetting } from "./backend";
+
+/**
+ * The user-defined widget interface.
+ *
+ * The entry file of each user-defined widget should export an object that fulfills this
+ * interface as default.
+ */
+export interface Widget {
+  /**
+   * The function that defines the widget element to render.
+   *
+   * @returns The React element to render.
+   */
+  render: () => ReactNode;
+  /**
+   * The width of the widget.
+   *
+   * This can be a number in pixels, or a string that is accepted in CSS.
+   */
+  width: number | string;
+  /**
+   * The height of the widget.
+   *
+   * This can be a number in pixels, or a string that is accepted in CSS.
+   */
+  height: number | string;
+}
 
 /**
  * The state of a widget in the manager.
@@ -44,23 +70,24 @@ export interface WidgetModule {
 }
 
 /**
- * =====================================================================================
- *
- *    EVENT PAYLOAD TYPES
- *
- * =====================================================================================
+ * The payload of the "render-widget" event.
  */
-
 export interface RenderWidgetPayload {
   widgetId: string;
   bundle: boolean;
   setting: WidgetSetting;
 }
 
+/**
+ * The payload of the "remove-widgets" event.
+ */
 export interface RemoveWidgetsPayload {
   removedIds: string[];
 }
 
+/**
+ * The payload of the "update-setting" event.
+ */
 export interface UpdateSettingPayload {
   widgetId: string;
   setting: WidgetSetting;

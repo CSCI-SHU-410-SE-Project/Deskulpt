@@ -48,11 +48,6 @@ jobs:
           cd website
           npm install
 
-      - name: Build TypeScript docs
-        run: |
-          cd src
-          npx typedoc
-
       - name: Build docs
         run: |
           cd website

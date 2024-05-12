@@ -3,7 +3,7 @@ import Draggable, { DraggableData, DraggableEvent } from "react-draggable";
 import { ErrorBoundary } from "react-error-boundary";
 import ErrorDisplay from "./ErrorDisplay";
 import { grabErrorInfo } from "../utils";
-import { WidgetSetting } from "../types";
+import { WidgetSetting } from "../types/backend";
 import { GripVertical } from "lucide-react";
 
 /**

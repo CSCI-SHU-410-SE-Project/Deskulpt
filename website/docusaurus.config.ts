@@ -25,11 +25,8 @@ const config: Config = {
         out: "./docs/tsdoc",
         entryPoints: ["../src"],
         entryPointStrategy: "expand",
+        outputFileStrategy: "modules",
         tsconfig: "../tsconfig.json",
-        sidebar: {
-          autoConfiguration: false,
-        },
-        name: "Deskulpt TypeScript Doc",
       },
     ],
   ],
@@ -70,16 +67,13 @@ const config: Config = {
           type: "docSidebar",
         },
         {
+          label: "Development",
+          sidebarId: "development",
+          type: "docSidebar",
+        },
+        {
           label: "Blog",
           to: "/blog",
-        },
-        {
-          label: "Rust Doc",
-          to: "pathname:///rustdoc/deskulpt",
-        },
-        {
-          label: "TypeScript Doc",
-          to: "pathname:///tsdoc",
         },
         {
           href: "https://github.com/CSCI-SHU-410-SE-Project/Deskulpt",

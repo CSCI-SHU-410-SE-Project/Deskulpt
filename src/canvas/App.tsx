@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { CanvasWidgetState, WidgetSetting } from "../types";
+import { CanvasWidgetState } from "../types/frontend";
+import { WidgetSetting } from "../types/backend";
 import WidgetContainer from "../components/WidgetContainer";
 import { useRenderWidgetListener } from "../hooks/useRenderWidgetListener";
 import { useRemoveWidgetsListener } from "../hooks/useRemoveWidgetsListener";

@@ -8,27 +8,23 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "tauri": "tauri",
-    "typedoc": "typedoc",
     "format": "node ./maint_tools/format.js",
     "lint": "node ./maint_tools/lint.js",
     "test": "node ./maint_tools/test.js",
+    "prepare": "husky",
     "setup:tooling:apis": "cd tooling/apis && npm install && npm run build",
     "setup:tooling:react": "cd tooling/react && npm install && npm run build",
-    "setup": "npm install && npm run setup:tooling:apis && npm run setup:tooling:react",
-    "prepare": "husky"
+    "setup": "npm install && npm run setup:tooling:apis && npm run setup:tooling:react"
   },
   "dependencies": {
     "@emotion/react": "^11.11.4",
     "@tauri-apps/api": "^2.0.0-beta.11",
     "antd": "^5.16.5",
-    "docusaurus-plugin-typedoc": "^1.0.1",
     "lucide-react": "^0.376.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-draggable": "^4.4.6",
-    "react-error-boundary": "^4.0.13",
-    "typedoc": "^0.25.13",
-    "typedoc-plugin-markdown": "^4.0.1"
+    "react-error-boundary": "^4.0.13"
   },
   "devDependencies": {
     "@emotion/babel-plugin": "^11.11.0",
