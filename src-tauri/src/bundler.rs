@@ -86,8 +86,8 @@ pub(crate) fn bundle(
     );
 
     // SWC bundler requires a map of entries to bundle; we provide a single entry point
-    // and expect there to be only one generated bundle, as long as there are no dynamic
-    // or conditional imports; we use the target path as the key for convenience
+    // and expect there to be only one generated bundle; we use the target path as the
+    // key for convenience
     let mut entries = HashMap::new();
     entries.insert(
         target.to_string_lossy().to_string(),
@@ -96,7 +96,7 @@ pub(crate) fn bundle(
 
     let mut bundles = bundler.bundle(entries)?;
     if bundles.len() != 1 {
-        bail!("Expected a single bundle; try to remove dynamic/conditional imports");
+        bail!("Expected a single bundle, got {}", bundles.len());
     }
     let module = bundles.pop().unwrap().module;
 
@@ -376,6 +376,7 @@ impl Hook for NoopHook {
         _: Span,
         _: &ModuleRecord,
     ) -> Result<Vec<KeyValueProp>, Error> {
+        // XXX: figure out a better way than panicking
         unimplemented!();
     }
 }
@@ -524,6 +525,42 @@ mod tests {
     }
 
     #[rstest]
+    // Node modules import that are not specified as external dependencies
+    #[case::import_node_modules(
+        "import_node_modules",
+        vec![
+            ChainReason::Exact("load_transformed failed".to_string()),
+            ChainReason::Exact("failed to analyze module".to_string()),
+            ChainReason::Exact(format!(
+                "failed to resolve os-name from {}",
+                fixture_dir().join("import_node_modules/input/index.jsx").display(),
+            )),
+            ChainReason::Exact(
+                "node_modules imports should be explicitly included in package.json to \
+                avoid being bundled at runtime; URL imports are not supported, one \
+                should vendor its source to local and use a relative import instead"
+                .to_string()
+            ),
+        ]
+    )]
+    // URL import
+    #[case::import_url(
+        "import_url",
+        vec![
+            ChainReason::Exact("load_transformed failed".to_string()),
+            ChainReason::Exact("failed to analyze module".to_string()),
+            ChainReason::Exact(format!(
+                "failed to resolve https://cdn.jsdelivr.net/npm/os-name@6.0.0/+esm from {}",
+                fixture_dir().join("import_url/input/index.jsx").display(),
+            )),
+            ChainReason::Exact(
+                "node_modules imports should be explicitly included in package.json to \
+                avoid being bundled at runtime; URL imports are not supported, one \
+                should vendor its source to local and use a relative import instead"
+                .to_string()
+            ),
+        ]
+    )]
     // Relative import that goes beyond the root
     #[case::import_beyond_root(
         "import_beyond_root",
@@ -546,12 +583,24 @@ mod tests {
         vec![
             ChainReason::Exact(format!(
                 "Entry point does not exist: '{}'",
-                fixture_dir()
-                    .join("entry_not_exist")
-                    .join("input")
-                    .join("index.jsx")
-                    .display()
+                fixture_dir().join("entry_not_exist/input/index.jsx").display()
             ))
+        ]
+    )]
+    // Bad syntax that cannot be parsed
+    #[case::bad_syntax(
+        "bad_syntax",
+        vec![
+            ChainReason::Exact("load_transformed failed".to_string()),
+            ChainReason::Exact("Bundler.load() failed".to_string()),
+            ChainReason::Exact(format!(
+                "Bundler.loader.load({}) failed",
+                fixture_dir().join("bad_syntax/input/index.jsx")
+                    .canonicalize()
+                    .unwrap()
+                    .display()
+                )),
+            ChainReason::Regex("error: Expected ';', '}' or <eof>".to_string()),
         ]
     )]
     fn test_bundle_error(#[case] case: &str, #[case] expected_error: Vec<ChainReason>) {
@@ -565,6 +614,19 @@ mod tests {
         )
         .expect_err("Expected bundling error");
         assert_err_eq(error, expected_error);
+    }
+
+    #[rstest]
+    #[should_panic]
+    fn test_bundle_import_meta_panic() {
+        // Test that accessing `import.meta` is not supported
+        let bundle_root = fixture_dir().join("import_meta/input");
+        let _ = bundle(
+            &bundle_root,
+            &bundle_root.join("index.jsx"),
+            Default::default(),
+            &Default::default(),
+        );
     }
 
     #[rstest]
