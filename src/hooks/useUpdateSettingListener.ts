@@ -1,6 +1,6 @@
 import { Dispatch, SetStateAction, useEffect } from "react";
 import { listenToUpdateSetting } from "../events";
-import { ManagerWidgetState } from "../types";
+import { ManagerWidgetState } from "../types/frontend";
 
 export function useUpdateSettingListener(
   setManagerWidgetStates: Dispatch<SetStateAction<Record<string, ManagerWidgetState>>>,

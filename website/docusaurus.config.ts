@@ -7,7 +7,7 @@ const config: Config = {
   tagline: "A cross-platform desktop customization tool.",
   favicon: "img/favicon.ico",
 
-  url: "https://CSCI-SHU-410-SE-Project.github.io/",
+  url: "https://CSCI-SHU-410-SE-Project.github.io",
   baseUrl: "/Deskulpt/",
   organizationName: "CSCI-SHU-410-SE-Project",
   projectName: "Deskulpt",
@@ -17,7 +17,19 @@ const config: Config = {
     locales: ["en"],
   },
 
-  plugins: ["docusaurus-plugin-sass"],
+  plugins: [
+    "docusaurus-plugin-sass",
+    [
+      "docusaurus-plugin-typedoc",
+      {
+        out: "./docs/tsdoc",
+        entryPoints: ["../src"],
+        entryPointStrategy: "expand",
+        outputFileStrategy: "modules",
+        tsconfig: "../tsconfig.json",
+      },
+    ],
+  ],
 
   presets: [
     [
@@ -52,6 +64,11 @@ const config: Config = {
         {
           label: "Guides",
           sidebarId: "guides",
+          type: "docSidebar",
+        },
+        {
+          label: "Development",
+          sidebarId: "development",
           type: "docSidebar",
         },
         {

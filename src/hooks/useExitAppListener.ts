@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { listenToExitApp } from "../events";
 import { invokeExitApp } from "../commands";
-import { ManagerWidgetState } from "../types";
+import { ManagerWidgetState } from "../types/frontend";
 
 export function useExitAppListener(
   toggleShortcut: string | null,

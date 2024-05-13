@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { ManagerWidgetState } from "../types";
-import { Settings } from "../types";
+import { ManagerWidgetState } from "../types/frontend";
+import { Settings } from "../types/backend";
 import { useToggleShortcut } from "../hooks/useToggleShortcut";
 import { getNewManagerWidgetStates, renderWidgets } from "./utils";
 import { useExitAppListener } from "../hooks/useExitAppListener";

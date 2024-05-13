@@ -1,4 +1,5 @@
-import { ManagerWidgetState, WidgetSetting } from "../types";
+import { ManagerWidgetState } from "../types/frontend";
+import { WidgetSetting } from "../types/backend";
 import { emitRemoveWidgetsToCanvas, emitRenderWidgetToCanvas } from "../events";
 import { invokeRefreshWidgetCollection } from "../commands";
 

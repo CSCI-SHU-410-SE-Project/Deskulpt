@@ -6,7 +6,7 @@
  */
 
 import { invoke } from "@tauri-apps/api/core";
-import { Settings, WidgetConfigCollection } from "./types";
+import { Settings, WidgetConfigCollection } from "./types/backend";
 
 export async function invokeBundleWidget(widgetId: string, apisBlobUrl: string) {
   return invoke<string>("bundle_widget", { widgetId, apisBlobUrl });

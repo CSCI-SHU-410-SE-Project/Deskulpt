@@ -1,5 +1,5 @@
 import { Button } from "antd";
-import { Result, WidgetConfig, WidgetSetting } from "../../types";
+import { Result, WidgetConfig, WidgetSetting } from "../../types/backend";
 import { emitRenderWidgetToCanvas } from "../../events";
 import ConfigPanel from "./ConfigPanel";
 import SettingPanel from "./SettingPanel";
