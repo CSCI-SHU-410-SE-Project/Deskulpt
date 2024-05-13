@@ -87,8 +87,9 @@ const config: Config = {
       copyright: `Copyright © ${new Date().getFullYear()} Deskulpt developers. Built with Docusaurus.`,
     },
     prism: {
-      theme: prismThemes.github,
-      darkTheme: prismThemes.dracula,
+      theme: prismThemes.oneLight,
+      darkTheme: prismThemes.oneDark,
+      additionalLanguages: ["bash"],
     },
   } satisfies Preset.ThemeConfig,
 };

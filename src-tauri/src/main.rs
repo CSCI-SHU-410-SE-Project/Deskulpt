@@ -1,5 +1,14 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+//! [![](https://github.com/CSCI-SHU-410-SE-Project/Deskulpt/raw/main/public/deskulpt-full.png)](https://csci-shu-410-se-project.github.io/Deskulpt/)
+//!
+//! The backend documentation for developers of Deskulpt.
+
+#![doc(
+    html_logo_url = "https://github.com/CSCI-SHU-410-SE-Project/Deskulpt/raw/main/src-tauri/icons/icon.png",
+    html_favicon_url = "https://github.com/CSCI-SHU-410-SE-Project/Deskulpt/raw/main/src-tauri/icons/icon.png"
+)]
+
 use tauri::{generate_handler, tauri_build_context, Builder, Manager};
 
 #[cfg(target_os = "macos")]

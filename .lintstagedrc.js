@@ -10,7 +10,7 @@ export default {
       `eslint --max-warnings=0 --no-warn-ignored --fix ${fileArgs}`,
     ];
   },
-  "**/*.{json,json5,md,html,css,scss,yml,yaml}": (filenames) => {
+  "**/*.{json,json5,md,mdx,html,css,scss,yml,yaml}": (filenames) => {
     const fileArgs = escape(filenames);
     return [`prettier --write ${fileArgs}`];
   },
