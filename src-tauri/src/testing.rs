@@ -3,10 +3,13 @@
 
 use anyhow::Error;
 use pretty_assertions::assert_eq;
+use regex::Regex;
 
 pub(crate) enum ChainReason {
     /// The error reason should be exactly equal to the given string.
     Exact(String),
+    /// The error reason should match the given regex.
+    Regex(String),
     /// The error reason should be an IO error.
     IOError,
     /// The error reason should be a `serde_json` error.
@@ -26,6 +29,13 @@ pub(crate) fn assert_err_eq(error: Error, chain: Vec<ChainReason>) {
         match expected_reason {
             ChainReason::Exact(msg) => {
                 assert_eq!(reason.to_string(), msg, "Expected reason: {reason:?}")
+            },
+            ChainReason::Regex(pattern) => {
+                let re = Regex::new(&pattern).unwrap();
+                assert!(
+                    re.is_match(&reason.to_string()),
+                    "Expected reason to match pattern: {pattern:?}"
+                );
             },
             ChainReason::IOError => {
                 let io_error = reason.downcast_ref::<std::io::Error>();

@@ -1,0 +1,1 @@
+import React from"@deskulpt-test/react";const render=()=>React.createElement("div",null,"Hello, world!");const __default={render,width:100,height:100};export{__default as default};
