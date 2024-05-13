@@ -191,8 +191,8 @@ pub(crate) fn bundle_widget<R: Runtime>(
 /// - The shortcut is not registered yet but we want to unregister it.
 /// - There is an error registering or unregistering the shortcut.
 #[command]
-pub(crate) fn register_toggle_shortcut(
-    app_handle: AppHandle,
+pub(crate) fn register_toggle_shortcut<R: Runtime>(
+    app_handle: AppHandle<R>,
     shortcut: String,
     reverse: bool,
 ) -> CommandOut<()> {
@@ -235,8 +235,8 @@ pub(crate) fn register_toggle_shortcut(
 /// - Tauri fails to open the widget base directory, most likely due to misconfigured
 ///   capabiblities.
 #[command]
-pub(crate) fn open_widget_directory(
-    app_handle: AppHandle,
+pub(crate) fn open_widget_directory<R: Runtime>(
+    app_handle: AppHandle<R>,
     widget_id: Option<String>,
 ) -> CommandOut<()> {
     let widget_base = &app_handle.state::<WidgetBaseDirectoryState>().0;
@@ -260,7 +260,9 @@ pub(crate) fn open_widget_directory(
 /// This command tries to load the previously stored settings. It never fails, but
 /// instead returns the default settings upon any error.
 #[command]
-pub(crate) fn init_settings(app_handle: AppHandle) -> CommandOut<Settings> {
+pub(crate) fn init_settings<R: Runtime>(
+    app_handle: AppHandle<R>,
+) -> CommandOut<Settings> {
     let app_config_dir = match app_handle.path().app_config_dir() {
         Ok(app_config_dir) => app_config_dir,
         Err(_) => return Ok(Default::default()),
@@ -273,7 +275,10 @@ pub(crate) fn init_settings(app_handle: AppHandle) -> CommandOut<Settings> {
 /// This command will try to save the widget internals for persistence before exiting
 /// the application, but failure to do so will not prevent the application from exiting.
 #[command]
-pub(crate) fn exit_app(app_handle: AppHandle, settings: Settings) -> CommandOut<()> {
+pub(crate) fn exit_app<R: Runtime>(
+    app_handle: AppHandle<R>,
+    settings: Settings,
+) -> CommandOut<()> {
     let app_config_dir = match app_handle.path().app_config_dir() {
         Ok(app_config_dir) => app_config_dir,
         Err(_) => {
@@ -292,6 +297,7 @@ mod tests {
     use super::*;
     use crate::{
         config::{DeskulptConf, WidgetConfig},
+        states::CanvasClickThroughState,
         testing::setup_mock_env,
     };
     use anyhow::anyhow;
@@ -482,5 +488,67 @@ mod tests {
         assert!(result.is_err());
         let error = result.unwrap_err();
         assert_eq!(error, "Invalid configuration message");
+    }
+
+    #[rstest]
+    fn test_register_toggle_shortcut() {
+        // Test the `register_toggle_shortcut` command; in particular registering and
+        // unregistering should work correctly, and the toggling of the click-through
+        // state should be triggered at correct times
+        let (_, app_handle) = setup_mock_env();
+
+        // Register the global shortcut plugin
+        app_handle
+            .plugin(tauri_plugin_global_shortcut::Builder::new().build())
+            .unwrap();
+        let manager = app_handle.global_shortcut();
+        let shortcut = "CmdorCtrl+Shift+D";
+        assert!(!manager.is_registered(shortcut));
+
+        // Convenience closure for asserting whether the shortcut is correctly handled;
+        // XXX: find out a way to mock keyboard events and test that shortcut is
+        // triggered correctly
+        let check_shortcut = |registered: bool| {
+            // Check that the shorcut is (un)registered as expected
+            let is_registered = manager.is_registered(shortcut);
+            assert_eq!(
+                is_registered, registered,
+                "Shortcut registration: expected {registered}, actual {is_registered}",
+            );
+        };
+
+        // Test registering a shortcut
+        let result =
+            register_toggle_shortcut(app_handle.clone(), shortcut.to_string(), false);
+        assert!(result.is_ok());
+        check_shortcut(true);
+
+        // Test trying to register the same shortcut again
+        let result =
+            register_toggle_shortcut(app_handle.clone(), shortcut.to_string(), false);
+        assert!(result.is_err());
+        let error = result.unwrap_err();
+        assert_eq!(
+            error,
+            format!("'{shortcut}' is registered and cannot be registered again")
+        );
+        check_shortcut(true);
+
+        // Test unregistering a shortcut
+        let result =
+            register_toggle_shortcut(app_handle.clone(), shortcut.to_string(), true);
+        assert!(result.is_ok());
+        check_shortcut(false);
+
+        // Test trying to unregister a shortcut that is not registered
+        let result =
+            register_toggle_shortcut(app_handle.clone(), shortcut.to_string(), true);
+        assert!(result.is_err());
+        let error = result.unwrap_err();
+        assert_eq!(
+            error,
+            format!("'{shortcut}' is not registered and cannot be unregistered")
+        );
+        check_shortcut(false);
     }
 }
