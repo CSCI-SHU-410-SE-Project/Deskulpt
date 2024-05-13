@@ -11,12 +11,12 @@ const commandMatrix = {
     run: {
       dir: "src-tauri",
       cmd: "cargo",
-      args: ["test", "--quiet"],
+      args: ["test"],
     },
     cov: {
       dir: "src-tauri",
       cmd: "cargo",
-      args: ["llvm-cov", "--quiet", "--html", "--"],
+      args: ["llvm-cov", "--html", "--"],
     },
   },
 };
