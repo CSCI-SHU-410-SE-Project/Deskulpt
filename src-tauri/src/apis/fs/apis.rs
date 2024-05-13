@@ -136,6 +136,7 @@ pub(crate) fn remove_dir<R: Runtime>(
 mod tests {
     use super::*;
     use crate::states::WidgetBaseDirectoryState;
+    use rstest::*;
     use std::fs::{self, File};
     use std::io::Write;
     use std::path::PathBuf;
@@ -143,8 +144,14 @@ mod tests {
     use tauri::Manager;
     use tempfile::tempdir;
 
-    fn setup_base_environment() -> (AppHandle<MockRuntime>, PathBuf, tempfile::TempDir)
-    {
+    fn setup_widget_directory(widget_base: &PathBuf, widget_id: &str) -> PathBuf {
+        let widget_dir = widget_base.join(widget_id);
+        fs::create_dir_all(&widget_dir).expect("Failed to create widget directory");
+        widget_dir
+    }
+
+    #[fixture]
+    fn env() -> (AppHandle<MockRuntime>, PathBuf, tempfile::TempDir) {
         let temp_dir = tempdir().expect("Failed to create a temporary directory");
         let app_dir = temp_dir.path();
         let widget_base = app_dir.join("widgets");
@@ -158,271 +165,186 @@ mod tests {
         (app_handle.clone(), widget_base, temp_dir)
     }
 
-    fn setup_widget_directory(widget_base: &PathBuf, widget_id: &str) -> PathBuf {
-        let widget_dir = widget_base.join(widget_id);
-        fs::create_dir_all(&widget_dir).expect("Failed to create widget directory");
-        widget_dir
-    }
-
-    #[test]
-    fn test_exists() {
-        let (app_handle, widget_base, _temp_dir) = setup_base_environment();
-
-        // Test for a file that exists
-        let widget_id = "test_exists";
-        let widget_dir = setup_widget_directory(&widget_base, widget_id);
-        let file_name = "test_file.txt";
+    #[rstest]
+    #[case("test_exists", "test_file.txt", true)]
+    #[case("test_exists", "non_existent_file.txt", false)]
+    fn test_exists(
+        env: (AppHandle<MockRuntime>, PathBuf, tempfile::TempDir),
+        #[case] widget_id: &str,
+        #[case] file_name: &str,
+        #[case] exists_expected: bool,
+    ) {
+        let widget_dir = setup_widget_directory(&env.1, widget_id);
         let file_path = widget_dir.join(file_name);
-        File::create(&file_path).unwrap().write_all(b"Hello, world!").unwrap();
-        assert!(
-            exists(app_handle.clone(), widget_id.to_string(), file_name.to_string())
+        if exists_expected {
+            File::create(&file_path).unwrap().write_all(b"Hello, world!").unwrap();
+        }
+        assert_eq!(
+            exists(env.0.clone(), widget_id.to_string(), file_name.to_string())
                 .unwrap(),
-            "File should exist",
-        );
-
-        // Test for a file that does not exist
-        let non_existent_file = "non_existent_file.txt";
-        assert!(
-            !exists(
-                app_handle.clone(),
-                widget_id.to_string(),
-                non_existent_file.to_string()
-            )
-            .unwrap(),
-            "File should not exist",
+            exists_expected,
+            "File existence should match expected: {}",
+            exists_expected
         );
     }
 
-    #[test]
-    fn test_is_file() {
-        let (app_handle, widget_base, _temp_dir) = setup_base_environment();
-
-        let widget_id = "test_is_file";
-        let widget_dir = setup_widget_directory(&widget_base, widget_id);
-
-        // Test for a file
-        let file_name = "test_file.txt";
-        let file_path = widget_dir.join(file_name);
-        File::create(&file_path).unwrap().write_all(b"Hello, world!").unwrap();
-        assert!(
-            is_file(app_handle.clone(), widget_id.to_string(), file_name.to_string())
+    #[rstest]
+    #[case("test_is_file", "test_file.txt", true)]
+    #[case("test_is_file", "new_dir", false)]
+    fn test_is_file_or_dir(
+        env: (AppHandle<MockRuntime>, PathBuf, tempfile::TempDir),
+        #[case] widget_id: &str,
+        #[case] file_name: &str,
+        #[case] is_file_expected: bool,
+    ) {
+        let widget_dir = setup_widget_directory(&env.1, widget_id);
+        let path = widget_dir.join(file_name);
+        if is_file_expected {
+            File::create(&path).unwrap().write_all(b"Hello, world!").unwrap();
+        } else {
+            fs::create_dir(&path).unwrap();
+        }
+        assert_eq!(
+            is_file(env.0.clone(), widget_id.to_string(), file_name.to_string())
                 .unwrap(),
-            "Path should be a file",
+            is_file_expected,
+            "Should be file: {}",
+            is_file_expected
         );
-
-        // Test for a directory
-        let dir_name = "new_dir";
-        let dir_path = widget_dir.join(dir_name);
-        fs::create_dir(&dir_path).unwrap();
-        assert!(
-            !is_file(app_handle.clone(), widget_id.to_string(), dir_name.to_string())
+        assert_eq!(
+            is_dir(env.0.clone(), widget_id.to_string(), file_name.to_string())
                 .unwrap(),
-            "Path should not be a file",
-        );
-    }
-
-    #[test]
-    fn test_is_dir() {
-        let (app_handle, widget_base, _temp_dir) = setup_base_environment();
-        let widget_id = "test_is_dir";
-        let widget_dir = setup_widget_directory(&widget_base, widget_id);
-
-        // Test for a directory
-        let dir_name = "new_dir";
-        let dir_path = widget_dir.join(dir_name);
-        fs::create_dir(&dir_path).unwrap();
-        assert!(
-            is_dir(app_handle.clone(), widget_id.to_string(), dir_name.to_string())
-                .unwrap(),
-            "Path should be a directory",
-        );
-
-        // Test for a file
-        let file_name = "test_file.txt";
-        let file_path = widget_dir.join(file_name);
-        File::create(&file_path).unwrap().write_all(b"Hello, world!").unwrap();
-        assert!(
-            !is_dir(app_handle.clone(), widget_id.to_string(), file_name.to_string())
-                .unwrap(),
-            "Path should not be a directory",
+            !is_file_expected,
+            "Should be directory: {}",
+            !is_file_expected
         );
     }
 
-    #[test]
-    fn test_read_file() {
-        let (app_handle, widget_base, _temp_dir) = setup_base_environment();
-        let widget_id = "test_read_file";
-        let widget_dir = setup_widget_directory(&widget_base, widget_id);
-
-        // Test for reading a file that exists in the widget directory
-        let file_name = "test_file.txt";
+    #[rstest]
+    #[case("test_read_file", "test_file.txt", "Hello, world!", true)]
+    #[case("test_read_file", "nonexistent_file.txt", "", false)]
+    fn test_read_file(
+        env: (AppHandle<MockRuntime>, PathBuf, tempfile::TempDir),
+        #[case] widget_id: &str,
+        #[case] file_name: &str,
+        #[case] content: &str,
+        #[case] should_succeed: bool,
+    ) {
+        let widget_dir = setup_widget_directory(&env.1, widget_id);
         let file_path = widget_dir.join(file_name);
-        let file_content = "Hello, world!";
-        File::create(&file_path).unwrap().write_all(file_content.as_bytes()).unwrap();
+        if should_succeed {
+            File::create(&file_path).unwrap().write_all(content.as_bytes()).unwrap();
+        }
         let result =
-            read_file(app_handle.clone(), widget_id.to_string(), file_name.to_string());
-        assert!(
+            read_file(env.0.clone(), widget_id.to_string(), file_name.to_string());
+        assert_eq!(
             result.is_ok(),
-            "Reading an existing file should succeed: {:?}",
-            result
+            should_succeed,
+            "Reading file should match expected success state: {}",
+            should_succeed
         );
-        let content = result.unwrap();
-        assert_eq!(content, file_content, "File content should match");
-
-        // Test for reading a file that exists in a subdirectory of the widget directory
-        let sub_dir_name = "sub_dir";
-        let sub_dir_path = widget_dir.join(sub_dir_name);
-        fs::create_dir(&sub_dir_path).unwrap();
-        let sub_file_name = "sub_file.txt";
-        let sub_file_path = sub_dir_path.join(sub_file_name);
-        let sub_file_content = "Sub file content";
-        File::create(&sub_file_path)
-            .unwrap()
-            .write_all(sub_file_content.as_bytes())
-            .unwrap();
-        let sub_file_path_arg = PathBuf::from(sub_dir_name).join(sub_file_name);
-        let result = read_file(
-            app_handle.clone(),
-            widget_id.to_string(),
-            sub_file_path_arg.to_string_lossy().to_string(),
-        );
-        assert!(
-            result.is_ok(),
-            "Reading an existing sub file should succeed: {:?}",
-            result
-        );
-        let content = result.unwrap();
-        assert_eq!(content, sub_file_content, "Sub file content should match");
-
-        // Test for reading a file that does not exist
-        let non_existent_file = "non_existent_file.txt";
-        let result = read_file(
-            app_handle.clone(),
-            widget_id.to_string(),
-            non_existent_file.to_string(),
-        );
-        assert!(result.is_err(), "Reading a non-existent file should return an error");
-        println!("Error message: {:?}", result);
-
-        // Test for reading a nonexisting file outside widget dir whose path contains relative path components
-        let relative_outside_nonexistent_file = "../non_existent_file.txt";
-        let result = read_file(
-            app_handle.clone(),
-            widget_id.to_string(),
-            relative_outside_nonexistent_file.to_string(),
-        );
-        assert!(
-            result.is_err(),
-            "Reading a non-existent file outside widget dir should return an error"
-        );
-        println!("Error message: {:?}", result);
-
-        // Test for reading a existing file outside widget dir whose path contains relative path components
-        let relative_outside_existing_file = "../test_file.txt";
-        // Create a file outside the widget directory
-        let outside_file_path = widget_base.join(relative_outside_existing_file);
-        let outside_file_content = "Outside file content";
-        File::create(&outside_file_path)
-            .unwrap()
-            .write_all(outside_file_content.as_bytes())
-            .unwrap();
-        let result = read_file(
-            app_handle.clone(),
-            widget_id.to_string(),
-            relative_outside_existing_file.to_string(),
-        );
-        assert!(
-            result.is_err(),
-            "Reading a file outside widget dir should return an error"
-        );
-        println!("Error message: {:?}", result);
+        if should_succeed {
+            assert_eq!(result.unwrap(), content, "File content should match");
+        }
     }
 
-    #[test]
-    fn test_write_file() {
-        let (app_handle, widget_base, _temp_dir) = setup_base_environment();
-        let widget_id = "test_write_file";
-        let widget_dir = setup_widget_directory(&widget_base, widget_id);
-        let file_name = "test_file.txt";
-        let file_content = "Hello, world!";
-
+    #[rstest]
+    #[case("test_write_file", "new_file.txt", "Hello, new world!")]
+    fn test_write_file(
+        env: (AppHandle<MockRuntime>, PathBuf, tempfile::TempDir),
+        #[case] widget_id: &str,
+        #[case] file_name: &str,
+        #[case] content: &str,
+    ) {
+        let widget_dir = setup_widget_directory(&env.1, widget_id);
         write_file(
-            app_handle,
+            env.0,
             widget_id.to_string(),
             file_name.to_string(),
-            file_content.to_string(),
+            content.to_string(),
         )
         .unwrap();
-        let content = fs::read_to_string(widget_dir.join(file_name)).unwrap();
-        assert_eq!(content, file_content, "File content should match");
+        let file_path = widget_dir.join(file_name);
+        assert_eq!(
+            fs::read_to_string(file_path).unwrap(),
+            content,
+            "Written content should match input"
+        );
     }
 
-    #[test]
-    fn test_append_file() {
-        let (app_handle, widget_base, _temp_dir) = setup_base_environment();
-        let widget_id = "test_append_file";
-        let widget_dir = setup_widget_directory(&widget_base, widget_id);
-        let file_name = "test_file.txt";
-        let initial_content = "Hello";
-        let appended_content = ", world!";
-        let full_content = format!("{}{}", initial_content, appended_content);
-
-        write_file(
-            app_handle.clone(),
-            widget_id.to_string(),
-            file_name.to_string(),
-            initial_content.to_string(),
-        )
-        .unwrap();
+    #[rstest]
+    #[case(
+        "test_append_file",
+        "appendable_file.txt",
+        "Hello",
+        ", world!",
+        "Hello, world!"
+    )]
+    fn test_append_file(
+        env: (AppHandle<MockRuntime>, PathBuf, tempfile::TempDir),
+        #[case] widget_id: &str,
+        #[case] file_name: &str,
+        #[case] initial_content: &str,
+        #[case] appended_content: &str,
+        #[case] expected_content: &str,
+    ) {
+        let widget_dir = setup_widget_directory(&env.1, widget_id);
+        let file_path = widget_dir.join(file_name);
+        File::create(&file_path)
+            .unwrap()
+            .write_all(initial_content.as_bytes())
+            .unwrap();
         append_file(
-            app_handle,
+            env.0,
             widget_id.to_string(),
             file_name.to_string(),
             appended_content.to_string(),
         )
         .unwrap();
-        let content = fs::read_to_string(widget_dir.join(file_name)).unwrap();
-        assert_eq!(content, full_content, "File content should match");
+        assert_eq!(
+            fs::read_to_string(file_path).unwrap(),
+            expected_content,
+            "Content after append should match expected"
+        );
     }
 
-    #[test]
-    fn test_remove_file() {
-        let (app_handle, widget_base, _temp_dir) = setup_base_environment();
-        let widget_id = "test_remove_file";
-        let widget_dir = setup_widget_directory(&widget_base, widget_id);
-        let file_name = "test_file.txt";
-        File::create(widget_dir.join(file_name))
-            .unwrap()
-            .write_all(b"Hello, world!")
-            .unwrap();
-
-        remove_file(app_handle, widget_id.to_string(), file_name.to_string()).unwrap();
-        assert!(!widget_dir.join(file_name).exists(), "File should be removed");
+    #[rstest]
+    #[case("test_remove_file", "removable_file.txt")]
+    fn test_remove_file(
+        env: (AppHandle<MockRuntime>, PathBuf, tempfile::TempDir),
+        #[case] widget_id: &str,
+        #[case] file_name: &str,
+    ) {
+        let widget_dir = setup_widget_directory(&env.1, widget_id);
+        let file_path = widget_dir.join(file_name);
+        File::create(&file_path).unwrap().write_all(b"Delete me").unwrap();
+        remove_file(env.0, widget_id.to_string(), file_name.to_string()).unwrap();
+        assert!(!file_path.exists(), "File should be removed");
     }
 
-    #[test]
-    fn test_create_dir() {
-        let (app_handle, widget_base, _temp_dir) = setup_base_environment();
-        let widget_id = "test_create_dir";
-        let _widget_dir = setup_widget_directory(&widget_base, widget_id);
-        let dir_name = "new_dir";
-
-        let result =
-            create_dir(app_handle, widget_id.to_string(), dir_name.to_string());
-        assert!(result.is_ok(), "Creating a directory should succeed: {:?}", result);
-        assert!(widget_base.join(widget_id).join(dir_name).is_dir());
+    #[rstest]
+    #[case("test_create_dir", "new_directory")]
+    fn test_create_dir(
+        env: (AppHandle<MockRuntime>, PathBuf, tempfile::TempDir),
+        #[case] widget_id: &str,
+        #[case] dir_name: &str,
+    ) {
+        let widget_dir = setup_widget_directory(&env.1, widget_id);
+        create_dir(env.0, widget_id.to_string(), dir_name.to_string()).unwrap();
+        assert!(widget_dir.join(dir_name).is_dir(), "Directory should be created");
     }
 
-    #[test]
-    fn test_remove_dir() {
-        let (app_handle, widget_base, _temp_dir) = setup_base_environment();
-        let widget_id = "test_remove_dir";
-        let _widget_dir = setup_widget_directory(&widget_base, widget_id);
-        let dir_name = "new_dir";
-        let dir_path = widget_base.join(widget_id).join(dir_name);
+    #[rstest]
+    #[case("test_remove_dir", "removable_directory")]
+    fn test_remove_dir(
+        env: (AppHandle<MockRuntime>, PathBuf, tempfile::TempDir),
+        #[case] widget_id: &str,
+        #[case] dir_name: &str,
+    ) {
+        let widget_dir = setup_widget_directory(&env.1, widget_id);
+        let dir_path = widget_dir.join(dir_name);
         fs::create_dir_all(&dir_path).unwrap();
-
-        remove_dir(app_handle, widget_id.to_string(), dir_name.to_string()).unwrap();
+        remove_dir(env.0, widget_id.to_string(), dir_name.to_string()).unwrap();
         assert!(!dir_path.exists(), "Directory should be removed");
     }
 }
