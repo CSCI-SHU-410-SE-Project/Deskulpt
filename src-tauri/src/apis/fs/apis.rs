@@ -155,7 +155,7 @@ mod tests {
         let app_handle = app.handle();
         app_handle.manage(WidgetBaseDirectoryState(widget_base.clone()));
 
-        (app_handle, widget_base, temp_dir)
+        (app_handle.clone(), widget_base, temp_dir)
     }
 
     fn setup_widget_directory(widget_base: &PathBuf, widget_id: &str) -> PathBuf {
