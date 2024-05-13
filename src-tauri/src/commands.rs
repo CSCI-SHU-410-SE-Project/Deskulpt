@@ -302,7 +302,7 @@ mod tests {
     use anyhow::anyhow;
     use copy_dir::copy_dir;
     use pretty_assertions::assert_eq;
-    use rstest::{fixture, rstest};
+    use rstest::rstest;
     use std::{env::current_dir, path::PathBuf};
     use tauri::test::MockRuntime;
     use tempfile::TempDir;
@@ -312,8 +312,7 @@ mod tests {
         current_dir().unwrap().join("tests/fixtures")
     }
 
-    #[fixture]
-    #[once]
+    /// Set up the environment for the `bundle_widget` command tests.
     fn setup_bundle_widget_env() -> (TempDir, AppHandle<MockRuntime>) {
         let (base_dir, app_handle) = setup_mock_env();
         {
@@ -424,11 +423,9 @@ mod tests {
     }
 
     #[rstest]
-    fn test_bundle_widget_pass(
-        setup_bundle_widget_env: &(TempDir, AppHandle<MockRuntime>),
-    ) {
+    fn test_bundle_widget_pass() {
         // Test that the `bundle_widget` command bundles a widget correctly
-        let (_, app_handle) = setup_bundle_widget_env;
+        let (_base_dir, app_handle) = setup_bundle_widget_env();
         let result =
             bundle_widget(app_handle.clone(), "pass".to_string(), Default::default());
 
@@ -438,11 +435,9 @@ mod tests {
     }
 
     #[rstest]
-    fn test_bundle_widget_bundling_error(
-        setup_bundle_widget_env: &(TempDir, AppHandle<MockRuntime>),
-    ) {
+    fn test_bundle_widget_bundling_error() {
         // Test that the `bundle_widget` command raises upon bundling error
-        let (_base_dir, app_handle) = setup_bundle_widget_env;
+        let (_base_dir, app_handle) = setup_bundle_widget_env();
         let result =
             bundle_widget(app_handle.clone(), "fail".to_string(), Default::default());
 
@@ -455,11 +450,9 @@ mod tests {
     }
 
     #[rstest]
-    fn test_bundle_widget_id_not_found(
-        setup_bundle_widget_env: &(TempDir, AppHandle<MockRuntime>),
-    ) {
+    fn test_bundle_widget_id_not_found() {
         // Test that the `bundle_widget` command raises for an unknown widget ID
-        let (_base_dir, app_handle) = setup_bundle_widget_env;
+        let (_base_dir, app_handle) = setup_bundle_widget_env();
         let result = bundle_widget(
             app_handle.clone(),
             "non_existent_id".to_string(),
@@ -472,12 +465,10 @@ mod tests {
     }
 
     #[rstest]
-    fn test_bundle_widget_invalid_conf(
-        setup_bundle_widget_env: &(TempDir, AppHandle<MockRuntime>),
-    ) {
+    fn test_bundle_widget_invalid_conf() {
         // Test that the `bundle_widget` command propagates the error message held in
         // an invalid widget configuration
-        let (_base_dir, app_handle) = setup_bundle_widget_env;
+        let (_base_dir, app_handle) = setup_bundle_widget_env();
         let result = bundle_widget(
             app_handle.clone(),
             "invalid_conf".to_string(),
