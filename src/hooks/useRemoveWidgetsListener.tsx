@@ -1,6 +1,6 @@
 import { Dispatch, SetStateAction, useEffect } from "react";
 import { listenToRemoveWidgets } from "../events";
-import { CanvasWidgetState } from "../types";
+import { CanvasWidgetState } from "../types/frontend";
 
 export function useRemoveWidgetsListener(
   canvasWidgetStates: Record<string, CanvasWidgetState>,

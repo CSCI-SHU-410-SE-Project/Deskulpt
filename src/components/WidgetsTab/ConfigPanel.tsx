@@ -1,5 +1,5 @@
 import { Tooltip } from "antd";
-import { Result, WidgetConfig } from "../../types";
+import { Result, WidgetConfig } from "../../types/backend";
 import * as styles from "./styles";
 
 /**

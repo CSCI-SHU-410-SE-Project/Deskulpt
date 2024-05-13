@@ -1,5 +1,6 @@
 import { Badge, FloatButton, Tabs } from "antd";
-import { ManagerWidgetState, Result, WidgetConfig, WidgetSetting } from "../../types";
+import { ManagerWidgetState } from "../../types/frontend";
+import { Result, WidgetConfig, WidgetSetting } from "../../types/backend";
 import WidgetInfoPanel from "./Details";
 import { Dispatch, SetStateAction } from "react";
 import { FileScan, FolderOpen, Repeat } from "lucide-react";

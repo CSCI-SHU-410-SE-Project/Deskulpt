@@ -10,7 +10,7 @@ import {
   RemoveWidgetsPayload,
   RenderWidgetPayload,
   UpdateSettingPayload,
-} from "./types";
+} from "./types/frontend";
 
 export async function emitRenderWidgetToCanvas(payload: RenderWidgetPayload) {
   await emitTo("canvas", "render-widget", payload);

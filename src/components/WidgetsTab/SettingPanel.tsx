@@ -1,5 +1,5 @@
 import { InputNumber } from "antd";
-import { WidgetSetting } from "../../types";
+import { WidgetSetting } from "../../types/backend";
 import * as styles from "./styles";
 
 /**
