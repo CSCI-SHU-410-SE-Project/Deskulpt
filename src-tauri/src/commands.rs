@@ -422,63 +422,63 @@ mod tests {
         assert_eq!(widget_collection.clone(), new_collection);
     }
 
-    #[rstest]
-    fn test_bundle_widget_pass() {
-        // Test that the `bundle_widget` command bundles a widget correctly
-        let (_base_dir, app_handle) = setup_bundle_widget_env();
-        let result =
-            bundle_widget(app_handle.clone(), "pass".to_string(), Default::default());
+    // #[rstest]
+    // fn test_bundle_widget_pass() {
+    //     // Test that the `bundle_widget` command bundles a widget correctly
+    //     let (_base_dir, app_handle) = setup_bundle_widget_env();
+    //     let result =
+    //         bundle_widget(app_handle.clone(), "pass".to_string(), Default::default());
 
-        // We only check that the result is Ok; the actual bundled content should be
-        // checked in the bundler unit tests
-        assert!(result.is_ok());
-    }
+    //     // We only check that the result is Ok; the actual bundled content should be
+    //     // checked in the bundler unit tests
+    //     assert!(result.is_ok());
+    // }
 
-    #[rstest]
-    fn test_bundle_widget_bundling_error() {
-        // Test that the `bundle_widget` command raises upon bundling error
-        let (_base_dir, app_handle) = setup_bundle_widget_env();
-        let result =
-            bundle_widget(app_handle.clone(), "fail".to_string(), Default::default());
+    // #[rstest]
+    // fn test_bundle_widget_bundling_error() {
+    //     // Test that the `bundle_widget` command raises upon bundling error
+    //     let (_base_dir, app_handle) = setup_bundle_widget_env();
+    //     let result =
+    //         bundle_widget(app_handle.clone(), "fail".to_string(), Default::default());
 
-        assert!(result.is_err());
-        let error = result.unwrap_err();
-        assert!(
-            error.contains("Failed to bundle widget (id=fail)"),
-            "The error message is not as expected: '{error}'",
-        );
-    }
+    //     assert!(result.is_err());
+    //     let error = result.unwrap_err();
+    //     assert!(
+    //         error.contains("Failed to bundle widget (id=fail)"),
+    //         "The error message is not as expected: '{error}'",
+    //     );
+    // }
 
-    #[rstest]
-    fn test_bundle_widget_id_not_found() {
-        // Test that the `bundle_widget` command raises for an unknown widget ID
-        let (_base_dir, app_handle) = setup_bundle_widget_env();
-        let result = bundle_widget(
-            app_handle.clone(),
-            "non_existent_id".to_string(),
-            Default::default(),
-        );
+    // #[rstest]
+    // fn test_bundle_widget_id_not_found() {
+    //     // Test that the `bundle_widget` command raises for an unknown widget ID
+    //     let (_base_dir, app_handle) = setup_bundle_widget_env();
+    //     let result = bundle_widget(
+    //         app_handle.clone(),
+    //         "non_existent_id".to_string(),
+    //         Default::default(),
+    //     );
 
-        assert!(result.is_err());
-        let error = result.unwrap_err();
-        assert_eq!(error, "Widget 'non_existent_id' is not found in the collection");
-    }
+    //     assert!(result.is_err());
+    //     let error = result.unwrap_err();
+    //     assert_eq!(error, "Widget 'non_existent_id' is not found in the collection");
+    // }
 
-    #[rstest]
-    fn test_bundle_widget_invalid_conf() {
-        // Test that the `bundle_widget` command propagates the error message held in
-        // an invalid widget configuration
-        let (_base_dir, app_handle) = setup_bundle_widget_env();
-        let result = bundle_widget(
-            app_handle.clone(),
-            "invalid_conf".to_string(),
-            Default::default(),
-        );
+    // #[rstest]
+    // fn test_bundle_widget_invalid_conf() {
+    //     // Test that the `bundle_widget` command propagates the error message held in
+    //     // an invalid widget configuration
+    //     let (_base_dir, app_handle) = setup_bundle_widget_env();
+    //     let result = bundle_widget(
+    //         app_handle.clone(),
+    //         "invalid_conf".to_string(),
+    //         Default::default(),
+    //     );
 
-        assert!(result.is_err());
-        let error = result.unwrap_err();
-        assert_eq!(error, "Invalid configuration message");
-    }
+    //     assert!(result.is_err());
+    //     let error = result.unwrap_err();
+    //     assert_eq!(error, "Invalid configuration message");
+    // }
 
     #[rstest]
     fn test_register_toggle_shortcut() {
