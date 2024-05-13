@@ -297,7 +297,6 @@ mod tests {
     use super::*;
     use crate::{
         config::{DeskulptConf, WidgetConfig},
-        states::CanvasClickThroughState,
         testing::setup_mock_env,
     };
     use anyhow::anyhow;
