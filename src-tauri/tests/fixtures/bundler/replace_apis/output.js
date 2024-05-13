@@ -1,0 +1,1 @@
+import React from"@deskulpt-test/react";import apis from"blob://dummy-url";const __default={render(){return React.createElement("div",null,apis.fs.isFile("./index.jsx"));},width:100,height:100};export{__default as default};

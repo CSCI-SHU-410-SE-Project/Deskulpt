@@ -5,7 +5,7 @@
 
 use crate::config::WidgetConfigCollection;
 use std::{fs::create_dir_all, path::PathBuf, sync::Mutex};
-use tauri::{menu::MenuItem, App, Manager, Wry};
+use tauri::{menu::MenuItem, Runtime};
 
 /// The type for the state of the collection of widget configurations.
 ///
@@ -24,9 +24,8 @@ impl WidgetBaseDirectoryState {
     /// Initialize the widget base directory state.
     ///
     /// This creates the widget base directory if it does not exist.
-    pub(crate) fn init(app: &App) -> Self {
-        let app_data_dir = app.path().app_data_dir().unwrap();
-        let widget_base_dir = app_data_dir.join("widgets");
+    pub(crate) fn init(base: PathBuf) -> Self {
+        let widget_base_dir = base.join("widgets");
         if !widget_base_dir.exists() {
             create_dir_all(&widget_base_dir).unwrap();
         }
@@ -35,14 +34,14 @@ impl WidgetBaseDirectoryState {
 }
 
 /// Canvas click-through state information.
-pub(crate) struct CanvasClickThrough {
+pub(crate) struct CanvasClickThrough<R: Runtime> {
     /// Whether the canvas is click-through.
     yes: bool,
     /// The menu item for toggling the canvas click-through state.
-    menu_item: MenuItem<Wry>,
+    menu_item: MenuItem<R>,
 }
 
-impl CanvasClickThrough {
+impl<R: Runtime> CanvasClickThrough<R> {
     /// Try to toggle the canvas click-through state.
     ///
     /// This is guaranteed to update whether the canvas is click-through or not. It may,
@@ -62,11 +61,13 @@ impl CanvasClickThrough {
 /// The type for the state of whether the canvas can be clicked through.
 ///
 /// The managed state will be updated at runtime and is thus protected by a mutex.
-pub(crate) struct CanvasClickThroughState(pub(crate) Mutex<CanvasClickThrough>);
+pub(crate) struct CanvasClickThroughState<R: Runtime>(
+    pub(crate) Mutex<CanvasClickThrough<R>>,
+);
 
-impl CanvasClickThroughState {
+impl<R: Runtime> CanvasClickThroughState<R> {
     /// Initialize the canvas click-through state.
-    pub(crate) fn init(is_click_through: bool, menu_item: MenuItem<Wry>) -> Self {
+    pub(crate) fn init(is_click_through: bool, menu_item: MenuItem<R>) -> Self {
         Self(Mutex::new(CanvasClickThrough { yes: is_click_through, menu_item }))
     }
 }

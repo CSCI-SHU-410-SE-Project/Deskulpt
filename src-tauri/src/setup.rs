@@ -67,7 +67,8 @@ pub(crate) fn listen_to_windows(window: &Window, event: &WindowEvent) {
 /// Initialize the Deskulpt system tray.
 ///
 /// This binds the menu and event handlers to the system tray with ID "deskulpt-tray",
-/// see `tauri.conf.json`. This tray would be intialized with the following features:
+/// see `tauri.conf.json`. Note that the cnavas click-through state is managed in this
+/// function as well! This tray would be intialized with the following features:
 ///
 /// - When left-clicking the tray icon or clicking the "toggle" menu item, toggle the
 ///   click-through state of the canvas window. Note that left-clicking is unsupported

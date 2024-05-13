@@ -2,7 +2,7 @@
 
 use crate::states::CanvasClickThroughState;
 use anyhow::{bail, Error};
-use tauri::{AppHandle, Manager};
+use tauri::{AppHandle, Manager, Runtime};
 
 /// Toggle the click-through state of the canvas window.
 ///
@@ -12,13 +12,15 @@ use tauri::{AppHandle, Manager};
 ///
 /// - The canvas window is not found.
 /// - Fails to set the canvas to ignore/unignore cursor events.
-pub(crate) fn toggle_click_through_state(app_handle: &AppHandle) -> Result<(), Error> {
+pub(crate) fn toggle_click_through_state<R: Runtime>(
+    app_handle: &AppHandle<R>,
+) -> Result<(), Error> {
     let canvas = match app_handle.get_webview_window("canvas") {
         Some(canvas) => canvas,
         None => bail!("Canvas window not found"),
     };
 
-    let click_through_state = &app_handle.state::<CanvasClickThroughState>();
+    let click_through_state = &app_handle.state::<CanvasClickThroughState<R>>();
     let mut click_through = click_through_state.0.lock().unwrap();
     let prev_can_click_through = click_through.yes();
 

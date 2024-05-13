@@ -1,0 +1,1 @@
+import React from"@deskulpt-test/react";function Counter(){const[count,setCount]=React.useState(0);function handleClick(){setCount(count+1);}return React.createElement("button",{onClick:handleClick},"You pressed me ",count," times!");}const App={render:()=>React.createElement(Counter,null),width:100,height:100};export{App as default};
