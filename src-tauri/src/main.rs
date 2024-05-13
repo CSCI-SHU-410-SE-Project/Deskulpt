@@ -22,7 +22,7 @@ fn main() {
     Builder::default()
         // Additional application setup
         .setup(|app| {
-            app.manage(states::WidgetBaseDirectoryState::init(app));
+            app.manage(states::WidgetBaseDirectoryState::init(app.path().app_data_dir().unwrap()));
             setup::init_system_tray(app)?;
             setup::create_canvas(app)?;
 

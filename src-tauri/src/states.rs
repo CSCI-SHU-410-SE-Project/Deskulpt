@@ -5,7 +5,7 @@
 
 use crate::config::WidgetConfigCollection;
 use std::{fs::create_dir_all, path::PathBuf, sync::Mutex};
-use tauri::{menu::MenuItem, App, Manager, Wry};
+use tauri::{menu::MenuItem, Wry};
 
 /// The type for the state of the collection of widget configurations.
 ///
@@ -24,9 +24,8 @@ impl WidgetBaseDirectoryState {
     /// Initialize the widget base directory state.
     ///
     /// This creates the widget base directory if it does not exist.
-    pub(crate) fn init(app: &App) -> Self {
-        let app_data_dir = app.path().app_data_dir().unwrap();
-        let widget_base_dir = app_data_dir.join("widgets");
+    pub(crate) fn init(base: PathBuf) -> Self {
+        let widget_base_dir = base.join("widgets");
         if !widget_base_dir.exists() {
             create_dir_all(&widget_base_dir).unwrap();
         }
