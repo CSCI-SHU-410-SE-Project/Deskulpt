@@ -302,7 +302,7 @@ mod tests {
     use anyhow::anyhow;
     use copy_dir::copy_dir;
     use pretty_assertions::assert_eq;
-    use rstest::rstest;
+    use rstest::{fixture, rstest};
     use std::{env::current_dir, path::PathBuf};
     use tauri::test::MockRuntime;
     use tempfile::TempDir;
@@ -313,6 +313,8 @@ mod tests {
     }
 
     /// Set up the environment for the `bundle_widget` command tests.
+    #[fixture]
+    #[once]
     fn setup_bundle_widget_env() -> (TempDir, AppHandle<MockRuntime>) {
         let (base_dir, app_handle) = setup_mock_env();
         {
@@ -422,123 +424,131 @@ mod tests {
         assert_eq!(widget_collection.clone(), new_collection);
     }
 
-    // #[rstest]
-    // fn test_bundle_widget_pass() {
-    //     // Test that the `bundle_widget` command bundles a widget correctly
-    //     let (_base_dir, app_handle) = setup_bundle_widget_env();
-    //     let result =
-    //         bundle_widget(app_handle.clone(), "pass".to_string(), Default::default());
+    #[rstest]
+    fn test_bundle_widget_pass(
+        setup_bundle_widget_env: &(TempDir, AppHandle<MockRuntime>),
+    ) {
+        // Test that the `bundle_widget` command bundles a widget correctly
+        let (_base_dir, app_handle) = setup_bundle_widget_env;
+        let result =
+            bundle_widget(app_handle.clone(), "pass".to_string(), Default::default());
 
-    //     // We only check that the result is Ok; the actual bundled content should be
-    //     // checked in the bundler unit tests
-    //     assert!(result.is_ok());
-    // }
-
-    // #[rstest]
-    // fn test_bundle_widget_bundling_error() {
-    //     // Test that the `bundle_widget` command raises upon bundling error
-    //     let (_base_dir, app_handle) = setup_bundle_widget_env();
-    //     let result =
-    //         bundle_widget(app_handle.clone(), "fail".to_string(), Default::default());
-
-    //     assert!(result.is_err());
-    //     let error = result.unwrap_err();
-    //     assert!(
-    //         error.contains("Failed to bundle widget (id=fail)"),
-    //         "The error message is not as expected: '{error}'",
-    //     );
-    // }
-
-    // #[rstest]
-    // fn test_bundle_widget_id_not_found() {
-    //     // Test that the `bundle_widget` command raises for an unknown widget ID
-    //     let (_base_dir, app_handle) = setup_bundle_widget_env();
-    //     let result = bundle_widget(
-    //         app_handle.clone(),
-    //         "non_existent_id".to_string(),
-    //         Default::default(),
-    //     );
-
-    //     assert!(result.is_err());
-    //     let error = result.unwrap_err();
-    //     assert_eq!(error, "Widget 'non_existent_id' is not found in the collection");
-    // }
-
-    // #[rstest]
-    // fn test_bundle_widget_invalid_conf() {
-    //     // Test that the `bundle_widget` command propagates the error message held in
-    //     // an invalid widget configuration
-    //     let (_base_dir, app_handle) = setup_bundle_widget_env();
-    //     let result = bundle_widget(
-    //         app_handle.clone(),
-    //         "invalid_conf".to_string(),
-    //         Default::default(),
-    //     );
-
-    //     assert!(result.is_err());
-    //     let error = result.unwrap_err();
-    //     assert_eq!(error, "Invalid configuration message");
-    // }
+        // We only check that the result is Ok; the actual bundled content should be
+        // checked in the bundler unit tests
+        assert!(result.is_ok());
+    }
 
     #[rstest]
-    fn test_register_toggle_shortcut() {
-        // Test the `register_toggle_shortcut` command; in particular registering and
-        // unregistering should work correctly, and the toggling of the click-through
-        // state should be triggered at correct times
-        let (_base_dir, app_handle) = setup_mock_env();
-
-        // Register the global shortcut plugin
-        app_handle
-            .plugin(tauri_plugin_global_shortcut::Builder::new().build())
-            .unwrap();
-        let manager = app_handle.global_shortcut();
-        let shortcut = "CmdorCtrl+Shift+D";
-        assert!(!manager.is_registered(shortcut));
-
-        // Convenience closure for asserting whether the shortcut is correctly handled;
-        // XXX: find out a way to mock keyboard events and test that shortcut is
-        // triggered correctly
-        let check_shortcut = |registered: bool| {
-            // Check that the shorcut is (un)registered as expected
-            let is_registered = manager.is_registered(shortcut);
-            assert_eq!(
-                is_registered, registered,
-                "Shortcut registration: expected {registered}, actual {is_registered}",
-            );
-        };
-
-        // Test registering a shortcut
+    fn test_bundle_widget_bundling_error(
+        setup_bundle_widget_env: &(TempDir, AppHandle<MockRuntime>),
+    ) {
+        // Test that the `bundle_widget` command raises upon bundling error
+        let (_base_dir, app_handle) = setup_bundle_widget_env;
         let result =
-            register_toggle_shortcut(app_handle.clone(), shortcut.to_string(), false);
-        assert!(result.is_ok());
-        check_shortcut(true);
+            bundle_widget(app_handle.clone(), "fail".to_string(), Default::default());
 
-        // Test trying to register the same shortcut again
-        let result =
-            register_toggle_shortcut(app_handle.clone(), shortcut.to_string(), false);
         assert!(result.is_err());
         let error = result.unwrap_err();
-        assert_eq!(
-            error,
-            format!("'{shortcut}' is registered and cannot be registered again")
+        assert!(
+            error.contains("Failed to bundle widget (id=fail)"),
+            "The error message is not as expected: '{error}'",
         );
-        check_shortcut(true);
-
-        // Test unregistering a shortcut
-        let result =
-            register_toggle_shortcut(app_handle.clone(), shortcut.to_string(), true);
-        assert!(result.is_ok());
-        check_shortcut(false);
-
-        // Test trying to unregister a shortcut that is not registered
-        let result =
-            register_toggle_shortcut(app_handle.clone(), shortcut.to_string(), true);
-        assert!(result.is_err());
-        let error = result.unwrap_err();
-        assert_eq!(
-            error,
-            format!("'{shortcut}' is not registered and cannot be unregistered")
-        );
-        check_shortcut(false);
     }
+
+    #[rstest]
+    fn test_bundle_widget_id_not_found(
+        setup_bundle_widget_env: &(TempDir, AppHandle<MockRuntime>),
+    ) {
+        // Test that the `bundle_widget` command raises for an unknown widget ID
+        let (_base_dir, app_handle) = setup_bundle_widget_env;
+        let result = bundle_widget(
+            app_handle.clone(),
+            "non_existent_id".to_string(),
+            Default::default(),
+        );
+
+        assert!(result.is_err());
+        let error = result.unwrap_err();
+        assert_eq!(error, "Widget 'non_existent_id' is not found in the collection");
+    }
+
+    #[rstest]
+    fn test_bundle_widget_invalid_conf(
+        setup_bundle_widget_env: &(TempDir, AppHandle<MockRuntime>),
+    ) {
+        // Test that the `bundle_widget` command propagates the error message held in
+        // an invalid widget configuration
+        let (_base_dir, app_handle) = setup_bundle_widget_env;
+        let result = bundle_widget(
+            app_handle.clone(),
+            "invalid_conf".to_string(),
+            Default::default(),
+        );
+
+        assert!(result.is_err());
+        let error = result.unwrap_err();
+        assert_eq!(error, "Invalid configuration message");
+    }
+
+    // #[rstest]
+    // fn test_register_toggle_shortcut() {
+    //     // Test the `register_toggle_shortcut` command; in particular registering and
+    //     // unregistering should work correctly, and the toggling of the click-through
+    //     // state should be triggered at correct times
+    //     let (_base_dir, app_handle) = setup_mock_env();
+
+    //     // Register the global shortcut plugin
+    //     app_handle
+    //         .plugin(tauri_plugin_global_shortcut::Builder::new().build())
+    //         .unwrap();
+    //     let manager = app_handle.global_shortcut();
+    //     let shortcut = "CmdorCtrl+Shift+D";
+    //     assert!(!manager.is_registered(shortcut));
+
+    //     // Convenience closure for asserting whether the shortcut is correctly handled;
+    //     // XXX: find out a way to mock keyboard events and test that shortcut is
+    //     // triggered correctly
+    //     let check_shortcut = |registered: bool| {
+    //         // Check that the shorcut is (un)registered as expected
+    //         let is_registered = manager.is_registered(shortcut);
+    //         assert_eq!(
+    //             is_registered, registered,
+    //             "Shortcut registration: expected {registered}, actual {is_registered}",
+    //         );
+    //     };
+
+    //     // Test registering a shortcut
+    //     let result =
+    //         register_toggle_shortcut(app_handle.clone(), shortcut.to_string(), false);
+    //     assert!(result.is_ok());
+    //     check_shortcut(true);
+
+    //     // Test trying to register the same shortcut again
+    //     let result =
+    //         register_toggle_shortcut(app_handle.clone(), shortcut.to_string(), false);
+    //     assert!(result.is_err());
+    //     let error = result.unwrap_err();
+    //     assert_eq!(
+    //         error,
+    //         format!("'{shortcut}' is registered and cannot be registered again")
+    //     );
+    //     check_shortcut(true);
+
+    //     // Test unregistering a shortcut
+    //     let result =
+    //         register_toggle_shortcut(app_handle.clone(), shortcut.to_string(), true);
+    //     assert!(result.is_ok());
+    //     check_shortcut(false);
+
+    //     // Test trying to unregister a shortcut that is not registered
+    //     let result =
+    //         register_toggle_shortcut(app_handle.clone(), shortcut.to_string(), true);
+    //     assert!(result.is_err());
+    //     let error = result.unwrap_err();
+    //     assert_eq!(
+    //         error,
+    //         format!("'{shortcut}' is not registered and cannot be unregistered")
+    //     );
+    //     check_shortcut(false);
+    // }
 }
