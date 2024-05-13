@@ -6,7 +6,7 @@ authors = ["Xinyu Li", "Yao Xiao", "Yuchen Zhou", "Frank Zhu"]
 edition = "2021"
 
 [build-dependencies]
-tauri-build = { version = "1.5.1", features = ["config-json5"] }
+tauri-build = { version = "2.0.0-beta.13", features = ["codegen"] }
 
 [dev-dependencies]
 cargo-llvm-cov = "0.6.9"
@@ -14,7 +14,9 @@ pretty_assertions = "1.4.0"
 rstest = "0.19.0"
 
 [dependencies]
-tauri = { version = "1.6.1", features = ["shell-open", "config-json5", "test", "system-tray"] }
+tauri = { version = "2.0.0-beta.17", features = ["macos-private-api", "test", "tray-icon"] }
+tauri-plugin-global-shortcut = "2.0.0-beta.4"
+tauri-plugin-shell = "2.0.0-beta.4"
 
 # Utilities
 anyhow = "1.0.80"
@@ -23,6 +25,9 @@ serde = { version = "1.0.197", features = ["derive"] }
 serde-error = "0.1.2"
 serde_json = "1.0.1"
 tempfile = "3.10.1"
+
+# APIs
+sysinfo = "0.30.11"
 
 # SWC crates and related
 parking_lot = "0.12.1"  # Required by swc_ecma_loader
@@ -36,7 +41,11 @@ swc_ecma_minifier = "0.192.19"
 swc_ecma_parser = "0.143.8"
 swc_ecma_transforms_optimization = "0.198.18"
 swc_ecma_transforms_react = "0.183.13"
+swc_ecma_transforms_typescript = "0.188.18"
 swc_ecma_visit = "0.98.6"
+
+[target."cfg(target_os = \"macos\")".dependencies]
+objc = "0.2.7"
 
 [features]
 custom-protocol = ["tauri/custom-protocol"]

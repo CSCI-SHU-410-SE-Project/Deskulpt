@@ -1,11 +1,17 @@
 /**
- * This file contains the types and interfaces that have backend counterparts
+ * This file contains the types and interfaces that have backend counterparts.
  */
+
+/** Default Serialization of the `Result` enum in Rust. */
+export type Result<T, E> = { Ok: T } | { Err: E };
+
+/** See `config.rs` for its backend counterpart. */
+export type WidgetConfigCollection = Record<string, Result<WidgetConfig, string>>;
 
 /** See `config.rs` for its backend counterpart. */
 export interface WidgetConfig {
-  deskulpt: DeskulptConf;
-  node: PackageJson | null;
+  deskulptConf: DeskulptConf;
+  externalDeps: Record<string, string>;
   directory: string;
 }
 
@@ -16,7 +22,15 @@ export interface DeskulptConf {
   ignore: boolean;
 }
 
-/** See `config.rs` for its backend counterpart. */
-export interface PackageJson {
-  dependencies: Record<string, string>;
+/** See `settings.rs` for its backend counterpart. */
+export interface Settings {
+  toggleShortcut: string | null;
+  widgetSettings: Record<string, WidgetSetting>;
+}
+
+/** See `settings.rs` for its backend counterpart. */
+export interface WidgetSetting {
+  x: number;
+  y: number;
+  opacity: number;
 }

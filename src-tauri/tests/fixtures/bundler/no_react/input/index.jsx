@@ -1,4 +1,4 @@
-const React = window.__DESKULPT__.defaultDeps.React;
+import React from "@deskulpt-test/react";
 
 export default {
   render() {

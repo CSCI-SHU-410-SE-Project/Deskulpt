@@ -4,31 +4,33 @@
 //! the use case of bundling Deskulpt widgets which has a custom set of dependency
 //! rules and are (at least recommended to be) small.
 
+use anyhow::{bail, Context, Error};
+use path_clean::PathClean;
 use std::{
     collections::{HashMap, HashSet},
     fs::File,
     io::Read,
     path::{Component, Path, PathBuf},
 };
-
-use anyhow::{bail, Context, Error};
-use path_clean::PathClean;
 use swc_atoms::Atom;
 use swc_bundler::{Bundler, Hook, Load, ModuleData, ModuleRecord, Resolve};
 use swc_common::{
     comments::SingleThreadedComments, errors::Handler, pass::Repeat, sync::Lrc,
     FileName, FilePathMapping, Globals, Mark, SourceMap, Span, GLOBALS,
 };
-use swc_ecma_ast::KeyValueProp;
+use swc_ecma_ast::{KeyValueProp, Module, ModuleDecl, Program};
 use swc_ecma_codegen::{
     text_writer::{JsWriter, WriteJs},
     Emitter,
 };
 use swc_ecma_loader::resolve::Resolution;
-use swc_ecma_parser::{parse_file_as_module, EsConfig, Syntax};
+use swc_ecma_parser::{parse_file_as_module, EsConfig, Syntax, TsConfig};
 use swc_ecma_transforms_optimization::simplify::dce;
 use swc_ecma_transforms_react::jsx;
-use swc_ecma_visit::FoldWith;
+use swc_ecma_transforms_typescript::typescript;
+use swc_ecma_visit::{
+    as_folder, noop_visit_mut_type, FoldWith, VisitMut, VisitMutWith,
+};
 use tempfile::NamedTempFile;
 
 /// The file extensions to try when an import is given without an extension
@@ -44,18 +46,24 @@ static EXTENSIONS: &[&str] = &["js", "jsx", "ts", "tsx"];
 pub(crate) fn bundle(
     root: &Path,
     target: &Path,
-    dependency_map: Option<&HashMap<String, String>>,
+    apis_blob_url: String,
+    dependency_map: &HashMap<String, String>,
 ) -> Result<String, Error> {
+    if !target.exists() {
+        bail!("Entry point does not exist: '{}'", target.display());
+    }
+
     let globals = Globals::default();
     let cm = Lrc::new(SourceMap::new(FilePathMapping::empty()));
 
     // Get the list of external modules not to resolve; this should include default
     // dependencies and (if any) external dependencies obtained from the dependency map
     let external_modules = {
-        let mut dependencies = HashSet::from([Atom::from("@deskulpt-test/react")]);
-        if let Some(map) = dependency_map {
-            dependencies.extend(map.keys().map(|k| Atom::from(k.clone())));
-        }
+        let mut dependencies = HashSet::from([
+            Atom::from("@deskulpt-test/react"),
+            Atom::from("@deskulpt-test/apis"),
+        ]);
+        dependencies.extend(dependency_map.keys().map(|k| Atom::from(k.clone())));
         Vec::from_iter(dependencies)
     };
 
@@ -93,12 +101,15 @@ pub(crate) fn bundle(
     let module = bundles.pop().unwrap().module;
 
     let code = GLOBALS.set(&globals, || {
+        let top_level_mark = Mark::new();
+        let unresolved_mark = Mark::new();
+
         // Tree-shaking optimization in the bundler is disabled, so we need to manually
         // apply the transform; we need to retain the top level mark `React` because it
         // is needed by the JSX transform even if not explicitly used in the code
         let mut tree_shaking = Repeat::new(dce::dce(
             dce::Config { top_retain: vec![Atom::from("React")], ..Default::default() },
-            Mark::new(),
+            unresolved_mark,
         ));
 
         // There are two types of JSX transforms ("classic" and "automatic"), see
@@ -108,18 +119,39 @@ pub(crate) fn bundle(
         // this module is not available when runnning the bundled code in the browser,
         // so we have to use the "classic" transform instead. The "classic" transform
         // requires `React` to be in scope, which we can require users to bring into
-        // scope by assigning `const React = window.__DESKULPT__.React`.
+        // scope by importing `import React from "@deskulpt-test/react";`.
         let mut jsx_transform = jsx::<SingleThreadedComments>(
             cm.clone(),
             None,
             Default::default(), // options, where runtime defaults to "classic"
-            Mark::new(),        // top level mark
-            Mark::new(),        // unresolved mark
+            top_level_mark,
+            unresolved_mark,
         );
 
+        // Transform that removes TypeScript types; weirdly, this must be applied on a
+        // program rather than a module; note that we use the verbatim module syntax to
+        // avoid removing unused import statements (particularly the `React` import)
+        let mut ts_transform = typescript::typescript(
+            typescript::Config { verbatim_module_syntax: true, ..Default::default() },
+            top_level_mark,
+        );
+
+        // We need to rename the imports of `@deskulpt-test/apis` to the blob URL which
+        // wraps the widget APIs to avoid exposing the raw APIs that allow specifying
+        // widget IDs; note that this transform should be done last to avoid messing up
+        // with import resolution
+        let mut wrap_apis = as_folder(ImportRenamer(
+            [("@deskulpt-test/apis".to_string(), apis_blob_url)].into(),
+        ));
+
         // Apply the module transformations
-        // @Charlie-XIAO: chain more transforms e.g. TypeScript
-        let module = module.fold_with(&mut tree_shaking).fold_with(&mut jsx_transform);
+        let module = module
+            .into_program()
+            .fold_with(&mut ts_transform)
+            .expect_module()
+            .fold_with(&mut tree_shaking)
+            .fold_with(&mut jsx_transform)
+            .fold_with(&mut wrap_apis);
 
         // Emit the bundled module as string into a buffer
         let mut buf = vec![];
@@ -139,6 +171,26 @@ pub(crate) fn bundle(
     Ok(code)
 }
 
+/// An AST transformer that renames import module specifiers.
+///
+/// This should be wrapped within [`as_folder`].
+struct ImportRenamer(HashMap<String, String>);
+
+impl VisitMut for ImportRenamer {
+    noop_visit_mut_type!();
+
+    fn visit_mut_module_decl(&mut self, n: &mut ModuleDecl) {
+        n.visit_mut_children_with(self);
+
+        if let ModuleDecl::Import(import_decl) = n {
+            let src = import_decl.src.value.to_string();
+            if let Some(new_src) = self.0.get(&src) {
+                import_decl.src.value = Atom::from(new_src.clone());
+            }
+        }
+    }
+}
+
 /// Deskulpt-customized path loader for SWC bundler.
 ///
 /// It is in charge of parsing the source file into a module AST. Note that transforms
@@ -148,13 +200,18 @@ struct PathLoader(Lrc<SourceMap>);
 
 impl Load for PathLoader {
     fn load(&self, file: &FileName) -> Result<ModuleData, Error> {
-        let fm = match file {
-            FileName::Real(path) => self.0.load_file(path)?,
+        let path = match file {
+            FileName::Real(path) => path,
             _ => unreachable!(),
         };
+        let fm = self.0.load_file(path)?;
 
-        // @Charlie-XIAO: maybe need to use Syntax::TypeScript based on file extension
-        let syntax = Syntax::Es(EsConfig { jsx: true, ..Default::default() });
+        let syntax = match path.extension() {
+            Some(ext) if ext == "ts" || ext == "tsx" => {
+                Syntax::Typescript(TsConfig { tsx: true, ..Default::default() })
+            },
+            _ => Syntax::Es(EsConfig { jsx: true, ..Default::default() }),
+        };
 
         // Parse the file as a module; note that transformations are not applied here,
         // because per-file transformations may lead to unexpected results when bundled
@@ -323,6 +380,30 @@ impl Hook for NoopHook {
     }
 }
 
+/// Trait for converting an object into a [`Program`].
+///
+/// Some transforms requires a [`Program`] as input, so this trait is for providing a
+/// better syntax for chaining the transforms, for instance:
+///
+/// ```ignore
+/// module
+///     .fold_with(&mut transform1)
+///     .into_program()
+///     .fold_with(&mut transform2) // `transform2` requires a `Program`
+///     .expect_module()
+///     .fold_with(&mut transform3)
+/// ```
+trait IntoProgram {
+    /// Return a [`Program`] wrapping the object itself.
+    fn into_program(self) -> Program;
+}
+
+impl IntoProgram for Module {
+    fn into_program(self) -> Program {
+        Program::Module(self)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -371,8 +452,13 @@ mod tests {
     fn test_bundle_ok(#[case] case: &str) {
         let case_dir = fixture_dir().join(case);
         let bundle_root = case_dir.join("input");
-        let result = bundle(&bundle_root, &bundle_root.join("index.jsx"), None)
-            .expect("Expected bundling to succeed");
+        let result = bundle(
+            &bundle_root,
+            &bundle_root.join("index.jsx"),
+            Default::default(),
+            &Default::default(),
+        )
+        .expect("Expected bundling to succeed");
 
         let expected = read_to_string(case_dir.join("output.js")).unwrap();
         self::assert_eq!(result, expected);
@@ -395,11 +481,29 @@ mod tests {
             )),
         ]
     )]
+    #[case::entry_not_exist(
+        "entry_not_exist",
+        vec![
+            ChainReason::Exact(format!(
+                "Entry point does not exist: '{}'",
+                fixture_dir()
+                    .join("entry_not_exist")
+                    .join("input")
+                    .join("index.jsx")
+                    .display()
+            ))
+        ]
+    )]
     fn test_bundle_error(#[case] case: &str, #[case] expected_error: Vec<ChainReason>) {
         let case_dir = fixture_dir().join(case);
         let bundle_root = case_dir.join("input");
-        let error = bundle(&bundle_root, &bundle_root.join("index.jsx"), None)
-            .expect_err("Expected bundling error");
+        let error = bundle(
+            &bundle_root,
+            &bundle_root.join("index.jsx"),
+            Default::default(),
+            &Default::default(),
+        )
+        .expect_err("Expected bundling error");
         assert_err_eq(error, expected_error);
     }
 
@@ -419,8 +523,9 @@ mod tests {
         std::fs::write(&entry_path, format!("import {{ foo }} from {utils_path:?};"))
             .unwrap();
 
-        let error = bundle(&bundle_root, &entry_path, None)
-            .expect_err("Expected bundling error");
+        let error =
+            bundle(&bundle_root, &entry_path, Default::default(), &Default::default())
+                .expect_err("Expected bundling error");
         let expected_error = vec![
             ChainReason::Exact("load_transformed failed".to_string()),
             ChainReason::Exact("failed to analyze module".to_string()),

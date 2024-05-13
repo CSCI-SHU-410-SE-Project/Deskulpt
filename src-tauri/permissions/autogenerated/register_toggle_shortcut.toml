@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-register-toggle-shortcut"
+description = "Enables the register_toggle_shortcut command without any pre-configured scope."
+commands.allow = ["register_toggle_shortcut"]
+
+[[permission]]
+identifier = "deny-register-toggle-shortcut"
+description = "Denies the register_toggle_shortcut command without any pre-configured scope."
+commands.deny = ["register_toggle_shortcut"]

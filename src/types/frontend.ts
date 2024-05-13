@@ -3,34 +3,62 @@
  * without corresponding backend implementations.
  */
 
-import ReactDOM from "react-dom/client";
-import { Widget } from ".";
-import { WidgetConfig } from "./backend";
+import { ReactNode } from "react";
+import { Result, WidgetConfig, WidgetSetting } from "./backend";
 
 /**
- * The state of a widget.
+ * The user-defined widget interface.
  *
- * We cannot manage widget states purely in the backend or in the frontend. Managing
- * purely in the backend may cause too frequent communication when the frontend needs
- * information. Managing purely in the frontend would cause use to send large objects
- * to the backend when sometimes we can just send the widget ID.
- *
- * The frontend widget state thus consists of (1) a shared part that is synced with the
- * backend at times, and (2) a frontend part that does not bother the backend.
+ * The entry file of each user-defined widget should export an object that fulfills this
+ * interface as default.
  */
-export interface WidgetState {
-  /** [SHARED] Widget configuration. */
-  config: WidgetConfig;
+export interface Widget {
+  /**
+   * The function that defines the widget element to render.
+   *
+   * @returns The React element to render.
+   */
+  render: () => ReactNode;
+  /**
+   * The width of the widget.
+   *
+   * This can be a number in pixels, or a string that is accepted in CSS.
+   */
+  width: number | string;
+  /**
+   * The height of the widget.
+   *
+   * This can be a number in pixels, or a string that is accepted in CSS.
+   */
+  height: number | string;
 }
 
 /**
- * The payload of the "render-widget" event.
+ * The state of a widget in the manager.
  */
-export interface RenderWidgetPayload {
-  widgetId: string;
-  success: boolean;
-  /** The bundled code if `success` is `true` or the bundler error. */
-  bundlerOutput: string;
+export interface ManagerWidgetState {
+  /** Configuration or configuration error of the widget. */
+  config: Result<WidgetConfig, string>;
+  /** Setting of the widget. */
+  setting: WidgetSetting;
+}
+
+/**
+ * The state of a widget on the canvas.
+ */
+export interface CanvasWidgetState {
+  /** The rendered widget component or the error component to display. */
+  display: ReactNode;
+  /** The width of the widget container, as exported from the widget module. */
+  width: number | string;
+  /** The height of the widget container, as exported from the widget module. */
+  height: number | string;
+  /** Setting of the widget. */
+  setting: WidgetSetting;
+  /** The URL of the blob of widget APIs. */
+  apisBlobUrl: string;
+  /** The URL of the blob of the widget module. */
+  moduleBlobUrl: string | null;
 }
 
 /**
@@ -42,29 +70,25 @@ export interface WidgetModule {
 }
 
 /**
- * The HTML and React DOM roots for rendering a widget.
+ * The payload of the "render-widget" event.
  */
-export interface WidgetDOMRoot {
-  html: HTMLDivElement;
-  react: ReactDOM.Root;
+export interface RenderWidgetPayload {
+  widgetId: string;
+  bundle: boolean;
+  setting: WidgetSetting;
 }
 
 /**
- * The record of a widget on the canvas.
+ * The payload of the "remove-widgets" event.
  */
-export interface WidgetRecord {
-  /**
-   * The HTML and React DOM roots in which the widget is rendered.
-   *
-   * To completely remove a widget from the canvas, one need to call the `unmount`
-   * method on `domRoot.react` and the `remove` method on `domRoot.html`, if possible.
-   */
-  root: WidgetDOMRoot;
-  /**
-   * Whether the widget is being rendered.
-   *
-   * If the widget is not being rendered, the corresponding error should be rendered in
-   * the DOM root instead.
-   */
-  error: boolean;
+export interface RemoveWidgetsPayload {
+  removedIds: string[];
+}
+
+/**
+ * The payload of the "update-setting" event.
+ */
+export interface UpdateSettingPayload {
+  widgetId: string;
+  setting: WidgetSetting;
 }
