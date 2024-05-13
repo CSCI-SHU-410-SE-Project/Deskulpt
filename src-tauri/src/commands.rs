@@ -442,7 +442,7 @@ mod tests {
         setup_bundle_widget_env: &(TempDir, AppHandle<MockRuntime>),
     ) {
         // Test that the `bundle_widget` command raises upon bundling error
-        let (_, app_handle) = setup_bundle_widget_env;
+        let (_base_dir, app_handle) = setup_bundle_widget_env;
         let result =
             bundle_widget(app_handle.clone(), "fail".to_string(), Default::default());
 
@@ -459,7 +459,7 @@ mod tests {
         setup_bundle_widget_env: &(TempDir, AppHandle<MockRuntime>),
     ) {
         // Test that the `bundle_widget` command raises for an unknown widget ID
-        let (_, app_handle) = setup_bundle_widget_env;
+        let (_base_dir, app_handle) = setup_bundle_widget_env;
         let result = bundle_widget(
             app_handle.clone(),
             "non_existent_id".to_string(),
@@ -477,7 +477,7 @@ mod tests {
     ) {
         // Test that the `bundle_widget` command propagates the error message held in
         // an invalid widget configuration
-        let (_, app_handle) = setup_bundle_widget_env;
+        let (_base_dir, app_handle) = setup_bundle_widget_env;
         let result = bundle_widget(
             app_handle.clone(),
             "invalid_conf".to_string(),
@@ -494,7 +494,7 @@ mod tests {
         // Test the `register_toggle_shortcut` command; in particular registering and
         // unregistering should work correctly, and the toggling of the click-through
         // state should be triggered at correct times
-        let (_, app_handle) = setup_mock_env();
+        let (_base_dir, app_handle) = setup_mock_env();
 
         // Register the global shortcut plugin
         app_handle
