@@ -54,13 +54,13 @@ macro_rules! cmderr {
 #[macro_export]
 macro_rules! cmdbail {
     ($msg:literal $(,)?) => {
-        return Err(cmderr!($msg))
+        return Err($crate::cmderr!($msg))
     };
     ($err:expr $(,)?) => {{
-        return Err(cmderr!($err))
+        return Err($crate::cmderr!($err))
     }};
     ($fmt:expr, $($arg:tt)*) => {
-        return Err(cmderr!($fmt, $($arg)*))
+        return Err($crate::cmderr!($fmt, $($arg)*))
     };
 }
 
