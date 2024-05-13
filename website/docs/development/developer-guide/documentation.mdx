@@ -4,3 +4,96 @@ description: Building and improving documentation.
 ---
 
 # Documentation
+
+## How to Contribute?
+
+In general, to contribute to the repo, you should open a [pull request](https://docs.github.com/en/pull-requests).
+
+## Local Development of the Codebase
+
+To develop Deskulpt locally, you can follow the steps below:
+
+0. Prerequisites:
+
+	You could follow the prerequisite of [Tauri](https://tauri.app/v1/guides/getting-started/prerequisites). You should also have a moderate level of understanding of Tauri app development as well. The following prerequisites should be installed once you finish the guide provided by Tauri:
+
+	- Node.js
+	- Rust
+
+1. Clone the repository:
+
+	```bash
+	git clone git@github.com:CSCI-SHU-410-SE-Project/Deskulpt.git
+	```
+
+2. Install the dependencies:
+
+	```bash
+	cd Deskulpt
+	npm install
+	```
+
+	Rust dependencies should be installed automatically when you build the project.
+
+3. Start the development server:
+
+	Tauri provides a development server that you can use to test your application. You can start the development server by running:
+
+	```bash
+	npm run dev
+	```
+
+4. Build the project:
+
+	You can build platform-specific executable and installer of Deskulpt by running:
+
+	```bash
+	npm run build
+	```
+
+## Local Development of the Documentation
+
+To develop the documentation locally, you can follow the steps below:
+
+0. Prerequisites:
+
+	The documentation is built with [Docusaurus](https://docusaurus.io/). It is written with Markdown (or MDX if you are familiar with JSX as well). 
+
+	You only need follow the [Node.js prerequisite setup guide](https://tauri.app/v1/guides/getting-started/prerequisites#nodejs) provided by Tauri. Note that you don't need rust or tauri to contribute to the documentation.
+
+1. Clone the repository:
+
+	```bash
+	git clone git@github.com:CSCI-SHU-410-SE-Project/Deskulpt.git
+	```
+
+2. Install the dependencies:
+
+	```bash
+	cd Deskulpt/website
+	npm install
+	```
+
+3. Start the development server:
+
+	Docusaurus provides a development server that you can use to test your documentation. You can start the development server by running:
+
+	```bash
+	npm run start
+	```
+
+4. Build the project:
+
+	You can build the documentation by running:
+
+	```bash
+	npm run build
+	```
+
+	To serve the build documentation, you can run:
+
+	```bash
+	npm run serve
+	```
+
+
