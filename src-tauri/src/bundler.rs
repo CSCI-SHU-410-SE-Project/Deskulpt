@@ -461,7 +461,7 @@ mod tests {
         .expect("Expected bundling to succeed");
 
         let expected = read_to_string(case_dir.join("output.js")).unwrap();
-        self::assert_eq!(result, expected);
+        assert_eq!(result, expected);
     }
 
     #[rstest]
@@ -483,7 +483,7 @@ mod tests {
         .expect("Expected bundling to succeed");
 
         let expected = read_to_string(case_dir.join("output.js")).unwrap();
-        self::assert_eq!(result, expected);
+        assert_eq!(result, expected);
     }
 
     #[rstest]
@@ -504,7 +504,7 @@ mod tests {
         .expect("Expected bundling to succeed");
 
         let expected = read_to_string(case_dir.join("output.js")).unwrap();
-        self::assert_eq!(result, expected);
+        assert_eq!(result, expected);
     }
 
     #[rstest]
@@ -521,7 +521,7 @@ mod tests {
         .expect("Expected bundling to succeed");
 
         let expected = read_to_string(case_dir.join("output.js")).unwrap();
-        self::assert_eq!(result, expected);
+        assert_eq!(result, expected);
     }
 
     #[rstest]
