@@ -86,8 +86,8 @@ pub(crate) fn bundle(
     );
 
     // SWC bundler requires a map of entries to bundle; we provide a single entry point
-    // and expect there to be only one generated bundle, as long as there are no dynamic
-    // or conditional imports; we use the target path as the key for convenience
+    // and expect there to be only one generated bundle; we use the target path as the
+    // key for convenience
     let mut entries = HashMap::new();
     entries.insert(
         target.to_string_lossy().to_string(),
@@ -96,7 +96,7 @@ pub(crate) fn bundle(
 
     let mut bundles = bundler.bundle(entries)?;
     if bundles.len() != 1 {
-        bail!("Expected a single bundle; try to remove dynamic/conditional imports");
+        bail!("Expected a single bundle, got {}", bundles.len());
     }
     let module = bundles.pop().unwrap().module;
 
@@ -376,6 +376,7 @@ impl Hook for NoopHook {
         _: Span,
         _: &ModuleRecord,
     ) -> Result<Vec<KeyValueProp>, Error> {
+        // XXX: figure out a better way than panicking
         unimplemented!();
     }
 }
@@ -432,8 +433,7 @@ mod tests {
     }
 
     #[rstest]
-    // Entry does not use the `React` variable; note that we require `React` to be
-    // brought into scope and the bundler should not removed it because of unused
+    // Entry does not use `React`, but we should not remove it
     #[case::no_react("no_react")]
     // Entry uses a `React` hook
     #[case::with_react_hook("with_react_hook")]
@@ -450,7 +450,7 @@ mod tests {
     // Entry does not define `React` but the imported JSX file does
     #[case::import_no_outer_react_def("import_no_outer_react_def")]
     fn test_bundle_ok(#[case] case: &str) {
-        let case_dir = fixture_dir().join(case);
+        let case_dir = fixture_dir().join("_javascript").join(case);
         let bundle_root = case_dir.join("input");
         let result = bundle(
             &bundle_root,
@@ -465,6 +465,102 @@ mod tests {
     }
 
     #[rstest]
+    // Basic TypeScript syntax
+    #[case::types("types")]
+    // Entry does not use `React`, but we should not remove it
+    #[case::no_react("no_react")]
+    // Importing types
+    #[case::import_types("import_types")]
+    fn test_bundle_ok_typescript(#[case] case: &str) {
+        let case_dir = fixture_dir().join("_typescript").join(case);
+        let bundle_root = case_dir.join("input");
+        let result = bundle(
+            &bundle_root,
+            &bundle_root.join("index.tsx"),
+            Default::default(),
+            &Default::default(),
+        )
+        .expect("Expected bundling to succeed");
+
+        let expected = read_to_string(case_dir.join("output.js")).unwrap();
+        self::assert_eq!(result, expected);
+    }
+
+    #[rstest]
+    fn test_bundle_ignore_external_dependencies() {
+        // Test that specified external dependencies are left as is in the bundled code
+        let case_dir = fixture_dir().join("external_deps");
+        let bundle_root = case_dir.join("input");
+        let external_deps = HashMap::from([
+            ("os-name".to_string(), "^6.0.0".to_string()),
+            ("matcher".to_string(), "^5.0.0".to_string()),
+        ]);
+        let result = bundle(
+            &bundle_root,
+            &bundle_root.join("index.jsx"),
+            Default::default(),
+            &external_deps,
+        )
+        .expect("Expected bundling to succeed");
+
+        let expected = read_to_string(case_dir.join("output.js")).unwrap();
+        self::assert_eq!(result, expected);
+    }
+
+    #[rstest]
+    fn test_bundle_replace_apis_url() {
+        // Test that the renaming of `@deskulpt-test/apis` to the blob URL is done
+        let case_dir = fixture_dir().join("replace_apis");
+        let bundle_root = case_dir.join("input");
+        let result = bundle(
+            &bundle_root,
+            &bundle_root.join("index.jsx"),
+            "blob://dummy-url".to_string(),
+            &Default::default(),
+        )
+        .expect("Expected bundling to succeed");
+
+        let expected = read_to_string(case_dir.join("output.js")).unwrap();
+        self::assert_eq!(result, expected);
+    }
+
+    #[rstest]
+    // Node modules import that are not specified as external dependencies
+    #[case::import_node_modules(
+        "import_node_modules",
+        vec![
+            ChainReason::Exact("load_transformed failed".to_string()),
+            ChainReason::Exact("failed to analyze module".to_string()),
+            ChainReason::Exact(format!(
+                "failed to resolve os-name from {}",
+                fixture_dir().join("import_node_modules/input/index.jsx").display(),
+            )),
+            ChainReason::Exact(
+                "node_modules imports should be explicitly included in package.json to \
+                avoid being bundled at runtime; URL imports are not supported, one \
+                should vendor its source to local and use a relative import instead"
+                .to_string()
+            ),
+        ]
+    )]
+    // URL import
+    #[case::import_url(
+        "import_url",
+        vec![
+            ChainReason::Exact("load_transformed failed".to_string()),
+            ChainReason::Exact("failed to analyze module".to_string()),
+            ChainReason::Exact(format!(
+                "failed to resolve https://cdn.jsdelivr.net/npm/os-name@6.0.0/+esm from {}",
+                fixture_dir().join("import_url/input/index.jsx").display(),
+            )),
+            ChainReason::Exact(
+                "node_modules imports should be explicitly included in package.json to \
+                avoid being bundled at runtime; URL imports are not supported, one \
+                should vendor its source to local and use a relative import instead"
+                .to_string()
+            ),
+        ]
+    )]
     // Relative import that goes beyond the root
     #[case::import_beyond_root(
         "import_beyond_root",
@@ -481,17 +577,30 @@ mod tests {
             )),
         ]
     )]
+    // Entry file does not exist
     #[case::entry_not_exist(
         "entry_not_exist",
         vec![
             ChainReason::Exact(format!(
                 "Entry point does not exist: '{}'",
-                fixture_dir()
-                    .join("entry_not_exist")
-                    .join("input")
-                    .join("index.jsx")
-                    .display()
+                fixture_dir().join("entry_not_exist/input/index.jsx").display()
             ))
+        ]
+    )]
+    // Bad syntax that cannot be parsed
+    #[case::bad_syntax(
+        "bad_syntax",
+        vec![
+            ChainReason::Exact("load_transformed failed".to_string()),
+            ChainReason::Exact("Bundler.load() failed".to_string()),
+            ChainReason::Exact(format!(
+                "Bundler.loader.load({}) failed",
+                fixture_dir().join("bad_syntax/input/index.jsx")
+                    .canonicalize()
+                    .unwrap()
+                    .display()
+                )),
+            ChainReason::Regex("error: Expected ';', '}' or <eof>".to_string()),
         ]
     )]
     fn test_bundle_error(#[case] case: &str, #[case] expected_error: Vec<ChainReason>) {
@@ -505,6 +614,19 @@ mod tests {
         )
         .expect_err("Expected bundling error");
         assert_err_eq(error, expected_error);
+    }
+
+    #[rstest]
+    #[should_panic]
+    fn test_bundle_import_meta_panic() {
+        // Test that accessing `import.meta` is not supported
+        let bundle_root = fixture_dir().join("import_meta/input");
+        let _ = bundle(
+            &bundle_root,
+            &bundle_root.join("index.jsx"),
+            Default::default(),
+            &Default::default(),
+        );
     }
 
     #[rstest]
