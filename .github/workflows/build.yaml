@@ -77,7 +77,7 @@ jobs:
       - name: Get short commit SHA
         id: short-sha
         run: |
-          shortsha=$(echo ${{ github.sha }} | cut -c 1-7)
+          shortsha=$(echo ${{ github.event.pull_request.head.sha }} | cut -c 1-7)
           echo "sha=$shortsha" >> $GITHUB_OUTPUT
 
       - name: Find comment
@@ -95,19 +95,12 @@ jobs:
         with:
           comment-id: ${{ steps.find-comment.outputs.comment-id }}
           issue-number: ${{ github.event.pull_request.number }}
-          body: |-
+          body: |
             ## ✔️ Deskulpt Built Successfully!
 
-            Deskulpt binaries have been built successfully on all supported platforms.
-            Your pull request is in excellent shape! ☀️
+            Deskulpt binaries have been built successfully on all supported platforms. Your pull request is in excellent shape! ☀️
 
-            <sub>
-              Workflow file: `.github/workflows/build.yaml`.
-              Generated for commit:
-              [`${{ steps.short-sha.outputs.sha }}`](https://github.com/${{ github.repository }}/pull/${{ github.event.number }}/commits/${{ github.sha }}).
-              Link to the built binaries:
-              [here](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
-            </sub>
+            <sub> Workflow file: `.github/workflows/build.yaml`. Generated for commit: [`${{ steps.short-sha.outputs.sha }}`](https://github.com/${{ github.repository }}/pull/${{ github.event.pull_request.number }}/commits/${{ github.event.pull_request.head.sha }}). Link to the built binaries: [here](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}) </sub>
           edit-mode: replace
 
   comment-failure:
@@ -119,7 +112,7 @@ jobs:
       - name: Get short commit SHA
         id: short-sha
         run: |
-          shortsha=$(echo ${{ github.sha }} | cut -c 1-7)
+          shortsha=$(echo ${{ github.event.pull_request.head.sha }} | cut -c 1-7)
           echo "sha=$shortsha" >> $GITHUB_OUTPUT
 
       - name: Find comment
@@ -140,14 +133,7 @@ jobs:
           body: |-
             ## ❌ Failed to Build Deskulpt
 
-            There seems to be some issues with the build process for certain platforms.
-            Please check the logs to see what went wrong and fix the issues accordingly.
+            There seems to be some issues with the build process for certain platforms. Please check the logs to see what went wrong and fix the issues accordingly.
 
-            <sub>
-              Workflow file: `.github/workflows/build.yaml`.
-              Generated for commit:
-              [`${{ steps.short-sha.outputs.sha }}`](https://github.com/${{ github.repository }}/pull/${{ github.event.number }}/commits/${{ github.sha }}).
-              Link to the failing workflow run:
-              [here](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
-            </sub>
+            <sub> Workflow file: `.github/workflows/build.yaml`. Generated for commit: [`${{ steps.short-sha.outputs.sha }}`](https://github.com/${{ github.repository }}/pull/${{ github.event.pull_request.number }}/commits/${{ github.event.pull_request.head.sha }}). Link to the failing workflow run: [here](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}) </sub>
           edit-mode: replace
