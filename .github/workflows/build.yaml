@@ -24,9 +24,6 @@ jobs:
     runs-on: ${{ matrix.platform }}
 
     steps:
-      - name: Fail the job
-        run: exit 1
-
       - name: Checkout repository
         uses: actions/checkout@v4
 
