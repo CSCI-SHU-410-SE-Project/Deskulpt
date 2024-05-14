@@ -62,4 +62,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: Deskulpt
-          path: ${{ join(fromJSON(steps.build-deskulpt.outputs.artifactPaths), "\n") }}
+          path: ${{ join(fromJSON(steps.build-deskulpt.outputs.artifactPaths), '\n') }}
