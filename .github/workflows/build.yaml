@@ -24,6 +24,9 @@ jobs:
     runs-on: ${{ matrix.platform }}
 
     steps:
+      - name: Fail the job
+        run: exit 1
+
       - name: Checkout repository
         uses: actions/checkout@v4
 
@@ -79,12 +82,24 @@ jobs:
           comment-author: "github-actions[bot]"
           body-includes: Check the built Deskulpt binaries at
 
-      - name: Create or update comment
+      - name: Post success comment
+        if: always() && needs.build.result == 'success'
         uses: peter-evans/create-or-update-comment@v4
         with:
           comment-id: ${{ steps.find-comment.outputs.comment-id }}
           issue-number: ${{ github.event.pull_request.number }}
           body: |
-            Check the built Deskulpt binaries at:
-            ${{ steps.upload-artifacts.outputs.artifact_url }}
+            Check the built Deskulpt binaries
+            [here](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}).
+          edit-mode: replace
+
+      - name: Post failure comment
+        if: always() && needs.build.result != 'success'
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          comment-id: ${{ steps.find-comment.outputs.comment-id }}
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            Failed to build Deskulpt binaries. Check the workflow run
+            [here](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}).
           edit-mode: replace
