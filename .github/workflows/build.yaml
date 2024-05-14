@@ -76,7 +76,9 @@ jobs:
     steps:
       - name: Get short commit SHA
         id: short-sha
-        run: echo "sha=${{ github.sha }}" | cut -c 5-11 >> $GITHUB_OUTPUT
+        run: |
+          shortsha=$(echo ${{ github.sha }} | cut -c 1-7)
+          echo "sha=$shortsha" >> $GITHUB_OUTPUT
 
       - name: Find comment
         id: find-comment
@@ -93,7 +95,7 @@ jobs:
         with:
           comment-id: ${{ steps.find-comment.outputs.comment-id }}
           issue-number: ${{ github.event.pull_request.number }}
-          body: |
+          body: |-
             ## ✔️ Deskulpt Built Successfully!
 
             Deskulpt binaries have been built successfully on all supported platforms.
@@ -116,7 +118,9 @@ jobs:
     steps:
       - name: Get short commit SHA
         id: short-sha
-        run: echo "sha=${{ github.sha }}" | cut -c 5-11 >> $GITHUB_OUTPUT
+        run: |
+          shortsha=$(echo ${{ github.sha }} | cut -c 1-7)
+          echo "sha=$shortsha" >> $GITHUB_OUTPUT
 
       - name: Find comment
         id: find-comment
