@@ -62,6 +62,5 @@ jobs:
         uses: actions/upload-artifact@v4
         if: matrix.platform == 'ubuntu-latest'
         with:
-          name: Deskulpt
-          # path: ${{ join(fromJSON(steps.build-deskulpt.outputs.artifactPaths), '\n') }}
-          path: /home/runner/work/Deskulpt/Deskulpt/src-tauri/target/release/bundle/**/*
+          name: binaries-${{ matrix.platform }}
+          path: "${{ join(fromJSON(steps.build-deskulpt.outputs.artifactPaths), '\n') }}"
