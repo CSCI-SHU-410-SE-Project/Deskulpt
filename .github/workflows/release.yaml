@@ -1,9 +1,9 @@
-name: "Release"
+name: Release Deskulpt
 
 on:
   push:
-    tags:
-      - "v*"
+    branches:
+      - release
   workflow_dispatch:
 
 jobs:
