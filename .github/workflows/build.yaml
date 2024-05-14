@@ -53,6 +53,13 @@ jobs:
       # Without specifying `tagName` and `releaseId`, tauri-action will only build the
       # application without trying to upload any assets
       - name: Build Deskulpt
+        id: build-deskulpt
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: Deskulpt
+          path: ${{ steps.build-deskulpt.outputs.artifactPaths }}
