@@ -74,6 +74,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Get short commit SHA
+        id: short-sha
+        run: echo ${{ github.sha }} | cut -c 1-7 >> $GITHUB_OUTPUT
+
       - name: Find comment
         id: find-comment
         uses: peter-evans/find-comment@v3
@@ -95,8 +99,9 @@ jobs:
             Your pull request is in excellent shape! ☀️
 
             <sub>
+              Workflow file: `.github/workflows/build.yaml`.
               Generated for commit:
-              [${{ github.sha.slice(0, 7) }}](https://github.com/${{ github.repository }}/pull/${{ github.event.number }}/commits/${{ github.sha }}).
+              [`${{ steps.short-sha.outputs }}`](https://github.com/${{ github.repository }}/pull/${{ github.event.number }}/commits/${{ github.sha }}).
               Link to the built binaries:
               [here](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
             </sub>
@@ -115,8 +120,9 @@ jobs:
             Please check the logs to see what went wrong and fix the issues accordingly.
 
             <sub>
+              Workflow file: `.github/workflows/build.yaml`.
               Generated for commit:
-              [${{ github.sha.slice(0, 7) }}](https://github.com/${{ github.repository }}/pull/${{ github.event.number }}/commits/${{ github.sha }}).
+              [`${{ steps.short-sha.outputs }}`](https://github.com/${{ github.repository }}/pull/${{ github.event.number }}/commits/${{ github.sha }}).
               Link to the failing workflow run:
               [here](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
             </sub>
