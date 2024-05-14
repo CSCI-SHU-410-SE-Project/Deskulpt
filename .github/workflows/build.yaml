@@ -68,9 +68,9 @@ jobs:
           name: binaries-${{ matrix.platform }}
           path: "${{ join(fromJSON(steps.build-deskulpt.outputs.artifactPaths), '\n') }}"
 
-  comment:
+  comment-success:
     needs: build
-    if: github.event_name == 'pull_request' # Comment only on pull requests
+    if: always() && needs.build.result == 'success' && github.event_name == 'pull_request'
     runs-on: ubuntu-latest
 
     steps:
@@ -84,7 +84,8 @@ jobs:
         with:
           issue-number: ${{ github.event.pull_request.number }}
           comment-author: "github-actions[bot]"
-          body-includes: Check the built Deskulpt binaries at
+          body-includes: |
+            Workflow file: `.github/workflows/build.yaml`.
 
       - name: Post success comment
         if: "always() && (needs.build.result == 'success')"
@@ -106,6 +107,25 @@ jobs:
               [here](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
             </sub>
           edit-mode: replace
+
+  comment-failure:
+    needs: build
+    if: always() && needs.build.result != 'success' && github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Get short commit SHA
+        id: short-sha
+        run: echo ${{ github.sha }} | cut -c 1-7 >> $GITHUB_OUTPUT
+
+      - name: Find comment
+        id: find-comment
+        uses: peter-evans/find-comment@v3
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-author: "github-actions[bot]"
+          body-includes: |
+            Workflow file: `.github/workflows/build.yaml`.
 
       - name: Post failure comment
         if: "always() && (needs.build.result != 'success')"
