@@ -20,6 +20,15 @@ const config: Config = {
   plugins: [
     "docusaurus-plugin-sass",
     [
+      "@easyops-cn/docusaurus-search-local",
+      {
+        hashed: true,
+        docsRouteBasePath: "/",
+        blogRouteBasePath: "/blog",
+        searchBarShortcutHint: false,
+      },
+    ],
+    [
       "docusaurus-plugin-typedoc",
       {
         out: "./docs/tsdoc",
@@ -54,11 +63,10 @@ const config: Config = {
       respectPrefersColorScheme: true,
     },
     navbar: {
-      title: "Deskulpt",
       logo: {
         alt: "Deskulpt",
-        src: "img/logo.svg",
-        className: "invert-on-dark",
+        src: "img/logo-wide.svg",
+        className: "invert-on-dark header-icon-lift",
       },
       items: [
         {
@@ -74,6 +82,10 @@ const config: Config = {
         {
           label: "Blog",
           to: "/blog",
+        },
+        {
+          type: "search",
+          position: "right",
         },
         {
           href: "https://github.com/CSCI-SHU-410-SE-Project/Deskulpt",
