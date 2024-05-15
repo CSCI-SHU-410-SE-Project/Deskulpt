@@ -5,7 +5,8 @@ import Heading from "@theme/Heading";
 import Link from "@docusaurus/Link";
 import styles from "./index.module.scss";
 import DeskulptLogo from "@site/static/img/logo-wide.svg";
-import { FaGithub } from "react-icons/fa";
+import { FaHandshake } from "react-icons/fa";
+import { BsLightning } from "react-icons/bs";
 import { MdOutlineDashboardCustomize } from "react-icons/md";
 
 type FeatureItem = {
@@ -17,7 +18,7 @@ type FeatureItem = {
 const features: FeatureItem[] = [
   {
     title: "Lightweight, Fast, Secure",
-    Svg: require("@site/static/img/tauri.svg").default,
+    Svg: BsLightning,
     description: (
       <>
         Deskulpt is built with <a href="https://v2.tauri.app/">Tauri v2</a> with
@@ -31,9 +32,20 @@ const features: FeatureItem[] = [
     Svg: MdOutlineDashboardCustomize,
     description: (
       <>
-        Deskulpt allows writing desktop widgets in{" "}
-        <a href="https://react.dev/">React</a>, unlocking infinite possibilities for
-        customization.
+        Deskulpt allows writing <a href="https://react.dev/">React</a> code to design
+        your desktop widgets, unlocking infinite possibilities for customization.
+      </>
+    ),
+  },
+  {
+    title: "Free and Open Source",
+    Svg: FaHandshake,
+    description: (
+      <>
+        Deskulpt is completely free and{" "}
+        <a href="https://github.com/CSCI-SHU-410-SE-Project/Deskulpt">open source</a>,
+        with an active community of developers and welcoming anyone to join or{" "}
+        <Link to="/development/developer-guide">contribute</Link>.
       </>
     ),
   },

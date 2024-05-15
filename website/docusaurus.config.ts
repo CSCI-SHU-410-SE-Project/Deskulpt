@@ -25,6 +25,7 @@ const config: Config = {
         hashed: true,
         docsRouteBasePath: "/",
         blogRouteBasePath: "/blog",
+        searchBarShortcutHint: false,
       },
     ],
     [
@@ -81,6 +82,10 @@ const config: Config = {
         {
           label: "Blog",
           to: "/blog",
+        },
+        {
+          type: "search",
+          position: "right",
         },
         {
           href: "https://github.com/CSCI-SHU-410-SE-Project/Deskulpt",

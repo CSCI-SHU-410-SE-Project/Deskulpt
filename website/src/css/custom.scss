@@ -31,6 +31,7 @@
   }
 }
 
+// Icon in the navbar header
 .header-icon-lift {
   padding-bottom: 4px;
 }
@@ -52,4 +53,9 @@
   &:hover::before {
     background-color: var(--ifm-navbar-link-hover-color);
   }
+}
+
+// Narrow the search bar in the navbar
+.navbar__search-input {
+  width: 7rem !important;
 }
