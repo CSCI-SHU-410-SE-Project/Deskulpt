@@ -20,6 +20,14 @@ const config: Config = {
   plugins: [
     "docusaurus-plugin-sass",
     [
+      "@easyops-cn/docusaurus-search-local",
+      {
+        hashed: true,
+        docsRouteBasePath: "/",
+        blogRouteBasePath: "/blog",
+      },
+    ],
+    [
       "docusaurus-plugin-typedoc",
       {
         out: "./docs/tsdoc",
