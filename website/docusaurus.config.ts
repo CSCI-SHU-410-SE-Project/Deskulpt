@@ -75,6 +75,11 @@ const config: Config = {
           type: "docSidebar",
         },
         {
+          label: "API",
+          sidebarId: "api",
+          type: "docSidebar",
+        },
+        {
           label: "Development",
           sidebarId: "development",
           type: "docSidebar",
