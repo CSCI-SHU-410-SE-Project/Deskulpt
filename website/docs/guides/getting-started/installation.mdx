@@ -3,4 +3,61 @@ sidebar_position: 1
 description: Install Deskulpt to start our desktop sculpting journey.
 ---
 
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import Link from "@docusaurus/Link";
+import DownloadOption from "@site/src/components/DownloadOption";
+import IconTabLabel from "@site/src/components/IconTabLabel";
+import { FaWindows, FaApple, FaLinux } from "react-icons/fa";
+
 # Installation
+
+Deskulpt is a cross-platform desktop customization tool that is available on all major
+desktop platforms. It currently supports:
+
+- Windows (10, 11)
+- MacOS (Intel, Apple Silicon)
+- Linux (X11, tested on Ubuntu)
+
+You may install the latest release of Deskulpt from [GitHub releases](https://github.com/CSCI-SHU-410-SE-Project/Deskulpt/releases)
+or use one of the links below. To build Deskulpt from source, please refer to the
+[developer guide](/development/developer-guide/contributing-code#building-from-source).
+
+<Tabs defaultValue="windows">
+  <TabItem
+    value="windows"
+    label={<IconTabLabel icon={<FaWindows />} title="Windows" />}
+  >
+    <DownloadOption version="0.0.1" artifact="Deskulpt_0.0.1_x64-setup.exe">
+      <span>EXE installer (64-bit)</span>
+    </DownloadOption>
+    <DownloadOption version="0.0.1" artifact="Deskulpt_0.0.1_x64_en-US.msi">
+      <span>MSI installer (64-bit)</span>
+    </DownloadOption>
+  </TabItem>
+  <TabItem value="macos" label={<IconTabLabel icon={<FaApple />} title="MacOS" />}>
+    <DownloadOption version="0.0.1" artifact="Deskulpt_0.0.1_aarch64.dmg">
+      <span>Disk Image (64-bit, Apple Silicon)</span>
+    </DownloadOption>
+    <DownloadOption version="0.0.1" artifact="Deskulpt_aarch64.app.tar.gz">
+      <span>Disk image (64-bit, Intel)</span>
+    </DownloadOption>
+    <DownloadOption version="0.0.1" artifact="Deskulpt_0.0.1_x64.dmg">
+      <span>App bundle (64-bit, Apple Silicon)</span>
+    </DownloadOption>
+    <DownloadOption version="0.0.1" artifact="Deskulpt_x64.app.tar.gz">
+      <span>App bundle (64-bit, Intel)</span>
+    </DownloadOption>
+  </TabItem>
+  <TabItem value="linux" label={<IconTabLabel icon={<FaLinux />} title="Linux" />}>
+    <DownloadOption version="0.0.1" artifact="deskulpt_0.0.1_amd64.AppImage">
+      <span>AppImage (64-bit, amd64)</span>
+    </DownloadOption>
+    <DownloadOption version="0.0.1" artifact="deskulpt-0.0.1-1.x86_64.rpm">
+      <span>RPM installer (Red Hat, 64-bit, x86_64)</span>
+    </DownloadOption>
+    <DownloadOption version="0.0.1" artifact="deskulpt_0.0.1_amd64.deb">
+      <span>DEB installer (Debian, 64-bit, amd64)</span>
+    </DownloadOption>
+  </TabItem>
+</Tabs>

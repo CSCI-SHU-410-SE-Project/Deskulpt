@@ -54,11 +54,10 @@ const config: Config = {
       respectPrefersColorScheme: true,
     },
     navbar: {
-      title: "Deskulpt",
       logo: {
         alt: "Deskulpt",
-        src: "img/logo.svg",
-        className: "invert-on-dark",
+        src: "img/logo-wide.svg",
+        className: "invert-on-dark header-icon-lift",
       },
       items: [
         {
