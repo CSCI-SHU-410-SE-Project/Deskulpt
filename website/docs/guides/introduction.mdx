@@ -1,1 +1,83 @@
 # Introduction
+
+**Deskulpt** is a cross-platform desktop customization tool that allows you to write
+React code to define [widgets](#what-are-widgets) on your desktop. It is powered by
+[Tauri v2](https://v2.tauri.app/), with its backend written in Rust and frontend written
+in TypeScript.
+
+## What are Widgets?
+
+If you are familiar with [React](https://react.dev/), a widget is simply a [React
+functional component](https://react.dev/learn/your-first-component), each being wrapped
+in some container and displayed on your desktop. Widgets can be anything from a simple
+text display to a complex interactive application: essentially almost anything you can
+do with React, under certain security restrictions imposed by Deskulpt.
+
+:::warning
+
+This part of documentation is under construction.
+
+:::
+
+## Design Principles
+
+- **Little to learn.** Deskulpt should be easy to learn and use. There should be no need
+  to learn a new language or framework to be able to develop desktop widgets. It should
+  only require basic knowledge of React and JavaScript (or TypeScript), plus some basic
+  configurations to work. If one does not wish to customize widgets themselves and only
+  use existing ones, they should be able to do so without any coding knowledge.
+- **Performant.** Deskulpt should be lightweight and fast. As a long-running
+  application that is designed to sit on your desktop, it should not consume too much
+  memory of CPU resources.
+
+:::warning
+
+This part of documentation is under construction.
+
+:::
+
+## Sinking and Floating
+
+Deskulpt has two basic modes: **sink mode** and **float mode**. This refer to the state
+of the canvas, which is essentially a transparent and undecorated window that sits
+always below other applications and covers the entire screen. All the widgets are drawn
+and rendered on the canvas.
+
+- In sink mode, the canvas can be clicked through, meaning that you can interact with
+  your desktop (icons, etc.), but the widgets will not be interactable. They are still
+  visible and dynamic, but they cannot respond to your mouse or keyboard events.
+- In float mode, the canvas cannot be clicked through, meaning that all widgets will be
+  fully interactable, i.e., you can click on them, drag them around, type in text areas,
+  etc. However, the desktop will be covered by the canvas, so you cannot interact with
+  your desktop.
+
+Note, however, that either in sink or float mode, the Deskulpt canvas will stay under
+other applications, meaning that even in float mode, the only thing you cannot interact
+with is your desktop but not any other applications. Deskulpt also provides convenient
+ways to switch between these two modes, including tray icon and self-defined global
+shortcuts.
+
+## Comparison with Similar Products
+
+- [Rainmeter](https://www.rainmeter.net/): Rainmeter is a very nice-looking desktop
+  customization tool for Windows. Contrary to Deskulpt, Rainmeter does not rely on
+  webview technology but rather uses Windows native APIs to draw widgets, making it
+  even more performant and less resource-consuming than Deskulpt. However, this comes at
+  the price of flexibility and ease of development. Rainmeter widgets ("skins") must be
+  written in its own language which imposes a learning curve on new users. Moreover,
+  since it attempts to provide flexibility for its widgets, the language itself becomes
+  quite complex and hard to master. This also limits the customizability of Rainmeter
+  widgets, at least not as easily as Deskulpt widgets.
+
+- [Übersicht](https://tracesof.net/uebersicht/): Übersicht is a desktop customization
+  tool for macOS. It is similar to Deskulpt, in that it uses web technologies for widget
+  rendering and allows writing React code for defining widgets. However, it suffers from
+  lower performance and higher resource consumption compared to Deskulpt. In particular,
+  Deskulpt has faster backend implementation in Rust (including the [SWC-based bundler](https://swc.rs/)),
+  and is more optimized regarding memory usage. Moreover, Übersicht suffers from certain
+  security issues (e.g., it allows running arbitrary shell commands which is potentially
+  dangerous), is known to have bugs and crashes on certain versions of macOS, and has
+  not been actively maintainer for a while.
+
+In short, Deskulpt seeks to combine the best of both worlds, seeking for the subtle
+balance between performance versus customizability and ease of use.

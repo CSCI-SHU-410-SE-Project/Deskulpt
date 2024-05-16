@@ -13,7 +13,7 @@
 ## Introduction
 
 **Deskulpt** is a cross-platform desktop customization tool that allows you to write
-React code to define widgets on your desktop. It is powered by [Tauri](https://tauri.app/),
+React code to define widgets on your desktop. It is powered by [Tauri v2](https://v2.tauri.app/),
 and written in Rust and TypeScript.
 
 The project was started in 2024 as a final project for the Software Engineering course
