@@ -22,15 +22,15 @@ export interface Widget {
   /**
    * The width of the widget.
    *
-   * This can be a number in pixels, or a string that is accepted in CSS.
+   * This should be a string that is accepted in CSS.
    */
-  width: number | string;
+  width: string;
   /**
    * The height of the widget.
    *
-   * This can be a number in pixels, or a string that is accepted in CSS.
+   * This should be a string that is accepted in CSS.
    */
-  height: number | string;
+  height: string;
 }
 
 /**
@@ -50,9 +50,9 @@ export interface CanvasWidgetState {
   /** The rendered widget component or the error component to display. */
   display: ReactNode;
   /** The width of the widget container, as exported from the widget module. */
-  width: number | string;
+  width: Widget["width"];
   /** The height of the widget container, as exported from the widget module. */
-  height: number | string;
+  height: Widget["height"];
   /** Setting of the widget. */
   setting: WidgetSetting;
   /** The URL of the blob of widget APIs. */

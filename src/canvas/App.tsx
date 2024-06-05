@@ -1,21 +1,25 @@
 import { useState } from "react";
 import { CanvasWidgetState } from "../types/frontend";
-import { WidgetSetting } from "../types/backend";
-import WidgetContainer from "../components/WidgetContainer";
-import { useRenderWidgetListener } from "../hooks/useRenderWidgetListener";
-import { useRemoveWidgetsListener } from "../hooks/useRemoveWidgetsListener";
+import { WidgetSetting, IdMap } from "../types/backend";
 import { emitUpdateSettingToManager } from "../events";
-import { useShowToastListener } from "../hooks/useShowToastListener";
+import WidgetContainer from "./components/WidgetContainer";
+import useRenderWidgetListener from "./hooks/useRenderWidgetListener";
+import useRemoveWidgetsListener from "./hooks/useRemoveWidgetsListener";
+import useShowToastListener from "./hooks/useShowToastListener";
+import { Toaster } from "sonner";
+import { Theme } from "@radix-ui/themes";
+import useThemeAppearanceListener from "./hooks/useThemeAppearanceListener";
 
 /**
  * The main component of the canvas window.
  */
 export default function App() {
   const [canvasWidgetStates, setCanvasWidgetStates] = useState<
-    Record<string, CanvasWidgetState>
+    IdMap<CanvasWidgetState>
   >({});
+  const appearance = useThemeAppearanceListener();
 
-  const contextHolder = useShowToastListener();
+  useShowToastListener();
   useRenderWidgetListener(canvasWidgetStates, setCanvasWidgetStates);
   useRemoveWidgetsListener(canvasWidgetStates, setCanvasWidgetStates);
 
@@ -39,8 +43,24 @@ export default function App() {
   }
 
   return (
-    <>
-      {contextHolder}
+    <Theme
+      appearance={appearance}
+      accentColor="indigo"
+      grayColor="slate"
+      hasBackground={false}
+    >
+      <Toaster
+        position="bottom-right"
+        gap={6}
+        toastOptions={{
+          style: {
+            color: "var(--gray-12)",
+            borderColor: "var(--gray-6)",
+            backgroundColor: "var(--gray-2)",
+            padding: "var(--space-2) var(--space-4)",
+          },
+        }}
+      />
       {Object.entries(canvasWidgetStates).map(
         ([widgetId, { display, width, height, setting }]) => (
           <WidgetContainer
@@ -54,6 +74,6 @@ export default function App() {
           </WidgetContainer>
         ),
       )}
-    </>
+    </Theme>
   );
 }

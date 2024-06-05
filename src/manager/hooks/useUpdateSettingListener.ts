@@ -1,9 +1,10 @@
 import { Dispatch, SetStateAction, useEffect } from "react";
-import { listenToUpdateSetting } from "../events";
-import { ManagerWidgetState } from "../types/frontend";
+import { listenToUpdateSetting } from "../../events";
+import { ManagerWidgetState } from "../../types/frontend";
+import { IdMap } from "../../types/backend";
 
-export function useUpdateSettingListener(
-  setManagerWidgetStates: Dispatch<SetStateAction<Record<string, ManagerWidgetState>>>,
+export default function useUpdateSettingListener(
+  setManagerWidgetStates: Dispatch<SetStateAction<IdMap<ManagerWidgetState>>>,
 ) {
   useEffect(() => {
     const unlisten = listenToUpdateSetting((event) => {

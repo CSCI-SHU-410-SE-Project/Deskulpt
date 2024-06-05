@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { invokeRegisterToggleShortcut } from "../commands";
+import { invokeRegisterToggleShortcut } from "../../commands";
 
-export function useToggleShortcut(initialToggleShortcut: string | null) {
+export default function useToggleShortcut(initialToggleShortcut: string | null) {
   const [toggleShortcut, setToggleShortcut] = useState<string | null>(
     initialToggleShortcut,
   );

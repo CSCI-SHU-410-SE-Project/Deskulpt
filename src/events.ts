@@ -11,6 +11,7 @@ import {
   RenderWidgetPayload,
   UpdateSettingPayload,
 } from "./types/frontend";
+import { ShowToastPayload, ThemeAppearance } from "./types/backend";
 
 export async function emitRenderWidgetToCanvas(payload: RenderWidgetPayload) {
   await emitTo("canvas", "render-widget", payload);
@@ -42,6 +43,16 @@ export async function listenToUpdateSetting(
   return listen("update-setting", handler);
 }
 
+export async function emitSwitchThemeAppearanceToCanvas(payload: ThemeAppearance) {
+  await emitTo("canvas", "switch-theme-appearance", payload);
+}
+
+export async function listenToSwitchThemeAppearance(
+  handler: EventCallback<ThemeAppearance>,
+) {
+  return listen("switch-theme-appearance", handler);
+}
+
 // The "exit-app" event is emitted by the backend to the manager
 
 export async function listenToExitApp(handler: EventCallback<null>) {
@@ -51,6 +62,6 @@ export async function listenToExitApp(handler: EventCallback<null>) {
 // The "show-toast" event is emitted by the backend to the canvas, though possibly in
 // the future it might be emitted by the manager or the canvas as well
 
-export async function listenToShowToast(handler: EventCallback<string>) {
+export async function listenToShowToast(handler: EventCallback<ShowToastPayload>) {
   return listen("show-toast", handler);
 }

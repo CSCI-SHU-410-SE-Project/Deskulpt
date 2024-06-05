@@ -8,7 +8,7 @@ use crate::{
     utils::toggle_click_through_state,
 };
 use anyhow::{Context, Error};
-use std::{collections::HashMap, fs::read_dir};
+use std::{collections::HashMap, fs::read_dir, path::PathBuf};
 use tauri::{command, AppHandle, Manager, Runtime};
 use tauri_plugin_global_shortcut::{GlobalShortcutExt, ShortcutState};
 use tauri_plugin_shell::ShellExt;
@@ -223,21 +223,22 @@ pub(crate) fn register_toggle_shortcut<R: Runtime>(
     }
 }
 
-/// Command for opening a widget directory or the widget base directory.
+/// Command for opening a widget-related resource.
 ///
-/// If the widget ID is `None`, this command will open the widget base directory.
-/// Otherwise, it checks whether the widget ID exists in the current widget collection
-/// and opens the corresponding widget directory.
+/// If widget ID is `None`, this command will open the widget base directory. Otherwise,
+/// it checks whether the widget ID. If `path` is `None`, it opens the corresponding
+/// widget directory; otherwise it opens the specified path within the widget directory.
+///
 ///
 /// This command will fail if:
 ///
 /// - The given widget ID is not found in the widget collection.
-/// - Tauri fails to open the widget base directory, most likely due to misconfigured
-///   capabiblities.
+/// - Tauri fails to open the resource.
 #[command]
-pub(crate) fn open_widget_directory<R: Runtime>(
+pub(crate) fn open_widget_resource<R: Runtime>(
     app_handle: AppHandle<R>,
     widget_id: Option<String>,
+    path: Option<PathBuf>,
 ) -> CommandOut<()> {
     let widget_base = &app_handle.state::<WidgetBaseDirectoryState>().0;
 
@@ -247,7 +248,11 @@ pub(crate) fn open_widget_directory<R: Runtime>(
             if !widget_collection.0.lock().unwrap().contains_key(&widget_id) {
                 cmdbail!("Widget '{}' is not found in the collection", widget_id)
             }
-            widget_base.join(widget_id)
+            let widget_dir = widget_base.join(widget_id);
+            match path {
+                Some(path) => widget_dir.join(path),
+                None => widget_dir,
+            }
         },
         None => widget_base.to_path_buf(),
     };

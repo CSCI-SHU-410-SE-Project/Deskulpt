@@ -1,5 +1,6 @@
 //! The module implements configuration-related utilities and structures.
 
+use crate::utils::IdMap;
 use anyhow::{bail, Context, Error};
 use serde::{Deserialize, Serialize};
 use std::{
@@ -9,7 +10,7 @@ use std::{
 };
 
 /// The collection of widget configurations or errors.
-pub(crate) type WidgetConfigCollection = HashMap<String, Result<WidgetConfig, String>>;
+pub(crate) type WidgetConfigCollection = IdMap<Result<WidgetConfig, String>>;
 
 /// Full configuration of a widget.
 #[derive(Clone, Serialize)]

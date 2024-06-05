@@ -1,22 +1,33 @@
-import { ReactNode, useRef } from "react";
+import { PropsWithChildren, useRef } from "react";
 import Draggable, { DraggableData, DraggableEvent } from "react-draggable";
 import { ErrorBoundary } from "react-error-boundary";
 import ErrorDisplay from "./ErrorDisplay";
-import { grabErrorInfo } from "../utils";
-import { WidgetSetting } from "../types/backend";
-import { GripVertical } from "lucide-react";
+import { grabErrorInfo } from "../../utils";
+import { WidgetSetting } from "../../types/backend";
+import { LuGripVertical } from "react-icons/lu";
+import { Box } from "@radix-ui/themes";
+import { Widget } from "../../types/frontend";
+
+interface WidgetContainerProps {
+  id: string;
+  setting: WidgetSetting;
+  setSetting: (setting: WidgetSetting) => void;
+  containerProps: {
+    width: Widget["width"];
+    height: Widget["height"];
+  };
+}
 
 /**
  * The widget container component that wraps around each user widget.
  */
-export default function WidgetContainer(props: {
-  id: string;
-  setting: WidgetSetting;
-  setSetting: (setting: WidgetSetting) => void;
-  children: ReactNode;
-  containerProps: { width: number | string; height: number | string };
-}) {
-  const { id, setting, setSetting, children, containerProps } = props;
+export default function WidgetContainer({
+  id,
+  setting,
+  setSetting,
+  containerProps,
+  children,
+}: PropsWithChildren<WidgetContainerProps>) {
   const containerRef = useRef(null);
 
   /**
@@ -34,24 +45,23 @@ export default function WidgetContainer(props: {
       handle=".draggable-handle"
       position={{ x: 0, y: 0 }}
     >
-      <div
+      <Box
         ref={containerRef}
+        overflow="hidden"
+        position="absolute"
+        left={`${setting.x}px`}
+        top={`${setting.y}px`}
+        width={containerProps.width}
+        height={containerProps.height}
         css={{
-          overflow: "hidden",
-          borderRadius: "5px",
-          padding: "5px 10px",
-          backgroundColor: "rgba(0, 0, 0, 0.7)",
-          color: "#cccccc",
-          boxShadow: "0 0 2px #888888",
-          position: "absolute",
-          left: setting.x,
-          top: setting.y,
+          color: "var(--gray-12)",
+          backgroundColor: "var(--gray-surface)",
+          borderRadius: "var(--radius-2)",
+          boxShadow: "0 0 2px var(--gray-8)",
           opacity: `${setting.opacity}%`,
-          width: containerProps.width,
-          height: containerProps.height,
         }}
       >
-        <GripVertical
+        <LuGripVertical
           className="draggable-handle"
           css={{
             position: "absolute",
@@ -61,7 +71,7 @@ export default function WidgetContainer(props: {
             height: "20px",
             cursor: "grab",
             opacity: "0",
-            transition: "opacity 0.3s ease-in-out",
+            transition: "opacity 200ms ease-in-out",
             "&:hover": {
               opacity: "1",
             },
@@ -77,7 +87,7 @@ export default function WidgetContainer(props: {
         >
           {children}
         </ErrorBoundary>
-      </div>
+      </Box>
     </Draggable>
   );
 }

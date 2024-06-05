@@ -1,19 +1,19 @@
 import { Dispatch, SetStateAction, useEffect } from "react";
-import { listenToRenderWidget } from "../events";
-import { CanvasWidgetState, WidgetModule } from "../types/frontend";
-import { WidgetSetting } from "../types/backend";
-import { invokeBundleWidget } from "../commands";
+import { listenToRenderWidget } from "../../events";
+import { CanvasWidgetState, WidgetModule } from "../../types/frontend";
+import { IdMap, WidgetSetting } from "../../types/backend";
+import { invokeBundleWidget } from "../../commands";
 import ErrorDisplay from "../components/ErrorDisplay";
-import { grabErrorInfo } from "../utils";
+import { grabErrorInfo } from "../../utils";
 
 // The default width and height of a widget container, used when the widget module
 // fails to be loaded correctly
 const defaultContainerWidth = 300;
 const defaultContainerHeight = 150;
 
-export function useRenderWidgetListener(
-  canvasWidgetStates: Record<string, CanvasWidgetState>,
-  setCanvasWidgetStates: Dispatch<SetStateAction<Record<string, CanvasWidgetState>>>,
+export default function useRenderWidgetListener(
+  canvasWidgetStates: IdMap<CanvasWidgetState>,
+  setCanvasWidgetStates: Dispatch<SetStateAction<IdMap<CanvasWidgetState>>>,
 ) {
   useEffect(() => {
     const unlisten = listenToRenderWidget((event) => {
