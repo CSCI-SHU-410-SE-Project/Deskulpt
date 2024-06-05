@@ -8,8 +8,8 @@ import { grabErrorInfo } from "../../utils";
 
 // The default width and height of a widget container, used when the widget module
 // fails to be loaded correctly
-const defaultContainerWidth = 300;
-const defaultContainerHeight = 150;
+const defaultContainerWidth = "300px";
+const defaultContainerHeight = "150px";
 
 export default function useRenderWidgetListener(
   canvasWidgetStates: IdMap<CanvasWidgetState>,
