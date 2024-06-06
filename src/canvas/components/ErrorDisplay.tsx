@@ -13,18 +13,15 @@ export default function ErrorDisplay({ title, error }: ErrorDisplayProps) {
     <ScrollArea scrollbars="both" asChild>
       <Box p="2">
         <Flex direction="column" gap="2">
-          <Flex align="center" gap="1">
+          <Flex align="center" gap="2">
             <Badge color="red">Error</Badge>
-            <Heading size="2" trim="both">
+            <Heading size="2" trim="both" css={{ whiteSpace: "pre" }}>
               {title}
             </Heading>
           </Flex>
           <Text
             size="1"
-            css={{
-              whiteSpace: "pre",
-              fontFamily: "var(--code-font-family)",
-            }}
+            css={{ whiteSpace: "pre", fontFamily: "var(--code-font-family)" }}
           >
             {error}
           </Text>

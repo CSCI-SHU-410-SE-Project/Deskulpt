@@ -1,7 +1,8 @@
 import { Button, Flex, Heading } from "@radix-ui/themes";
+import { ReactNode } from "react";
 
 interface WidgetContentHeadingProps {
-  heading: string;
+  heading: ReactNode;
   actionIcon: React.ReactNode;
   actionText: string;
   action: () => void;

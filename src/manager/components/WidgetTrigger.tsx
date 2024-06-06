@@ -1,4 +1,4 @@
-import { Box, Flex, Tabs, Text } from "@radix-ui/themes";
+import { Badge, Box, Flex, Tabs, Text } from "@radix-ui/themes";
 import { Result, WidgetConfig } from "../../types/backend";
 
 interface WidgetTriggerProps {
@@ -34,7 +34,13 @@ export default function WidgetTrigger({ index, config }: WidgetTriggerProps) {
             opacity: 1, // TODO: decrease opacity when widget unloaded
           }}
         />
-        <Text>{"Ok" in config ? config.Ok.deskulptConf.name : "[ERROR]"}</Text>
+        <Text>
+          {"Ok" in config ? (
+            config.Ok.deskulptConf.name
+          ) : (
+            <Badge color="red">Error</Badge>
+          )}
+        </Text>
       </Flex>
     </Tabs.Trigger>
   );

@@ -1,4 +1,4 @@
-import { Box, Flex, ScrollArea, Separator, Tabs } from "@radix-ui/themes";
+import { Badge, Box, Flex, ScrollArea, Separator, Tabs, Text } from "@radix-ui/themes";
 import { LuFolderOpen, LuRepeat } from "react-icons/lu";
 import { invokeOpenWidgetResource } from "../../commands";
 import { IdMap, Result, WidgetConfig, WidgetSetting } from "../../types/backend";
@@ -29,7 +29,11 @@ export default function WidgetContent({
     <Tabs.Content value={`tab${index}`} asChild>
       <Flex height="100%" gap="3" direction="column" css={{ flex: 3 }}>
         <WidgetContentHeading
-          heading="Configuration"
+          heading={
+            <Flex align="center" gap="2">
+              Configuration {"Err" in config && <Badge color="red">Error</Badge>}
+            </Flex>
+          }
           actionIcon={<LuFolderOpen />}
           actionText="Edit"
           action={() => invokeOpenWidgetResource(widgetId, null)}
@@ -39,7 +43,12 @@ export default function WidgetContent({
             {"Ok" in config ? (
               <WidgetContentConfigList widgetId={widgetId} config={config.Ok} />
             ) : (
-              config.Err // TODO: Implement an error component
+              <Text
+                size="1"
+                css={{ whiteSpace: "pre-wrap", fontFamily: "var(--code-font-family)" }}
+              >
+                {config.Err}
+              </Text>
             )}
           </Box>
         </ScrollArea>
