@@ -1,10 +1,10 @@
 import {
   Flex,
-  Link,
-  IconButton,
-  Tooltip,
   FlexProps,
+  IconButton,
+  Link,
   LinkProps,
+  Tooltip,
 } from "@radix-ui/themes";
 import { RxCopy } from "react-icons/rx";
 import { writeText } from "@tauri-apps/plugin-clipboard-manager";

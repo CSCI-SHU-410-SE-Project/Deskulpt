@@ -63,14 +63,14 @@ export default function WidgetContainer({
       >
         <LuGripVertical
           className="draggable-handle"
+          size={20}
           css={{
             position: "absolute",
-            top: "5px",
-            right: "5px",
-            width: "20px",
-            height: "20px",
+            top: "var(--space-1)",
+            right: "var(--space-1)",
             cursor: "grab",
             opacity: "0",
+            zIndex: 9999,
             transition: "opacity 200ms ease-in-out",
             "&:hover": {
               opacity: "1",

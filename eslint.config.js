@@ -43,7 +43,7 @@ export default tseslint.config(
     rules: {
       // Disables checking an asynchronous function passed as a JSX attribute expected
       // to be a function that returns void. This is useful for event handlers of React
-      // components, e.g., `onClick` of a button.
+      // components, e.g., `onClick` of a button
       "@typescript-eslint/no-misused-promises": [
         "error",
         {
@@ -52,13 +52,23 @@ export default tseslint.config(
           },
         },
       ],
+      // Sort within multiple imports from the same module; sorting across modules is
+      // disabled because it cannot be autofixed and sorts by declarations instead of
+      // import specifiers; TODO: complement with eslint-plugin-import when it supports
+      // eslint flat configuration
+      "sort-imports": [
+        "error",
+        {
+          ignoreDeclarationSort: true,
+        },
+      ],
     },
   },
 
   // --- Linter Overrides ------------------------------------------------------------
 
   {
-    // Disables type checking for JavaScript files.
+    // Disables type checking for JavaScript files
     files: ["**/*.js"],
     ...tseslint.configs.disableTypeChecked,
   },

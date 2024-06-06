@@ -1,4 +1,4 @@
-import { Flex, Text, Box, Tabs } from "@radix-ui/themes";
+import { Box, Flex, Tabs, Text } from "@radix-ui/themes";
 import { Result, WidgetConfig } from "../../types/backend";
 
 interface WidgetTriggerProps {

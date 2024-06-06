@@ -1,4 +1,4 @@
-import { DataList, Flex, Code, Tooltip, IconButton } from "@radix-ui/themes";
+import { Code, DataList, Flex, IconButton, Tooltip } from "@radix-ui/themes";
 import { WidgetConfig } from "../../types/backend";
 import WidgetDependencies from "./WidgetDependencies";
 import { MdOpenInNew } from "react-icons/md";

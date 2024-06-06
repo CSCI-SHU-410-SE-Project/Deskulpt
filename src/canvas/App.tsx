@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { CanvasWidgetState } from "../types/frontend";
-import { WidgetSetting, IdMap } from "../types/backend";
+import { IdMap, WidgetSetting } from "../types/backend";
 import { emitUpdateSettingToManager } from "../events";
 import WidgetContainer from "./components/WidgetContainer";
 import useRenderWidgetListener from "./hooks/useRenderWidgetListener";
@@ -32,9 +32,7 @@ export default function App() {
   async function setSettingForWidget(widgetId: string, setting: WidgetSetting) {
     // This step must be done first, otherwise there will be a visible delay between
     // the transform change and the absolute position change, causing an undesirable
-    // visual effect; TODO: figure out a way that do not use absolute position per
-    // drag termination but still be able to keep the two-way control of position
-    // between the manager and the canvas
+    // visual effect
     setCanvasWidgetStates((prev) => ({
       ...prev,
       [widgetId]: { ...prev[widgetId], setting },

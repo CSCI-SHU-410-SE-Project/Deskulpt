@@ -2,7 +2,7 @@ import { Dispatch, SetStateAction } from "react";
 import { LuFileScan, LuFolderOpen, LuRepeat } from "react-icons/lu";
 import { invokeOpenWidgetResource } from "../../commands";
 import { renderWidgets } from "../utils";
-import { Tabs, ScrollArea, Flex } from "@radix-ui/themes";
+import { Flex, ScrollArea, Tabs } from "@radix-ui/themes";
 import { toast } from "sonner";
 import { ManagerWidgetState } from "../../types/frontend";
 import { IdMap } from "../../types/backend";

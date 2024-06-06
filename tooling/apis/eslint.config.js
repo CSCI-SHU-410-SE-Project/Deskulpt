@@ -32,16 +32,26 @@ export default tseslint.config(
   eslint.configs.recommended,
   ...tseslint.configs.recommendedTypeChecked,
   ...tseslint.configs.stylisticTypeChecked,
+  {
+    rules: {
+      "sort-imports": [
+        "error",
+        {
+          ignoreDeclarationSort: true,
+        },
+      ],
+    },
+  },
 
   // --- Linter Overrides ------------------------------------------------------------
 
   {
-    // Disables type checking for JavaScript files.
+    // Disables type checking for JavaScript files
     files: ["**/*.js"],
     ...tseslint.configs.disableTypeChecked,
   },
   {
-    // It is hard to pass these rules when wrapping raw APIs.
+    // It is hard to pass these rules when wrapping raw APIs
     files: ["src/index.ts"],
     rules: {
       "@typescript-eslint/ban-types": "off",

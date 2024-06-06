@@ -1,13 +1,13 @@
 import {
-  Blockquote,
-  Flex,
-  Button,
-  Popover,
-  Text,
   Badge,
+  Blockquote,
+  Button,
   Checkbox,
   Em,
+  Flex,
+  Popover,
   Strong,
+  Text,
 } from "@radix-ui/themes";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import Shortcut from "./Shortcut";

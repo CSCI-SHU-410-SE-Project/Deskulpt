@@ -1,10 +1,10 @@
 import {
-  Text,
   Flex,
   IconButton,
-  Popover,
   Link,
+  Popover,
   ScrollArea,
+  Text,
   Tooltip,
 } from "@radix-ui/themes";
 import { LuView } from "react-icons/lu";
