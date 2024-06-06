@@ -6,7 +6,7 @@ import { DataList, Flex } from "@radix-ui/themes";
 import NumberInput from "./NumberInput";
 import { FaTimes } from "react-icons/fa";
 
-interface WidgetContentSettingListProps {
+export interface WidgetContentSettingListProps {
   widgetId: string;
   setting: WidgetSetting;
   setManagerWidgetStates: Dispatch<SetStateAction<IdMap<ManagerWidgetState>>>;

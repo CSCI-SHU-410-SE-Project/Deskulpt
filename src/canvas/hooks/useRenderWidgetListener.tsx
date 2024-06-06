@@ -11,6 +11,12 @@ import { grabErrorInfo } from "../../utils";
 const defaultContainerWidth = "300px";
 const defaultContainerHeight = "150px";
 
+/**
+ * Listen and react to the "render-widget" event.
+ *
+ * @param canvasWidgetStates Canvas widget states.
+ * @param setCanvasWidgetStates Setter for the canvas widget states.
+ */
 export default function useRenderWidgetListener(
   canvasWidgetStates: IdMap<CanvasWidgetState>,
   setCanvasWidgetStates: Dispatch<SetStateAction<IdMap<CanvasWidgetState>>>,

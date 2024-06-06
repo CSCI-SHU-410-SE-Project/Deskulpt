@@ -11,11 +11,19 @@ import { writeText } from "@tauri-apps/plugin-clipboard-manager";
 import { toast } from "sonner";
 import { PropsWithChildren } from "react";
 
-interface ExternalCopyLinkProps {
+export interface ExternalCopyLinkProps {
+  /** The external target of the link. */
   href: LinkProps["href"];
+  /** The gap size between the link text and the copy button. */
   gap?: FlexProps["gap"];
 }
 
+/**
+ * The external link component with a copy button.
+ *
+ * The link will be opened in a new tab when clicked. The copy button will copy the link
+ * address to the clipboard. Wrap the link text within this component.
+ */
 export default function ExternalCopyLink({
   href,
   gap = "3",

@@ -9,7 +9,7 @@ import {
 } from "@radix-ui/themes";
 import { LuView } from "react-icons/lu";
 
-interface WidgetDependenciesProps {
+export interface WidgetDependenciesProps {
   dependencies: Record<string, string>;
 }
 

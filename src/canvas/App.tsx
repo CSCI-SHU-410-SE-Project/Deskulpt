@@ -66,7 +66,8 @@ export default function App() {
             id={widgetId}
             setting={setting}
             setSetting={(setting) => setSettingForWidget(widgetId, setting)}
-            containerProps={{ width, height }}
+            width={width}
+            height={height}
           >
             {display}
           </WidgetContainer>

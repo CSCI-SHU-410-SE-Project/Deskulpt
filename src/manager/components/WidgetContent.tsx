@@ -10,7 +10,7 @@ import { toast } from "sonner";
 import WidgetContentConfigList from "./WidgetContentConfigList";
 import WidgetContentSettingList from "./WidgetContentSettingList";
 
-interface WidgetContentProps {
+export interface WidgetContentProps {
   index: number;
   widgetId: string;
   config: Result<WidgetConfig, string>;

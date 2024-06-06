@@ -3,6 +3,12 @@ import { listenToRemoveWidgets } from "../../events";
 import { CanvasWidgetState } from "../../types/frontend";
 import { IdMap } from "../../types/backend";
 
+/**
+ * Listen and react to the "remove-widgets" event.
+ *
+ * @param canvasWidgetStates Canvas widget states.
+ * @param setCanvasWidgetStates Setter for the canvas widget states.
+ */
 export default function useRemoveWidgetsListener(
   canvasWidgetStates: IdMap<CanvasWidgetState>,
   setCanvasWidgetStates: Dispatch<SetStateAction<IdMap<CanvasWidgetState>>>,

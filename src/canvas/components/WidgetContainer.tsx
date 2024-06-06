@@ -8,31 +8,39 @@ import { LuGripVertical } from "react-icons/lu";
 import { Box } from "@radix-ui/themes";
 import { Widget } from "../../types/frontend";
 
-interface WidgetContainerProps {
+export interface WidgetContainerProps {
+  /** ID of the widget. */
   id: string;
+  /** The setting of the widget. */
   setting: WidgetSetting;
+  /** Callback function to update the setting of the specific widget. */
   setSetting: (setting: WidgetSetting) => void;
-  containerProps: {
-    width: Widget["width"];
-    height: Widget["height"];
-  };
+  /** Width of the widget container. */
+  width: Widget["width"];
+  /** Height of the widget container. */
+  height: Widget["height"];
 }
 
 /**
  * The widget container component that wraps around each user widget.
+ *
+ * It wraps the widget in a draggable container with a grip handle on the top right
+ * corner on hover. It adds no padding within the container to allow users to have full
+ * control over the appearance.
+ *
+ * If the child (i.e., the widget) throws a rendering error, it will be caught by the
+ * error boundary and displayed with the {@link ErrorDisplay} component.
  */
 export default function WidgetContainer({
   id,
   setting,
   setSetting,
-  containerProps,
+  width,
+  height,
   children,
 }: PropsWithChildren<WidgetContainerProps>) {
   const containerRef = useRef(null);
 
-  /**
-   * Update the container position according to transform data.
-   */
   function updateContainerPos(_: DraggableEvent, data: DraggableData) {
     setSetting({ ...setting, x: setting.x + data.x, y: setting.y + data.y });
   }
@@ -51,8 +59,8 @@ export default function WidgetContainer({
         position="absolute"
         left={`${setting.x}px`}
         top={`${setting.y}px`}
-        width={containerProps.width}
-        height={containerProps.height}
+        width={width}
+        height={height}
         css={{
           color: "var(--gray-12)",
           backgroundColor: "var(--gray-surface)",

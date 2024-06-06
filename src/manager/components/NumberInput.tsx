@@ -1,13 +1,30 @@
 import { ChangeEvent, useEffect } from "react";
 
-interface NumberInputProps {
+export interface NumberInputProps {
+  /** The controlled number input value. */
   value: number;
+  /** The callback on value change. */
   onChange: (value: number) => void;
+  /** The minimal accepted number. */
   min?: number;
+  /** The maximal accepted number. */
   max?: number;
+  /** The widget of the number input area. */
   width?: string;
 }
 
+/**
+ * A simple number input component.
+ *
+ * Compared with the feature-rich number input components from libraries like Material
+ * UI and Ant Design, this component is not for general use but designed only for
+ * specific use cases in this project.
+ *
+ * The component is *controlled*, meaning that the value is passed in as a prop and the
+ * parent component is responsible for updating it. The component is also functional,
+ * such that it has the increment/decrement buttons, accepts keyboard input, reacts to
+ * up/down keys and the scroll wheel, etc.
+ */
 export default function NumberInput({
   value,
   onChange,
@@ -16,7 +33,7 @@ export default function NumberInput({
   width,
 }: NumberInputProps) {
   useEffect(() => {
-    onChange && onChange(value);
+    onChange(value);
   }, [value]);
 
   function handleChange(event: ChangeEvent<HTMLInputElement>) {

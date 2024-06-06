@@ -1,7 +1,17 @@
 import { Badge, Box, Flex, Heading, ScrollArea, Text } from "@radix-ui/themes";
 
-interface ErrorDisplayProps {
+export interface ErrorDisplayProps {
+  /**
+   * Title of the error display.
+   *
+   * This should be a short description of the error. It will be displayed as a heading.
+   */
   title: string;
+  /**
+   * The full error stack.
+   *
+   * This will be displayed as a pre-wrap code block.
+   */
   error: string;
 }
 

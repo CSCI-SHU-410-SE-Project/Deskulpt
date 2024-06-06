@@ -3,7 +3,7 @@ import { DataList, Flex } from "@radix-ui/themes";
 import SettingToggleShortcut from "../components/SettingToggleShortcut";
 import Shortcut from "../components/Shortcut";
 
-interface SettingsTabProps {
+export interface SettingsTabProps {
   toggleShortcut: string | null;
   setToggleShortcut: Dispatch<SetStateAction<string | null>>;
 }

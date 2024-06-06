@@ -13,55 +13,106 @@ import {
 } from "./types/frontend";
 import { ShowToastPayload, ThemeAppearance } from "./types/backend";
 
+/**
+ * Emit the "render-widget" event to the canvas window.
+ *
+ * @param payload The payload of the event.
+ */
 export async function emitRenderWidgetToCanvas(payload: RenderWidgetPayload) {
   await emitTo("canvas", "render-widget", payload);
 }
 
+/**
+ * Listen to the "render-widget" event.
+ *
+ * @param handler The callback function to handle the event.
+ * @returns A promise that resolves to a function to unlisten to the event.
+ */
 export async function listenToRenderWidget(
   handler: EventCallback<RenderWidgetPayload>,
 ) {
   return listen("render-widget", handler);
 }
 
+/**
+ * Emit the "remove-widgets" event to the canvas window.
+ *
+ * @param payload The payload of the event.
+ */
 export async function emitRemoveWidgetsToCanvas(payload: RemoveWidgetsPayload) {
   await emitTo("canvas", "remove-widgets", payload);
 }
 
+/**
+ * Listen to the "remove-widgets" event.
+ *
+ * @param handler The callback function to handle the event.
+ * @returns A promise that resolves to a function to unlisten to the event.
+ */
 export async function listenToRemoveWidgets(
   handler: EventCallback<RemoveWidgetsPayload>,
 ) {
   return listen("remove-widgets", handler);
 }
 
+/**
+ * Emit the "update-setting" event to the manager window.
+ *
+ * @param payload The payload of the event.
+ */
 export async function emitUpdateSettingToManager(payload: UpdateSettingPayload) {
   await emitTo("manager", "update-setting", payload);
 }
 
+/**
+ * Listen to the "update-setting" event.
+ *
+ * @param handler The callback function to handle the event.
+ * @returns A promise that resolves to a function to unlisten to the event.
+ */
 export async function listenToUpdateSetting(
   handler: EventCallback<UpdateSettingPayload>,
 ) {
   return listen("update-setting", handler);
 }
 
+/**
+ * Emit the "switch-theme-appearance" event to the canvas window.
+ *
+ * @param payload The payload of the event.
+ */
 export async function emitSwitchThemeAppearanceToCanvas(payload: ThemeAppearance) {
   await emitTo("canvas", "switch-theme-appearance", payload);
 }
 
+/**
+ * Listen to the "switch-theme-appearance" event.
+ *
+ * @param handler The callback function to handle the event.
+ * @returns A promise that resolves to a function to unlisten to the event.
+ */
 export async function listenToSwitchThemeAppearance(
   handler: EventCallback<ThemeAppearance>,
 ) {
   return listen("switch-theme-appearance", handler);
 }
 
-// The "exit-app" event is emitted by the backend to the manager
-
+/**
+ * Listen to the "exit-app" event.
+ *
+ * @param handler The callback function to handle the event.
+ * @returns A promise that resolves to a function to unlisten to the event.
+ */
 export async function listenToExitApp(handler: EventCallback<null>) {
   return listen("exit-app", handler);
 }
 
-// The "show-toast" event is emitted by the backend to the canvas, though possibly in
-// the future it might be emitted by the manager or the canvas as well
-
+/**
+ * Listen to the "show-toast" event.
+ *
+ * @param handler The callback function to handle the event.
+ * @returns A promise that resolves to a function to unlisten to the event.
+ */
 export async function listenToShowToast(handler: EventCallback<ShowToastPayload>) {
   return listen("show-toast", handler);
 }

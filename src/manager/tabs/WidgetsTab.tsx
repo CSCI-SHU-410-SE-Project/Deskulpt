@@ -10,7 +10,7 @@ import WidgetTrigger from "../components/WidgetTrigger";
 import WidgetContent from "../components/WidgetContent";
 import FloatButton from "../components/FloatButton";
 
-interface WidgetsTabProps {
+export interface WidgetsTabProps {
   managerWidgetStates: IdMap<ManagerWidgetState>;
   setManagerWidgetStates: Dispatch<SetStateAction<IdMap<ManagerWidgetState>>>;
   rescanAndRender: () => Promise<number>;

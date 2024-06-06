@@ -4,7 +4,7 @@ import WidgetDependencies from "./WidgetDependencies";
 import { MdOpenInNew } from "react-icons/md";
 import { invokeOpenWidgetResource } from "../../commands";
 
-interface WidgetContentConfigListProps {
+export interface WidgetContentConfigListProps {
   widgetId: string;
   config: WidgetConfig;
 }

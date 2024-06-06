@@ -11,12 +11,13 @@ import { Box, Tabs, Theme } from "@radix-ui/themes";
 import ManagerToaster from "./components/ManagerToaster";
 import ThemeAppearanceToggler from "./components/ThemeAppearanceToggler";
 
-interface ManagerAppProps {
+export interface ManagerAppProps {
+  /** The initial settings read from the previously saved setting file. */
   initialSettings: Settings;
 }
 
 /**
- * The main component of the widget manager window.
+ * The main component of the manager window.
  */
 export default function App({ initialSettings }: ManagerAppProps) {
   const [themeAppearance, setThemeAppearance] = useState(

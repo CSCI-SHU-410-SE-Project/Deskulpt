@@ -4,7 +4,7 @@ import { MdOutlineDarkMode, MdOutlineLightMode } from "react-icons/md";
 import { Dispatch, SetStateAction } from "react";
 import { emitSwitchThemeAppearanceToCanvas } from "../../events";
 
-interface ThemeAppearanceTogglerProps {
+export interface ThemeAppearanceTogglerProps {
   themeAppearance: ThemeAppearance;
   setThemeAppearance: Dispatch<SetStateAction<ThemeAppearance>>;
 }
