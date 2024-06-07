@@ -15,8 +15,8 @@ use std::{
 use swc_atoms::Atom;
 use swc_bundler::{Bundler, Hook, Load, ModuleData, ModuleRecord, Resolve};
 use swc_common::{
-    comments::SingleThreadedComments, errors::Handler, pass::Repeat, sync::Lrc,
-    FileName, FilePathMapping, Globals, Mark, SourceMap, Span, GLOBALS,
+    comments::SingleThreadedComments, errors::Handler, sync::Lrc, FileName,
+    FilePathMapping, Globals, Mark, SourceMap, Span, GLOBALS,
 };
 use swc_ecma_ast::{KeyValueProp, Module, ModuleDecl, Program};
 use swc_ecma_codegen::{
@@ -25,7 +25,6 @@ use swc_ecma_codegen::{
 };
 use swc_ecma_loader::resolve::Resolution;
 use swc_ecma_parser::{parse_file_as_module, EsConfig, Syntax, TsConfig};
-use swc_ecma_transforms_optimization::simplify::dce;
 use swc_ecma_transforms_react::jsx;
 use swc_ecma_transforms_typescript::typescript;
 use swc_ecma_visit::{
@@ -60,8 +59,9 @@ pub(crate) fn bundle(
     // dependencies and (if any) external dependencies obtained from the dependency map
     let external_modules = {
         let mut dependencies = HashSet::from([
-            Atom::from("@deskulpt-test/react"),
             Atom::from("@deskulpt-test/apis"),
+            Atom::from("@deskulpt-test/emotion"),
+            Atom::from("@deskulpt-test/react"),
         ]);
         dependencies.extend(dependency_map.keys().map(|k| Atom::from(k.clone())));
         Vec::from_iter(dependencies)
@@ -75,13 +75,8 @@ pub(crate) fn bundle(
         // we need to compare paths with the root we canonicalize the root path here to
         // get the same prefix; XXX not sure if there will be symlink issues
         PathResolver { root: root.canonicalize()?.to_path_buf() },
-        // We must disabled the default tree-shaking by the SWC bundler, otherwise it
-        // will remove unused `React` variables, which is required by the JSX transform
-        swc_bundler::Config {
-            external_modules,
-            disable_dce: true,
-            ..Default::default()
-        },
+        // Do not resolve the external modules
+        swc_bundler::Config { external_modules, ..Default::default() },
         Box::new(NoopHook),
     );
 
@@ -104,33 +99,28 @@ pub(crate) fn bundle(
         let top_level_mark = Mark::new();
         let unresolved_mark = Mark::new();
 
-        // Tree-shaking optimization in the bundler is disabled, so we need to manually
-        // apply the transform; we need to retain the top level mark `React` because it
-        // is needed by the JSX transform even if not explicitly used in the code
-        let mut tree_shaking = Repeat::new(dce::dce(
-            dce::Config { top_retain: vec![Atom::from("React")], ..Default::default() },
-            unresolved_mark,
-        ));
-
-        // There are two types of JSX transforms ("classic" and "automatic"), see
-        // https://legacy.reactjs.org/blog/2020/09/22/introducing-the-new-jsx-transform.html
-        //
-        // The "automatic" transform automatically imports from "react/jsx-runtime", but
-        // this module is not available when runnning the bundled code in the browser,
-        // so we have to use the "classic" transform instead. The "classic" transform
-        // requires `React` to be in scope, which we can require users to bring into
-        // scope by importing `import React from "@deskulpt-test/react";`.
+        // We use the automatic JSX transform (in contrast to the classic transform)
+        // here so that there is no need to bring anything into scope just for syntax
+        // which could be unused; to enable the `css` prop from Emotion, we specify the
+        // import source to be `@deskulpt-test/emotion`, so that `jsx`, `jsxs`, and
+        // `Fragment` will be imported from `@deskulpt-test/emotion/jsx-runtime`, which
+        // will then be redirected to `src/.scripts/emotion-react-jsx-runtime.js` that
+        // re-exports necessary runtime functions
         let mut jsx_transform = jsx::<SingleThreadedComments>(
             cm.clone(),
             None,
-            Default::default(), // options, where runtime defaults to "classic"
+            swc_ecma_transforms_react::Options {
+                runtime: Some(swc_ecma_transforms_react::Runtime::Automatic),
+                import_source: Some("@deskulpt-test/emotion".to_string()),
+                ..Default::default()
+            },
             top_level_mark,
             unresolved_mark,
         );
 
         // Transform that removes TypeScript types; weirdly, this must be applied on a
         // program rather than a module; note that we use the verbatim module syntax to
-        // avoid removing unused import statements (particularly the `React` import)
+        // avoid removing unused import statements in case they are needed
         let mut ts_transform = typescript::typescript(
             typescript::Config { verbatim_module_syntax: true, ..Default::default() },
             top_level_mark,
@@ -149,7 +139,6 @@ pub(crate) fn bundle(
             .into_program()
             .fold_with(&mut ts_transform)
             .expect_module()
-            .fold_with(&mut tree_shaking)
             .fold_with(&mut jsx_transform)
             .fold_with(&mut wrap_apis);
 
@@ -433,90 +422,28 @@ mod tests {
     }
 
     #[rstest]
-    // Entry does not use `React`, but we should not remove it
-    #[case::no_react("no_react")]
-    // Entry uses a `React` hook
-    #[case::with_react_hook("with_react_hook")]
-    // Entry imports a JS file with the extension
-    #[case::import("import")]
-    // Entry imports a JS file without specifying the extension
-    #[case::import_no_ext("import_no_ext")]
-    // Entry imports a JSX file without specifying the extension
-    #[case::import_no_ext_jsx("import_no_ext_jsx")]
-    // Entry imports a directory with `index.js`
-    #[case::import_directory("import_directory")]
-    // Entry defines `React` but the imported JSX file does not
-    #[case::import_no_inner_react_def("import_no_inner_react_def")]
-    // Entry does not define `React` but the imported JSX file does
-    #[case::import_no_outer_react_def("import_no_outer_react_def")]
-    fn test_bundle_ok(#[case] case: &str) {
-        let case_dir = fixture_dir().join("_javascript").join(case);
+    // Use correct JSX runtime for `jsx`, `jsxs`, and `Fragment``
+    #[case::jsx_runtime("jsx_runtime", "index.jsx")]
+    // Correctly resolve JS/JSX imports with and without extensions, or as index files
+    // of a directory
+    #[case::import("import", "index.jsx")]
+    // Correctly strip off TypeScript syntax
+    #[case::strip_types("strip_types", "index.tsx")]
+    // Replace `@deskulpt-test/apis` with the blob URL
+    #[case::replace_apis("replace_apis", "index.js")]
+    // Do not resolve imports from default and external dependencies
+    #[case::external_deps("external_deps", "index.js")]
+    fn test_bundle_ok(#[case] case: &str, #[case] entry: &str) {
+        let case_dir = fixture_dir().join(case);
         let bundle_root = case_dir.join("input");
         let result = bundle(
             &bundle_root,
-            &bundle_root.join("index.jsx"),
-            Default::default(),
-            &Default::default(),
-        )
-        .expect("Expected bundling to succeed");
-
-        let expected = read_to_string(case_dir.join("output.js")).unwrap();
-        assert_eq!(result, expected);
-    }
-
-    #[rstest]
-    // Basic TypeScript syntax
-    #[case::types("types")]
-    // Entry does not use `React`, but we should not remove it
-    #[case::no_react("no_react")]
-    // Importing types
-    #[case::import_types("import_types")]
-    fn test_bundle_ok_typescript(#[case] case: &str) {
-        let case_dir = fixture_dir().join("_typescript").join(case);
-        let bundle_root = case_dir.join("input");
-        let result = bundle(
-            &bundle_root,
-            &bundle_root.join("index.tsx"),
-            Default::default(),
-            &Default::default(),
-        )
-        .expect("Expected bundling to succeed");
-
-        let expected = read_to_string(case_dir.join("output.js")).unwrap();
-        assert_eq!(result, expected);
-    }
-
-    #[rstest]
-    fn test_bundle_ignore_external_dependencies() {
-        // Test that specified external dependencies are left as is in the bundled code
-        let case_dir = fixture_dir().join("external_deps");
-        let bundle_root = case_dir.join("input");
-        let external_deps = HashMap::from([
-            ("os-name".to_string(), "^6.0.0".to_string()),
-            ("matcher".to_string(), "^5.0.0".to_string()),
-        ]);
-        let result = bundle(
-            &bundle_root,
-            &bundle_root.join("index.jsx"),
-            Default::default(),
-            &external_deps,
-        )
-        .expect("Expected bundling to succeed");
-
-        let expected = read_to_string(case_dir.join("output.js")).unwrap();
-        assert_eq!(result, expected);
-    }
-
-    #[rstest]
-    fn test_bundle_replace_apis_url() {
-        // Test that the renaming of `@deskulpt-test/apis` to the blob URL is done
-        let case_dir = fixture_dir().join("replace_apis");
-        let bundle_root = case_dir.join("input");
-        let result = bundle(
-            &bundle_root,
-            &bundle_root.join("index.jsx"),
+            &bundle_root.join(entry),
             "blob://dummy-url".to_string(),
-            &Default::default(),
+            &HashMap::from([
+                ("os-name".to_string(), "^6.0.0".to_string()),
+                ("matcher".to_string(), "^5.0.0".to_string()),
+            ]),
         )
         .expect("Expected bundling to succeed");
 

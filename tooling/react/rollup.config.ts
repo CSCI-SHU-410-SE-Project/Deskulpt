@@ -21,11 +21,11 @@ export default defineConfig([
     plugins: [typescript(), terser()],
     onwarn,
   },
-  // CJS build for publishing
+  // ESM build for publishing
   {
     input: "src/index.ts",
     output: {
-      format: "cjs",
+      format: "esm",
       file: "./dist/index.js",
     },
     external: ["react"],
