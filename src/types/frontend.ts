@@ -13,24 +13,12 @@ import { Result, WidgetConfig, WidgetSetting } from "./backend";
  * interface as default.
  */
 export interface Widget {
-  /**
-   * The function that defines the widget element to render.
-   *
-   * @returns The React element to render.
-   */
+  /** Function that returns the React component to render. */
   render: () => ReactNode;
-  /**
-   * The width of the widget.
-   *
-   * This can be a number in pixels, or a string that is accepted in CSS.
-   */
-  width: number | string;
-  /**
-   * The height of the widget.
-   *
-   * This can be a number in pixels, or a string that is accepted in CSS.
-   */
-  height: number | string;
+  /** Widget widget as accepted in CSS. */
+  width: string;
+  /** Widget height as accepted in CSS. */
+  height: string;
 }
 
 /**
@@ -50,9 +38,9 @@ export interface CanvasWidgetState {
   /** The rendered widget component or the error component to display. */
   display: ReactNode;
   /** The width of the widget container, as exported from the widget module. */
-  width: number | string;
+  width: Widget["width"];
   /** The height of the widget container, as exported from the widget module. */
-  height: number | string;
+  height: Widget["height"];
   /** Setting of the widget. */
   setting: WidgetSetting;
   /** The URL of the blob of widget APIs. */
@@ -73,8 +61,11 @@ export interface WidgetModule {
  * The payload of the "render-widget" event.
  */
 export interface RenderWidgetPayload {
+  /** The widget ID. */
   widgetId: string;
+  /** Whether to call the backend to bundle the widget. */
   bundle: boolean;
+  /** The widget-specific setting. */
   setting: WidgetSetting;
 }
 
@@ -82,6 +73,7 @@ export interface RenderWidgetPayload {
  * The payload of the "remove-widgets" event.
  */
 export interface RemoveWidgetsPayload {
+  /** The widget IDs to remove. */
   removedIds: string[];
 }
 
@@ -89,6 +81,8 @@ export interface RemoveWidgetsPayload {
  * The payload of the "update-setting" event.
  */
 export interface UpdateSettingPayload {
+  /** The widget ID. */
   widgetId: string;
+  /** The widget-specific settting to update. */
   setting: WidgetSetting;
 }

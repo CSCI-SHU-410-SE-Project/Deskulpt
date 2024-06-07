@@ -7,7 +7,7 @@ use std::{
 };
 use tauri::{
     menu::{MenuBuilder, MenuItemBuilder},
-    tray::ClickType,
+    tray::{MouseButton, MouseButtonState, TrayIconEvent},
     App, AppHandle, Manager, WebviewUrl, WebviewWindowBuilder, Window, WindowEvent,
 };
 
@@ -105,8 +105,10 @@ pub(crate) fn init_system_tray(app: &App) -> Result<(), Box<dyn std::error::Erro
 
     // Register event handler for the tray icon itself
     deskulpt_tray.on_tray_icon_event(|tray, event| {
-        if event.click_type == ClickType::Left {
-            let _ = toggle_click_through_state(tray.app_handle());
+        if let TrayIconEvent::Click { button, button_state, .. } = event {
+            if button == MouseButton::Left && button_state == MouseButtonState::Down {
+                let _ = toggle_click_through_state(tray.app_handle()); // Consume error
+            }
         }
     });
 

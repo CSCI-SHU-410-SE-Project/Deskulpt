@@ -4,7 +4,7 @@ const INTERNAL_COMMANDS: &[&str] = &[
     "bundle_widget",
     "exit_app",
     "init_settings",
-    "open_widget_directory",
+    "open_widget_resource",
     "refresh_widget_collection",
     "register_toggle_shortcut",
 ];

@@ -1,4 +1,4 @@
-import { defineConfig, RollupLog } from "rollup";
+import { RollupLog, defineConfig } from "rollup";
 import typescript from "@rollup/plugin-typescript";
 import terser from "@rollup/plugin-terser";
 import replace from "@rollup/plugin-replace";

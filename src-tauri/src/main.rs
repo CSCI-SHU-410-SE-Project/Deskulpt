@@ -50,11 +50,12 @@ fn main() {
             commands::bundle_widget,
             commands::exit_app,
             commands::init_settings,
-            commands::open_widget_directory,
+            commands::open_widget_resource,
             commands::refresh_widget_collection,
             commands::register_toggle_shortcut,
         ])
         // Register plugins
+        .plugin(tauri_plugin_clipboard_manager::init())
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())
         .plugin(tauri_plugin_shell::init())
         .plugin(apis::fs::init())

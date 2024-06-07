@@ -1,22 +1,33 @@
 //! This module invludes the global and per-widget settings and relevant utilities.
 
+use crate::utils::IdMap;
 use anyhow::Error;
 use serde::{Deserialize, Serialize};
 use std::{
-    collections::HashMap,
     fs::{read_to_string, File},
     io::BufWriter,
     path::Path,
 };
 
+/// The theme appearance.
+#[derive(Default, Deserialize, Serialize)]
+#[serde(rename_all = "lowercase")]
+enum ThemeAppearance {
+    Light,
+    #[default]
+    Dark,
+}
+
 /// The global settings.
 #[derive(Default, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub(crate) struct Settings {
+    /// Dark/Light theme appearance.
+    theme_appearance: ThemeAppearance,
     /// The keyboard shortcut for toggling the canvas.
     toggle_shortcut: Option<String>,
     /// The collection of per-widget settings.
-    widget_settings: HashMap<String, WidgetSetting>,
+    widget_settings: IdMap<WidgetSetting>,
 }
 
 /// The per-widget settings.

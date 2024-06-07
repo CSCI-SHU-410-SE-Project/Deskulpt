@@ -18,14 +18,15 @@
   },
   "dependencies": {
     "@emotion/react": "^11.11.4",
-    "@tauri-apps/api": "^2.0.0-beta.11",
-    "antd": "^5.16.5",
-    "lucide-react": "^0.376.0",
+    "@radix-ui/themes": "^3.0.5",
+    "@tauri-apps/api": "^2.0.0-beta.13",
+    "@tauri-apps/plugin-clipboard-manager": "^2.1.0-beta.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-draggable": "^4.4.6",
     "react-error-boundary": "^4.0.13",
-    "react-icons": "^5.2.1"
+    "react-icons": "^5.2.1",
+    "sonner": "^1.4.41"
   },
   "devDependencies": {
     "@emotion/babel-plugin": "^11.11.0",

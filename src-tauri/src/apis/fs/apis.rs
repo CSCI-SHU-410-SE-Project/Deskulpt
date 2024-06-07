@@ -147,7 +147,7 @@ mod tests {
         assert!(!result.unwrap());
 
         // Create the file and should return true
-        std::fs::File::create(&file_path).unwrap();
+        std::fs::File::create(file_path).unwrap();
         let result = exists(
             app_handle.clone(),
             "dummy".to_string(),
@@ -166,8 +166,8 @@ mod tests {
         // Create a file and a directory
         let file_path = widget_dir.join("dummy_file.txt");
         let dir_path = widget_dir.join("dummy_dir");
-        std::fs::File::create(&file_path).unwrap();
-        std::fs::create_dir(&dir_path).unwrap();
+        std::fs::File::create(file_path).unwrap();
+        std::fs::create_dir(dir_path).unwrap();
 
         // Check that `is_file` gives true and `is_dir` gives false for the file
         let result = is_file(

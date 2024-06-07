@@ -86,20 +86,20 @@ mod tests {
     // Widget ID corresponds to a file instead of a directory
     #[case::not_a_directory("dummy", |widget_dir: PathBuf| {
         let file_path = widget_dir.join("dummy");
-        std::fs::File::create(&file_path).unwrap();
+        std::fs::File::create(file_path).unwrap();
     })]
     // Widget ID corresponds to a directory that is beyond the widget base directory
     #[case::beyond_base("../dummy", |widget_dir: PathBuf| {
         // We can safely create a directory one level outside the widget base directory,
         // since that would still be inside the temporary directory 
         let dir_path = widget_dir.join("../dummy");
-        std::fs::create_dir(&dir_path).unwrap();
+        std::fs::create_dir(dir_path).unwrap();
     })]
     // Widget ID corresponds to a directory that is not a direct descendant of the
     // widget base directory
     #[case::not_direct_descendant("dummy/subdummy", |widget_dir: PathBuf| {
         let dir_path = widget_dir.join("dummy/subdummy");
-        std::fs::create_dir_all(&dir_path).unwrap();
+        std::fs::create_dir_all(dir_path).unwrap();
     })]
     fn test_get_resource_path_invalid_id(
         #[case] widget_id: &str,

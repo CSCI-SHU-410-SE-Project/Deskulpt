@@ -14,9 +14,10 @@ regex = "1.10.4"
 rstest = "0.19.0"
 
 [dependencies]
-tauri = { version = "2.0.0-beta.17", features = ["macos-private-api", "test", "tray-icon"] }
-tauri-plugin-global-shortcut = "2.0.0-beta.4"
-tauri-plugin-shell = "2.0.0-beta.4"
+tauri = { version = "2.0.0-beta.22", features = ["macos-private-api", "test", "tray-icon"] }
+tauri-plugin-clipboard-manager = "2.1.0-beta.4"
+tauri-plugin-global-shortcut = "2.0.0-beta.6"
+tauri-plugin-shell = "2.0.0-beta.7"
 
 # Utilities
 anyhow = "1.0.80"

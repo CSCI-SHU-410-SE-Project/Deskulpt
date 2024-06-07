@@ -1,8 +1,9 @@
 /**
- * Grab as much information as possible from the unknown error.
+ * Grab as much information as possible from an unknown error.
  *
- * A string error will be returned as is. An Error object will return its stack if it
- * exists, otherwise its message. An unknown error will return a generic message.
+ * A string error will be returned as is. An `Error` object will return its stack if it
+ * exists, otherwise its message. If the error does not fall into any of the above
+ * categories, a generic message will be returned.
  *
  * @param err The unknown error, commonly from `catch`.
  * @returns The error information.

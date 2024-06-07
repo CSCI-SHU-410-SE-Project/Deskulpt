@@ -2,7 +2,26 @@
 
 use crate::states::CanvasClickThroughState;
 use anyhow::{bail, Error};
+use serde::Serialize;
+use std::collections::HashMap;
 use tauri::{AppHandle, Manager, Runtime};
+
+/// Mapping from widget IDs to corresponding data.
+pub(crate) type IdMap<T> = HashMap<String, T>;
+
+/// Toast kind of the "show-toast" event.
+#[derive(Serialize, Clone)]
+#[serde(rename_all = "lowercase")]
+enum ToastKind {
+    Success,
+}
+
+/// Payload of the "show-toast" event.
+#[derive(Serialize, Clone)]
+struct ShowToastPayload {
+    kind: ToastKind,
+    message: String,
+}
 
 /// Toggle the click-through state of the canvas window.
 ///
@@ -38,7 +57,13 @@ pub(crate) fn toggle_click_through_state<R: Runtime>(
     let _ = app_handle.emit_to(
         "canvas",
         "show-toast",
-        format!("Canvas {}", if prev_can_click_through { "floated" } else { "sunk" }),
+        ShowToastPayload {
+            kind: ToastKind::Success,
+            message: format!(
+                "Canvas {}.",
+                if prev_can_click_through { "floated" } else { "sunk" }
+            ),
+        },
     );
     Ok(())
 }
