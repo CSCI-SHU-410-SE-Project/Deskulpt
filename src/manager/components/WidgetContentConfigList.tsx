@@ -5,10 +5,18 @@ import { MdOpenInNew } from "react-icons/md";
 import { invokeOpenWidgetResource } from "../../commands";
 
 export interface WidgetContentConfigListProps {
+  /** The widget ID. */
   widgetId: string;
+  /** The widget configuration. */
   config: WidgetConfig;
 }
 
+/**
+ * Component for displaying the widget configurations.
+ *
+ * This is rendered as a data list, displaying the widget ID, name, entry, and
+ * external dependencies.
+ */
 export default function WidgetContentConfigList({
   widgetId,
   config,

@@ -4,12 +4,17 @@ import SettingToggleShortcut from "../components/SettingToggleShortcut";
 import Shortcut from "../components/Shortcut";
 
 export interface SettingsTabProps {
+  /** The current toggle shortcut. */
   toggleShortcut: string | null;
+  /** Setter for the toggle shortcut state. */
   setToggleShortcut: Dispatch<SetStateAction<string | null>>;
 }
 
 /**
  * The global settings tab in the manager.
+ *
+ * This tab is rendered as a data list with some margin. It contains the settings and
+ * setters for the global settings, which include the toggle shortcut.
  */
 export default function SettingsTab({
   toggleShortcut,

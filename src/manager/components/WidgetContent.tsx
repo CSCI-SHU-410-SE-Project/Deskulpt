@@ -11,13 +11,25 @@ import WidgetContentConfigList from "./WidgetContentConfigList";
 import WidgetContentSettingList from "./WidgetContentSettingList";
 
 export interface WidgetContentProps {
+  /** The index of the widget in the collection. */
   index: number;
+  /** The widget ID. */
   widgetId: string;
+  /** The widget configuration or error. */
   config: Result<WidgetConfig, string>;
+  /** The widget-specific settings. */
   setting: WidgetSetting;
+  /** Setter for the manager widget states. */
   setManagerWidgetStates: Dispatch<SetStateAction<IdMap<ManagerWidgetState>>>;
 }
 
+/**
+ * The widget content component.
+ *
+ * It is rendered as the content of a tab. It consists of a configuration section
+ * {@link WidgetContentConfigList} and a setting section
+ * {@link WidgetContentSettingList}.
+ */
 export default function WidgetContent({
   index,
   widgetId,

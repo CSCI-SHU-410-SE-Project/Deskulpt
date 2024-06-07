@@ -4,6 +4,16 @@ import { invokeExitApp } from "../../commands";
 import { ManagerWidgetState } from "../../types/frontend";
 import { IdMap, ThemeAppearance } from "../../types/backend";
 
+/**
+ * Listen and react to the "exit-app" event.
+ *
+ * Upon receiving the event, the hook will collect all current states that needs to be
+ * persisted and invoke the backend to persist them and exit the app.
+ *
+ * @param toggleShortcut The current toggle shortcut.
+ * @param themeAppearance The current theme appearance.
+ * @param managerWidgetStates The current manager widget states.
+ */
 export default function useExitAppListener(
   toggleShortcut: string | null,
   themeAppearance: ThemeAppearance,

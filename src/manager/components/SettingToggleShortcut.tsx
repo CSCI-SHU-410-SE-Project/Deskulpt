@@ -15,7 +15,7 @@ import { FaEdit } from "react-icons/fa";
 import useKeyboardListener from "../hooks/useKeyboardListener";
 
 export interface SettingToggleShortcutProps {
-  /** The setter for the toggle shortcut state. */
+  /** Setter for the toggle shortcut state. */
   setToggleShortcut: Dispatch<SetStateAction<string | null>>;
 }
 

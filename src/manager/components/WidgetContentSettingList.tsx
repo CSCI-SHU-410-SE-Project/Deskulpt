@@ -7,11 +7,21 @@ import NumberInput from "./NumberInput";
 import { FaTimes } from "react-icons/fa";
 
 export interface WidgetContentSettingListProps {
+  /** The widget ID. */
   widgetId: string;
+  /** The widget-specific setting. */
   setting: WidgetSetting;
+  /** Setter for the manager widget states. */
   setManagerWidgetStates: Dispatch<SetStateAction<IdMap<ManagerWidgetState>>>;
 }
 
+/**
+ * Component for displaying the widget-specific settings.
+ *
+ * This includes setter for the position and opacity of a widget. The states in the
+ * manager will be updated via the setter, and the updated settings will also be sent
+ * to the canvas via emitting corresponding events.
+ */
 export default function WidgetContentSettingList({
   widgetId,
   setting,

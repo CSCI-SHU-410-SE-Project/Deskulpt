@@ -1,22 +1,18 @@
 import { Badge, Box, Flex, Heading, ScrollArea, Text } from "@radix-ui/themes";
 
 export interface ErrorDisplayProps {
-  /**
-   * Title of the error display.
-   *
-   * This should be a short description of the error. It will be displayed as a heading.
-   */
+  /** Title of the error display. */
   title: string;
-  /**
-   * The full error stack.
-   *
-   * This will be displayed as a pre-wrap code block.
-   */
+  /** The full error message. */
   error: string;
 }
 
 /**
  * The error display component for user widget errors.
+ *
+ * It will display an error badge and the error title as a heading, followed by the full
+ * error message displayed as pre-wrap monospace text. The component is wrapped in a
+ * scroll area is scrollable in both directions.
  */
 export default function ErrorDisplay({ title, error }: ErrorDisplayProps) {
   return (

@@ -1,7 +1,6 @@
 import { Dispatch, SetStateAction } from "react";
 import { LuFileScan, LuFolderOpen, LuRepeat } from "react-icons/lu";
 import { invokeOpenWidgetResource } from "../../commands";
-import { renderWidgets } from "../utils";
 import { Flex, ScrollArea, Tabs } from "@radix-ui/themes";
 import { toast } from "sonner";
 import { ManagerWidgetState } from "../../types/frontend";
@@ -9,27 +8,40 @@ import { IdMap } from "../../types/backend";
 import WidgetTrigger from "../components/WidgetTrigger";
 import WidgetContent from "../components/WidgetContent";
 import FloatButton from "../components/FloatButton";
+import { emitRenderWidgetToCanvas } from "../../events";
 
 export interface WidgetsTabProps {
+  /** The manager widget states. */
   managerWidgetStates: IdMap<ManagerWidgetState>;
+  /** Setter for the manager widget states. */
   setManagerWidgetStates: Dispatch<SetStateAction<IdMap<ManagerWidgetState>>>;
+  /** The function for refreshing the widget collection. */
   rescanAndRender: () => Promise<number>;
 }
 
 /**
  * The widgets tab in the manager.
+ *
+ * This tab is rendered as a vertical tab list along with {@link FloatButton}s in the
+ * bottom right corner. It contains the triggers {@link WidgetTrigger} and the contents
+ * {@link WidgetContent} for each widget in the collection.
  */
 export default function WidgetsTab({
   managerWidgetStates,
   setManagerWidgetStates,
   rescanAndRender,
 }: WidgetsTabProps) {
-  async function rerenderAction() {
-    await renderWidgets(managerWidgetStates);
-    toast.success(`Re-rendered ${Object.keys(managerWidgetStates).length} widgets.`);
-  }
+  const rerenderAction = async () => {
+    const managerWidgetStatesArray = Object.entries(managerWidgetStates);
+    await Promise.all(
+      managerWidgetStatesArray.map(([widgetId, { setting }]) =>
+        emitRenderWidgetToCanvas({ widgetId, setting, bundle: true }),
+      ),
+    );
+    toast.success(`Re-rendered ${managerWidgetStatesArray.length} widgets.`);
+  };
 
-  async function rescanAction() {
+  const rescanAction = async () => {
     const count = await rescanAndRender();
     if (count === 0) {
       toast.success("Rescanned base directory.");
@@ -38,7 +50,7 @@ export default function WidgetsTab({
         `Rescanned base directory and rendered ${count} newly added widgets.`,
       );
     }
-  }
+  };
 
   return (
     <>

@@ -5,10 +5,19 @@ import { Dispatch, SetStateAction } from "react";
 import { emitSwitchThemeAppearanceToCanvas } from "../../events";
 
 export interface ThemeAppearanceTogglerProps {
+  /** Theme appearance. */
   themeAppearance: ThemeAppearance;
+  /** State for theme appearance. */
   setThemeAppearance: Dispatch<SetStateAction<ThemeAppearance>>;
 }
 
+/**
+ * The theme appearance toggler component.
+ *
+ * This component will be a small icon bottom on the top right corner of the manager
+ * window. Clicking the icon button should switch the theme appearance between light
+ * and dark mode. The tooltip and icon should reflect the current theme appearance.
+ */
 export default function ThemeAppearanceToggler({
   themeAppearance,
   setThemeAppearance,

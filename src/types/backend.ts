@@ -2,49 +2,69 @@
  * This file contains the types and interfaces that have backend counterparts.
  */
 
-/** Default serialization of the `Result` enum in Rust. */
+/**
+ * Default serialization of the `Result` enum in Rust.
+ */
 export type Result<T, E> = { Ok: T } | { Err: E };
 
-/** See `utils.rs` for its backend counterpart. */
+/**
+ * See [its backend counterpart](https://csci-shu-410-se-project.github.io/Deskulpt/rustdoc/deskulpt/utils/type.IdMap.html).
+ */
 export type IdMap<T> = Record<string, T>;
 
-/** See `utils.rs` for its backend counterpart. */
+/**
+ * See [its backend counterpart](https://csci-shu-410-se-project.github.io/Deskulpt/rustdoc/deskulpt/utils/enum.ToastKind.html).
+ */
 export type ToastKind = "success";
 
-/** See `utils.rs` for its backend counterpart. */
+/**
+ * See [its backend counterpart](https://csci-shu-410-se-project.github.io/Deskulpt/rustdoc/deskulpt/utils/struct.ShowToastPayload.html).
+ */
 export interface ShowToastPayload {
   kind: ToastKind;
   message: string;
 }
 
-/** See `config.rs` for its backend counterpart. */
+/**
+ * See [its backend counterpart](https://csci-shu-410-se-project.github.io/Deskulpt/rustdoc/deskulpt/config/type.WidgetConfigCollection.html).
+ */
 export type WidgetConfigCollection = IdMap<Result<WidgetConfig, string>>;
 
-/** See `config.rs` for its backend counterpart. */
+/**
+ * See [its backend counterpart](https://csci-shu-410-se-project.github.io/Deskulpt/rustdoc/deskulpt/config/struct.WidgetConfig.html).
+ */
 export interface WidgetConfig {
   deskulptConf: DeskulptConf;
   externalDeps: Record<string, string>;
   directory: string;
 }
 
-/** See `config.rs` for its backend counterpart. */
+/**
+ * See [its backend counterpart](https://csci-shu-410-se-project.github.io/Deskulpt/rustdoc/deskulpt/config/struct.DeskulptConf.html).
+ */
 export interface DeskulptConf {
   name: string;
   entry: string;
   ignore: boolean;
 }
 
-/** See `settings.rs` for its backend counterpart. */
+/**
+ * See [its backend counterpart](https://csci-shu-410-se-project.github.io/Deskulpt/rustdoc/deskulpt/settings/enum.ThemeAppearance.html).
+ */
 export type ThemeAppearance = "light" | "dark";
 
-/** See `settings.rs` for its backend counterpart. */
+/**
+ * See [its backend counterpart](https://csci-shu-410-se-project.github.io/Deskulpt/rustdoc/deskulpt/settings/struct.Settings.html).
+ */
 export interface Settings {
   themeAppearance: ThemeAppearance;
   toggleShortcut: string | null;
   widgetSettings: IdMap<WidgetSetting>;
 }
 
-/** See `settings.rs` for its backend counterpart. */
+/**
+ * See [its backend counterpart](https://csci-shu-410-se-project.github.io/Deskulpt/rustdoc/deskulpt/settings/struct.WidgetSetting.html).
+ */
 export interface WidgetSetting {
   x: number;
   y: number;

@@ -1,13 +1,31 @@
-import { useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { ManagerWidgetState } from "../../types/frontend";
 import { IdMap, WidgetSetting } from "../../types/backend";
 import { invokeRefreshWidgetCollection } from "../../commands";
-import { emitRemoveWidgetsToCanvas } from "../../events";
-import { renderWidgets } from "../utils";
+import { emitRemoveWidgetsToCanvas, emitRenderWidgetToCanvas } from "../../events";
 
+export interface UseManagerWidgetStatesOutput {
+  /** The manager widget states. */
+  managerWidgetStates: IdMap<ManagerWidgetState>;
+  /** Setter for the manager widget states. */
+  setManagerWidgetStates: Dispatch<SetStateAction<IdMap<ManagerWidgetState>>>;
+  /** Function that scans the widget base directory and renders newly added widgets. */
+  rescanAndRender: () => Promise<number>;
+}
+
+/**
+ * Hook for initializing the manager widget states.
+ *
+ * This initializes the manager widget states with the initial widget settings, and
+ * prepares the setter and the {@link UseManagerWidgetStatesOutput.rescanAndRender}
+ * function that is the core function for refreshing the widget collection. This will
+ * also perform an initial scanning and render on mount with a small timeout.
+ *
+ * @param initialWidgetSettings The initial collection of per-widget settings.
+ */
 export default function useManagerWidgetStates(
   initialWidgetSettings: IdMap<WidgetSetting>,
-) {
+): UseManagerWidgetStatesOutput {
   const [managerWidgetStates, setManagerWidgetStates] = useState<
     IdMap<ManagerWidgetState>
   >({});
@@ -61,13 +79,16 @@ export default function useManagerWidgetStates(
    */
   async function rescanAndRender() {
     const newManagerWidgetStates = await getNewManagerWidgetStates();
-    const addedStatesRecords = Object.entries(newManagerWidgetStates).filter(
+    const addedStates = Object.entries(newManagerWidgetStates).filter(
       ([widgetId]) => !(widgetId in managerWidgetStates),
     );
-    const addedStates = Object.fromEntries(addedStatesRecords);
     setManagerWidgetStates(newManagerWidgetStates); // Direct replacement
-    await renderWidgets(addedStates);
-    return addedStatesRecords.length;
+    await Promise.all(
+      addedStates.map(([widgetId, { setting }]) =>
+        emitRenderWidgetToCanvas({ widgetId, setting, bundle: true }),
+      ),
+    );
+    return addedStates.length;
   }
 
   useEffect(() => {

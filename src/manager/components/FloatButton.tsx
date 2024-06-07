@@ -2,11 +2,7 @@ import { Box, IconButton, Tooltip } from "@radix-ui/themes";
 import { ReactNode } from "react";
 
 export interface FloatButtonProps {
-  /**
-   * The order of the float button.
-   *
-   * The button will be away from the bottom by `(order - 1) * 40` pixels.
-   */
+  /** The order of the button, i.e., `(order - 1) * 40` pixels away from the bottom. */
   order: number;
   /** The icon to display in the float button. */
   icon: ReactNode;

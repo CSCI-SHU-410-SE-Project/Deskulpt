@@ -13,23 +13,11 @@ import { Result, WidgetConfig, WidgetSetting } from "./backend";
  * interface as default.
  */
 export interface Widget {
-  /**
-   * The function that defines the widget element to render.
-   *
-   * @returns The React element to render.
-   */
+  /** Function that returns the React component to render. */
   render: () => ReactNode;
-  /**
-   * The width of the widget.
-   *
-   * This should be a string that is accepted in CSS.
-   */
+  /** Widget widget as accepted in CSS. */
   width: string;
-  /**
-   * The height of the widget.
-   *
-   * This should be a string that is accepted in CSS.
-   */
+  /** Widget height as accepted in CSS. */
   height: string;
 }
 
@@ -73,8 +61,11 @@ export interface WidgetModule {
  * The payload of the "render-widget" event.
  */
 export interface RenderWidgetPayload {
+  /** The widget ID. */
   widgetId: string;
+  /** Whether to call the backend to bundle the widget. */
   bundle: boolean;
+  /** The widget-specific setting. */
   setting: WidgetSetting;
 }
 
@@ -82,6 +73,7 @@ export interface RenderWidgetPayload {
  * The payload of the "remove-widgets" event.
  */
 export interface RemoveWidgetsPayload {
+  /** The widget IDs to remove. */
   removedIds: string[];
 }
 
@@ -89,6 +81,8 @@ export interface RemoveWidgetsPayload {
  * The payload of the "update-setting" event.
  */
 export interface UpdateSettingPayload {
+  /** The widget ID. */
   widgetId: string;
+  /** The widget-specific settting to update. */
   setting: WidgetSetting;
 }

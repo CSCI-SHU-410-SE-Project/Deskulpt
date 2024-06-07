@@ -2,7 +2,7 @@ import { PropsWithChildren, useRef } from "react";
 import Draggable, { DraggableData, DraggableEvent } from "react-draggable";
 import { ErrorBoundary } from "react-error-boundary";
 import ErrorDisplay from "./ErrorDisplay";
-import { grabErrorInfo } from "../../utils";
+import { grabErrorInfo } from "../utils";
 import { WidgetSetting } from "../../types/backend";
 import { LuGripVertical } from "react-icons/lu";
 import { Box } from "@radix-ui/themes";

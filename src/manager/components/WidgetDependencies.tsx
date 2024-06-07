@@ -10,9 +10,18 @@ import {
 import { LuView } from "react-icons/lu";
 
 export interface WidgetDependenciesProps {
+  /** The dependencies mapping package name to the corresponding version string. */
   dependencies: Record<string, string>;
 }
 
+/**
+ * Display component for widget dependencies.
+ *
+ * This component normally just displays the number of dependencies. It also renders
+ * a view details button, which on click will show a popover with a list of package
+ * names and corresponding version strings. The package names are linked to their URL
+ * on [npmjs.com](https://www.npmjs.com/).
+ */
 export default function WidgetDependencies({ dependencies }: WidgetDependenciesProps) {
   const dependenciesArray = Object.entries(dependencies);
 

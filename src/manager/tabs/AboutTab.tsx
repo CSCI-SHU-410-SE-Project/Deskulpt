@@ -13,6 +13,10 @@ import Logo from "/deskulpt.svg";
 
 /**
  * The about tab in the manager.
+ *
+ * This tab is rendered as a flex container with 100% height. It displays static
+ * information of the Deskulpt application, including the version, authors, repository,
+ * and documentation.
  */
 export default function AboutTab() {
   return (

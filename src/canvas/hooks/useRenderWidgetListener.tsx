@@ -4,7 +4,7 @@ import { CanvasWidgetState, WidgetModule } from "../../types/frontend";
 import { IdMap, WidgetSetting } from "../../types/backend";
 import { invokeBundleWidget } from "../../commands";
 import ErrorDisplay from "../components/ErrorDisplay";
-import { grabErrorInfo } from "../../utils";
+import { grabErrorInfo } from "../utils";
 
 // The default width and height of a widget container, used when the widget module
 // fails to be loaded correctly
