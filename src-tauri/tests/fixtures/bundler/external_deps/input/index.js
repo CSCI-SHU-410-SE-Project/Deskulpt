@@ -1,6 +1,6 @@
 // Default dependencies
-import { css } from "@deskulpt-test/emotion";
 import React, { useState } from "@deskulpt-test/react";
+import { css } from "@deskulpt-test/ui";
 
 // External dependencies
 import { matcher } from "matcher";

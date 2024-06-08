@@ -60,8 +60,8 @@ pub(crate) fn bundle(
     let external_modules = {
         let mut dependencies = HashSet::from([
             Atom::from("@deskulpt-test/apis"),
-            Atom::from("@deskulpt-test/emotion"),
             Atom::from("@deskulpt-test/react"),
+            Atom::from("@deskulpt-test/ui"),
         ]);
         dependencies.extend(dependency_map.keys().map(|k| Atom::from(k.clone())));
         Vec::from_iter(dependencies)

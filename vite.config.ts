@@ -13,10 +13,10 @@ export default defineConfig(({ command }) => ({
       },
     }),
     importmapPlugin(command, {
-      "@deskulpt-test/emotion": "src/.scripts/emotion.js",
-      "@deskulpt-test/emotion/jsx-runtime": "src/.scripts/emotion-react-jsx-runtime.js",
+      "@deskulpt-test/emotion/jsx-runtime": "src/.scripts/jsx-runtime.js",
       "@deskulpt-test/raw-apis": "src/.scripts/raw-apis.js",
       "@deskulpt-test/react": "src/.scripts/react.js",
+      "@deskulpt-test/ui": "src/.scripts/ui.js",
     }),
   ],
   clearScreen: false,

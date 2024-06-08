@@ -15,7 +15,7 @@ export default defineConfig([
     input: "src/jsx-runtime.js",
     output: {
       format: "esm",
-      file: "../../src/.scripts/emotion-react-jsx-runtime.js",
+      file: "../../src/.scripts/jsx-runtime.js",
     },
     external: ["@emotion/react/jsx-runtime"],
     plugins: [terser()],
@@ -26,9 +26,9 @@ export default defineConfig([
     input: "src/index.ts",
     output: {
       format: "esm",
-      file: "../../src/.scripts/emotion.js",
+      file: "../../src/.scripts/ui.js",
     },
-    external: ["@emotion/react"],
+    external: ["@emotion/react", "@radix-ui/themes"],
     plugins: [typescript(), terser()],
     onwarn,
   },
@@ -39,7 +39,7 @@ export default defineConfig([
       format: "esm",
       file: "./dist/index.js",
     },
-    external: ["@emotion/react"],
+    external: ["@emotion/react", "@radix-ui/themes"],
     plugins: [
       typescript({
         declaration: true,
