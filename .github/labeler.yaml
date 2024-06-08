@@ -18,10 +18,10 @@
           - tooling/apis/**
           - src-tauri/src/apis/**
 
-"tooling:emotion":
+"tooling:ui":
   - changed-files:
       - any-glob-to-any-file:
-          - tooling/emotion/**
+          - tooling/ui/**
 
 "tooling:react":
   - changed-files:
