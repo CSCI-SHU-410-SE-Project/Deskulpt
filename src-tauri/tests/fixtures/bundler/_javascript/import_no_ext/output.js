@@ -1,1 +1,0 @@
-function getMessage(){return"This function is successfully imported.";}import React from"@deskulpt-test/react";function Message(){return React.createElement("div",null,getMessage());}const App={render:()=>React.createElement(Message,null),width:100,height:100};export{App as default};

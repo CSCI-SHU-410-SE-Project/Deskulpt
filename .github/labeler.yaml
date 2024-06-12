@@ -12,13 +12,18 @@
           - .github/**
           - maint_tools/**
 
-"tooling:react":
-  - changed-files:
-      - any-glob-to-any-file:
-          - tooling/react/**
-
 "tooling:apis":
   - changed-files:
       - any-glob-to-any-file:
           - tooling/apis/**
           - src-tauri/src/apis/**
+
+"tooling:ui":
+  - changed-files:
+      - any-glob-to-any-file:
+          - tooling/ui/**
+
+"tooling:react":
+  - changed-files:
+      - any-glob-to-any-file:
+          - tooling/react/**
