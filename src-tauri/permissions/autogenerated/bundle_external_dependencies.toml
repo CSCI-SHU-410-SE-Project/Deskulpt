@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-bundle-external-dependencies"
+description = "Enables the bundle_external_dependencies command without any pre-configured scope."
+commands.allow = ["bundle_external_dependencies"]
+
+[[permission]]
+identifier = "deny-bundle-external-dependencies"
+description = "Denies the bundle_external_dependencies command without any pre-configured scope."
+commands.deny = ["bundle_external_dependencies"]

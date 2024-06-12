@@ -1,7 +1,7 @@
 //! The module provides the commands used internally by Deskulpt.
 
 use crate::{
-    bundler::bundle,
+    bundler::{bundle, bundle_external},
     config::{read_widget_config, WidgetConfigCollection},
     settings::{read_settings, write_settings, Settings},
     states::{WidgetBaseDirectoryState, WidgetConfigCollectionState},
@@ -173,7 +173,51 @@ pub(crate) fn bundle_widget<R: Runtime>(
             apis_blob_url,
             &widget_config.external_deps,
         )
-        .context(format!("Failed to bundle widget (id={})", widget_id))
+        .context(format!("Failed to bundle widget (id={widget_id})"))
+        .map_err(|e| cmderr!(e));
+    }
+
+    // Error out if the widget ID is not found in the collection
+    cmdbail!("Widget '{widget_id}' is not found in the collection")
+}
+
+/// Command for bundling the external dependencies of the specified widget.
+///
+/// The widget configuration will be obtained by searching the managed widget collection
+/// for the given widget ID. The bundle of external dependencies will be written to the
+/// designated location in the widget directory directly instead of being returned.
+///
+/// This command will fail if:
+///
+/// - The widget ID is not found in the state of the widget collection.
+/// - The widget collection state corresponding to the widget ID is an error message
+///   instead of a widget configuration.
+/// - There is an error when bundling the widget external dependencies.
+#[command]
+pub(crate) fn bundle_external_dependencies<R: Runtime>(
+    app_handle: AppHandle<R>,
+    widget_id: String,
+) -> CommandOut<()> {
+    let widget_collection_state = &app_handle.state::<WidgetConfigCollectionState>();
+    let widget_collection = widget_collection_state.0.lock().unwrap();
+
+    if let Some(widget_config) = widget_collection.get(&widget_id) {
+        let widget_config = match widget_config.as_ref() {
+            Ok(widget_config) => widget_config,
+            Err(e) => cmdbail!(e.clone()),
+        };
+        // Obtain the absolute path of the widget entry point
+        let widget_entry =
+            &widget_config.directory.join(&widget_config.deskulpt_conf.entry);
+
+        // Wrap the bundled code if success, otherwise let the error propagate
+        return bundle_external(
+            &app_handle,
+            &widget_config.directory,
+            widget_entry,
+            &widget_config.external_deps,
+        )
+        .context(format!("Failed to bundle external dependencies (id={widget_id})"))
         .map_err(|e| cmderr!(e));
     }
 

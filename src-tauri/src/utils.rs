@@ -3,8 +3,9 @@
 use crate::states::CanvasClickThroughState;
 use anyhow::{bail, Error};
 use serde::Serialize;
-use std::collections::HashMap;
-use tauri::{AppHandle, Manager, Runtime};
+use std::{collections::HashMap, path::Path, time::Instant};
+use tauri::{async_runtime, AppHandle, Manager, Runtime};
+use tauri_plugin_shell::ShellExt;
 
 /// Mapping from widget IDs to corresponding data.
 pub(crate) type IdMap<T> = HashMap<String, T>;
@@ -21,6 +22,21 @@ enum ToastKind {
 struct ShowToastPayload {
     kind: ToastKind,
     message: String,
+}
+
+/// Result of executing a shell command.
+#[derive(Serialize)]
+pub(crate) struct ShellCommandResult {
+    /// The elapsed time of executing the command in seconds.
+    pub(crate) time: f64,
+    /// Whether the command is successful.
+    pub(crate) success: bool,
+    /// The exit code of the command.
+    pub(crate) code: Option<i32>,
+    /// The standard output of the command.
+    pub(crate) stdout: String,
+    /// The standard error of the command.
+    pub(crate) stderr: String,
 }
 
 /// Toggle the click-through state of the canvas window.
@@ -66,4 +82,34 @@ pub(crate) fn toggle_click_through_state<R: Runtime>(
         },
     );
     Ok(())
+}
+
+/// Execute a shell command.
+///
+/// This will launch a command prompt on Windows or a bash shell on Unix in the
+/// specified working directory and execute the given command via Tauri async runtime.
+/// This function will not raise an error regardless of whether the command succeeds or
+/// not, unless the internal execution failed that cannot be recovered or recorded.
+pub(crate) fn run_shell_command<R: Runtime>(
+    app_handle: &AppHandle<R>,
+    cwd: &Path,
+    cmd: &str,
+) -> ShellCommandResult {
+    let now = Instant::now();
+    let shell = app_handle.shell();
+
+    let (alias, flag) =
+        if cfg!(target_os = "windows") { ("cmd", "/C") } else { ("bash", "-c") };
+
+    let output = async_runtime::block_on(async move {
+        shell.command(alias).current_dir(cwd).args([flag, cmd]).output().await.unwrap()
+    });
+
+    ShellCommandResult {
+        time: now.elapsed().as_secs_f64(),
+        success: output.status.success(),
+        code: output.status.code(),
+        stdout: String::from_utf8_lossy(&output.stdout).to_string(),
+        stderr: String::from_utf8_lossy(&output.stderr).to_string(),
+    }
 }

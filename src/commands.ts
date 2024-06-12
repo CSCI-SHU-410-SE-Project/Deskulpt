@@ -16,6 +16,13 @@ export async function invokeBundleWidget(widgetId: string, apisBlobUrl: string) 
 }
 
 /**
+ * Invoke the [`bundle_external_dependencies`](https://csci-shu-410-se-project.github.io/Deskulpt/rustdoc/deskulpt/commands/fn.bundle_external_dependencies.html) command.
+ */
+export async function invokeBundleExternalDependencies(widgetId: string) {
+  return invoke<string>("bundle_external_dependencies", { widgetId });
+}
+
+/**
  * Invoke the [`exit_app`](https://csci-shu-410-se-project.github.io/Deskulpt/rustdoc/deskulpt/commands/fn.exit_app.html) command.
  */
 export async function invokeExitApp(settings: Settings) {

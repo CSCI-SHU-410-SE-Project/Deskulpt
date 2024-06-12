@@ -1,6 +1,7 @@
 use tauri_build::{try_build, AppManifest, Attributes, CodegenContext, InlinedPlugin};
 
 const INTERNAL_COMMANDS: &[&str] = &[
+    "bundle_external_dependencies",
     "bundle_widget",
     "exit_app",
     "init_settings",
