@@ -119,9 +119,8 @@ pub(super) fn apply_common_transforms(module: Module, cm: Lrc<SourceMap>) -> Mod
         top_level_mark,
         unresolved_mark,
     );
-    let module = module.fold_with(&mut jsx_transform);
 
-    module
+    module.fold_with(&mut jsx_transform)
 }
 
 /// Emit a module into a buffer.

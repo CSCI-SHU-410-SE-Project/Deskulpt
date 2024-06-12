@@ -112,7 +112,7 @@ pub(crate) fn bundle_external<R: Runtime>(
         let mut external_imports: Vec<ModuleItem> = vec![];
         let mut export_specifiers: Vec<ExportSpecifier> = vec![];
         let mut inspector = as_folder(transforms::ExternalImportInspector {
-            external_dependencies: &dependency_map,
+            external_dependencies: dependency_map,
             imports: &mut external_imports,
             export_specifiers: &mut export_specifiers,
         });
