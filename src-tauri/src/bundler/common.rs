@@ -23,18 +23,10 @@ use swc_ecma_transforms_typescript::typescript;
 use swc_ecma_visit::FoldWith;
 
 /// Bundle the entry point into a raw module without further transforms.
-///
-/// If `replace_external` is true, import statements of external dependencies will be
-/// converted into named imports from the external bundle file (without checking if it
-/// exists). This should be used when aiming to bundle the widget source code. If
-/// `replace_external` is false, the external dependencies will be left as is, same as
-/// for default dependencies. This should be used when aiming to bundle external
-/// dependencies which requires knowledge of which external dependencies are used.
 pub(super) fn bundle_into_raw_module(
     root: &Path,
     target: &Path,
     dependency_map: &HashMap<String, String>,
-    replace_external: bool,
     globals: &Globals,
     cm: Lrc<SourceMap>,
 ) -> Result<Module, Error> {
@@ -47,6 +39,7 @@ pub(super) fn bundle_into_raw_module(
     let external_modules = {
         let mut dependencies = HashSet::from([
             Atom::from("@deskulpt-test/apis"),
+            Atom::from("@deskulpt-test/emotion/jsx-runtime"),
             Atom::from("@deskulpt-test/react"),
             Atom::from("@deskulpt-test/ui"),
         ]);
@@ -57,7 +50,7 @@ pub(super) fn bundle_into_raw_module(
     let mut bundler = Bundler::new(
         globals,
         cm.clone(),
-        PathLoader { root, cm: cm.clone(), dependency_map, replace_external },
+        PathLoader { cm: cm.clone() },
         // The path resolver produces paths with the \\?\ prefix on Windows, and since
         // we need to compare paths with the root we canonicalize the root path here to
         // get the same prefix; XXX not sure if there will be symlink issues

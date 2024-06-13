@@ -9,30 +9,9 @@ use swc_ecma_ast::{
 };
 use swc_ecma_visit::{noop_visit_mut_type, VisitMut, VisitMutWith};
 
-/// An AST transformer that renames import module specifiers.
-pub(super) struct ImportRenamer {
-    /// The mapping from old import sources to new import sources.
-    pub(super) rename_mapping: HashMap<String, String>,
-}
-
-impl VisitMut for ImportRenamer {
-    noop_visit_mut_type!();
-
-    fn visit_mut_module_decl(&mut self, n: &mut ModuleDecl) {
-        n.visit_mut_children_with(self);
-
-        if let ModuleDecl::Import(import_decl) = n {
-            let src = import_decl.src.value.to_string();
-            if let Some(new_src) = self.rename_mapping.get(&src) {
-                import_decl.src.value = Atom::from(new_src.clone());
-            }
-        }
-    }
-}
-
 /// An AST transformer that records information of external imports.
 ///
-/// It does not modify the AST but only inspects it for recording purposes.
+/// It does **not** actually transform the AST but instead inspects information from it.
 pub(super) struct ExternalImportInspector<'a> {
     /// The external dependencies to be recorded and removed.
     pub(super) external_dependencies: &'a HashMap<String, String>,
@@ -83,25 +62,25 @@ impl VisitMut for ExternalImportInspector<'_> {
     }
 }
 
-/// An AST transformer that resolves imports of external dependencies.
+/// An AST transformer that redirects imports of external dependencies.
 ///
-/// It works by replacing the import statements of external dependencies with named
-/// imports pointing to the bundle of external dependencies [`EXTERNAL_BUNDLE`],
-/// assuming that it exists.
-pub(super) struct ExternalImportResolver<'a> {
+/// It replaces the import statements of external dependencies with named imports
+/// pointing to the bundle of external dependencies [`EXTERNAL_BUNDLE`].
+pub(super) struct ExternalImportRedirector<'a> {
     /// The root directory of the widget to bundle.
     pub(super) root: &'a Path,
     /// The external dependencies of the widget.
     pub(super) external_dependencies: &'a HashMap<String, String>,
 }
 
-impl VisitMut for ExternalImportResolver<'_> {
+impl VisitMut for ExternalImportRedirector<'_> {
     noop_visit_mut_type!();
 
     fn visit_mut_import_decl(&mut self, n: &mut ImportDecl) {
         n.visit_mut_children_with(self);
-
         let import_source = n.src.value.as_str();
+
+        // Import source is an external dependency
         if self.external_dependencies.contains_key(import_source)
             && !import_source.starts_with("@deskulpt-test/")
         {
@@ -127,6 +106,26 @@ impl VisitMut for ExternalImportResolver<'_> {
             // Rpleace the import source and specifiers
             n.src = Box::new(self.root.join(EXTERNAL_BUNDLE).to_string_lossy().into());
             n.specifiers = new_specifiers;
+        }
+    }
+}
+
+/// An AST transformer that resolves imports of widget APIs.
+///
+/// It replaces the imports from `@deskulpt-test/apis` with the given blob URL.
+pub(super) struct ApisImportRenamer {
+    /// The APIs blob URL.
+    pub(super) apis_blob_url: String,
+}
+
+impl VisitMut for ApisImportRenamer {
+    noop_visit_mut_type!();
+
+    fn visit_mut_import_decl(&mut self, n: &mut ImportDecl) {
+        n.visit_mut_children_with(self);
+
+        if n.src.value.as_str() == "@deskulpt-test/apis" {
+            n.src.value = Atom::from(self.apis_blob_url.clone());
         }
     }
 }

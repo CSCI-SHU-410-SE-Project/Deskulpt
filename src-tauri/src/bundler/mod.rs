@@ -28,10 +28,13 @@ const EXTENSIONS: &[&str] = &["js", "jsx", "ts", "tsx"];
 /// The file is meant to hold the import statements of external dependencies and export
 /// them as named exports. This can then be bundled with node modules resolution into
 /// [`EXTERNAL_BUNDLE`].
-const EXTERNAL_BUNDLE_BRIDGE: &str = ".deskulpt--external-imports.js";
+const EXTERNAL_BUNDLE_BRIDGE: &str = "__external_bundle_bridge.js";
 
-/// Name of the bundle file of external dependencies.
-const EXTERNAL_BUNDLE: &str = ".deskulpt--bundle.js";
+/// Name of the bundle of external dependencies.
+const EXTERNAL_BUNDLE: &str = "__external_bundle.js";
+
+/// Name of the bundle of widget source code without resolving external dependencies.
+const TEMP_WIDGET_BUNDLE: &str = "__temp_widget_bundle.js";
 
 /// Bundle a widget and return the bundled code as a string.
 ///
@@ -48,26 +51,72 @@ pub(crate) fn bundle(
     let globals = Globals::default();
     let cm = Lrc::new(SourceMap::new(FilePathMapping::empty()));
 
+    let mut apis_renamer = as_folder(transforms::ApisImportRenamer { apis_blob_url });
     let module = common::bundle_into_raw_module(
         root,
         target,
         dependency_map,
-        true, // Replace external imports
         &globals,
         cm.clone(),
     )?;
 
-    let code = GLOBALS.set(&globals, || {
+    if dependency_map.is_empty() {
+        // If there are no external dependencies, there is no need to resolve external
+        // imports and bundle a second round
+        let code = GLOBALS.set(&globals, || {
+            let module = common::apply_common_transforms(module, cm.clone())
+                .fold_with(&mut apis_renamer);
+
+            // Directly emit the bundled code into the buffer and return as string
+            let mut buf = vec![];
+            common::emit_module_to_buf(module, cm.clone(), &mut buf);
+            String::from_utf8_lossy(&buf).to_string()
+        });
+        return Ok(code);
+    }
+
+    // There are external dependencies so we need to first redirect external imports to
+    // local then bundle again; for this purpose we prepare a temporary file to hold the
+    // intermediate widget bundle without resolving external imports
+    let temp_bundle_path = root.join(TEMP_WIDGET_BUNDLE);
+    let mut temp_bundle_file = File::create(&temp_bundle_path)?;
+
+    GLOBALS.set(&globals, || {
         let module = common::apply_common_transforms(module, cm.clone());
 
-        // We need to rename the imports of `@deskulpt-test/apis` to the blob URL which
-        // wraps the widget-specific APIs
-        let mut wrap_apis = as_folder(transforms::ImportRenamer {
-            rename_mapping: [("@deskulpt-test/apis".to_string(), apis_blob_url)].into(),
+        // Redirect external imports to prepare for the second round of bundling
+        let mut resolver = as_folder(transforms::ExternalImportRedirector {
+            root,
+            external_dependencies: dependency_map,
         });
-        let module = module.fold_with(&mut wrap_apis);
+        let module = module.fold_with(&mut resolver);
 
-        // Emit the bundled module as string into a buffer
+        // Emit the module to the temporary file
+        common::emit_module_to_buf(module, cm.clone(), &mut temp_bundle_file);
+    });
+
+    // Bundle a second time to resolve the external imports, using the temporary bundle
+    // of widget source code as the entry point
+    let module = common::bundle_into_raw_module(
+        root,
+        &temp_bundle_path,
+        dependency_map,
+        &globals,
+        cm.clone(),
+    );
+
+    // Remove the temporary bundle file; avoid bundling error from leaving it behind
+    remove_file(&temp_bundle_path)?;
+    let module = module?;
+
+    let code = GLOBALS.set(&globals, || {
+        // We no longer need to apply the common transforms as they are already applied
+        // in the first round of bundling, and the bundle of external dependencies
+        // should have already been an ESM module itself; it suffices to redirect the
+        // imports of widget APIs
+        let module = module.fold_with(&mut apis_renamer);
+
+        // Emit the bundled code into the buffer and return as string
         let mut buf = vec![];
         common::emit_module_to_buf(module, cm.clone(), &mut buf);
         String::from_utf8_lossy(&buf).to_string()
@@ -99,12 +148,12 @@ pub(crate) fn bundle_external<R: Runtime>(
         root,
         target,
         dependency_map,
-        false, // Keep external imports
         &globals,
         cm.clone(),
     )?;
 
     let bridge_path = root.join(EXTERNAL_BUNDLE_BRIDGE);
+    let mut bridge_file = File::create(&bridge_path)?;
     GLOBALS.set(&globals, || {
         let module = common::apply_common_transforms(module, cm.clone());
 
@@ -139,11 +188,6 @@ pub(crate) fn bundle_external<R: Runtime>(
         };
 
         // Write the bridge module
-        let bridge_file = File::create(&bridge_path);
-        if bridge_file.is_err() {
-            return;
-        }
-        let mut bridge_file = bridge_file.unwrap(); // Safe because not error
         common::emit_module_to_buf(bridge_module, cm.clone(), &mut bridge_file);
     });
 
