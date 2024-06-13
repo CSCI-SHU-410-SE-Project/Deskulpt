@@ -9,6 +9,7 @@ import {
 } from "@radix-ui/themes";
 import { invokeBundleExternalDependencies } from "../../commands";
 import { useState } from "react";
+import { toast } from "sonner";
 
 export interface WidgetDependenciesProps {
   /** The widget ID. */
@@ -73,7 +74,8 @@ export default function WidgetDependencies({
             onClick={() => {
               setIsBundlingExternal(true);
               invokeBundleExternalDependencies(widgetId)
-                .catch(console.error)
+                .then(() => toast.success("External dependencies bundled."))
+                .catch(() => toast.error("Failed to bundle external dependencies."))
                 .finally(() => setIsBundlingExternal(false));
             }}
           >

@@ -75,9 +75,17 @@ pub(crate) fn bundle(
         return Ok(code);
     }
 
-    // There are external dependencies so we need to first redirect external imports to
-    // local then bundle again; for this purpose we prepare a temporary file to hold the
-    // intermediate widget bundle without resolving external imports
+    // There are external dependencies, but the external dependency bundle is not ready
+    if !root.join(EXTERNAL_BUNDLE).exists() {
+        bail!(
+            "External dependencies required: {dependency_map:?}, but the bundle is not
+            found at {EXTERNAL_BUNDLE}; bundle the external dependencies first"
+        );
+    }
+
+    // We need to first redirect external imports to EXTERNAL_BUNDLE then bundle again;
+    // for this purpose we prepare a temporary file to hold the intermediate widget
+    // bundle without resolving external imports
     let temp_bundle_path = root.join(TEMP_WIDGET_BUNDLE);
     let mut temp_bundle_file = File::create(&temp_bundle_path)?;
 
@@ -215,4 +223,131 @@ pub(crate) fn bundle_external<R: Runtime>(
 
     let _ = remove_file(&bridge_path);
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::testing::{assert_err_eq, ChainReason};
+    use pretty_assertions::assert_eq;
+    use rstest::rstest;
+    use std::{fs::read_to_string, path::PathBuf};
+
+    /// Get the absolute path to the fixture directory.
+    ///
+    /// The paths used within the SWC bundler are all canonicalized (and thus verbatim
+    /// with the `\\?\` prefix on Windows), so canonicalize here to match them. Note
+    /// that this is not the case elsewhere in the codebase.
+    fn fixture_dir() -> PathBuf {
+        Path::new("tests/fixtures/bundler").canonicalize().unwrap()
+    }
+
+    #[rstest]
+    // Use correct JSX runtime for `jsx`, `jsxs`, and `Fragment`
+    #[case::jsx_runtime("jsx_runtime", "index.jsx")]
+    // Correctly resolve JS/JSX imports with and without extensions, or as index files
+    // of a directory
+    #[case::import("import", "index.jsx")]
+    // Correctly strip off TypeScript syntax
+    #[case::strip_types("strip_types", "index.tsx")]
+    // Replace `@deskulpt-test/apis` with the blob URL
+    #[case::replace_apis("replace_apis", "index.js")]
+    // Do not resolve imports from default and external dependencies
+    #[case::default_deps("default_deps", "index.js")]
+    fn test_bundle_ok(#[case] case: &str, #[case] entry: &str) {
+        let case_dir = fixture_dir().join(case);
+        let bundle_root = case_dir.join("input");
+        let result = bundle(
+            &bundle_root,
+            &bundle_root.join(entry),
+            "blob://dummy-url".to_string(),
+            &Default::default(),
+        )
+        .expect("Expected bundling to succeed");
+
+        let expected = read_to_string(case_dir.join("output.js")).unwrap();
+        assert_eq!(result, expected);
+    }
+
+    #[rstest]
+    // Node modules import that are not specified as external dependencies
+    #[case::import_node_modules(
+        "import_node_modules",
+        vec![
+            ChainReason::Skip,
+            ChainReason::Skip,
+            ChainReason::Regex("failed to resolve lodash from".to_string()),
+            ChainReason::Exact(
+                "node_modules imports should be explicitly included in package.json to \
+                avoid being bundled at runtime; URL imports are not supported, one \
+                should vendor its source to local and use a relative import instead"
+                .to_string()
+            ),
+        ],
+    )]
+    // URL import
+    #[case::import_url(
+        "import_url",
+        vec![
+            ChainReason::Skip,
+            ChainReason::Skip,
+            ChainReason::Regex("failed to resolve https://dummy.js from".to_string()),
+            ChainReason::Exact(
+                "node_modules imports should be explicitly included in package.json to \
+                avoid being bundled at runtime; URL imports are not supported, one \
+                should vendor its source to local and use a relative import instead"
+                .to_string()
+            ),
+        ],
+    )]
+    // Relative import that goes beyond the root
+    #[case::import_beyond_root(
+        "import_beyond_root",
+        vec![
+            ChainReason::Skip,
+            ChainReason::Skip,
+            ChainReason::Regex("failed to resolve ../../foo from".to_string()),
+            ChainReason::Regex("Relative imports should not go beyond the root".to_string()),
+        ],
+    )]
+    // Entry file does not exist
+    #[case::entry_not_exist(
+        "entry_not_exist",
+        vec![ChainReason::Regex("Entry point does not exist".to_string())],
+    )]
+    // Bad syntax that cannot be parsed
+    #[case::bad_syntax(
+        "bad_syntax",
+        vec![
+            ChainReason::Skip,
+            ChainReason::Skip,
+            ChainReason::Skip,
+            ChainReason::Regex("error: Expected ';', '}' or <eof>".to_string()),
+        ],
+    )]
+    fn test_bundle_error(#[case] case: &str, #[case] expected_error: Vec<ChainReason>) {
+        let case_dir = fixture_dir().join(case);
+        let bundle_root = case_dir.join("input");
+        let error = bundle(
+            &bundle_root,
+            &bundle_root.join("index.jsx"),
+            Default::default(),
+            &Default::default(),
+        )
+        .expect_err("Expected bundling error");
+        assert_err_eq(error, expected_error);
+    }
+
+    #[rstest]
+    #[should_panic]
+    fn test_bundle_import_meta_panic() {
+        // Test that accessing `import.meta` is not supported
+        let bundle_root = fixture_dir().join("import_meta/input");
+        let _ = bundle(
+            &bundle_root,
+            &bundle_root.join("index.jsx"),
+            Default::default(),
+            &Default::default(),
+        );
+    }
 }
