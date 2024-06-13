@@ -32,8 +32,8 @@ impl Load for PathLoader {
             _ => Syntax::Es(EsConfig { jsx: true, ..Default::default() }),
         };
 
-        // Parse the file as a module; most AST transforms are postponed until the
-        // bundling phase to avoid messing up per-file ASTs
+        // Parse the file as a module; AST transforms are postponed until the bundling
+        // phase to avoid messing up per-file ASTs
         match parse_file_as_module(&fm, syntax, Default::default(), None, &mut vec![]) {
             Ok(module) => Ok(ModuleData { fm, module, helpers: Default::default() }),
             Err(err) => {
