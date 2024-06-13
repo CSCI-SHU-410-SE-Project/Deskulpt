@@ -25,7 +25,7 @@ export default function FloatButton({
   onClick,
 }: FloatButtonProps) {
   return (
-    <Box position="absolute" right="3" bottom={`${(order - 1) * 40}px`}>
+    <Box position="absolute" right="0" bottom={`${(order - 1) * 40}px`}>
       <Tooltip content={tooltip} side="left">
         <IconButton variant="surface" radius="full" onClick={onClick}>
           {icon}
