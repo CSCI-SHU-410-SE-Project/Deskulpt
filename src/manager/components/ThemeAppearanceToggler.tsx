@@ -29,7 +29,7 @@ export default function ThemeAppearanceToggler({
   };
 
   return (
-    <Box position="absolute" right="3" top="2">
+    <Box position="absolute" right="3" top="4">
       <Tooltip
         side="left"
         content={`Switch to ${themeAppearance === "light" ? "dark" : "light"} mode`}
