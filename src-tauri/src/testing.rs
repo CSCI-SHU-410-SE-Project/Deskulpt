@@ -72,10 +72,10 @@ pub(crate) fn assert_err_eq(error: Error, chain: Vec<ChainReason>) {
 ///   environment. It should be used the same as `$APPDATA`, `$APPCONFIG`, etc. The
 ///   `TempDir` object itself is returned, because it will be deleted once it goes out
 ///   of scope.
+///
 /// - Creates a mock Tauri application. The mock application manages the widget base
 ///   directory state, which is `$MOCKBASE/widgets`. It also manages an empty widget
 ///   configuration collection state. A handle to this mock application is returned.
-/// - Registers the same plugins as the main application, except for APIs plugins.
 pub(crate) fn setup_mock_env() -> (TempDir, AppHandle<MockRuntime>) {
     let temp_dir = tempdir().expect("Failed to create temporary directory");
     let mock_base_dir = temp_dir.path().to_path_buf();
@@ -84,10 +84,6 @@ pub(crate) fn setup_mock_env() -> (TempDir, AppHandle<MockRuntime>) {
     let app_handle = app.handle().clone();
     app_handle.manage(WidgetBaseDirectoryState(mock_base_dir.join("widgets")));
     app_handle.manage(WidgetConfigCollectionState::default());
-
-    app_handle.plugin(tauri_plugin_clipboard_manager::init()).unwrap();
-    app_handle.plugin(tauri_plugin_global_shortcut::Builder::new().build()).unwrap();
-    app_handle.plugin(tauri_plugin_shell::init()).unwrap();
 
     (temp_dir, app_handle)
 }

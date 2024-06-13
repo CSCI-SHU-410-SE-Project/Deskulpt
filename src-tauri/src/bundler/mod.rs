@@ -351,6 +351,7 @@ mod tests {
         let (temp_dir, app_handle) = setup_mock_env();
         let bundle_root = temp_dir.path().join("external_deps");
         copy_dir(case_dir.join("input"), &bundle_root).unwrap();
+        app_handle.plugin(tauri_plugin_shell::init()).unwrap();
         run_shell_command(&app_handle, &bundle_root, "npm install");
 
         // Directly bundle the widget and check that we get the proper error
