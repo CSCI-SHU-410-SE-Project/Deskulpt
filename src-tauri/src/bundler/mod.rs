@@ -228,7 +228,8 @@ pub(crate) fn bundle_external<R: Runtime>(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::testing::{assert_err_eq, ChainReason};
+    use crate::testing::{assert_err_eq, setup_mock_env, ChainReason};
+    use copy_dir::copy_dir;
     use pretty_assertions::assert_eq;
     use rstest::rstest;
     use std::{fs::read_to_string, path::PathBuf};
@@ -336,6 +337,65 @@ mod tests {
         )
         .expect_err("Expected bundling error");
         assert_err_eq(error, expected_error);
+    }
+
+    #[rstest]
+    fn test_bundle_external_dependencies() {
+        // Test the bundling of widgets that use external dependencies
+        let case_dir = fixture_dir().join("external_deps");
+        let external_deps =
+            HashMap::from([("internal-ip".to_string(), "8.0.0".to_string())]);
+
+        // Set up test environment in a temporary directory to avoid polluting the
+        // workspace with node modules, etc.
+        let (temp_dir, app_handle) = setup_mock_env();
+        let bundle_root = temp_dir.path().join("external_deps");
+        copy_dir(case_dir.join("input"), &bundle_root).unwrap();
+        run_shell_command(&app_handle, &bundle_root, "npm install");
+
+        // Directly bundle the widget and check that we get the proper error
+        let error = bundle(
+            &bundle_root,
+            &bundle_root.join("index.js"),
+            Default::default(),
+            &external_deps,
+        )
+        .expect_err("Expected error before external dependencies are not bundled");
+        assert_err_eq(
+            error,
+            vec![ChainReason::Regex(regex::escape(&format!(
+                "External dependencies required: {external_deps:?}"
+            )))],
+        );
+
+        // Create the bundle of external dependencies
+        bundle_external(
+            &app_handle,
+            &bundle_root,
+            &bundle_root.join("index.js"),
+            &external_deps,
+        )
+        .unwrap();
+
+        // Check that the bundle is created and the bundle bridge is removed properly
+        assert!(bundle_root.join(EXTERNAL_BUNDLE).exists());
+        assert!(!bundle_root.join(EXTERNAL_BUNDLE_BRIDGE).exists());
+
+        let result = read_to_string(bundle_root.join(EXTERNAL_BUNDLE)).unwrap();
+        let expected = read_to_string(case_dir.join("output-external.js")).unwrap();
+        assert_eq!(result.trim(), expected);
+
+        // Bundle the widget again and check that it succeeds
+        let result = bundle(
+            &bundle_root,
+            &bundle_root.join("index.js"),
+            Default::default(),
+            &external_deps,
+        )
+        .expect("Expected success after external dependencies are bundled");
+
+        let expected = read_to_string(case_dir.join("output.js")).unwrap();
+        assert_eq!(result, expected);
     }
 
     #[rstest]
