@@ -34,7 +34,6 @@ fn main() {
             app.manage(states::WidgetBaseDirectoryState::init(app.path().app_data_dir().unwrap()));
             setup::init_system_tray(app)?;
             setup::create_canvas(app)?;
-            println!("{}", app.path().resource_dir().unwrap().display());
 
             #[cfg(target_os = "macos")]
             // Hide the application from the dock on macOS because hide-from-taskbar is

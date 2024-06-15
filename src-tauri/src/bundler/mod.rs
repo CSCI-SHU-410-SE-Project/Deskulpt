@@ -200,6 +200,7 @@ pub(crate) fn bundle_external<R: Runtime>(
     });
 
     // Install rollup and plugins to convert the bridge file into the final bundle
+    #[cfg(target_os = "windows")]
     let command = format!(
         concat!(
             "npm install --save-dev",
@@ -228,7 +229,35 @@ pub(crate) fn bundle_external<R: Runtime>(
         EXTERNAL_BUNDLE,
     );
 
-    println!("{command}");
+    #[cfg(not(target_os = "windows"))]
+    let command = format!(
+        concat!(
+            "npm install --save-dev",
+            " rollup",
+            " @rollup/plugin-alias",
+            " @rollup/plugin-replace",
+            " @rollup/plugin-commonjs",
+            " @rollup/plugin-node-resolve",
+            " @rollup/plugin-terser",
+            " && ",
+            "npx rollup {}",
+            " --file {}",
+            " --format esm",
+            " --external @deskulpt-test/react",
+            // Redirect `react` to `@deskulpt-test/react` available at runtime
+            " --plugin \"alias={{entries:{{react:'@deskulpt-test/react'}}}}\"",
+            // Replace `process.env.NODE_ENV` with `"production"` because `process` is
+            // undefined in browser environments
+            " --plugin \"replace={{'process.env.NODE_ENV':JSON.stringify('production'),preventAssignment:true}}\"",
+            // Convert CommonJS modules into ESM, resolve node modules, and minify
+            " --plugin commonjs",
+            " --plugin node-resolve",
+            " --plugin terser",
+        ),
+        EXTERNAL_BUNDLE_BRIDGE,
+        EXTERNAL_BUNDLE,
+    );
+
     let result = run_shell_command(app_handle, root, &command);
     if !result.success {
         println!("{}\n{}", result.stdout, result.stderr);
