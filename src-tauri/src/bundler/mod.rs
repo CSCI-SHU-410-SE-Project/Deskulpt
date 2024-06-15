@@ -78,7 +78,7 @@ pub(crate) fn bundle(
     // There are external dependencies, but the external dependency bundle is not ready
     if !root.join(EXTERNAL_BUNDLE).exists() {
         bail!(
-            "External dependencies required: {dependency_map:?}, but the bundle is not
+            "External dependencies required: {dependency_map:?}, but the bundle is not \
             found at {EXTERNAL_BUNDLE}; bundle the external dependencies first"
         );
     }
@@ -199,26 +199,41 @@ pub(crate) fn bundle_external<R: Runtime>(
         common::emit_module_to_buf(bridge_module, cm.clone(), &mut bridge_file);
     });
 
-    // Install rollup dependencies
-    let result = run_shell_command(
-        app_handle,
-        root,
-        "npm install --save-dev rollup @rollup/plugin-commonjs @rollup/plugin-node-resolve @rollup/plugin-terser",
+    // Install rollup and plugins to convert the bridge file into the final bundle
+    let command = format!(
+        concat!(
+            "npm install --save-dev",
+            " rollup",
+            " @rollup/plugin-alias",
+            " @rollup/plugin-replace",
+            " @rollup/plugin-commonjs",
+            " @rollup/plugin-node-resolve",
+            " @rollup/plugin-terser",
+            " && ",
+            "npx rollup {}",
+            " --file {}",
+            " --format esm",
+            " --external @deskulpt-test/react",
+            // Redirect `react` to `@deskulpt-test/react` available at runtime
+            " --plugin alias={{entries:{{react:'@deskulpt-test/react'}}}}",
+            // Replace `process.env.NODE_ENV` with `"production"` because `process` is
+            // undefined in browser environments
+            " --plugin replace={{'process.env.NODE_ENV':JSON.stringify('production'),preventAssignment:true}}",
+            // Convert CommonJS modules into ESM, resolve node modules, and minify
+            " --plugin commonjs",
+            " --plugin node-resolve",
+            " --plugin terser",
+        ),
+        EXTERNAL_BUNDLE_BRIDGE,
+        EXTERNAL_BUNDLE,
     );
-    if !result.success {
-        let _ = remove_file(&bridge_path);
-        bail!("Failed to install rollup; make sure node and npm are properly set up");
-    }
 
-    // Bundle the external dependencies via rollup
-    let result = run_shell_command(
-        app_handle,
-        root,
-        &format!("npx rollup {EXTERNAL_BUNDLE_BRIDGE} --file {EXTERNAL_BUNDLE} --format esm --plugin commonjs --plugin node-resolve --plugin terser"),
-    );
+    println!("{command}");
+    let result = run_shell_command(app_handle, root, &command);
     if !result.success {
+        println!("{}\n{}", result.stdout, result.stderr);
         let _ = remove_file(&bridge_path);
-        bail!("Failed to execute rollup");
+        bail!("Failed to install or execute rollup");
     }
 
     let _ = remove_file(&bridge_path);

@@ -98,11 +98,12 @@ pub(crate) fn run_shell_command<R: Runtime>(
     let now = Instant::now();
     let shell = app_handle.shell();
 
+    // Use command prompt on Windows or bash otherwise
     let (alias, flag) =
-        if cfg!(target_os = "windows") { ("cmd", "/C") } else { ("bash", "-c") };
+        if cfg!(target_os = "windows") { ("cmd", "/C") } else { ("sh", "-c") };
 
     let output = async_runtime::block_on(async move {
-        shell.command(alias).current_dir(cwd).args([flag, cmd]).output().await.unwrap()
+        shell.command(alias).current_dir(cwd).arg(flag).arg(cmd).output().await.unwrap()
     });
 
     ShellCommandResult {
