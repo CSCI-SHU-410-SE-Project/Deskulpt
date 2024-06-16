@@ -221,7 +221,7 @@ pub(crate) async fn bundle_external<R: Runtime>(
         )
     } else {
         (
-            "\"alias={entries:{{react:'@deskulpt-test/react'}}\"",
+            "\"alias={entries:{react:'@deskulpt-test/react'}}\"",
             "\"replace={'process.env.NODE_ENV':JSON.stringify('production'),preventAssignment:true}\"",
         )
     };
