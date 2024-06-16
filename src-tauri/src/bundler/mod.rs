@@ -156,8 +156,7 @@ fn bundle_external_bridge(
         cm.clone(),
     )?;
 
-    let bridge_path = root.join(EXTERNAL_BUNDLE_BRIDGE);
-    let mut bridge_file = File::create(&bridge_path)?;
+    let mut bridge_file = File::create(root.join(EXTERNAL_BUNDLE_BRIDGE))?;
     GLOBALS.set(&globals, || {
         let module = common::apply_common_transforms(module, cm.clone());
 
@@ -217,13 +216,13 @@ pub(crate) async fn bundle_external<R: Runtime>(
     // The escaping of commands seems to be different on Windows and Unix
     let (plugin_alias, plugin_replace) = if cfg!(target_os = "windows") {
         (
-            "alias={{entries:{{react:'@deskulpt-test/react'}}}}",
-            "replace={{'process.env.NODE_ENV':JSON.stringify('production'),preventAssignment:true}}",
+            "alias={entries:{react:'@deskulpt-test/react'}}",
+            "replace={'process.env.NODE_ENV':JSON.stringify('production'),preventAssignment:true}",
         )
     } else {
         (
-            "\"alias={{entries:{{react:'@deskulpt-test/react'}}}}\"",
-            "\"replace={{'process.env.NODE_ENV':JSON.stringify('production'),preventAssignment:true}}\"",
+            "\"alias={entries:{{react:'@deskulpt-test/react'}}\"",
+            "\"replace={'process.env.NODE_ENV':JSON.stringify('production'),preventAssignment:true}\"",
         )
     };
 
@@ -252,12 +251,8 @@ pub(crate) async fn bundle_external<R: Runtime>(
             " --file {}",
             " --format esm",
             " --external @deskulpt-test/react",
-            // Redirect `react` to `@deskulpt-test/react` available at runtime
-            " --plugin {}",
-            // Replace `process.env.NODE_ENV` with `"production"` because `process` is
-            // undefined in browser environments
-            " --plugin {}",
-            // Convert CommonJS modules into ESM, resolve node modules, and minify
+            " --plugin {}", // alias
+            " --plugin {}", // replace
             " --plugin commonjs",
             " --plugin node-resolve",
             " --plugin terser",
