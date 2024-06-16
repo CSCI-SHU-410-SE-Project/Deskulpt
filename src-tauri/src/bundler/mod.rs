@@ -133,22 +133,18 @@ pub(crate) fn bundle(
     Ok(code)
 }
 
-/// Bundle the external dependencies of a widget.
+/// Generate the bundle bridge of the external dependencies,
 ///
-/// This is not designed for bundling widget source code. Instead, through bundling the
-/// widget source code it obtains information necessary to produce a tree-shaked bundle
-/// of external dependencies. It produces a bridge module based on these information and
-/// the actual bundling is done via [`rollup`](https://rollupjs.org/). It would thus
-/// require proper setup of `node` and `npm` in the environment (i.e., the requirements
-/// for widget developers).
-pub(crate) fn bundle_external<R: Runtime>(
-    app_handle: &AppHandle<R>,
+/// The bridge file is meant to hold all import statements of external dependencies in
+/// a widget and export them as named exports. This way once the bridge file is resolved
+/// via node modules resolution, all external dependencies will be available in a single
+/// file accessed by name, and in a tree-shaked manner instead of including the entire
+/// packages of the external dependencies.
+fn bundle_external_bridge(
     root: &Path,
     target: &Path,
     dependency_map: &HashMap<String, String>,
 ) -> Result<(), Error> {
-    assert!(!dependency_map.is_empty());
-
     let globals = Globals::default();
     let cm = Lrc::new(SourceMap::new(FilePathMapping::empty()));
 
@@ -199,8 +195,49 @@ pub(crate) fn bundle_external<R: Runtime>(
         common::emit_module_to_buf(bridge_module, cm.clone(), &mut bridge_file);
     });
 
-    // Install rollup and plugins to convert the bridge file into the final bundle
-    #[cfg(target_os = "windows")]
+    Ok(())
+}
+
+/// Bundle the external dependencies of a widget.
+///
+/// This should be done prior to bundling the widget source code for a widget that uses
+/// external dependencies. It produces a tree-shaked bundle of external dependencies at
+/// the designated location [`EXTERNAL_BUNDLE`]. This is done via creating the bridge
+/// file [`bundle_external_bridge`] and then calling [`rollup`](https://rollupjs.org/).
+/// It would thus require proper setup of `node` and `npm` in the environment.
+pub(crate) async fn bundle_external<R: Runtime>(
+    app_handle: &AppHandle<R>,
+    root: &Path,
+    target: &Path,
+    dependency_map: &HashMap<String, String>,
+) -> Result<(), Error> {
+    assert!(!dependency_map.is_empty());
+    bundle_external_bridge(root, target, dependency_map)?;
+
+    // The escaping of commands seems to be different on Windows and Unix
+    let (plugin_alias, plugin_replace) = if cfg!(target_os = "windows") {
+        (
+            "alias={{entries:{{react:'@deskulpt-test/react'}}}}",
+            "replace={{'process.env.NODE_ENV':JSON.stringify('production'),preventAssignment:true}}",
+        )
+    } else {
+        (
+            "\"alias={{entries:{{react:'@deskulpt-test/react'}}}}\"",
+            "\"replace={{'process.env.NODE_ENV':JSON.stringify('production'),preventAssignment:true}}\"",
+        )
+    };
+
+    // Install rollup and plugins to convert the bridge file into the final bundle;
+    // the configuration is approximately as follows:
+    //
+    // - Redirect `react` to `@deskulpt-test/react` and treat the latter as external;
+    //   this way we avoid the unnecessary inclusion of `react` in the bundle which is
+    //   available at runtime (and with the correct version)
+    // - Replace `process.env.NODE_ENV` with `"production"` because `process` is not
+    //   available in browser environments
+    // - Convert CommonJS modules into ESM
+    // - Resolve node modules
+    // - Minify the bundle
     let command = format!(
         concat!(
             "npm install --save-dev",
@@ -216,51 +253,21 @@ pub(crate) fn bundle_external<R: Runtime>(
             " --format esm",
             " --external @deskulpt-test/react",
             // Redirect `react` to `@deskulpt-test/react` available at runtime
-            " --plugin alias={{entries:{{react:'@deskulpt-test/react'}}}}",
+            " --plugin {}",
             // Replace `process.env.NODE_ENV` with `"production"` because `process` is
             // undefined in browser environments
-            " --plugin replace={{'process.env.NODE_ENV':JSON.stringify('production'),preventAssignment:true}}",
+            " --plugin {}",
             // Convert CommonJS modules into ESM, resolve node modules, and minify
             " --plugin commonjs",
             " --plugin node-resolve",
             " --plugin terser",
         ),
-        EXTERNAL_BUNDLE_BRIDGE,
-        EXTERNAL_BUNDLE,
+        EXTERNAL_BUNDLE_BRIDGE, EXTERNAL_BUNDLE, plugin_alias, plugin_replace,
     );
 
-    #[cfg(not(target_os = "windows"))]
-    let command = format!(
-        concat!(
-            "npm install --save-dev",
-            " rollup",
-            " @rollup/plugin-alias",
-            " @rollup/plugin-replace",
-            " @rollup/plugin-commonjs",
-            " @rollup/plugin-node-resolve",
-            " @rollup/plugin-terser",
-            " && ",
-            "npx rollup {}",
-            " --file {}",
-            " --format esm",
-            " --external @deskulpt-test/react",
-            // Redirect `react` to `@deskulpt-test/react` available at runtime
-            " --plugin \"alias={{entries:{{react:'@deskulpt-test/react'}}}}\"",
-            // Replace `process.env.NODE_ENV` with `"production"` because `process` is
-            // undefined in browser environments
-            " --plugin \"replace={{'process.env.NODE_ENV':JSON.stringify('production'),preventAssignment:true}}\"",
-            // Convert CommonJS modules into ESM, resolve node modules, and minify
-            " --plugin commonjs",
-            " --plugin node-resolve",
-            " --plugin terser",
-        ),
-        EXTERNAL_BUNDLE_BRIDGE,
-        EXTERNAL_BUNDLE,
-    );
-
-    let result = run_shell_command(app_handle, root, &command);
+    let bridge_path = root.join(EXTERNAL_BUNDLE_BRIDGE);
+    let result = run_shell_command(app_handle, root, &command).await;
     if !result.success {
-        println!("{}\n{}", result.stdout, result.stderr);
         let _ = remove_file(&bridge_path);
         bail!("Failed to install or execute rollup");
     }
@@ -384,7 +391,7 @@ mod tests {
     }
 
     #[rstest]
-    fn test_bundle_external_dependencies() {
+    async fn test_bundle_external_dependencies() {
         // Test the bundling of widgets that use external dependencies
         let case_dir = fixture_dir().join("external_deps");
         let external_deps =
@@ -396,7 +403,7 @@ mod tests {
         let bundle_root = temp_dir.path().join("external_deps");
         copy_dir(case_dir.join("input"), &bundle_root).unwrap();
         app_handle.plugin(tauri_plugin_shell::init()).unwrap();
-        run_shell_command(&app_handle, &bundle_root, "npm install");
+        run_shell_command(&app_handle, &bundle_root, "npm install").await;
 
         // Directly bundle the widget and check that we get the proper error
         let error = bundle(
@@ -420,6 +427,7 @@ mod tests {
             &bundle_root.join("index.js"),
             &external_deps,
         )
+        .await
         .unwrap();
 
         // Check that the bundle is created and the bundle bridge is removed properly

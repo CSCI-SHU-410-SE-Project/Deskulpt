@@ -4,7 +4,7 @@ use crate::states::CanvasClickThroughState;
 use anyhow::{bail, Error};
 use serde::Serialize;
 use std::{collections::HashMap, path::Path, time::Instant};
-use tauri::{async_runtime, AppHandle, Manager, Runtime};
+use tauri::{AppHandle, Manager, Runtime};
 use tauri_plugin_shell::ShellExt;
 
 /// Mapping from widget IDs to corresponding data.
@@ -90,7 +90,7 @@ pub(crate) fn toggle_click_through_state<R: Runtime>(
 /// specified working directory and execute the given command via Tauri async runtime.
 /// This function will not raise an error regardless of whether the command succeeds or
 /// not, unless the internal execution failed that cannot be recovered or recorded.
-pub(crate) fn run_shell_command<R: Runtime>(
+pub(crate) async fn run_shell_command<R: Runtime>(
     app_handle: &AppHandle<R>,
     cwd: &Path,
     cmd: &str,
@@ -102,9 +102,14 @@ pub(crate) fn run_shell_command<R: Runtime>(
     let (alias, flag) =
         if cfg!(target_os = "windows") { ("cmd", "/C") } else { ("sh", "-c") };
 
-    let output = async_runtime::block_on(async move {
-        shell.command(alias).current_dir(cwd).arg(flag).arg(cmd).output().await.unwrap()
-    });
+    let output = shell
+        .command(alias)
+        .current_dir(cwd)
+        .arg(flag)
+        .arg(cmd)
+        .output()
+        .await
+        .unwrap();
 
     ShellCommandResult {
         time: now.elapsed().as_secs_f64(),

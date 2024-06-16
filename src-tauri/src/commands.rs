@@ -194,35 +194,38 @@ pub(crate) fn bundle_widget<R: Runtime>(
 ///   instead of a widget configuration.
 /// - There is an error when bundling the widget external dependencies.
 #[command]
-pub(crate) fn bundle_external_dependencies<R: Runtime>(
+pub(crate) async fn bundle_external_dependencies<R: Runtime>(
     app_handle: AppHandle<R>,
     widget_id: String,
 ) -> CommandOut<()> {
     let widget_collection_state = &app_handle.state::<WidgetConfigCollectionState>();
-    let widget_collection = widget_collection_state.0.lock().unwrap();
 
-    if let Some(widget_config) = widget_collection.get(&widget_id) {
-        let widget_config = match widget_config.as_ref() {
-            Ok(widget_config) => widget_config,
-            Err(e) => cmdbail!(e.clone()),
-        };
-        // Obtain the absolute path of the widget entry point
-        let widget_entry =
-            &widget_config.directory.join(&widget_config.deskulpt_conf.entry);
+    let widget_config = {
+        let widget_collection = widget_collection_state.0.lock().unwrap();
+        if let Some(widget_config) = widget_collection.get(&widget_id) {
+            match widget_config.as_ref() {
+                Ok(widget_config) => widget_config.clone(),
+                Err(e) => cmdbail!(e.clone()),
+            }
+        } else {
+            cmdbail!("Widget '{widget_id}' is not found in the collection")
+        }
+    };
 
-        // Wrap the bundled code if success, otherwise let the error propagate
-        return bundle_external(
-            &app_handle,
-            &widget_config.directory,
-            widget_entry,
-            &widget_config.external_deps,
-        )
-        .context(format!("Failed to bundle external dependencies (id={widget_id})"))
-        .map_err(|e| cmderr!(e));
-    }
+    // Obtain the absolute path of the widget entry point
+    let widget_entry =
+        &widget_config.directory.join(&widget_config.deskulpt_conf.entry);
 
-    // Error out if the widget ID is not found in the collection
-    cmdbail!("Widget '{widget_id}' is not found in the collection")
+    // Wrap the bundled code if success, otherwise let the error propagate
+    bundle_external(
+        &app_handle,
+        &widget_config.directory,
+        widget_entry,
+        &widget_config.external_deps,
+    )
+    .await
+    .context(format!("Failed to bundle external dependencies (id={widget_id})"))
+    .map_err(|e| cmderr!(e))
 }
 
 /// Register or unregister a global shortcut for toggling the click-through state.
