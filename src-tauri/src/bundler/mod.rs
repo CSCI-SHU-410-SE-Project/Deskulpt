@@ -264,7 +264,7 @@ pub(crate) async fn bundle_external<R: Runtime>(
     let result = run_shell_command(app_handle, root, &command).await;
     if !result.success {
         let _ = remove_file(&bridge_path);
-        bail!("Failed to install or execute rollup");
+        bail!("Failed to install or execute rollup\n\n{}", result.stderr);
     }
 
     let _ = remove_file(&bridge_path);
