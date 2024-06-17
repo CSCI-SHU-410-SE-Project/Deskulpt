@@ -1,6 +1,6 @@
 {
   "name": "@deskulpt-test/react",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Deskulpt partial re-export of React.",
   "type": "module",
   "main": "./dist/index.js",
