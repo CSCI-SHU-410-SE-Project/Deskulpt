@@ -6,14 +6,14 @@ updates:
     schedule:
       interval: daily
     labels:
-      - "type: maintenance"
+      - "dependabot"
 
   - package-ecosystem: cargo
     directory: /src-tauri
     schedule:
       interval: daily
     labels:
-      - "type: maintenance"
+      - "dependabot"
 
   # Deskulpt tooling
   - package-ecosystem: npm
@@ -21,21 +21,21 @@ updates:
     schedule:
       interval: daily
     labels:
-      - "type: maintenance"
+      - "dependabot"
 
   - package-ecosystem: npm
     directory: /tooling/react
     schedule:
       interval: daily
     labels:
-      - "type: maintenance"
+      - "dependabot"
 
   - package-ecosystem: npm
     directory: /tooling/ui
     schedule:
       interval: daily
     labels:
-      - "type: maintenance"
+      - "dependabot"
 
   # Website
   - package-ecosystem: npm
@@ -43,4 +43,4 @@ updates:
     schedule:
       interval: daily
     labels:
-      - "type: maintenance"
+      - "dependabot"
