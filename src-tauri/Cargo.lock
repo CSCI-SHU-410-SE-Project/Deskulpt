@@ -832,7 +832,7 @@ dependencies = [
  "swc_ecma_transforms_optimization 0.198.18",
  "swc_ecma_transforms_react",
  "swc_ecma_transforms_typescript",
- "swc_ecma_visit 0.98.7",
+ "swc_ecma_visit 0.99.0",
  "sysinfo",
  "tauri",
  "tauri-build",
