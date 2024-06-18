@@ -46,7 +46,7 @@
     "prettier": "^3.2.5",
     "shell-quote": "^1.8.1",
     "typescript": "^5.4.5",
-    "typescript-eslint": "^7.6.0",
+    "typescript-eslint": "^7.13.1",
     "vite": "^5.3.1"
   }
 }
