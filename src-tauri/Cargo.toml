@@ -32,7 +32,7 @@ sysinfo = "0.30.11"
 
 # SWC crates and related
 parking_lot = "0.12.3"  # Required by swc_ecma_loader
-swc_atoms = "0.6.5"
+swc_atoms = "0.6.7"
 swc_bundler = "0.225.13"
 swc_common = "0.33.25"
 swc_ecma_ast = "0.112.5"
