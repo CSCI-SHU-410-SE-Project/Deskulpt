@@ -40,6 +40,7 @@ export default function WidgetContainer({
   children,
 }: PropsWithChildren<WidgetContainerProps>) {
   const containerRef = useRef(null);
+  let retried = false;
 
   function updateContainerPos(_: DraggableEvent, data: DraggableData) {
     setSetting({ ...setting, x: setting.x + data.x, y: setting.y + data.y });
@@ -86,12 +87,23 @@ export default function WidgetContainer({
           }}
         />
         <ErrorBoundary
-          fallbackRender={({ error }) => (
-            <ErrorDisplay
-              title={`Error in '${id}': potential issues with the \`render\` function)`}
-              error={grabErrorInfo(error)}
-            />
-          )}
+          fallbackRender={({ error, resetErrorBoundary }) => {
+            if (!retried) {
+              // Reset the error boundary and retry the render once per re-render of the
+              // widget, since otherwise even if the error in the children is fixed, the
+              // error boundary will not refresh itself; note that the `retried` flag is
+              // reset to false on each re-render and it is here to prevent infinite
+              // loops of resetting error boundary and falling back
+              resetErrorBoundary();
+              retried = true;
+            }
+            return (
+              <ErrorDisplay
+                title={`Error in '${id}': potential issues with the \`render\` function)`}
+                error={grabErrorInfo(error)}
+              />
+            );
+          }}
         >
           {children}
         </ErrorBoundary>
