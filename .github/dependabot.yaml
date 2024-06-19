@@ -4,31 +4,79 @@ updates:
   - package-ecosystem: npm
     directory: /
     schedule:
-      interval: daily
+      interval: weekly
+    labels:
+      - dependencies
+    groups:
+      tauri:
+        patterns:
+          - "@tauri-apps/*"
+      dev:
+        dependency-type: development
 
   - package-ecosystem: cargo
     directory: /src-tauri
     schedule:
-      interval: daily
+      interval: weekly
+    labels:
+      - dependencies
+    groups:
+      tauri:
+        patterns:
+          - tauri*
+      swc:
+        patterns:
+          - swc*
+      dev:
+        dependency-type: development
 
   # Deskulpt tooling
   - package-ecosystem: npm
     directory: /tooling/apis
     schedule:
-      interval: daily
+      interval: weekly
+    labels:
+      - dependencies
+    groups:
+      dev:
+        dependency-type: development
 
   - package-ecosystem: npm
     directory: /tooling/react
     schedule:
-      interval: daily
+      interval: weekly
+    labels:
+      - dependencies
+    groups:
+      dev:
+        dependency-type: development
 
   - package-ecosystem: npm
     directory: /tooling/ui
     schedule:
-      interval: daily
+      interval: weekly
+    labels:
+      - dependencies
+    groups:
+      dev:
+        dependency-type: development
 
   # Website
   - package-ecosystem: npm
     directory: /website
     schedule:
-      interval: daily
+      interval: weekly
+    labels:
+      - dependencies
+    groups:
+      docusaurus:
+        patterns:
+          - "@docusaurus/*"
+      dev:
+        dependency-type: development
+
+  # Maintenance
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
