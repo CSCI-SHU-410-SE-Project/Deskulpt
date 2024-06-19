@@ -370,9 +370,9 @@ dependencies = [
 
 [[package]]
 name = "cargo-llvm-cov"
-version = "0.6.9"
+version = "0.6.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "137c054c19f1134aabe426018c3d8718ff5cfe679ba895f3f0a869eccf8b380b"
+checksum = "8c9f81a298cfd7bf22c7bfd09475859ee6408c056ddace5749bc6f87dbeb4ffa"
 dependencies = [
  "anyhow",
  "camino",
@@ -3359,12 +3359,11 @@ checksum = "7ffc183a10b4478d04cbbbfc96d0873219d962dd5accaff2ffbd4ceb7df837f4"
 
 [[package]]
 name = "ruzstd"
-version = "0.6.0"
+version = "0.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5174a470eeb535a721ae9fdd6e291c2411a906b96592182d05217591d5c5cf7b"
+checksum = "5022b253619b1ba797f243056276bed8ed1a73b0f5a7ce7225d524067644bf8f"
 dependencies = [
  "byteorder",
- "derive_more",
 ]
 
 [[package]]
