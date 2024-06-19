@@ -5,6 +5,7 @@
   "local": true,
   "windows": ["manager"],
   "permissions": [
+    "allow-bundle-external-dependencies",
     "allow-exit-app",
     "allow-init-settings",
     "allow-open-widget-resource",

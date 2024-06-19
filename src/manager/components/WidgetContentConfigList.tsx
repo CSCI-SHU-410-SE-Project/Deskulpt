@@ -53,7 +53,7 @@ export default function WidgetContentConfigList({
       <DataList.Item>
         <DataList.Label>Dependencies</DataList.Label>
         <DataList.Value>
-          <WidgetDependencies dependencies={config.externalDeps} />
+          <WidgetDependencies widgetId={widgetId} dependencies={config.externalDeps} />
         </DataList.Value>
       </DataList.Item>
     </DataList.Root>

@@ -47,6 +47,7 @@ fn main() {
         .on_window_event(setup::listen_to_windows)
         // Register internal command handlers
         .invoke_handler(generate_handler![
+            commands::bundle_external_dependencies,
             commands::bundle_widget,
             commands::exit_app,
             commands::init_settings,
