@@ -4,7 +4,6 @@ updates:
   - package-ecosystem: npm
     directories:
       - /
-      - /website
       - /tooling/apis
       - /tooling/react
       - /tooling/ui
