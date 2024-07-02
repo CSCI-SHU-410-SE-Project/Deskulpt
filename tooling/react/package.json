@@ -10,7 +10,6 @@
   ],
   "scripts": {
     "build": "rollup -c --configPlugin typescript",
-    "pub": "npm install && npm run build && npm publish --access public",
     "lint": "eslint --max-warnings=0 .",
     "lint:fix": "eslint --max-warnings=0 --fix ."
   },

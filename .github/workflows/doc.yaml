@@ -40,18 +40,15 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: lts/*
-          cache: npm
+          cache: pnpm
 
       - name: Install doc dependencies
-        run: |
-          npm install
-          cd website
-          npm install
+        run: pnpm install
 
       - name: Build docs
         run: |
           cd website
-          npm run build
+          pnpm build
 
       - name: Copy Rust docs to build directory
         run: |

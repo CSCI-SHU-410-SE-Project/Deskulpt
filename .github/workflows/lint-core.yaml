@@ -42,13 +42,13 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: lts/*
-          cache: npm
+          cache: pnpm
 
       - name: Install frontend dependencies
-        run: npm install
+        run: pnpm install
 
       - name: Check code formatting
-        run: npm run format
+        run: pnpm format
 
       - name: Check code linting
-        run: npm run lint
+        run: pnpm lint

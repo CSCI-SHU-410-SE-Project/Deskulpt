@@ -46,7 +46,7 @@ set up your Git repository.
    automatically when you build the project.
 
    ```bash
-   npm install
+   pnpm install
    ```
 
    Alternatively, you may not only want to install dependencies of the Deskulpt core,
@@ -54,21 +54,21 @@ set up your Git repository.
    running:
 
    ```bash
-   npm run setup
+   pnpm setup
    ```
 
 5. Start the development server. This will be slow for the first time as it needs to
    build the whole Rust backend. Subsequent runs will be significantly faster.
 
    ```bash
-   npm run tauri dev
+   pnpm tauri dev
    ```
 
 6. Build the project. You can build the platform-specific executable or installer of
    Deskulpt by running:
 
    ```bash
-   npm run tauri build
+   pnpm tauri build
    ```
 
    Refer to the printout of the command for the location of the built artifacts. You may
@@ -76,7 +76,7 @@ set up your Git repository.
    devtools:
 
    ```bash
-   npm run tauri build -- --debug
+   pnpm tauri build -- --debug
    ```
 
 You should now have a working installation of Deskulpt, and your Git repository properly
@@ -145,22 +145,22 @@ scripts to help you with this:
   consistency with the format of the codebase.
 
   ```bash
-  npm run format            # Check
-  npm run format -- --fix   # Automatic fix if possible
-  npm run format js         # Lint only the frontend
-  npm run format rs         # Lint only the backend
-  npm run format -- --help  # See more details
+  pnpm format            # Check
+  pnpm format -- --fix   # Automatic fix if possible
+  pnpm format js         # Lint only the frontend
+  pnpm format rs         # Lint only the backend
+  pnpm format -- --help  # See more details
   ```
 
 - **Linting**: Run the linters to check for code styling issues. This is useful to
   ensure that your code follows the project's coding standards.
 
   ```bash
-  npm run lint            # Check
-  npm run lint -- --fix   # Automatic fix if possible
-  npm run lint js         # Lint only the frontend
-  npm run lint rs         # Lint only the backend
-  npm run lint -- --help  # See more details
+  pnpm lint            # Check
+  pnpm lint -- --fix   # Automatic fix if possible
+  pnpm lint js         # Lint only the frontend
+  pnpm lint rs         # Lint only the backend
+  pnpm lint -- --help  # See more details
   ```
 
 - **Testing**: Run the test suite to ensure that your changes do not break existing
@@ -168,10 +168,10 @@ scripts to help you with this:
   functionality of Deskulpt.
 
   ```bash
-  npm run test rs           # Run all backend tests
-  npm run test rs bundler   # Run only backend tests that match the "bundler" pattern
-  npm run test rs -- --cov  # Also generate coverage report
-  npm run test -- --help    # See more details
+  pnpm test rs           # Run all backend tests
+  pnpm test rs bundler   # Run only backend tests that match the "bundler" pattern
+  pnpm test rs -- --cov  # Also generate coverage report
+  pnpm test -- --help    # See more details
   ```
 
 Powered by [Husky](https://typicode.github.io/husky/), formatting and linting for the
