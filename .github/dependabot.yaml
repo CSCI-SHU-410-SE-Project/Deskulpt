@@ -7,6 +7,9 @@ updates:
       interval: weekly
     labels:
       - dependencies
+    ignore:
+      - dependency-name: "eslint"
+        versions: ["9.x"]
     groups:
       tauri:
         patterns:
@@ -37,6 +40,9 @@ updates:
       interval: weekly
     labels:
       - dependencies
+    ignore:
+      - dependency-name: "eslint"
+        versions: ["9.x"]
     groups:
       dev:
         dependency-type: development
@@ -47,6 +53,9 @@ updates:
       interval: weekly
     labels:
       - dependencies
+    ignore:
+      - dependency-name: "eslint"
+        versions: ["9.x"]
     groups:
       dev:
         dependency-type: development
@@ -57,6 +66,9 @@ updates:
       interval: weekly
     labels:
       - dependencies
+    ignore:
+      - dependency-name: "eslint"
+        versions: ["9.x"]
     groups:
       dev:
         dependency-type: development
