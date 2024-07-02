@@ -16,14 +16,14 @@ documentation, guide improvements, examples, tutorials, and more.
 
    ```bash
    cd website
-   npm install
+   pnpm install
    ```
 
 2. Start the development server. This supports live-reloading, so in most cases you can
    see the changes you make in real-time:
 
    ```bash
-   npm run start
+   pnpm start
    ```
 
 3. Build and serve the documentation. The build step will generate the static files
@@ -31,14 +31,14 @@ documentation, guide improvements, examples, tutorials, and more.
    serves the built documentation:
 
    ```bash
-   npm run build
-   npm run serve             # Will use existing build
-   npm run serve -- --build  # Will (re)build before serving
+   pnpm build
+   pnpm serve             # Will use existing build
+   pnpm serve -- --build  # Will (re)build before serving
    ```
 
 4. The [backend developer API references](https://csci-shu-410-se-project.github.io/Deskulpt/rustdoc/deskulpt/)
    are generated separately from the main documentation. It can be built by running:
 
    ```bash
-   npm run rustdoc
+   pnpm rustdoc
    ```

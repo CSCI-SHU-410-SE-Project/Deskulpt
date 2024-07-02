@@ -10,12 +10,12 @@ const commandMatrix = {
   js: {
     check: {
       dir: ".",
-      cmd: "npx",
+      cmd: "pnpm",
       args: ["prettier", "--check", "."],
     },
     fix: {
       dir: ".",
-      cmd: "npx",
+      cmd: "pnpm",
       args: ["prettier", "--write", "."],
     },
   },

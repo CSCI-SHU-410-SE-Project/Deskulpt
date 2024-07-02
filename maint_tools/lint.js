@@ -10,12 +10,12 @@ const commandMatrix = {
   js: {
     check: {
       dir: ".",
-      cmd: "npx",
+      cmd: "pnpm",
       args: ["eslint", "--max-warnings=0", "."],
     },
     fix: {
       dir: ".",
-      cmd: "npx",
+      cmd: "pnpm",
       args: ["eslint", "--fix", "--max-warnings=0", "."],
     },
   },
