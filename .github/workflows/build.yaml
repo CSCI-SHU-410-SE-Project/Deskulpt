@@ -53,7 +53,7 @@ jobs:
           cache: pnpm
 
       - name: Install frontend dependencies
-        run: pnpm install
+        run: pnpm install --frozen-lockfile
 
       # Without specifying `tagName` and `releaseId`, tauri-action will only build the
       # application without trying to upload any assets
