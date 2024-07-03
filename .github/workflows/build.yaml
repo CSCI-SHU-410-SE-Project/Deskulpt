@@ -41,14 +41,19 @@ jobs:
         with:
           workspaces: ./src-tauri -> target
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
       - name: Node setup and cache
         uses: actions/setup-node@v4
         with:
           node-version: lts/*
-          cache: npm
+          cache: pnpm
 
       - name: Install frontend dependencies
-        run: npm install
+        run: pnpm install --frozen-lockfile
 
       # Without specifying `tagName` and `releaseId`, tauri-action will only build the
       # application without trying to upload any assets

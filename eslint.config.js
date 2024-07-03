@@ -16,6 +16,7 @@ export default tseslint.config(
       "**/website/**",
       "**/tooling/**",
       "src/.scripts/**",
+      "vite.config.ts",
     ],
   },
 

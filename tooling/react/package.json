@@ -9,8 +9,8 @@
     "dist"
   ],
   "scripts": {
+    "preinstall": "npx only-allow pnpm",
     "build": "rollup -c --configPlugin typescript",
-    "pub": "npm install && npm run build && npm publish --access public",
     "lint": "eslint --max-warnings=0 .",
     "lint:fix": "eslint --max-warnings=0 --fix ."
   },
@@ -28,11 +28,11 @@
     "@rollup/plugin-terser": "^0.4.4",
     "@rollup/plugin-typescript": "^11.1.6",
     "eslint": "^8.57.0",
-    "globals": "^15.0.0",
+    "globals": "^15.8.0",
     "rollup": "^4.14.3",
     "tslib": "^2.6.2",
-    "typescript": "^5.4.5",
-    "typescript-eslint": "^7.7.0"
+    "typescript": "^5.5.3",
+    "typescript-eslint": "^7.15.0"
   },
   "peerDependencies": {
     "@types/react": "^18.3.3",

@@ -1,12 +1,19 @@
 version: 2
 updates:
-  # Deskulpt core
+  # Core and tooling (frontend)
   - package-ecosystem: npm
-    directory: /
+    directories:
+      - /
+      - /tooling/apis
+      - /tooling/react
+      - /tooling/ui
     schedule:
       interval: weekly
     labels:
       - dependencies
+    ignore:
+      - dependency-name: "eslint"
+        versions: ["9.x"]
     groups:
       tauri:
         patterns:
@@ -14,6 +21,7 @@ updates:
       dev:
         dependency-type: development
 
+  # Core and tooling (backend)
   - package-ecosystem: cargo
     directory: /src-tauri
     schedule:
@@ -27,37 +35,6 @@ updates:
       swc:
         patterns:
           - swc*
-      dev:
-        dependency-type: development
-
-  # Deskulpt tooling
-  - package-ecosystem: npm
-    directory: /tooling/apis
-    schedule:
-      interval: weekly
-    labels:
-      - dependencies
-    groups:
-      dev:
-        dependency-type: development
-
-  - package-ecosystem: npm
-    directory: /tooling/react
-    schedule:
-      interval: weekly
-    labels:
-      - dependencies
-    groups:
-      dev:
-        dependency-type: development
-
-  - package-ecosystem: npm
-    directory: /tooling/ui
-    schedule:
-      interval: weekly
-    labels:
-      - dependencies
-    groups:
       dev:
         dependency-type: development
 
