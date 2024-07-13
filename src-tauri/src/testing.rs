@@ -24,7 +24,7 @@ pub(crate) enum ChainReason {
     /// The error reason should be a `serde_json` error.
     SerdeError,
     /// Skip validating the reason.
-    _Skip,
+    Skip,
 }
 
 /// Assert that an [`Error`] object has the expected chain of reasons.
@@ -57,7 +57,7 @@ pub(crate) fn assert_err_eq(error: Error, chain: Vec<ChainReason>) {
                     "Expected a serde_json error in the error chain",
                 );
             },
-            ChainReason::_Skip => continue,
+            ChainReason::Skip => continue,
         }
     }
     // Assert that the chain of reasons ends here

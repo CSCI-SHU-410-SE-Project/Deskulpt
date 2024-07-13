@@ -56,6 +56,7 @@ struct PackageJson {
 /// If widget configuration is loaded successfully, it will return `Ok(Some(config))`.
 /// If the directory does not represent a widget that is meant to be rendered, it will
 /// return `Ok(None)`. Any failure to load the configuration will return an error.
+/// Including default dependencies in `dependencies` will also return an error.
 ///
 /// The cases where a directory is not meant to be rendered include:
 /// - `deskulpt.conf.json` is not found.
@@ -98,7 +99,23 @@ pub(crate) fn read_widget_config(path: &Path) -> Result<Option<WidgetConfig>, Er
             read_to_string(package_json_path).context("Failed to read package.json")?;
         let package_json: PackageJson = serde_json::from_str(&package_json_str)
             .context("Failed to interpret package.json")?;
-        package_json.dependencies.unwrap_or_default()
+        match package_json.dependencies {
+            Some(dependencies) => {
+                // Ensure that default dependencies are not specified as `dependencies`,
+                // as these would be treated as external dependencies
+                if dependencies
+                    .iter()
+                    .any(|(name, _)| name.starts_with("@deskulpt-test/"))
+                {
+                    bail!(
+                        "Packages '@deskulpt-test/...' should be specified as \
+                        'devDependencies' instead of 'dependencies'"
+                    );
+                }
+                dependencies
+            },
+            None => Default::default(),
+        }
     } else {
         Default::default()
     };
