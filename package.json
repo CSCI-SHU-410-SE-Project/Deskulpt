@@ -17,8 +17,8 @@
   "dependencies": {
     "@emotion/react": "^11.11.4",
     "@radix-ui/themes": "^3.1.1",
-    "@tauri-apps/api": "^2.0.0-beta.13",
-    "@tauri-apps/plugin-clipboard-manager": "^2.1.0-beta.3",
+    "@tauri-apps/api": "^2.0.0-beta.15",
+    "@tauri-apps/plugin-clipboard-manager": "^2.1.0-beta.5",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-draggable": "^4.4.6",
@@ -28,7 +28,7 @@
   },
   "devDependencies": {
     "@emotion/babel-plugin": "^11.11.0",
-    "@tauri-apps/cli": "^2.0.0-beta.20",
+    "@tauri-apps/cli": "^2.0.0-beta.22",
     "@types/node": "^20.14.9",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
