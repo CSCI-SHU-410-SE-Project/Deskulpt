@@ -15,11 +15,11 @@ importers:
         specifier: ^3.1.1
         version: 3.1.1(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@tauri-apps/api':
-        specifier: ^2.0.0-beta.13
-        version: 2.0.0-beta.13
+        specifier: ^2.0.0-rc.0
+        version: 2.0.0-rc.0
       '@tauri-apps/plugin-clipboard-manager':
-        specifier: ^2.1.0-beta.3
-        version: 2.1.0-beta.3
+        specifier: ^2.1.0-beta.6
+        version: 2.1.0-beta.6
       react:
         specifier: ^18.3.1
         version: 18.3.1
@@ -100,8 +100,8 @@ importers:
   tooling/apis:
     dependencies:
       '@tauri-apps/api':
-        specifier: ^2.0.0-beta.11
-        version: 2.0.0-beta.13
+        specifier: ^2.0.0-rc.0
+        version: 2.0.0-rc.0
     devDependencies:
       '@rollup/plugin-replace':
         specifier: ^5.0.5
@@ -2398,9 +2398,9 @@ packages:
     resolution: {integrity: sha512-+PmQX0PiAYPMeVYe237LJAYvOMYW1j2rH5YROyS3b4CTVJum34HfRvKvAzozHAQG0TnHNdUfY9nCeUyRAs//cw==}
     engines: {node: '>=14.16'}
 
-  '@tauri-apps/api@2.0.0-beta.13':
-    resolution: {integrity: sha512-Np1opKANzRMF3lgJ9gDquBCB9SxlE2lRmNpVx1+L6RyzAmigkuh0ZulT5jMnDA3JLsuSDU135r/s4t/Pmx4atg==}
-    engines: {node: '>= 18', npm: '>= 6.6.0', yarn: '>= 1.19.1'}
+  '@tauri-apps/api@2.0.0-rc.0':
+    resolution: {integrity: sha512-v454Qs3REHc3Za59U+/eSmBsdmF+3NE5+76+lFDaitVqN4ZglDHENDaMARYKGJVZuxiSkzyqG0SeG7lLQjVkPA==}
+    engines: {node: '>= 18.18', npm: '>= 6.6.0', yarn: '>= 1.19.1'}
 
   '@tauri-apps/cli-darwin-arm64@2.0.0-beta.20':
     resolution: {integrity: sha512-oCJOCib7GuYkwkBXx+ekamR8NZZU+2i3MLP+DHpDxK5gS2uhCE+CBkamJkNt6y1x6xdVnwyqZOm5RvN4SRtyIA==}
@@ -2467,8 +2467,8 @@ packages:
     engines: {node: '>= 10'}
     hasBin: true
 
-  '@tauri-apps/plugin-clipboard-manager@2.1.0-beta.3':
-    resolution: {integrity: sha512-j48jTdZWeX5BylIGLYbXtg6ynZAcFKDKK6dguHAbG3zviqNE/XMf2vHOPJeFDZsDE5kVOZZS7nKOj7T2WiCpvw==}
+  '@tauri-apps/plugin-clipboard-manager@2.1.0-beta.6':
+    resolution: {integrity: sha512-MBuoVXPcq1yab4z6DGx7D44ntvr21taoozJnf1IHeXg864MnlCPeZj6fuDm+vF2o+3ac2sSZDZmo6PvrkLC8lQ==}
 
   '@trysound/sax@0.2.0':
     resolution: {integrity: sha512-L7z9BgrNEcYyUYtF+HaEfiS5ebkh9jXqbszz7pC0hRBPaatV0XjSD3+eHrpqFemQfgwiFF0QPIarnIihIDn7OA==}
@@ -9431,7 +9431,7 @@ snapshots:
     dependencies:
       defer-to-connect: 2.0.1
 
-  '@tauri-apps/api@2.0.0-beta.13': {}
+  '@tauri-apps/api@2.0.0-rc.0': {}
 
   '@tauri-apps/cli-darwin-arm64@2.0.0-beta.20':
     optional: true
@@ -9476,9 +9476,9 @@ snapshots:
       '@tauri-apps/cli-win32-ia32-msvc': 2.0.0-beta.20
       '@tauri-apps/cli-win32-x64-msvc': 2.0.0-beta.20
 
-  '@tauri-apps/plugin-clipboard-manager@2.1.0-beta.3':
+  '@tauri-apps/plugin-clipboard-manager@2.1.0-beta.6':
     dependencies:
-      '@tauri-apps/api': 2.0.0-beta.13
+      '@tauri-apps/api': 2.0.0-rc.0
 
   '@trysound/sax@0.2.0': {}
 
