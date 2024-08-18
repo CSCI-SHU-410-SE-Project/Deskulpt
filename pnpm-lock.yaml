@@ -220,8 +220,8 @@ importers:
         specifier: ^0.2.5
         version: 0.2.5(@docusaurus/core@3.4.0(@docusaurus/types@3.4.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(eslint@8.57.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.5.3))(sass@1.77.8)(webpack@5.92.1)
       docusaurus-plugin-typedoc:
-        specifier: ^1.0.1
-        version: 1.0.2(typedoc-plugin-markdown@4.1.2(typedoc@0.26.3(typescript@5.5.3)))
+        specifier: ^1.0.5
+        version: 1.0.5(typedoc-plugin-markdown@4.1.2(typedoc@0.26.3(typescript@5.5.3)))
       prism-react-renderer:
         specifier: ^2.3.1
         version: 2.3.1(react@18.3.1)
@@ -3478,8 +3478,8 @@ packages:
       '@docusaurus/core': ^2.0.0-beta || ^3.0.0-alpha
       sass: ^1.30.0
 
-  docusaurus-plugin-typedoc@1.0.2:
-    resolution: {integrity: sha512-V7ZOjsFVByfVuhIIFSVJCWKBQzIHLxl3W+sLVDUqMo/fwPZrHFFD0WropfPdZ7MR7AA697+0BeUWMEpLyO/QPw==}
+  docusaurus-plugin-typedoc@1.0.5:
+    resolution: {integrity: sha512-mv8LBJYilGOOPLqaIM3vbYc34m4qwOCpb4WfP24DOPFNj2uiTerw8sg9MGvN6Jx2+J8rq9/WMnjcyz3UMqoIIQ==}
     peerDependencies:
       typedoc-plugin-markdown: '>=4.0.0'
 
@@ -10629,7 +10629,7 @@ snapshots:
       - node-sass
       - webpack
 
-  docusaurus-plugin-typedoc@1.0.2(typedoc-plugin-markdown@4.1.2(typedoc@0.26.3(typescript@5.5.3))):
+  docusaurus-plugin-typedoc@1.0.5(typedoc-plugin-markdown@4.1.2(typedoc@0.26.3(typescript@5.5.3))):
     dependencies:
       typedoc-plugin-markdown: 4.1.2(typedoc@0.26.3(typescript@5.5.3))
 
