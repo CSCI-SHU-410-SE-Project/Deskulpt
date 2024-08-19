@@ -1,12 +1,13 @@
 version: 2
 updates:
-  # Core and tooling (frontend)
+  # Node dependencies
   - package-ecosystem: npm
     directories:
       - /
       - /tooling/apis
       - /tooling/react
       - /tooling/ui
+      - /website
     schedule:
       interval: weekly
     labels:
@@ -18,10 +19,14 @@ updates:
       tauri:
         patterns:
           - "@tauri-apps/*"
+      docusaurus:
+        patterns:
+          - "@docusaurus/*"
+          - "docusaurus-plugin-*"
       dev:
         dependency-type: development
 
-  # Core and tooling (backend)
+  # Cargo dependencies
   - package-ecosystem: cargo
     directory: /src-tauri
     schedule:
@@ -38,21 +43,7 @@ updates:
       dev:
         dependency-type: development
 
-  # Website
-  - package-ecosystem: npm
-    directory: /website
-    schedule:
-      interval: weekly
-    labels:
-      - dependencies
-    groups:
-      docusaurus:
-        patterns:
-          - "@docusaurus/*"
-      dev:
-        dependency-type: development
-
-  # Maintenance
+  # GitHub Actions dependencies
   - package-ecosystem: github-actions
     directory: /
     schedule:
