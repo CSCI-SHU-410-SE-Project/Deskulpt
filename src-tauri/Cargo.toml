@@ -22,7 +22,7 @@ tauri-plugin-shell = "2.0.0-beta.8"
 # Utilities
 anyhow = "1.0.86"
 path-clean = "1.0.1"
-serde = { version = "1.0.204", features = ["derive"] }
+serde = { version = "1.0.208", features = ["derive"] }
 serde-error = "0.1.2"
 serde_json = "1.0.125"
 tempfile = "3.10.1"
