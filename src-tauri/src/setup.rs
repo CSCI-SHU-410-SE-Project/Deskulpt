@@ -8,7 +8,8 @@ use std::{
 use tauri::{
     menu::{MenuBuilder, MenuItemBuilder},
     tray::{MouseButton, MouseButtonState, TrayIconEvent},
-    App, AppHandle, Manager, WebviewUrl, WebviewWindowBuilder, Window, WindowEvent,
+    App, AppHandle, Emitter, Manager, WebviewUrl, WebviewWindowBuilder, Window,
+    WindowEvent,
 };
 
 #[cfg(target_os = "macos")]

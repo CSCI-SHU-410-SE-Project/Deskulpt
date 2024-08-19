@@ -4,7 +4,7 @@ use crate::states::CanvasClickThroughState;
 use anyhow::{bail, Error};
 use serde::Serialize;
 use std::collections::HashMap;
-use tauri::{AppHandle, Manager, Runtime};
+use tauri::{AppHandle, Emitter, Manager, Runtime};
 
 /// Mapping from widget IDs to corresponding data.
 pub(crate) type IdMap<T> = HashMap<String, T>;

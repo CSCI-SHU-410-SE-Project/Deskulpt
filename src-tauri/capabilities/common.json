@@ -5,9 +5,9 @@
   "local": true,
   "windows": ["canvas", "manager"],
   "permissions": [
-    "event:allow-emit-to",
-    "event:allow-listen",
-    "event:allow-unlisten",
+    "core:event:allow-emit-to",
+    "core:event:allow-listen",
+    "core:event:allow-unlisten",
     "clipboard-manager:allow-write-text"
   ]
 }
