@@ -11,17 +11,17 @@
     "clear": "docusaurus clear && rimraf docs/tsdoc"
   },
   "dependencies": {
-    "@docusaurus/core": "^3.4.0",
-    "@docusaurus/preset-classic": "^3.4.0",
+    "@docusaurus/core": "^3.5.2",
+    "@docusaurus/preset-classic": "^3.5.2",
     "@easyops-cn/docusaurus-search-local": "^0.44.2",
     "@mdx-js/react": "^3.0.1",
     "clsx": "^2.1.1",
     "docusaurus-plugin-sass": "^0.2.5",
-    "docusaurus-plugin-typedoc": "^1.0.1",
+    "docusaurus-plugin-typedoc": "^1.0.5",
     "prism-react-renderer": "^2.3.1",
-    "sass": "^1.77.6",
-    "typedoc": "^0.26.2",
-    "typedoc-plugin-markdown": "^4.1.0"
+    "sass": "^1.77.8",
+    "typedoc": "^0.26.6",
+    "typedoc-plugin-markdown": "^4.1.2"
   },
   "devDependencies": {
     "@docusaurus/module-type-aliases": "^3.4.0",

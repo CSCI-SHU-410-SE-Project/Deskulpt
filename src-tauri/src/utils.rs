@@ -4,7 +4,7 @@ use crate::states::CanvasClickThroughState;
 use anyhow::{bail, Error};
 use serde::Serialize;
 use std::{collections::HashMap, path::Path, time::Instant};
-use tauri::{AppHandle, Manager, Runtime};
+use tauri::{AppHandle, Emitter, Manager, Runtime};
 use tauri_plugin_shell::ShellExt;
 
 /// Mapping from widget IDs to corresponding data.
