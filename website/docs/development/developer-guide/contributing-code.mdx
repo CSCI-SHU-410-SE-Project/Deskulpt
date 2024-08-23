@@ -133,37 +133,39 @@ Before submitting a pull request, it is recommended to run quality checks and te
 ensure that your changes are in good shape. Deskulpt provides the following convenience
 scripts to help you with this:
 
-- **Formatting**: Run the formatter to ensure that your code is properly formatted, in
+- **Formatting:** Run the formatter to ensure that your code is properly formatted, in
   consistency with the format of the codebase.
 
   ```bash
-  pnpm format            # Check
-  pnpm format -- --fix   # Automatic fix if possible
-  pnpm format js         # Lint only the frontend
-  pnpm format rs         # Lint only the backend
-  pnpm format -- --help  # See more details
+  pnpm format     # All
+  pnpm format:js  # JS/TS only
+  pnpm format:rs  # Rust only
   ```
 
-- **Linting**: Run the linters to check for code styling issues. This is useful to
+- **Linting:** Run the linters to check for code styling issues. This is useful to
   ensure that your code follows the project's coding standards.
 
   ```bash
-  pnpm lint            # Check
-  pnpm lint -- --fix   # Automatic fix if possible
-  pnpm lint js         # Lint only the frontend
-  pnpm lint rs         # Lint only the backend
-  pnpm lint -- --help  # See more details
+  pnpm lint     # All
+  pnpm lint:js  # JS/TS only
+  pnpm lint:rs  # Rust only
   ```
 
-- **Testing**: Run the test suite to ensure that your changes do not break existing
+- **Testing:** Run the test suite to ensure that your changes do not break existing
   functionality. This is especially important for changes that affect the core
   functionality of Deskulpt.
 
   ```bash
-  pnpm test rs           # Run all backend tests
-  pnpm test rs bundler   # Run only backend tests that match the "bundler" pattern
-  pnpm test rs -- --cov  # Also generate coverage report
-  pnpm test -- --help    # See more details
+  pnpm test     # All
+  pnpm test:rs  # Rust only
+  ```
+
+- **Code coverage:** Run the test suite and generate a coverage report to ensure that
+  the test suite covers a significant portion (if not all) of the codebase.
+
+  ```bash
+  pnpm cov     # All
+  pnpm cov:rs  # Rust only
   ```
 
 Powered by [Husky](https://typicode.github.io/husky/), formatting and linting for the
