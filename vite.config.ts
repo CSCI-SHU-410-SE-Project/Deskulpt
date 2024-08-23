@@ -45,7 +45,7 @@ export default defineConfig(({ command }) => ({
 }));
 
 /**
- * Cutom plugin to deal with import maps.
+ * Custom plugin to deal with import maps.
  *
  * Note that the values of `imports` must be relative to the vite server root.
  *
