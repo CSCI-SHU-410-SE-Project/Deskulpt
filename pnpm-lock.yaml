@@ -221,7 +221,7 @@ importers:
         version: 0.2.5(@docusaurus/core@3.5.2(@docusaurus/types@3.5.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@mdx-js/react@3.0.1(@types/react@18.3.3)(react@18.3.1))(eslint@8.57.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.5.4))(sass@1.77.8)(webpack@5.92.1)
       docusaurus-plugin-typedoc:
         specifier: ^1.0.5
-        version: 1.0.5(typedoc-plugin-markdown@4.1.2(typedoc@0.26.6(typescript@5.5.4)))
+        version: 1.0.5(typedoc-plugin-markdown@4.2.6(typedoc@0.26.6(typescript@5.5.4)))
       prism-react-renderer:
         specifier: ^2.3.1
         version: 2.3.1(react@18.3.1)
@@ -232,8 +232,8 @@ importers:
         specifier: ^0.26.6
         version: 0.26.6(typescript@5.5.4)
       typedoc-plugin-markdown:
-        specifier: ^4.1.2
-        version: 4.1.2(typedoc@0.26.6(typescript@5.5.4))
+        specifier: ^4.2.6
+        version: 4.2.6(typedoc@0.26.6(typescript@5.5.4))
     devDependencies:
       '@docusaurus/module-type-aliases':
         specifier: ^3.5.2
@@ -6221,8 +6221,8 @@ packages:
   typedarray-to-buffer@3.1.5:
     resolution: {integrity: sha512-zdu8XMNEDepKKR+XYOXAVPtWui0ly0NtohUscw+UmaHiAWT8hrV1rr//H6V+0DvJ3OQ19S979M0laLfX8rm82Q==}
 
-  typedoc-plugin-markdown@4.1.2:
-    resolution: {integrity: sha512-jZt8jmQLbmg9jmFQyfJrjLf6ljRwJ5fKMeqmFr0oPXmeX5ZRYYtCe6y/058vDESE/R+TwEvNua6SuG43UBbszw==}
+  typedoc-plugin-markdown@4.2.6:
+    resolution: {integrity: sha512-k33o2lZSGpL3GjH28eW+RsujzCYFP0L5GNqpK+wa4CBcMOxpj8WV7SydNRLS6eSa2UvaPvNVJTaAZ6Tm+8GXoA==}
     engines: {node: '>= 18'}
     peerDependencies:
       typedoc: 0.26.x
@@ -10865,9 +10865,9 @@ snapshots:
       - node-sass
       - webpack
 
-  docusaurus-plugin-typedoc@1.0.5(typedoc-plugin-markdown@4.1.2(typedoc@0.26.6(typescript@5.5.4))):
+  docusaurus-plugin-typedoc@1.0.5(typedoc-plugin-markdown@4.2.6(typedoc@0.26.6(typescript@5.5.4))):
     dependencies:
-      typedoc-plugin-markdown: 4.1.2(typedoc@0.26.6(typescript@5.5.4))
+      typedoc-plugin-markdown: 4.2.6(typedoc@0.26.6(typescript@5.5.4))
 
   dom-converter@0.2.0:
     dependencies:
@@ -14040,7 +14040,7 @@ snapshots:
     dependencies:
       is-typedarray: 1.0.0
 
-  typedoc-plugin-markdown@4.1.2(typedoc@0.26.6(typescript@5.5.4)):
+  typedoc-plugin-markdown@4.2.6(typedoc@0.26.6(typescript@5.5.4)):
     dependencies:
       typedoc: 0.26.6(typescript@5.5.4)
 
