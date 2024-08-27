@@ -877,7 +877,6 @@ dependencies = [
  "cargo-llvm-cov",
  "copy_dir",
  "objc",
- "parking_lot",
  "path-clean",
  "pretty_assertions",
  "regex",
