@@ -127,11 +127,15 @@ export default function useRenderWidgetListener(
         return;
       }
 
-      // We have validated the module so we can call `render` safely
+      // We have validated the module so we can call `render` safely; there could be
+      // error within `render` so it needs to called in advance, otherwise things will
+      // get broken in the state setter, causing the error to be uncaught and also
+      // affecting other widget displays
+      const widgetDisplay = module.default.render();
       setCanvasWidgetStates((prev) => ({
         ...prev,
         [widgetId]: {
-          display: module.default.render(),
+          display: widgetDisplay,
           width: module.default.width,
           height: module.default.height,
           moduleBlobUrl,
