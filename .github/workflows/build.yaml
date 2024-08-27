@@ -102,9 +102,9 @@ jobs:
             body="There seems to be some issues with the build process for certain platforms. Please check the logs in the [failing workflow run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}) for more details and fix the issues accordingly."
           fi
 
-          echo "header=$header" >> $GITHUB_ENV
-          echo "body=$body" >> $GITHUB_ENV
-          echo "footnote=$footnote" >> $GITHUB_ENV
+          echo "header=$header" >> $GITHUB_OUTPUT
+          echo "body=$body" >> $GITHUB_OUTPUT
+          echo "footnote=$footnote" >> $GITHUB_OUTPUT
 
       - name: Post comment
         uses: peter-evans/create-or-update-comment@v4
