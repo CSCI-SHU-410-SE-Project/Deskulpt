@@ -70,18 +70,15 @@ jobs:
           name: binaries-${{ matrix.platform }}
           path: "${{ join(fromJSON(steps.build-deskulpt.outputs.artifactPaths), '\n') }}"
 
-  comment-success:
+  comment:
     needs: build
-    if: always() && needs.build.result == 'success' && github.event_name == 'pull_request'
+    if: ${{ !cancelled() && github.event_name == 'pull_request' }}
     runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
 
     steps:
-      - name: Get short commit SHA
-        id: short-sha
-        run: |
-          shortsha=$(echo ${{ github.event.pull_request.head.sha }} | cut -c 1-7)
-          echo "sha=$shortsha" >> $GITHUB_OUTPUT
-
       - name: Find comment
         id: find-comment
         uses: peter-evans/find-comment@v3
@@ -91,51 +88,33 @@ jobs:
           body-includes: |
             .github/workflows/build.yaml
 
-      - name: Post success comment
-        if: "always() && (needs.build.result == 'success')"
+      - name: Construct comment body
+        id: comment-body
+        run: |
+          shortsha=$(echo ${{ github.event.pull_request.head.sha }} | cut -c 1-7)
+
+          header="✔️ Deskulpt Built Successfully!"
+          body="Deskulpt binaries have been built successfully on all supported platforms. Your pull request is in excellent shape! You may check the built Deskulpt binaries [here](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}) and download them to test locally."
+          footnote="Workflow file: \`.github/workflows/build.yaml\`. Generated for commit: [\`$shortsha\`](https://github.com/${{ github.repository }}/pull/${{ github.event.pull_request.number }}/commits/${{ github.event.pull_request.head.sha }})."
+
+          if [ "${{ needs.build.result }}" != "success" ]; then
+            header="❌ Failed to Build Deskulpt"
+            body="There seems to be some issues with the build process for certain platforms. Please check the logs in the [failing workflow run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}) for more details and fix the issues accordingly."
+          fi
+
+          echo "header=$header" >> $GITHUB_OUTPUT
+          echo "body=$body" >> $GITHUB_OUTPUT
+          echo "footnote=$footnote" >> $GITHUB_OUTPUT
+
+      - name: Post comment
         uses: peter-evans/create-or-update-comment@v4
         with:
           comment-id: ${{ steps.find-comment.outputs.comment-id }}
           issue-number: ${{ github.event.pull_request.number }}
+          edit-mode: replace
           body: |
-            ## ✔️ Deskulpt Built Successfully!
+            ## ${{ steps.comment-body.outputs.header }}
 
-            Deskulpt binaries have been built successfully on all supported platforms. Your pull request is in excellent shape! You may check the built Deskulpt binaries [here](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}) and download them to test locally.
+            ${{ steps.comment-body.outputs.body }}
 
-            <sub> Workflow file: `.github/workflows/build.yaml`. Generated for commit: [`${{ steps.short-sha.outputs.sha }}`](https://github.com/${{ github.repository }}/pull/${{ github.event.pull_request.number }}/commits/${{ github.event.pull_request.head.sha }}). </sub>
-          edit-mode: replace
-
-  comment-failure:
-    needs: build
-    if: always() && needs.build.result != 'success' && github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Get short commit SHA
-        id: short-sha
-        run: |
-          shortsha=$(echo ${{ github.event.pull_request.head.sha }} | cut -c 1-7)
-          echo "sha=$shortsha" >> $GITHUB_OUTPUT
-
-      - name: Find comment
-        id: find-comment
-        uses: peter-evans/find-comment@v3
-        with:
-          issue-number: ${{ github.event.pull_request.number }}
-          comment-author: "github-actions[bot]"
-          body-includes: |
-            .github/workflows/build.yaml
-
-      - name: Post failure comment
-        if: "always() && (needs.build.result != 'success')"
-        uses: peter-evans/create-or-update-comment@v4
-        with:
-          comment-id: ${{ steps.find-comment.outputs.comment-id }}
-          issue-number: ${{ github.event.pull_request.number }}
-          body: |-
-            ## ❌ Failed to Build Deskulpt
-
-            There seems to be some issues with the build process for certain platforms. Please check the logs in the [failing workflow run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}) for more details and fix the issues accordingly.
-
-            <sub> Workflow file: `.github/workflows/build.yaml`. Generated for commit: [`${{ steps.short-sha.outputs.sha }}`](https://github.com/${{ github.repository }}/pull/${{ github.event.pull_request.number }}/commits/${{ github.event.pull_request.head.sha }}). </sub>
-          edit-mode: replace
+            <sub> ${{ steps.comment-body.outputs.footnote }} </sub>

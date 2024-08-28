@@ -16,12 +16,7 @@ use swc_ecma_visit::{as_folder, FoldWith};
 use tauri::{AppHandle, Runtime};
 
 mod common;
-mod path_loader;
-mod path_resolver;
 mod transforms;
-
-/// The supported file extensions to import.
-const EXTENSIONS: &[&str] = &["js", "jsx", "ts", "tsx"];
 
 /// Name of the bridge file for external dependencies.
 ///
@@ -51,7 +46,6 @@ pub(crate) fn bundle(
     let globals = Globals::default();
     let cm = Lrc::new(SourceMap::new(FilePathMapping::empty()));
 
-    let mut apis_renamer = as_folder(transforms::ApisImportRenamer { apis_blob_url });
     let module = common::bundle_into_raw_module(
         root,
         target,
@@ -60,11 +54,13 @@ pub(crate) fn bundle(
         cm.clone(),
     )?;
 
+    let mut apis_renamer = as_folder(transforms::ApisImportRenamer { apis_blob_url });
+
     if dependency_map.is_empty() {
         // If there are no external dependencies, there is no need to resolve external
         // imports and bundle a second round
         let code = GLOBALS.set(&globals, || {
-            let module = common::apply_common_transforms(module, cm.clone())
+            let module = common::apply_basic_transforms(module, cm.clone())
                 .fold_with(&mut apis_renamer);
 
             // Directly emit the bundled code into the buffer and return as string
@@ -90,7 +86,7 @@ pub(crate) fn bundle(
     let mut temp_bundle_file = File::create(&temp_bundle_path)?;
 
     GLOBALS.set(&globals, || {
-        let module = common::apply_common_transforms(module, cm.clone());
+        let module = common::apply_basic_transforms(module, cm.clone());
 
         // Redirect external imports to prepare for the second round of bundling
         let mut resolver = as_folder(transforms::ExternalImportRedirector {
@@ -158,7 +154,7 @@ fn bundle_external_bridge(
 
     let mut bridge_file = File::create(root.join(EXTERNAL_BUNDLE_BRIDGE))?;
     GLOBALS.set(&globals, || {
-        let module = common::apply_common_transforms(module, cm.clone());
+        let module = common::apply_basic_transforms(module, cm.clone());
 
         // Inspect the import statements of external dependencies and record them
         let mut external_imports: Vec<ModuleItem> = vec![];
@@ -278,7 +274,11 @@ mod tests {
     use copy_dir::copy_dir;
     use pretty_assertions::assert_eq;
     use rstest::rstest;
-    use std::{fs::read_to_string, path::PathBuf};
+    use std::{
+        fs::{create_dir, read_to_string},
+        path::PathBuf,
+    };
+    use tempfile::{tempdir, TempDir};
 
     /// Get the absolute path to the fixture directory.
     ///
@@ -289,8 +289,17 @@ mod tests {
         Path::new("tests/fixtures/bundler").canonicalize().unwrap()
     }
 
+    /// Setup a temporary directory for testing.
+    ///
+    /// This would create a temporary directory and an `input` directory inside it.
+    fn setup_temp_dir() -> TempDir {
+        let temp_dir = tempdir().unwrap();
+        create_dir(temp_dir.path().join("input")).unwrap();
+        temp_dir
+    }
+
     #[rstest]
-    // Use correct JSX runtime for `jsx`, `jsxs`, and `Fragment`
+    // Use correct JSX runtime for `jsx`, `jsxs`, and `Fragment``
     #[case::jsx_runtime("jsx_runtime", "index.jsx")]
     // Correctly resolve JS/JSX imports with and without extensions, or as index files
     // of a directory

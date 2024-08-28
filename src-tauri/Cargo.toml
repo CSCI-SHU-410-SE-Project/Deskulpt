@@ -17,19 +17,19 @@ rstest = "0.22.0"
 [dependencies]
 tauri = { version = "2.0.0-beta.23", features = ["macos-private-api", "test", "tray-icon"] }
 tauri-plugin-clipboard-manager = "2.1.0-beta.7"
-tauri-plugin-global-shortcut = "2.0.0-rc.0"
-tauri-plugin-shell = "2.0.0-rc.0"
+tauri-plugin-global-shortcut = "2.0.0-rc.1"
+tauri-plugin-shell = "2.0.0-rc.2"
 
 # Utilities
 anyhow = "1.0.86"
 path-clean = "1.0.1"
-serde = { version = "1.0.208", features = ["derive"] }
+serde = { version = "1.0.209", features = ["derive"] }
 serde-error = "0.1.2"
-serde_json = "1.0.125"
-tempfile = "3.11.0"
+serde_json = "1.0.127"
+tempfile = "3.12.0"
 
 # APIs
-sysinfo = "0.31.2"
+sysinfo = "0.31.3"
 
 # SWC crates and related
 swc_atoms = "0.6.7"

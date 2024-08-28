@@ -67,7 +67,8 @@ jobs:
 
   deploy:
     needs: build
-    if: github.event_name == 'push' # Do not deploy on PRs
+    # Do not deploy on PRs
+    if: github.event_name == 'push'
     permissions:
       pages: write
       id-token: write
