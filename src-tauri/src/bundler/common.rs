@@ -201,17 +201,20 @@ impl Load for PathLoader {
 /// that module specifiers that are ignored in the first place will not go through this
 /// resolver at all.
 ///
-/// This path resolver intends to resolve the following types of imports:
+/// This path resolver manages to solve only relative/absolute path imports (with or
+/// without extension). See [`EXTENSIONS`] for the list of extensions it will try. The
+/// resolver will however reject the following types of imports:
 ///
-/// - Extension-less relative paths, e.g., `import foo from "./foo"`
-/// - Relative paths, e.g., `import foo from "./foo.js"`
-///
-/// It is not designed to resolve the following types of imports:
-///
-/// - Absolute path imports, e.g., `import foo from "/foo"`
-/// - URL imports, e.g., `import foo from "https://example.com/foo"`
-/// - Node resolution imports, e.g., `import globals from "globals"`
-/// - Relative imports that go beyond the root
+/// - URL imports, because it is neither reasonable to resolve during the bundling phase
+///   nor possible to ignore within the current framework. Vendor the source locally and
+///   use a relative/absolute path import instead. In particular, if the source is also
+///   available as a node module, see below. *URL imports may be supported in the future
+///   with additional configurations, but not recommended.*
+/// - Node module resolution, because it requires a node environment while Deskulpt does
+///   not ship one with it. Deskulpt supports bundling external dependencies separately
+///   and including them in the final bundle.
+/// - Imports that go beyond the root, because a widget is not allowed to access
+///   resources outside of its root directory.
 struct PathResolver(PathBuf);
 
 impl PathResolver {
@@ -240,6 +243,36 @@ impl PathResolver {
         bail!("File resolution failed")
     }
 
+    /// Helper function to validate a module specifier.
+    ///
+    /// The base directory is the directory from which to look for the specifier.
+    /// Absolute/relative path specifiers are accepted, while node modules and URL
+    /// specifiers are rejected.
+    fn validate_specifer(
+        &self,
+        base_dir: &Path,
+        module_specifier: &str,
+    ) -> Result<PathBuf, Error> {
+        let spec_path = Path::new(module_specifier);
+
+        if spec_path.is_absolute() {
+            return Ok(spec_path.clean());
+        }
+
+        // If not absolute, then it should be either relative, a node module, or a URL;
+        // we support only relative import among these types
+        let mut components = spec_path.components();
+        if let Some(Component::CurDir | Component::ParentDir) = components.next() {
+            return Ok(base_dir.join(module_specifier).clean());
+        }
+
+        bail!(
+            "node_modules imports should be explicitly included in package.json to \
+            avoid being bundled at runtime; URL imports are not supported, one should \
+            vendor its source to local and use a relative import instead"
+        )
+    }
+
     /// Helper function for the [`Resolve`] trait.
     ///
     /// Note that errors emitted here do not need to provide information about `base`
@@ -263,39 +296,20 @@ impl PathResolver {
             base
         };
 
-        let spec_path = Path::new(module_specifier);
-        // Absolute paths are not supported
-        if spec_path.is_absolute() {
-            bail!("Absolute imports are not supported; use relative imports instead");
+        let path = self.validate_specifer(base_dir, module_specifier)?;
+
+        // Try to resolve by treating `path` as a file first, otherwise try by
+        // looking for an `index` file under `path` as a directory
+        let resolved_path = self
+            .resolve_as_file(&path)
+            .or_else(|_| self.resolve_as_file(&path.join("index")))?;
+
+        // Reject if the resolved path goes beyond the root
+        let resolved_path = resolved_path.canonicalize()?;
+        if !resolved_path.starts_with(&self.0) {
+            bail!("Imports must not go beyond the root '{}'", self.0.display());
         }
-
-        // If not absolute, then it should be either relative, a node module, or a URL;
-        // we support only relative import among these types
-        let mut components = spec_path.components();
-        if let Some(Component::CurDir | Component::ParentDir) = components.next() {
-            let path = base_dir.join(module_specifier).clean();
-
-            // Try to resolve by treating `path` as a file first, otherwise try by
-            // looking for an `index` file under `path` as a directory
-            let resolved_path = self
-                .resolve_as_file(&path)
-                .or_else(|_| self.resolve_as_file(&path.join("index")))?;
-
-            // Reject if the resolved path goes beyond the root
-            if !resolved_path.starts_with(&self.0) {
-                bail!(
-                    "Relative imports should not go beyond the root '{}'",
-                    self.0.display(),
-                );
-            }
-            return Ok(FileName::Real(resolved_path));
-        }
-
-        bail!(
-            "node_modules imports should be explicitly included in package.json to \
-            avoid being bundled at runtime; URL imports are not supported, one should \
-            vendor its source to local and use a relative import instead"
-        )
+        Ok(FileName::Real(resolved_path))
     }
 }
 

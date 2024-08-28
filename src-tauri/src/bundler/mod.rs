@@ -60,13 +60,15 @@ pub(crate) fn bundle(
 mod tests {
     use super::*;
     use crate::testing::{assert_err_eq, ChainReason};
+    use copy_dir::copy_dir;
     use pretty_assertions::assert_eq;
     use rstest::rstest;
     use std::{
-        fs::{create_dir, read_to_string},
+        fs::{read_to_string, File},
         path::PathBuf,
     };
-    use tempfile::{tempdir, TempDir};
+    use tempfile::tempdir;
+    use tera::Tera;
 
     /// Get the absolute path to the fixture directory.
     ///
@@ -75,15 +77,6 @@ mod tests {
     /// that this is not the case elsewhere in the codebase.
     fn fixture_dir() -> PathBuf {
         Path::new("tests/fixtures/bundler").canonicalize().unwrap()
-    }
-
-    /// Setup a temporary directory for testing.
-    ///
-    /// This would create a temporary directory and an `input` directory inside it.
-    fn setup_temp_dir() -> TempDir {
-        let temp_dir = tempdir().unwrap();
-        create_dir(temp_dir.path().join("input")).unwrap();
-        temp_dir
     }
 
     #[rstest]
@@ -164,7 +157,7 @@ mod tests {
                 fixture_dir().join("import_beyond_root/input/index.jsx").display(),
             )),
             ChainReason::Exact(format!(
-                "Relative imports should not go beyond the root '{}'",
+                "Imports must not go beyond the root '{}'",
                 fixture_dir().join("import_beyond_root/input").display(),
             )),
         ]
@@ -209,6 +202,43 @@ mod tests {
     }
 
     #[rstest]
+    fn test_bundle_import_absolute() {
+        // Test that absolute imports are resolved correctly
+        let temp_dir = tempdir().unwrap();
+        let base = temp_dir.path().join("import_absolute");
+        let case_dir = base.join("input");
+        copy_dir(fixture_dir().join("import_absolute"), &base).unwrap();
+
+        let mut tera = Tera::default();
+        tera.add_template_file(case_dir.join("index.jsx.template"), Some("index"))
+            .unwrap();
+
+        // We use debugging format for the path because otherwise path separator "\" on
+        // Windows will not be escaped
+        let mut context = tera::Context::new();
+        context.insert("path", &format!("{:?}", case_dir.join("utils")));
+
+        // Render the template to the actual file
+        tera.render_to(
+            "index",
+            &context,
+            File::create(case_dir.join("index.jsx")).unwrap(),
+        )
+        .unwrap();
+
+        let result = bundle(
+            &case_dir,
+            &case_dir.join("index.jsx"),
+            Default::default(),
+            &Default::default(),
+        )
+        .expect("Expected bundling to succeed");
+
+        let expected = read_to_string(base.join("output.js")).unwrap();
+        assert_eq!(result, expected);
+    }
+
+    #[rstest]
     #[should_panic]
     fn test_bundle_import_meta_panic() {
         // Test that accessing `import.meta` is not supported
@@ -219,40 +249,5 @@ mod tests {
             Default::default(),
             &Default::default(),
         );
-    }
-
-    #[rstest]
-    fn test_bundle_absolute_import_error() {
-        // Test that an absolute import raises a proper error
-        let temp_dir = setup_temp_dir();
-        let bundle_root = temp_dir.path().canonicalize().unwrap().join("input");
-        let utils_path = bundle_root.join("utils.js");
-        std::fs::write(&utils_path, "export const foo = 42;").unwrap();
-
-        // Create an entry file that imports the absolute path of `utils.js`; note that
-        // we use debugging format for the path because otherwise path separator "\" on
-        // Windows will not be escaped
-        let entry_path = bundle_root.join("index.jsx");
-        println!("import {{ foo }} from {utils_path:?};");
-        std::fs::write(&entry_path, format!("import {{ foo }} from {utils_path:?};"))
-            .unwrap();
-
-        let error =
-            bundle(&bundle_root, &entry_path, Default::default(), &Default::default())
-                .expect_err("Expected bundling error");
-        let expected_error = vec![
-            ChainReason::Exact("load_transformed failed".to_string()),
-            ChainReason::Exact("failed to analyze module".to_string()),
-            ChainReason::Exact(format!(
-                "failed to resolve {} from {}",
-                utils_path.display(),
-                entry_path.display()
-            )),
-            ChainReason::Exact(
-                "Absolute imports are not supported; use relative imports instead"
-                    .to_string(),
-            ),
-        ];
-        assert_err_eq(error, expected_error);
     }
 }
