@@ -104,7 +104,7 @@ impl VisitMut for ExternalImportRedirector<'_> {
             }
 
             // Rpleace the import source and specifiers
-            n.src = Box::new(self.root.join(EXTERNAL_BUNDLE).to_string_lossy().into());
+            n.src = Box::new(format!("./{EXTERNAL_BUNDLE}").into());
             n.specifiers = new_specifiers;
         }
     }
