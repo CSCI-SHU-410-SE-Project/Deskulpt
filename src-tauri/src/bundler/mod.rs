@@ -54,7 +54,7 @@ pub(crate) fn bundle(
         cm.clone(),
     )?;
 
-    let mut apis_renamer = as_folder(transforms::ApisImportRenamer { apis_blob_url });
+    let mut apis_renamer = as_folder(transforms::ApisImportRenamer(apis_blob_url));
 
     if dependency_map.is_empty() {
         // If there are no external dependencies, there is no need to resolve external
@@ -274,11 +274,7 @@ mod tests {
     use copy_dir::copy_dir;
     use pretty_assertions::assert_eq;
     use rstest::rstest;
-    use std::{
-        fs::{create_dir, read_to_string},
-        path::PathBuf,
-    };
-    use tempfile::{tempdir, TempDir};
+    use std::{fs::read_to_string, path::PathBuf};
 
     /// Get the absolute path to the fixture directory.
     ///
@@ -289,17 +285,8 @@ mod tests {
         Path::new("tests/fixtures/bundler").canonicalize().unwrap()
     }
 
-    /// Setup a temporary directory for testing.
-    ///
-    /// This would create a temporary directory and an `input` directory inside it.
-    fn setup_temp_dir() -> TempDir {
-        let temp_dir = tempdir().unwrap();
-        create_dir(temp_dir.path().join("input")).unwrap();
-        temp_dir
-    }
-
     #[rstest]
-    // Use correct JSX runtime for `jsx`, `jsxs`, and `Fragment``
+    // Use correct JSX runtime for `jsx`, `jsxs`, and `Fragment`
     #[case::jsx_runtime("jsx_runtime", "index.jsx")]
     // Correctly resolve JS/JSX imports with and without extensions, or as index files
     // of a directory

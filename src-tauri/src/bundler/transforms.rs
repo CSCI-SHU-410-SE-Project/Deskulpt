@@ -113,10 +113,10 @@ impl VisitMut for ExternalImportRedirector<'_> {
 /// An AST transformer that resolves imports of widget APIs.
 ///
 /// It replaces the imports from `@deskulpt-test/apis` with the given blob URL.
-pub(super) struct ApisImportRenamer {
-    /// The APIs blob URL.
-    pub(super) apis_blob_url: String,
-}
+pub(super) struct ApisImportRenamer(
+    /// The APIs blob URL to be used as the import source.
+    pub(super) String,
+);
 
 impl VisitMut for ApisImportRenamer {
     noop_visit_mut_type!();
@@ -125,7 +125,7 @@ impl VisitMut for ApisImportRenamer {
         n.visit_mut_children_with(self);
 
         if n.src.value.as_str() == "@deskulpt-test/apis" {
-            n.src.value = Atom::from(self.apis_blob_url.clone());
+            n.src.value = Atom::from(self.0.clone());
         }
     }
 }
