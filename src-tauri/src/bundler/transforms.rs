@@ -3,7 +3,6 @@
 use super::{EXTERNAL_BUNDLE, EXTERNAL_BUNDLE_BRIDGE};
 use crate::utils::run_shell_command;
 use anyhow::{bail, Error};
-use shell_escape::escape;
 use std::{borrow::Cow, collections::HashMap, fs::remove_file, path::Path};
 use swc_atoms::Atom;
 use swc_common::DUMMY_SP;
@@ -154,7 +153,9 @@ impl VisitMut for ExternalImportRedirector<'_> {
                 }));
             }
 
-            // Rpleace the import source and specifiers
+            // Replace the import source and specifiers; this transformer will be used
+            // to produce a temporary bundle of widget source code which will be placed
+            // at the root, so it is safe to use a relative path
             n.src = Box::new(format!("./{EXTERNAL_BUNDLE}").into());
             n.specifiers = new_specifiers;
         }
@@ -250,8 +251,8 @@ pub(super) async fn resolve_bridge_module<R: Runtime>(
         ),
         EXTERNAL_BUNDLE_BRIDGE,
         EXTERNAL_BUNDLE,
-        escape(Cow::Borrowed("alias={entries:{react:'@deskulpt-test/react'}}")),
-        escape(Cow::Borrowed("replace={'process.env.NODE_ENV':JSON.stringify('production'),preventAssignment:true}"))
+        shell_escape::escape(Cow::Borrowed("alias={entries:{react:'@deskulpt-test/react'}}")),
+        shell_escape::escape(Cow::Borrowed("replace={'process.env.NODE_ENV':JSON.stringify('production'),preventAssignment:true}"))
     );
 
     let bridge_path = root.join(EXTERNAL_BUNDLE_BRIDGE);

@@ -16,17 +16,21 @@ use tauri::{AppHandle, Runtime};
 mod common;
 mod transforms;
 
-/// Name of the bridge file for external dependencies.
+/// Bridge file for external dependencies.
 ///
-/// The file is meant to hold the import statements of external dependencies and export
-/// them as named exports. This can then be bundled with node modules resolution into
+/// It should live at the root of each widget directory. This file is used to generate
 /// [`EXTERNAL_BUNDLE`].
 const EXTERNAL_BUNDLE_BRIDGE: &str = "__external_bundle_bridge.js";
 
-/// Name of the bundle of external dependencies.
+/// Bundle file of external dependencies.
+///
+/// It should live at the root of each widget directory.
 const EXTERNAL_BUNDLE: &str = "__external_bundle.js";
 
-/// Name of the bundle of widget source code without resolving external dependencies.
+/// Temporary bundle of widget source code.
+///
+/// It should live at the root of each widget directory. This file is used to produce
+/// the final bundle of widget source code.
 const TEMP_WIDGET_BUNDLE: &str = "__temp_widget_bundle.js";
 
 /// Bundle a widget and return the bundled code as a string.
@@ -77,44 +81,38 @@ pub(crate) fn bundle(
         );
     }
 
-    // We need to first redirect external imports to EXTERNAL_BUNDLE then bundle again;
-    // for this purpose we prepare a temporary file to hold the intermediate widget
-    // bundle without resolving external imports
+    // Step 1: Bundle the widget source code, not resolving the external imports but
+    // redirecting them to the external dependency bundle; emit the result to a
+    // temporary bundle file
     let temp_bundle_path = root.join(TEMP_WIDGET_BUNDLE);
     let mut temp_bundle_file = File::create(&temp_bundle_path)?;
 
     GLOBALS.set(&globals, || {
         let module = common::apply_basic_transforms(module, cm.clone());
 
-        // Redirect external imports to prepare for the second round of bundling
+        // Redirect external imports
         let mut resolver = as_folder(transforms::ExternalImportRedirector {
             external_dependencies: dependency_map,
         });
         let module = module.fold_with(&mut resolver);
 
-        // Emit the module to the temporary file
+        // Emit to the temporary bundle file
         common::emit_module_to_buf(module, cm.clone(), &mut temp_bundle_file);
     });
 
-    // Bundle a second time to resolve the external imports, using the temporary bundle
-    // of widget source code as the entry point
+    // Step 2: Bundle the temporary bundle file and the external dependencies bundle
+    // together so that external imports finally gets resolved
     let module = common::bundle_into_raw_module(
         root,
         &temp_bundle_path,
         dependency_map,
         &globals,
         cm.clone(),
-    );
-
-    // Remove the temporary bundle file; avoid bundling error from leaving it behind
-    remove_file(&temp_bundle_path)?;
-    let module = module?;
+    )?;
+    let _ = remove_file(&temp_bundle_path);
 
     let code = GLOBALS.set(&globals, || {
-        // We no longer need to apply the common transforms as they are already applied
-        // in the first round of bundling, and the bundle of external dependencies
-        // should have already been an ESM module itself; it suffices to redirect the
-        // imports of widget APIs
+        // It suffices to redirect the APIs which we did not do in the first step
         let module = module.fold_with(&mut apis_renamer);
 
         // Emit the bundled code into the buffer and return as string
@@ -130,9 +128,8 @@ pub(crate) fn bundle(
 ///
 /// This should be done prior to bundling the widget source code for a widget that uses
 /// external dependencies. It produces a tree-shaked bundle of external dependencies at
-/// the designated location [`EXTERNAL_BUNDLE`]. This is done via creating the bridge
-/// file [`bundle_external_bridge`] and then calling [`rollup`](https://rollupjs.org/).
-/// It would thus require proper setup of `node` and `npm` in the environment.
+/// [`EXTERNAL_BUNDLE`] with the help of [rollup](https://rollupjs.org/). It would thus
+/// require proper setup of `node` and `npm` in the environment.
 pub(crate) async fn bundle_external<R: Runtime>(
     app_handle: &AppHandle<R>,
     root: &Path,
@@ -165,7 +162,8 @@ pub(crate) async fn bundle_external<R: Runtime>(
         });
     }
 
-    // Resolve the bundle bridge of external dependencies
+    // Resolve the bundle bridge of external dependencies to create the final bundle
+    // of external dependencies
     transforms::resolve_bridge_module(app_handle, root).await?;
     Ok(())
 }
