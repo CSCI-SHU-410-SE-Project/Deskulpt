@@ -52,13 +52,16 @@ pub(crate) fn assert_err_eq(error: Error, chain: Vec<ChainReason>) {
             },
             ChainReason::IOError => {
                 let io_error = reason.downcast_ref::<std::io::Error>();
-                assert!(io_error.is_some(), "Expected an IO error in the error chain");
+                assert!(
+                    io_error.is_some(),
+                    "Expected an IO error in the error chain; got: {reason:?}",
+                );
             },
             ChainReason::SerdeError => {
                 let serde_error = reason.downcast_ref::<serde_json::Error>();
                 assert!(
                     serde_error.is_some(),
-                    "Expected a serde_json error in the error chain",
+                    "Expected a serde_json error in the error chain; got: {reason:?}",
                 );
             },
             ChainReason::Skip => continue,
