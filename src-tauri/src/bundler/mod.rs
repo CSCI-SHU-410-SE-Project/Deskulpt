@@ -283,8 +283,8 @@ mod tests {
             ChainReason::Skip,
             ChainReason::Skip,
             ChainReason::Skip,
-            ChainReason::Regex("error: Expected ';', '}' or <eof>".to_string())
-        ],
+            ChainReason::Regex("error: Expected ';', '}' or <eof>".to_string()),
+        ]
     )]
     fn test_bundle_error(#[case] case: &str, #[case] expected_error: Vec<ChainReason>) {
         let case_dir = fixture_dir().join(case);
