@@ -37,24 +37,31 @@ pub(crate) fn assert_err_eq(error: Error, chain: Vec<ChainReason>) {
 
         match expected_reason {
             ChainReason::Exact(msg) => {
-                assert_eq!(reason.to_string(), msg, "Expected reason: {reason:?}")
+                assert_eq!(
+                    reason.to_string(),
+                    msg,
+                    "Expected reason to be: {msg:?}; got: {reason:?}"
+                );
             },
             ChainReason::Regex(pattern) => {
                 let re = Regex::new(&pattern).unwrap();
                 assert!(
                     re.is_match(&reason.to_string()),
-                    "Expected reason to match pattern: {pattern:?}"
+                    "Expected reason to match pattern: {pattern:?}; got: {reason:?}"
                 );
             },
             ChainReason::IOError => {
                 let io_error = reason.downcast_ref::<std::io::Error>();
-                assert!(io_error.is_some(), "Expected an IO error in the error chain");
+                assert!(
+                    io_error.is_some(),
+                    "Expected an IO error in the error chain; got: {reason:?}",
+                );
             },
             ChainReason::SerdeError => {
                 let serde_error = reason.downcast_ref::<serde_json::Error>();
                 assert!(
                     serde_error.is_some(),
-                    "Expected a serde_json error in the error chain",
+                    "Expected a serde_json error in the error chain; got: {reason:?}",
                 );
             },
             ChainReason::Skip => continue,

@@ -199,9 +199,8 @@ mod tests {
     #[case::import("import", "index.jsx")]
     // Correctly strip off TypeScript syntax
     #[case::strip_types("strip_types", "index.tsx")]
-    // Replace `@deskulpt-test/apis` with the blob URL
-    #[case::replace_apis("replace_apis", "index.js")]
-    // Do not resolve imports from default and external dependencies
+    // Do not resolve imports from default dependencies, and that `@deskulpt-test/apis`
+    // should be replaced with the blob URL
     #[case::default_deps("default_deps", "index.js")]
     fn test_bundle_ok(#[case] case: &str, #[case] entry: &str) {
         let case_dir = fixture_dir().join(case);
@@ -225,7 +224,7 @@ mod tests {
         vec![
             ChainReason::Skip,
             ChainReason::Skip,
-            ChainReason::Regex("failed to resolve lodash from".to_string()),
+            ChainReason::Regex("failed to resolve os-name from".to_string()),
             ChainReason::Exact(
                 "node_modules imports should be explicitly included in package.json to \
                 avoid being bundled at runtime; URL imports are not supported, one \
@@ -240,7 +239,7 @@ mod tests {
         vec![
             ChainReason::Skip,
             ChainReason::Skip,
-            ChainReason::Regex("failed to resolve https://dummy.js from".to_string()),
+            ChainReason::Regex("failed to resolve https://foo.js from".to_string()),
             ChainReason::Exact(
                 "node_modules imports should be explicitly included in package.json to \
                 avoid being bundled at runtime; URL imports are not supported, one \
@@ -257,7 +256,7 @@ mod tests {
             ChainReason::Skip,
             ChainReason::Regex("failed to resolve ../../foo from".to_string()),
             ChainReason::Regex("Relative imports should not go beyond the root".to_string()),
-        ],
+        ]
     )]
     // Entry file does not exist
     #[case::entry_not_exist(
@@ -359,5 +358,39 @@ mod tests {
             Default::default(),
             &Default::default(),
         );
+    }
+
+    #[rstest]
+    fn test_bundle_absolute_import_error() {
+        // Test that an absolute import raises a proper error
+        let temp_dir = setup_temp_dir();
+
+        // Create the following structure in the temporary directory:
+        //     input/
+        //       ├─ index.jsx  (imports utils.js via absolute path)
+        //       └─ utils.js
+        // Note that the absolute path we used the debugging format otherwise the
+        // backslashes on Windows would not be escaped properly
+        let bundle_root = temp_dir.path().join("input");
+        let index_path = bundle_root.join("index.jsx");
+        let utils_path = bundle_root.join("utils.js");
+        std::fs::write(&index_path, format!("import {{ foo }} from {utils_path:?};"))
+            .unwrap();
+        std::fs::write(&utils_path, "export const foo = 42;").unwrap();
+
+        // Test the bundling error
+        let error =
+            bundle(&bundle_root, &index_path, Default::default(), &Default::default())
+                .expect_err("Expected bundling error");
+        let expected_error = vec![
+            ChainReason::Skip,
+            ChainReason::Skip,
+            ChainReason::Skip,
+            ChainReason::Exact(
+                "Absolute imports are not supported; use relative imports instead"
+                    .to_string(),
+            ),
+        ];
+        assert_err_eq(error, expected_error);
     }
 }

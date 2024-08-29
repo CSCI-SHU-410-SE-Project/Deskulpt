@@ -1,1 +1,1 @@
-import dummy from "https://dummy.js";
+import osName from "https://foo.js";
