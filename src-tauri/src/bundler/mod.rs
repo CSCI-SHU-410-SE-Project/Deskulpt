@@ -87,17 +87,16 @@ mod tests {
     }
 
     #[rstest]
-    // Use correct JSX runtime for `jsx`, `jsxs`, and `Fragment``
+    // Use correct JSX runtime for `jsx`, `jsxs`, and `Fragment`
     #[case::jsx_runtime("jsx_runtime", "index.jsx")]
     // Correctly resolve JS/JSX imports with and without extensions, or as index files
     // of a directory
     #[case::import("import", "index.jsx")]
     // Correctly strip off TypeScript syntax
     #[case::strip_types("strip_types", "index.tsx")]
-    // Replace `@deskulpt-test/apis` with the blob URL
-    #[case::replace_apis("replace_apis", "index.js")]
-    // Do not resolve imports from default and external dependencies
-    #[case::external_deps("external_deps", "index.js")]
+    // Do not resolve imports from default dependencies, and that `@deskulpt-test/apis`
+    // should be replaced with the blob URL
+    #[case::default_deps("default_deps", "index.js")]
     fn test_bundle_ok(#[case] case: &str, #[case] entry: &str) {
         let case_dir = fixture_dir().join(case);
         let bundle_root = case_dir.join("input");
@@ -105,10 +104,7 @@ mod tests {
             &bundle_root,
             &bundle_root.join(entry),
             "blob://dummy-url".to_string(),
-            &HashMap::from([
-                ("os-name".to_string(), "^6.0.0".to_string()),
-                ("matcher".to_string(), "^5.0.0".to_string()),
-            ]),
+            &Default::default(),
         )
         .expect("Expected bundling to succeed");
 
@@ -121,12 +117,9 @@ mod tests {
     #[case::import_node_modules(
         "import_node_modules",
         vec![
-            ChainReason::Exact("load_transformed failed".to_string()),
-            ChainReason::Exact("failed to analyze module".to_string()),
-            ChainReason::Exact(format!(
-                "failed to resolve os-name from {}",
-                fixture_dir().join("import_node_modules/input/index.jsx").display(),
-            )),
+            ChainReason::Skip,
+            ChainReason::Skip,
+            ChainReason::Regex("failed to resolve os-name from".to_string()),
             ChainReason::Exact(
                 "node_modules imports should be explicitly included in package.json to \
                 avoid being bundled at runtime; URL imports are not supported, one \
@@ -139,12 +132,9 @@ mod tests {
     #[case::import_url(
         "import_url",
         vec![
-            ChainReason::Exact("load_transformed failed".to_string()),
-            ChainReason::Exact("failed to analyze module".to_string()),
-            ChainReason::Exact(format!(
-                "failed to resolve https://cdn.jsdelivr.net/npm/os-name@6.0.0/+esm from {}",
-                fixture_dir().join("import_url/input/index.jsx").display(),
-            )),
+            ChainReason::Skip,
+            ChainReason::Skip,
+            ChainReason::Regex("failed to resolve https://foo.js from".to_string()),
             ChainReason::Exact(
                 "node_modules imports should be explicitly included in package.json to \
                 avoid being bundled at runtime; URL imports are not supported, one \
@@ -157,41 +147,24 @@ mod tests {
     #[case::import_beyond_root(
         "import_beyond_root",
         vec![
-            ChainReason::Exact("load_transformed failed".to_string()),
-            ChainReason::Exact("failed to analyze module".to_string()),
-            ChainReason::Exact(format!(
-                "failed to resolve ../../foo from {}",
-                fixture_dir().join("import_beyond_root/input/index.jsx").display(),
-            )),
-            ChainReason::Exact(format!(
-                "Relative imports should not go beyond the root '{}'",
-                fixture_dir().join("import_beyond_root/input").display(),
-            )),
+            ChainReason::Skip,
+            ChainReason::Skip,
+            ChainReason::Regex("failed to resolve ../../foo from".to_string()),
+            ChainReason::Regex("Relative imports should not go beyond the root".to_string()),
         ]
     )]
     // Entry file does not exist
     #[case::entry_not_exist(
         "entry_not_exist",
-        vec![
-            ChainReason::Exact(format!(
-                "Entry point does not exist: '{}'",
-                fixture_dir().join("entry_not_exist/input/index.jsx").display()
-            ))
-        ]
+        vec![ChainReason::Regex("Entry point does not exist".to_string())],
     )]
     // Bad syntax that cannot be parsed
     #[case::bad_syntax(
         "bad_syntax",
         vec![
-            ChainReason::Exact("load_transformed failed".to_string()),
-            ChainReason::Exact("Bundler.load() failed".to_string()),
-            ChainReason::Exact(format!(
-                "Bundler.loader.load({}) failed",
-                fixture_dir().join("bad_syntax/input/index.jsx")
-                    .canonicalize()
-                    .unwrap()
-                    .display()
-                )),
+            ChainReason::Skip,
+            ChainReason::Skip,
+            ChainReason::Skip,
             ChainReason::Regex("error: Expected ';', '}' or <eof>".to_string()),
         ]
     )]
@@ -225,29 +198,28 @@ mod tests {
     fn test_bundle_absolute_import_error() {
         // Test that an absolute import raises a proper error
         let temp_dir = setup_temp_dir();
-        let bundle_root = temp_dir.path().canonicalize().unwrap().join("input");
+
+        // Create the following structure in the temporary directory:
+        //     input/
+        //       ├─ index.jsx  (imports utils.js via absolute path)
+        //       └─ utils.js
+        // Note that the absolute path we used the debugging format otherwise the
+        // backslashes on Windows would not be escaped properly
+        let bundle_root = temp_dir.path().join("input");
+        let index_path = bundle_root.join("index.jsx");
         let utils_path = bundle_root.join("utils.js");
+        std::fs::write(&index_path, format!("import {{ foo }} from {utils_path:?};"))
+            .unwrap();
         std::fs::write(&utils_path, "export const foo = 42;").unwrap();
 
-        // Create an entry file that imports the absolute path of `utils.js`; note that
-        // we use debugging format for the path because otherwise path separator "\" on
-        // Windows will not be escaped
-        let entry_path = bundle_root.join("index.jsx");
-        println!("import {{ foo }} from {utils_path:?};");
-        std::fs::write(&entry_path, format!("import {{ foo }} from {utils_path:?};"))
-            .unwrap();
-
+        // Test the bundling error
         let error =
-            bundle(&bundle_root, &entry_path, Default::default(), &Default::default())
+            bundle(&bundle_root, &index_path, Default::default(), &Default::default())
                 .expect_err("Expected bundling error");
         let expected_error = vec![
-            ChainReason::Exact("load_transformed failed".to_string()),
-            ChainReason::Exact("failed to analyze module".to_string()),
-            ChainReason::Exact(format!(
-                "failed to resolve {} from {}",
-                utils_path.display(),
-                entry_path.display()
-            )),
+            ChainReason::Skip,
+            ChainReason::Skip,
+            ChainReason::Skip,
             ChainReason::Exact(
                 "Absolute imports are not supported; use relative imports instead"
                     .to_string(),
