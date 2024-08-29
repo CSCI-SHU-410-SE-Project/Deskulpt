@@ -3,15 +3,13 @@
 //! Note that this is not a general-purpose bundler; it is specifically designed for
 //! the use case of bundling Deskulpt widgets and their external dependencies.
 
-use crate::utils::run_shell_command;
 use anyhow::{bail, Error};
 use std::{
     collections::HashMap,
     fs::{remove_file, File},
     path::Path,
 };
-use swc_common::{sync::Lrc, FilePathMapping, Globals, SourceMap, DUMMY_SP, GLOBALS};
-use swc_ecma_ast::{ExportSpecifier, Module, ModuleDecl, ModuleItem, NamedExport};
+use swc_common::{sync::Lrc, FilePathMapping, Globals, SourceMap, GLOBALS};
 use swc_ecma_visit::{as_folder, FoldWith};
 use tauri::{AppHandle, Runtime};
 
@@ -90,7 +88,6 @@ pub(crate) fn bundle(
 
         // Redirect external imports to prepare for the second round of bundling
         let mut resolver = as_folder(transforms::ExternalImportRedirector {
-            root,
             external_dependencies: dependency_map,
         });
         let module = module.fold_with(&mut resolver);
@@ -129,70 +126,6 @@ pub(crate) fn bundle(
     Ok(code)
 }
 
-/// Generate the bundle bridge of the external dependencies,
-///
-/// The bridge file is meant to hold all import statements of external dependencies in
-/// a widget and export them as named exports. This way once the bridge file is resolved
-/// via node modules resolution, all external dependencies will be available in a single
-/// file accessed by name, and in a tree-shaked manner instead of including the entire
-/// packages of the external dependencies.
-fn bundle_external_bridge(
-    root: &Path,
-    target: &Path,
-    dependency_map: &HashMap<String, String>,
-) -> Result<(), Error> {
-    let globals = Globals::default();
-    let cm = Lrc::new(SourceMap::new(FilePathMapping::empty()));
-
-    let module = common::bundle_into_raw_module(
-        root,
-        target,
-        dependency_map,
-        &globals,
-        cm.clone(),
-    )?;
-
-    let mut bridge_file = File::create(root.join(EXTERNAL_BUNDLE_BRIDGE))?;
-    GLOBALS.set(&globals, || {
-        let module = common::apply_basic_transforms(module, cm.clone());
-
-        // Inspect the import statements of external dependencies and record them
-        let mut external_imports: Vec<ModuleItem> = vec![];
-        let mut export_specifiers: Vec<ExportSpecifier> = vec![];
-        let mut inspector = as_folder(transforms::ExternalImportInspector {
-            external_dependencies: dependency_map,
-            imports: &mut external_imports,
-            export_specifiers: &mut export_specifiers,
-        });
-        module.fold_with(&mut inspector);
-
-        // Build the bridge module for bundling external dependencies; this module
-        // will hold those original import statements and their corresponding named
-        // export statements
-        let export_decl =
-            ModuleItem::ModuleDecl(ModuleDecl::ExportNamed(NamedExport {
-                span: DUMMY_SP,
-                specifiers: export_specifiers,
-                src: None,
-                type_only: false,
-                with: None,
-            }));
-        let bridge_module = Module {
-            span: DUMMY_SP,
-            body: external_imports
-                .into_iter()
-                .chain(std::iter::once(export_decl))
-                .collect(),
-            shebang: None,
-        };
-
-        // Write the bridge module
-        common::emit_module_to_buf(bridge_module, cm.clone(), &mut bridge_file);
-    });
-
-    Ok(())
-}
-
 /// Bundle the external dependencies of a widget.
 ///
 /// This should be done prior to bundling the widget source code for a widget that uses
@@ -207,70 +140,43 @@ pub(crate) async fn bundle_external<R: Runtime>(
     dependency_map: &HashMap<String, String>,
 ) -> Result<(), Error> {
     assert!(!dependency_map.is_empty());
-    bundle_external_bridge(root, target, dependency_map)?;
 
-    // The escaping of commands seems to be different on Windows and Unix
-    let (plugin_alias, plugin_replace) = if cfg!(target_os = "windows") {
-        (
-            "alias={entries:{react:'@deskulpt-test/react'}}",
-            "replace={'process.env.NODE_ENV':JSON.stringify('production'),preventAssignment:true}",
-        )
-    } else {
-        (
-            "\"alias={entries:{react:'@deskulpt-test/react'}}\"",
-            "\"replace={'process.env.NODE_ENV':JSON.stringify('production'),preventAssignment:true}\"",
-        )
-    };
+    {
+        // Wrap within a scoped block to limit the lifetime of `cm` so it is dropped
+        // before entering the async context; this is necessary because `cm` is not
+        // `Send` and cannot be passed to the async context
+        let globals = Globals::default();
+        let cm = Lrc::new(SourceMap::new(FilePathMapping::empty()));
 
-    // Install rollup and plugins to convert the bridge file into the final bundle;
-    // the configuration is approximately as follows:
-    //
-    // - Redirect `react` to `@deskulpt-test/react` and treat the latter as external;
-    //   this way we avoid the unnecessary inclusion of `react` in the bundle which is
-    //   available at runtime (and with the correct version)
-    // - Replace `process.env.NODE_ENV` with `"production"` because `process` is not
-    //   available in browser environments
-    // - Convert CommonJS modules into ESM
-    // - Resolve node modules
-    // - Minify the bundle
-    let command = format!(
-        concat!(
-            "npm install --save-dev",
-            " rollup",
-            " @rollup/plugin-alias",
-            " @rollup/plugin-replace",
-            " @rollup/plugin-commonjs",
-            " @rollup/plugin-node-resolve",
-            " @rollup/plugin-terser",
-            " && ",
-            "npx rollup {}",
-            " --file {}",
-            " --format esm",
-            " --external @deskulpt-test/react",
-            " --plugin {}", // alias
-            " --plugin {}", // replace
-            " --plugin commonjs",
-            " --plugin node-resolve",
-            " --plugin terser",
-        ),
-        EXTERNAL_BUNDLE_BRIDGE, EXTERNAL_BUNDLE, plugin_alias, plugin_replace,
-    );
+        let module = common::bundle_into_raw_module(
+            root,
+            target,
+            dependency_map,
+            &globals,
+            cm.clone(),
+        )?;
 
-    let bridge_path = root.join(EXTERNAL_BUNDLE_BRIDGE);
-    let result = run_shell_command(app_handle, root, &command).await;
-    if !result.success {
-        let _ = remove_file(&bridge_path);
-        bail!("Failed to install or execute rollup\n\n{}", result.stderr);
+        // Generate the bundle bridge of external dependencies
+        let mut bridge_file = File::create(root.join(EXTERNAL_BUNDLE_BRIDGE))?;
+        GLOBALS.set(&globals, || {
+            let module = common::apply_basic_transforms(module, cm.clone());
+            let bridge_module = transforms::build_bridge_module(module, dependency_map);
+            common::emit_module_to_buf(bridge_module, cm.clone(), &mut bridge_file);
+        });
     }
 
-    let _ = remove_file(&bridge_path);
+    // Resolve the bundle bridge of external dependencies
+    transforms::resolve_bridge_module(app_handle, root).await?;
     Ok(())
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::testing::{assert_err_eq, setup_mock_env, ChainReason};
+    use crate::{
+        testing::{assert_err_eq, setup_mock_env, ChainReason},
+        utils::run_shell_command,
+    };
     use copy_dir::copy_dir;
     use pretty_assertions::assert_eq;
     use rstest::rstest;

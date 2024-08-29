@@ -1066,6 +1066,7 @@ dependencies = [
  "serde",
  "serde-error",
  "serde_json",
+ "shell-escape",
  "swc_atoms",
  "swc_bundler",
  "swc_common",
