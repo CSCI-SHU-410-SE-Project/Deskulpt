@@ -24,7 +24,7 @@ pub(crate) enum ChainReason {
     /// The error reason should be a `serde_json` error.
     SerdeError,
     /// Skip validating the reason.
-    _Skip,
+    Skip,
 }
 
 /// Assert that an [`Error`] object has the expected chain of reasons.
@@ -37,13 +37,17 @@ pub(crate) fn assert_err_eq(error: Error, chain: Vec<ChainReason>) {
 
         match expected_reason {
             ChainReason::Exact(msg) => {
-                assert_eq!(reason.to_string(), msg, "Expected reason: {reason:?}")
+                assert_eq!(
+                    reason.to_string(),
+                    msg,
+                    "Expected reason to be: {msg:?}; got: {reason:?}"
+                );
             },
             ChainReason::Regex(pattern) => {
                 let re = Regex::new(&pattern).unwrap();
                 assert!(
                     re.is_match(&reason.to_string()),
-                    "Expected reason to match pattern: {pattern:?}"
+                    "Expected reason to match pattern: {pattern:?}; got: {reason:?}"
                 );
             },
             ChainReason::IOError => {
@@ -57,7 +61,7 @@ pub(crate) fn assert_err_eq(error: Error, chain: Vec<ChainReason>) {
                     "Expected a serde_json error in the error chain",
                 );
             },
-            ChainReason::_Skip => continue,
+            ChainReason::Skip => continue,
         }
     }
     // Assert that the chain of reasons ends here
