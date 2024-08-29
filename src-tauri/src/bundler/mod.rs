@@ -180,7 +180,11 @@ mod tests {
     use copy_dir::copy_dir;
     use pretty_assertions::assert_eq;
     use rstest::rstest;
-    use std::{fs::read_to_string, path::PathBuf};
+    use std::{
+        fs::{create_dir, read_to_string},
+        path::PathBuf,
+    };
+    use tempfile::{tempdir, TempDir};
 
     /// Get the absolute path to the fixture directory.
     ///
@@ -189,6 +193,15 @@ mod tests {
     /// that this is not the case elsewhere in the codebase.
     fn fixture_dir() -> PathBuf {
         Path::new("tests/fixtures/bundler").canonicalize().unwrap()
+    }
+
+    /// Setup a temporary directory for testing.
+    ///
+    /// This would create a temporary directory and an `input` directory inside it.
+    fn setup_temp_dir() -> TempDir {
+        let temp_dir = tempdir().unwrap();
+        create_dir(temp_dir.path().join("input")).unwrap();
+        temp_dir
     }
 
     #[rstest]
@@ -231,7 +244,7 @@ mod tests {
                 should vendor its source to local and use a relative import instead"
                 .to_string()
             ),
-        ],
+        ]
     )]
     // URL import
     #[case::import_url(
@@ -246,7 +259,7 @@ mod tests {
                 should vendor its source to local and use a relative import instead"
                 .to_string()
             ),
-        ],
+        ]
     )]
     // Relative import that goes beyond the root
     #[case::import_beyond_root(
@@ -270,7 +283,7 @@ mod tests {
             ChainReason::Skip,
             ChainReason::Skip,
             ChainReason::Skip,
-            ChainReason::Regex("error: Expected ';', '}' or <eof>".to_string()),
+            ChainReason::Regex("error: Expected ';', '}' or <eof>".to_string())
         ],
     )]
     fn test_bundle_error(#[case] case: &str, #[case] expected_error: Vec<ChainReason>) {
