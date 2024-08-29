@@ -1,5 +1,3 @@
-#![cfg(test)]
-
 //! This module is provides testing utilities.
 //!
 //! It should not be included except for in test builds.
