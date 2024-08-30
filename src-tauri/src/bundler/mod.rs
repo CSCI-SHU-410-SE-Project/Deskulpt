@@ -5,8 +5,10 @@
 
 use anyhow::Error;
 use std::{collections::HashMap, path::Path};
-use swc_common::{sync::Lrc, FilePathMapping, Globals, SourceMap, GLOBALS};
-use swc_ecma_visit::{as_folder, FoldWith};
+use swc_core::{
+    common::{sync::Lrc, FilePathMapping, Globals, SourceMap, GLOBALS},
+    ecma::visit::{as_folder, FoldWith},
+};
 
 mod common;
 mod transforms;

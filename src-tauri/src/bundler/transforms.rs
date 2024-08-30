@@ -2,13 +2,15 @@
 
 use std::collections::HashMap;
 
-use swc_atoms::Atom;
-use swc_ecma_ast::ModuleDecl;
-use swc_ecma_visit::{noop_visit_mut_type, VisitMut, VisitMutWith};
+use swc_core::{
+    atoms::Atom,
+    ecma::{
+        ast::ModuleDecl,
+        visit::{noop_visit_mut_type, VisitMut, VisitMutWith},
+    },
+};
 
 /// An AST transformer that renames import module specifiers.
-///
-/// This should be wrapped within [`as_folder`].
 pub(super) struct ImportRenamer(pub(super) HashMap<String, String>);
 
 impl VisitMut for ImportRenamer {
