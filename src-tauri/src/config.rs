@@ -56,6 +56,7 @@ struct PackageJson {
 /// If widget configuration is loaded successfully, it will return `Ok(Some(config))`.
 /// If the directory does not represent a widget that is meant to be rendered, it will
 /// return `Ok(None)`. Any failure to load the configuration will return an error.
+/// Including default dependencies in `dependencies` will also return an error.
 ///
 /// The cases where a directory is not meant to be rendered include:
 /// - `deskulpt.conf.json` is not found.
@@ -98,7 +99,24 @@ pub(crate) fn read_widget_config(path: &Path) -> Result<Option<WidgetConfig>, Er
             read_to_string(package_json_path).context("Failed to read package.json")?;
         let package_json: PackageJson = serde_json::from_str(&package_json_str)
             .context("Failed to interpret package.json")?;
-        package_json.dependencies.unwrap_or_default()
+
+        match package_json.dependencies {
+            Some(dependencies) => {
+                // Ensure that default dependencies are not specified as `dependencies`,
+                // as they will be treated differently from external dependencies
+                if let Some((name, _)) = dependencies
+                    .iter()
+                    .find(|(name, _)| name.starts_with("@deskulpt-test/"))
+                {
+                    bail!(
+                        "{name} should be specified in 'devDependencies' instead of in \
+                        'dependencies'"
+                    );
+                }
+                dependencies
+            },
+            None => Default::default(),
+        }
     } else {
         Default::default()
     };
@@ -221,6 +239,16 @@ mod tests {
         vec![
             ChainReason::Exact("Failed to read package.json".to_string()),
             ChainReason::IOError,
+        ],
+    )]
+    // Specified default dependencies in `dependencies`
+    #[case::default_deps_in_dependencies(
+        fixture_dir().join("default_deps_in_dependencies"),
+        vec![
+            ChainReason::Exact(
+                "@deskulpt-test/react should be specified in 'devDependencies' instead \
+                of in 'dependencies'".to_string()
+            ),
         ],
     )]
     fn test_read_error(
