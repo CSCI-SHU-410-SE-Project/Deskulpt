@@ -38,12 +38,9 @@ pub(crate) fn bundle(
     )?;
 
     let code = GLOBALS.set(&globals, || {
-        // We need to rename the imports of `@deskulpt-test/apis` to the blob URL which
-        // wraps the widget APIs to avoid exposing the raw APIs that allow specifying
-        // widget IDs; note that this transform should be done last to avoid messing up
-        // with import resolution
-        let mut wrap_apis = as_folder(transforms::ApisImportRenamer(apis_blob_url));
-        let module = module.fold_with(&mut wrap_apis);
+        // Redirect widget APIs imports to the APIs blob URL
+        let mut rename_apis = as_folder(transforms::ApisImportRenamer(apis_blob_url));
+        let module = module.fold_with(&mut rename_apis);
 
         // Emit the bundled module as string into a buffer
         let mut buf = vec![];
