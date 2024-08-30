@@ -8,22 +8,25 @@ use std::{
     io::{Read, Write},
     path::{Component, Path, PathBuf},
 };
-use swc_atoms::Atom;
-use swc_bundler::{Bundler, Hook, Load, ModuleData, ModuleRecord, Resolve};
-use swc_common::{
-    comments::SingleThreadedComments, errors::Handler, sync::Lrc, FileName, Globals,
-    Mark, SourceMap, Span,
+use swc_core::{
+    atoms::Atom,
+    bundler::{Bundler, Hook, Load, ModuleData, ModuleRecord, Resolve},
+    common::{
+        comments::SingleThreadedComments, errors::Handler, sync::Lrc, FileName,
+        Globals, Mark, SourceMap, Span,
+    },
+    ecma::{
+        ast::{KeyValueProp, Module, Program},
+        codegen::{
+            text_writer::{JsWriter, WriteJs},
+            Emitter,
+        },
+        loader::resolve::Resolution,
+        parser::{parse_file_as_module, EsSyntax, Syntax, TsSyntax},
+        transforms::{react::react, typescript::typescript},
+        visit::FoldWith,
+    },
 };
-use swc_ecma_ast::{KeyValueProp, Module, Program};
-use swc_ecma_codegen::{
-    text_writer::{JsWriter, WriteJs},
-    Emitter,
-};
-use swc_ecma_loader::resolve::Resolution;
-use swc_ecma_parser::{parse_file_as_module, EsConfig, Syntax, TsConfig};
-use swc_ecma_transforms_react::jsx;
-use swc_ecma_transforms_typescript::typescript;
-use swc_ecma_visit::FoldWith;
 use tempfile::NamedTempFile;
 
 /// The file extensions to try when an import is given without an extension
@@ -72,7 +75,7 @@ pub(super) fn bundle_into_raw_module(
         PathLoader(cm.clone()),
         PathResolver(path_resolver_root),
         // Do not resolve the external modules
-        swc_bundler::Config { external_modules, ..Default::default() },
+        swc_core::bundler::Config { external_modules, ..Default::default() },
         Box::new(NoopHook),
     );
 
@@ -92,50 +95,11 @@ pub(super) fn bundle_into_raw_module(
     Ok(bundles.pop().unwrap().module)
 }
 
-/// Apply basic AST transforms to a module.
-///
-/// This includes stripping off TypeScript types and transforming JSX syntax.
-pub(super) fn apply_basic_transforms(module: Module, cm: Lrc<SourceMap>) -> Module {
-    let top_level_mark = Mark::new();
-    let unresolved_mark = Mark::new();
-
-    // Transform that removes TypeScript types; weirdly, this must be applied on a
-    // program rather than a module; note that we use the verbatim module syntax to
-    // avoid removing unused import statements in case they are needed
-    let mut ts_transform = typescript::typescript(
-        typescript::Config { verbatim_module_syntax: true, ..Default::default() },
-        top_level_mark,
-    );
-    let program = Program::Module(module);
-    let module = program.fold_with(&mut ts_transform).expect_module();
-
-    // We use the automatic JSX transform (in contrast to the classic transform)
-    // here so that there is no need to bring anything into scope just for syntax
-    // which could be unused; to enable the `css` prop from Emotion, we specify the
-    // import source to be `@deskulpt-test/emotion`, so that `jsx`, `jsxs`, and
-    // `Fragment` will be imported from `@deskulpt-test/emotion/jsx-runtime`, which
-    // will then be redirected to `src/.scripts/emotion-react-jsx-runtime.js` that
-    // re-exports necessary runtime functions
-    let mut jsx_transform = jsx::<SingleThreadedComments>(
-        cm.clone(),
-        None,
-        swc_ecma_transforms_react::Options {
-            runtime: Some(swc_ecma_transforms_react::Runtime::Automatic),
-            import_source: Some("@deskulpt-test/emotion".to_string()),
-            ..Default::default()
-        },
-        top_level_mark,
-        unresolved_mark,
-    );
-
-    module.fold_with(&mut jsx_transform)
-}
-
 /// Emit a module into a buffer.
 pub(super) fn emit_module_to_buf<W: Write>(module: Module, cm: Lrc<SourceMap>, buf: W) {
     let wr = JsWriter::new(cm.clone(), "\n", buf, None);
     let mut emitter = Emitter {
-        cfg: swc_ecma_codegen::Config::default().with_minify(true),
+        cfg: swc_core::ecma::codegen::Config::default().with_minify(true),
         cm: cm.clone(),
         comments: None,
         wr: Box::new(wr) as Box<dyn WriteJs>,
@@ -145,9 +109,8 @@ pub(super) fn emit_module_to_buf<W: Write>(module: Module, cm: Lrc<SourceMap>, b
 
 /// Deskulpt-customized path loader for SWC bundler.
 ///
-/// It is in charge of parsing the source file into a module AST. Note that transforms
-/// are not applied here to avoid messing up per-file ASTs that can cause unexpected
-/// bundling results.
+/// It is in charge of parsing the source file into a module AST. TypeScript types are
+/// stripped off and JSX syntax is transformed during the parsing.
 struct PathLoader(Lrc<SourceMap>);
 
 impl Load for PathLoader {
@@ -160,16 +123,55 @@ impl Load for PathLoader {
 
         let syntax = match path.extension() {
             Some(ext) if ext == "ts" || ext == "tsx" => {
-                Syntax::Typescript(TsConfig { tsx: true, ..Default::default() })
+                Syntax::Typescript(TsSyntax { tsx: true, ..Default::default() })
             },
-            _ => Syntax::Es(EsConfig { jsx: true, ..Default::default() }),
+            _ => Syntax::Es(EsSyntax { jsx: true, ..Default::default() }),
         };
 
-        // Parse the file as a module; note that transformations are not applied here,
-        // because per-file transformations may lead to unexpected results when bundled
-        // together; instead, transformations are postponed until the bundling phase
+        // Parse the file as a module
         match parse_file_as_module(&fm, syntax, Default::default(), None, &mut vec![]) {
-            Ok(module) => Ok(ModuleData { fm, module, helpers: Default::default() }),
+            Ok(module) => {
+                let unresolved_mark = Mark::new();
+                let top_level_mark = Mark::new();
+
+                // Strip off TypeScript types
+                let mut ts_transform = typescript::typescript(
+                    Default::default(),
+                    unresolved_mark,
+                    top_level_mark,
+                );
+
+                // We use the automatic JSX transform (in contrast to the classic
+                // transform) here so that there is no need to bring anything into scope
+                // just for syntax which could be unused; to enable the `css` prop from
+                // Emotion, we specify the import source to be `@deskulpt-test/emotion`,
+                // so that the JSX runtime utilities will be automatically imported from
+                // `@deskulpt-test/emotion/jsx-runtime`
+                let mut jsx_transform = react::<SingleThreadedComments>(
+                    self.0.clone(),
+                    None,
+                    swc_core::ecma::transforms::react::Options {
+                        runtime: Some(
+                            swc_core::ecma::transforms::react::Runtime::Automatic,
+                        ),
+                        import_source: Some("@deskulpt-test/emotion".to_string()),
+                        ..Default::default()
+                    },
+                    top_level_mark,
+                    unresolved_mark,
+                );
+
+                match Program::Module(module)
+                    .fold_with(&mut ts_transform)
+                    .fold_with(&mut jsx_transform)
+                    .module()
+                {
+                    Some(module) => {
+                        Ok(ModuleData { fm, module, helpers: Default::default() })
+                    },
+                    None => bail!("Failed to parse the file as a module"),
+                }
+            },
             Err(err) => {
                 // The error handler requires a destination for the emitter writer that
                 // implements `Write`; a buffer implements `Write` but its borrowed

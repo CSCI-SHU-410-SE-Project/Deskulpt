@@ -4,22 +4,22 @@ use super::{EXTERNAL_BUNDLE, EXTERNAL_BUNDLE_BRIDGE};
 use crate::utils::run_shell_command;
 use anyhow::{bail, Error};
 use std::{borrow::Cow, collections::HashMap, fs::remove_file, path::Path};
-use swc_atoms::Atom;
-use swc_common::DUMMY_SP;
-use swc_ecma_ast::{
-    ExportNamedSpecifier, ExportSpecifier, ImportDecl, ImportNamedSpecifier,
-    ImportSpecifier, Module, ModuleDecl, ModuleExportName, ModuleItem, NamedExport,
-};
-use swc_ecma_visit::{
-    as_folder, noop_visit_mut_type, FoldWith, VisitMut, VisitMutWith,
+use swc_core::{
+    common::DUMMY_SP,
+    ecma::{
+        ast::{
+            ExportNamedSpecifier, ExportSpecifier, ImportDecl, ImportNamedSpecifier,
+            ImportSpecifier, Module, ModuleDecl, ModuleExportName, ModuleItem,
+            NamedExport,
+        },
+        visit::{as_folder, noop_visit_mut_type, FoldWith, VisitMut, VisitMutWith},
+    },
 };
 use tauri::{AppHandle, Runtime};
 
-/// An AST transformer that resolves imports of widget APIs.
-///
-/// It replaces the imports from `@deskulpt-test/apis` with the given blob URL.
+/// An AST transformer that redirects widget APIs imports to the specified blob URL.
 pub(super) struct ApisImportRenamer(
-    /// The APIs blob URL to be used as the import source.
+    /// The blob URL to redirect APIs imports to.
     pub(super) String,
 );
 
@@ -30,7 +30,7 @@ impl VisitMut for ApisImportRenamer {
         n.visit_mut_children_with(self);
 
         if n.src.value.as_str() == "@deskulpt-test/apis" {
-            n.src.value = Atom::from(self.0.clone());
+            n.src = Box::new(self.0.clone().into());
         }
     }
 }
@@ -263,4 +263,20 @@ pub(super) async fn resolve_bridge_module<R: Runtime>(
     }
     let _ = remove_file(&bridge_path);
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use swc_core::ecma::{transforms::testing::test_inline, visit::as_folder};
+
+    // Test that the `ApisImportRenamer` transformer correctly renames the imports of
+    // `@deskulpt-test/apis` to the specified blob URL
+    test_inline!(
+        Default::default(),
+        |_| as_folder(ApisImportRenamer("blob://dummy-url".into())),
+        test_transform_apis_import_renamer,
+        r#"import "@deskulpt-test/apis";"#,
+        r#"import "blob://dummy-url";"#
+    );
 }

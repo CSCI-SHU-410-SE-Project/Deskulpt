@@ -37,9 +37,6 @@ updates:
       tauri:
         patterns:
           - tauri*
-      swc:
-        patterns:
-          - swc*
       dev:
         dependency-type: development
 

@@ -9,8 +9,10 @@ use std::{
     fs::{remove_file, File},
     path::Path,
 };
-use swc_common::{sync::Lrc, FilePathMapping, Globals, SourceMap, GLOBALS};
-use swc_ecma_visit::{as_folder, FoldWith};
+use swc_core::{
+    common::{sync::Lrc, FilePathMapping, Globals, SourceMap, GLOBALS},
+    ecma::visit::{as_folder, FoldWith},
+};
 use tauri::{AppHandle, Runtime};
 
 mod common;
@@ -56,14 +58,13 @@ pub(crate) fn bundle(
         cm.clone(),
     )?;
 
-    let mut apis_renamer = as_folder(transforms::ApisImportRenamer(apis_blob_url));
+    let mut rename_apis = as_folder(transforms::ApisImportRenamer(apis_blob_url));
 
     if dependency_map.is_empty() {
         // If there are no external dependencies, there is no need to resolve external
         // imports and bundle a second round
         let code = GLOBALS.set(&globals, || {
-            let module = common::apply_basic_transforms(module, cm.clone())
-                .fold_with(&mut apis_renamer);
+            let module = module.fold_with(&mut rename_apis);
 
             // Directly emit the bundled code into the buffer and return as string
             let mut buf = vec![];
@@ -88,8 +89,6 @@ pub(crate) fn bundle(
     let mut temp_bundle_file = File::create(&temp_bundle_path)?;
 
     GLOBALS.set(&globals, || {
-        let module = common::apply_basic_transforms(module, cm.clone());
-
         // Redirect external imports
         let mut resolver = as_folder(transforms::ExternalImportRedirector {
             external_dependencies: dependency_map,
@@ -113,7 +112,7 @@ pub(crate) fn bundle(
 
     let code = GLOBALS.set(&globals, || {
         // It suffices to redirect the APIs which we did not do in the first step
-        let module = module.fold_with(&mut apis_renamer);
+        let module = module.fold_with(&mut rename_apis);
 
         // Emit the bundled code into the buffer and return as string
         let mut buf = vec![];
@@ -156,7 +155,6 @@ pub(crate) async fn bundle_external<R: Runtime>(
         // Generate the bundle bridge of external dependencies
         let mut bridge_file = File::create(root.join(EXTERNAL_BUNDLE_BRIDGE))?;
         GLOBALS.set(&globals, || {
-            let module = common::apply_basic_transforms(module, cm.clone());
             let bridge_module = transforms::build_bridge_module(module, dependency_map);
             common::emit_module_to_buf(bridge_module, cm.clone(), &mut bridge_file);
         });
@@ -385,8 +383,11 @@ mod tests {
         let bundle_root = temp_dir.path().join("input");
         let index_path = bundle_root.join("index.jsx");
         let utils_path = bundle_root.join("utils.js");
-        std::fs::write(&index_path, format!("import {{ foo }} from {utils_path:?};"))
-            .unwrap();
+        std::fs::write(
+            &index_path,
+            format!("import {{ foo }} from {utils_path:?}; console.log(foo);"),
+        )
+        .unwrap();
         std::fs::write(&utils_path, "export const foo = 42;").unwrap();
 
         // Test the bundling error
