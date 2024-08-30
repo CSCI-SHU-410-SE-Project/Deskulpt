@@ -24,7 +24,7 @@
   },
   "homepage": "https://csci-shu-410-se-project.github.io/Deskulpt/",
   "dependencies": {
-    "@tauri-apps/api": "^2.0.0-rc.3"
+    "@tauri-apps/api": "^2.0.0-rc.4"
   },
   "devDependencies": {
     "@rollup/plugin-replace": "^5.0.5",
@@ -32,7 +32,7 @@
     "@rollup/plugin-typescript": "^11.1.6",
     "eslint": "^8.57.0",
     "globals": "^15.9.0",
-    "rollup": "^4.21.1",
+    "rollup": "^4.21.2",
     "tslib": "^2.7.0",
     "typescript": "^5.5.4",
     "typescript-eslint": "^8.3.0"
