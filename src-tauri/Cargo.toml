@@ -31,7 +31,7 @@ tempfile = "3.12.0"
 sysinfo = "0.31.3"
 
 # SWC crates
-swc_core = { version = "0.102.1", features = [
+swc_core = { version = "0.102.2", features = [
   "__common",
   "bundler",
   "ecma_ast",
