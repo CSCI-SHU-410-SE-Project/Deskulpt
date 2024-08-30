@@ -59,7 +59,7 @@ pub(super) fn bundle_into_raw_module(
     // The root of the path resolver will be used to determine whether a resolved import
     // goes beyond the root; the comparison is done via path prefixes so we must be
     // consistent with how SWC resolves paths, see:
-    // https://github.com/swc-project/swc/blob/f584ef76d75e86da15d0725ac94be35a88a1c946/crates/swc_bundler/src/bundler/mod.rs#L161
+    // https://github.com/swc-project/swc/blob/f584ef76d75e86da15d0725ac94be35a88a1c946/crates/swc_bundler/src/bundler/mod.rs#L159-L166
     #[cfg(target_os = "windows")]
     let path_resolver_root = root.canonicalize()?;
     #[cfg(not(target_os = "windows"))]
