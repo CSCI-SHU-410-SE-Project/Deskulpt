@@ -56,14 +56,20 @@ pub(super) fn bundle_into_raw_module(
         Vec::from_iter(dependencies)
     };
 
+    // The root of the path resolver will be used to determine whether a resolved import
+    // goes beyond the root; the comparison is done via path prefixes so we must be
+    // consistent with how SWC resolves paths, see:
+    // https://github.com/swc-project/swc/blob/f584ef76d75e86da15d0725ac94be35a88a1c946/crates/swc_bundler/src/bundler/mod.rs#L161
+    #[cfg(target_os = "windows")]
+    let path_resolver_root = root.canonicalize()?;
+    #[cfg(not(target_os = "windows"))]
+    let path_resolver_root = root.to_path_buf();
+
     let mut bundler = Bundler::new(
         globals,
         cm.clone(),
         PathLoader(cm.clone()),
-        // The path resolver produces paths with the \\?\ prefix on Windows, and since
-        // we need to compare paths with the root we canonicalize the root path here to
-        // get the same prefix; XXX not sure if there will be symlink issues
-        PathResolver(root.canonicalize()?.to_path_buf()),
+        PathResolver(path_resolver_root),
         // Do not resolve the external modules
         swc_bundler::Config { external_modules, ..Default::default() },
         Box::new(NoopHook),
