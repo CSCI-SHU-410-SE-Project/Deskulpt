@@ -42,9 +42,7 @@ pub(crate) fn bundle(
         // wraps the widget APIs to avoid exposing the raw APIs that allow specifying
         // widget IDs; note that this transform should be done last to avoid messing up
         // with import resolution
-        let mut wrap_apis = as_folder(transforms::ImportRenamer(
-            [("@deskulpt-test/apis".to_string(), apis_blob_url)].into(),
-        ));
+        let mut wrap_apis = as_folder(transforms::ApisImportRenamer(apis_blob_url));
         let module = module.fold_with(&mut wrap_apis);
 
         // Emit the bundled module as string into a buffer
