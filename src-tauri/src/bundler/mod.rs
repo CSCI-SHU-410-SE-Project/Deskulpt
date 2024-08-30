@@ -36,8 +36,6 @@ pub(crate) fn bundle(
     )?;
 
     let code = GLOBALS.set(&globals, || {
-        let module = common::apply_basic_transforms(module, cm.clone());
-
         // We need to rename the imports of `@deskulpt-test/apis` to the blob URL which
         // wraps the widget APIs to avoid exposing the raw APIs that allow specifying
         // widget IDs; note that this transform should be done last to avoid messing up
@@ -208,8 +206,11 @@ mod tests {
         let bundle_root = temp_dir.path().join("input");
         let index_path = bundle_root.join("index.jsx");
         let utils_path = bundle_root.join("utils.js");
-        std::fs::write(&index_path, format!("import {{ foo }} from {utils_path:?};"))
-            .unwrap();
+        std::fs::write(
+            &index_path,
+            format!("import {{ foo }} from {utils_path:?}; console.log(foo);"),
+        )
+        .unwrap();
         std::fs::write(&utils_path, "export const foo = 42;").unwrap();
 
         // Test the bundling error
