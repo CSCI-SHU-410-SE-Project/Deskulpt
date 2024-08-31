@@ -91,7 +91,7 @@ pub(crate) fn bundle(
     GLOBALS.set(&globals, || {
         // Redirect external imports
         let mut resolver = as_folder(transforms::ExternalImportRedirector {
-            external_dependencies: dependency_map,
+            external_dependencies: dependency_map.clone(),
         });
         let module = module.fold_with(&mut resolver);
 

@@ -1,4 +1,4 @@
-//! This module implements AST transformers and utilities.
+//! This module implements custom AST transformers and utilities.
 
 use super::{EXTERNAL_BUNDLE, EXTERNAL_BUNDLE_BRIDGE};
 use crate::utils::run_shell_command;
@@ -118,12 +118,12 @@ impl VisitMut for ExternalImportInspector<'_> {
 /// ```typescript
 /// import { foo1, foo2, foo3, foo4 } from "./${EXTERNAL_BUNDLE}";
 /// ```
-pub(super) struct ExternalImportRedirector<'a> {
+pub(super) struct ExternalImportRedirector {
     /// The external dependencies of the widget.
-    pub(super) external_dependencies: &'a HashMap<String, String>,
+    pub(super) external_dependencies: HashMap<String, String>,
 }
 
-impl VisitMut for ExternalImportRedirector<'_> {
+impl VisitMut for ExternalImportRedirector {
     noop_visit_mut_type!();
 
     fn visit_mut_import_decl(&mut self, n: &mut ImportDecl) {
@@ -268,7 +268,21 @@ pub(super) async fn resolve_bridge_module<R: Runtime>(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use swc_core::ecma::{transforms::testing::test_inline, visit::as_folder};
+    use crate::{bundler::common::emit_module_to_buf, testing::setup_mock_env};
+    use rstest::rstest;
+    use std::fs::{read_to_string, write, File};
+    use swc_core::{
+        common::{sync::Lrc, SourceMap},
+        ecma::{
+            parser::parse_file_as_module, transforms::testing::test_inline,
+            visit::as_folder,
+        },
+    };
+
+    /// Get a sample set of external dependencies.
+    fn get_external_dependencies() -> HashMap<String, String> {
+        HashMap::from([("mod1".into(), "1".into()), ("mod2".into(), "1".into())])
+    }
 
     // Test that the `ApisImportRenamer` transformer correctly renames the imports of
     // `@deskulpt-test/apis` to the specified blob URL
@@ -279,4 +293,54 @@ mod tests {
         r#"import "@deskulpt-test/apis";"#,
         r#"import "blob://dummy-url";"#
     );
+
+    // Test that the `ExternalImportRedirector` transformer correctly redirects the
+    // imports of external dependencies to the external bundle and does not touch other
+    // import statements
+    test_inline!(
+        Default::default(),
+        |_| as_folder(ExternalImportRedirector {
+            external_dependencies: get_external_dependencies()
+        }),
+        test_transform_external_import_redirector,
+        r#"import foo from "mod1"; import { bar } from "mod2"; import * as baz from "mod3";"#,
+        &format!(
+            r#"import {{ foo }} from "./{EXTERNAL_BUNDLE}";
+import {{ bar }} from "./{EXTERNAL_BUNDLE}";
+import * as baz from "mod3";"#
+        )
+    );
+
+    #[rstest]
+    fn test_build_bridge_module() {
+        // Test that the bridge module can be built correctly
+        let (temp_dir, _) = setup_mock_env();
+        let input = temp_dir.path().join("input.js");
+        let output = temp_dir.path().join("output.js");
+
+        // Create the input module
+        write(&input, r#"import foo from "mod1"; import { bar } from "mod2"; import * as baz from "mod3";"#).unwrap();
+        let cm: Lrc<SourceMap> = Default::default();
+        let fm = cm.load_file(&input).unwrap();
+        let module = parse_file_as_module(
+            &fm,
+            Default::default(),
+            Default::default(),
+            None,
+            &mut vec![],
+        )
+        .unwrap();
+
+        // Build the bridge module
+        let bridge_module = build_bridge_module(module, &get_external_dependencies());
+        let bridge_file = File::create(&output).unwrap();
+        emit_module_to_buf(bridge_module, cm, &bridge_file);
+
+        // Check the output; non-external imports should not be included in the bridge
+        // module, and the each external import should be exported as a named export
+        let actual = read_to_string(&output).unwrap();
+        let expected =
+            r#"import foo from"mod1";import{bar}from"mod2";export{foo,bar};"#;
+        assert_eq!(actual, expected);
+    }
 }
