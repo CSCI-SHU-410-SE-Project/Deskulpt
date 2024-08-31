@@ -5,8 +5,10 @@
 
 use anyhow::Error;
 use std::{collections::HashMap, path::Path};
-use swc_common::{sync::Lrc, FilePathMapping, Globals, SourceMap, GLOBALS};
-use swc_ecma_visit::{as_folder, FoldWith};
+use swc_core::{
+    common::{sync::Lrc, FilePathMapping, Globals, SourceMap, GLOBALS},
+    ecma::visit::{as_folder, FoldWith},
+};
 
 mod common;
 mod transforms;
@@ -36,16 +38,9 @@ pub(crate) fn bundle(
     )?;
 
     let code = GLOBALS.set(&globals, || {
-        let module = common::apply_basic_transforms(module, cm.clone());
-
-        // We need to rename the imports of `@deskulpt-test/apis` to the blob URL which
-        // wraps the widget APIs to avoid exposing the raw APIs that allow specifying
-        // widget IDs; note that this transform should be done last to avoid messing up
-        // with import resolution
-        let mut wrap_apis = as_folder(transforms::ImportRenamer(
-            [("@deskulpt-test/apis".to_string(), apis_blob_url)].into(),
-        ));
-        let module = module.fold_with(&mut wrap_apis);
+        // Redirect widget APIs imports to the APIs blob URL
+        let mut rename_apis = as_folder(transforms::ApisImportRenamer(apis_blob_url));
+        let module = module.fold_with(&mut rename_apis);
 
         // Emit the bundled module as string into a buffer
         let mut buf = vec![];
@@ -208,8 +203,11 @@ mod tests {
         let bundle_root = temp_dir.path().join("input");
         let index_path = bundle_root.join("index.jsx");
         let utils_path = bundle_root.join("utils.js");
-        std::fs::write(&index_path, format!("import {{ foo }} from {utils_path:?};"))
-            .unwrap();
+        std::fs::write(
+            &index_path,
+            format!("import {{ foo }} from {utils_path:?}; console.log(foo);"),
+        )
+        .unwrap();
         std::fs::write(&utils_path, "export const foo = 42;").unwrap();
 
         // Test the bundling error
