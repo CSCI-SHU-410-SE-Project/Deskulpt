@@ -127,8 +127,7 @@ pub(crate) fn bundle(
 ///
 /// This should be done prior to bundling the widget source code for a widget that uses
 /// external dependencies. It produces a tree-shaked bundle of external dependencies at
-/// [`EXTERNAL_BUNDLE`] with the help of [rollup](https://rollupjs.org/). It would thus
-/// require proper setup of `node` and `npm` in the environment.
+/// [`EXTERNAL_BUNDLE`].
 pub(crate) async fn bundle_external<R: Runtime>(
     app_handle: &AppHandle<R>,
     root: &Path,

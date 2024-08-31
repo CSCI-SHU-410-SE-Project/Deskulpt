@@ -1,4 +1,4 @@
-//! This module implements custom AST transformers and utilities.
+//! This module implements custom AST transformers, visitors, and related utilities.
 
 use super::{EXTERNAL_BUNDLE, EXTERNAL_BUNDLE_BRIDGE};
 use crate::utils::run_shell_command;
@@ -12,7 +12,10 @@ use swc_core::{
             ImportSpecifier, Module, ModuleDecl, ModuleExportName, ModuleItem,
             NamedExport,
         },
-        visit::{as_folder, noop_visit_mut_type, FoldWith, VisitMut, VisitMutWith},
+        visit::{
+            noop_visit_mut_type, noop_visit_type, Visit, VisitMut, VisitMutWith,
+            VisitWith,
+        },
     },
 };
 use tauri::{AppHandle, Runtime};
@@ -35,43 +38,30 @@ impl VisitMut for ApisImportRenamer {
     }
 }
 
-/// An AST transformer that records information of external imports.
+/// An AST visitor that records information of external imports.
 ///
-/// It does **not** actually transform the AST but instead inspects information from it.
-/// The information it collects is useful when we construct the external dependencies
-/// bridge.
+/// It inspects useful information for constructing the external dependencies bridge.
 struct ExternalImportInspector<'a> {
     /// The external dependencies to inspect.
     external_dependencies: &'a HashMap<String, String>,
     /// Collection of module items constructed from the external imports.
     ///
     /// Items will be added in place. In particular, each import declaration will be
-    /// wrapped into a module item and added to the collection. This will help construct
-    /// the import part of the external dependencies bridge.
+    /// wrapped into a module item and added to the collection.
     imports: &'a mut Vec<ModuleItem>,
     /// Collection of export specifiers constructed from the external imports.
     ///
     /// Items will be added in place. In particular, each specifier in an import
     /// declaration, whether named, default, or namespace, will be converted into a
-    /// named export specifier and added to the collection.
-    ///
-    /// ```typescript
-    /// import { foo1, a as foo2 } from "bar";  // -> foo1, foo2
-    /// import foo3 from "bar";                 // -> foo3
-    /// import * as foo4 from "bar";            // -> foo4
-    /// ```
-    ///
-    /// In other words, this does not care about where they are imported from, but only
-    /// what they are imported as.  This will help construct the export part of the
-    /// external dependencies bridge.
+    /// named export specifier with their local name and added to the collection.
     export_specifiers: &'a mut Vec<ExportSpecifier>,
 }
 
-impl VisitMut for ExternalImportInspector<'_> {
-    noop_visit_mut_type!();
+impl Visit for ExternalImportInspector<'_> {
+    noop_visit_type!();
 
-    fn visit_mut_import_decl(&mut self, n: &mut ImportDecl) {
-        n.visit_mut_children_with(self);
+    fn visit_import_decl(&mut self, n: &ImportDecl) {
+        n.visit_children_with(self);
 
         let import_source = n.src.value.as_str();
         if self.external_dependencies.contains_key(import_source)
@@ -105,19 +95,7 @@ impl VisitMut for ExternalImportInspector<'_> {
 /// An AST transformer that redirects imports of external dependencies.
 ///
 /// It replaces the import statements of external dependencies with named imports
-/// pointing to the bundle of external dependencies [`EXTERNAL_BUNDLE`]. For instance,
-///
-/// ```typescript
-/// import { foo1, a as foo2 } from "bar";
-/// import foo3 from "bar";
-/// import * as foo4 from "bar";
-/// ```
-///
-/// will be transformed into
-///
-/// ```typescript
-/// import { foo1, foo2, foo3, foo4 } from "./${EXTERNAL_BUNDLE}";
-/// ```
+/// (according to their local names) pointing to [`EXTERNAL_BUNDLE`].
 pub(super) struct ExternalImportRedirector {
     /// The external dependencies of the widget.
     pub(super) external_dependencies: HashMap<String, String>,
@@ -164,7 +142,7 @@ impl VisitMut for ExternalImportRedirector {
 
 /// Utility for generating a bridge module for bundling external dependencies.
 ///
-/// This function makes use of the [`ExternalImportInspector`] transform and creates a
+/// This function makes use of the [`ExternalImportInspector`] visitor and creates a
 /// bridge module that imports all external dependencies and exports them as named
 /// exports. Hence once resolved via node modules resolution, the bridge module will
 /// contain the source code of all external dependencies and export according to how
@@ -177,12 +155,12 @@ pub(super) fn build_bridge_module(
     let mut export_specifiers: Vec<ExportSpecifier> = vec![];
 
     // Inspect the module to collect information of external imports
-    let mut inspector = as_folder(ExternalImportInspector {
+    let mut inspector = ExternalImportInspector {
         external_dependencies: dependency_map,
         imports: &mut external_imports,
         export_specifiers: &mut export_specifiers,
-    });
-    module.fold_with(&mut inspector);
+    };
+    module.visit_children_with(&mut inspector);
 
     // The import declarations are already stored in `external_imports` as module items;
     // we further construct the exporting part of the bridge module into a module item
@@ -208,11 +186,9 @@ pub(super) fn build_bridge_module(
 
 /// Utility for resolving a bridge module via rollup.
 ///
-/// This function makes use of the [`ExternalImportInspector`] transform and creates a
-/// bridge module that imports all external dependencies and exports them as named
-/// exports. Hence once resolved via node modules resolution, the bridge module will
-/// contain the source code of all external dependencies and export according to how
-/// they appear locally in the widget source code.
+/// It calls [rollup](https://rollupjs.org/) for node modules resolution, thus all the
+/// imports (of external dependencies) in the bridge module are resolved and we have
+/// them properly exported for use. Always used with [`build_bridge_module`].
 pub(super) async fn resolve_bridge_module<R: Runtime>(
     app_handle: &AppHandle<R>,
     root: &Path,
