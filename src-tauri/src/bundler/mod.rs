@@ -66,7 +66,7 @@ pub(crate) fn bundle(
         let code = GLOBALS.set(&globals, || {
             let module = module.fold_with(&mut rename_apis);
 
-            // Directly emit the bundled code into the buffer and return as string
+            // Directly emit the bundled module as string into a buffer and return
             let mut buf = vec![];
             common::emit_module_to_buf(module, cm.clone(), &mut buf);
             String::from_utf8_lossy(&buf).to_string()
@@ -114,7 +114,7 @@ pub(crate) fn bundle(
         // It suffices to redirect the APIs which we did not do in the first step
         let module = module.fold_with(&mut rename_apis);
 
-        // Emit the bundled code into the buffer and return as string
+        // Emit the bundled module as string into a buffer
         let mut buf = vec![];
         common::emit_module_to_buf(module, cm.clone(), &mut buf);
         String::from_utf8_lossy(&buf).to_string()
