@@ -43,7 +43,7 @@
   "devDependencies": {
     "@emotion/babel-plugin": "^11.12.0",
     "@tauri-apps/cli": "^2.0.0-rc.8",
-    "@types/node": "^22.5.1",
+    "@types/node": "^22.5.2",
     "@types/react": "^18.3.5",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.1",
@@ -54,7 +54,7 @@
     "globals": "^15.9.0",
     "husky": "^9.1.5",
     "indent-string": "^5.0.0",
-    "lint-staged": "^15.2.9",
+    "lint-staged": "^15.2.10",
     "prettier": "^3.3.3",
     "shell-quote": "^1.8.1",
     "typescript": "^5.5.4",
