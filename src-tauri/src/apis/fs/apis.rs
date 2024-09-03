@@ -7,7 +7,7 @@ use std::io::Write;
 use tauri::{command, AppHandle, Runtime};
 
 #[command]
-pub(crate) fn exists<R: Runtime>(
+pub(crate) async fn exists<R: Runtime>(
     app_handle: AppHandle<R>,
     widget_id: String,
     path: String,
@@ -17,7 +17,7 @@ pub(crate) fn exists<R: Runtime>(
 }
 
 #[command]
-pub(crate) fn is_file<R: Runtime>(
+pub(crate) async fn is_file<R: Runtime>(
     app_handle: AppHandle<R>,
     widget_id: String,
     path: String,
@@ -27,7 +27,7 @@ pub(crate) fn is_file<R: Runtime>(
 }
 
 #[command]
-pub(crate) fn is_dir<R: Runtime>(
+pub(crate) async fn is_dir<R: Runtime>(
     app_handle: AppHandle<R>,
     widget_id: String,
     path: String,
@@ -37,7 +37,7 @@ pub(crate) fn is_dir<R: Runtime>(
 }
 
 #[command]
-pub(crate) fn read_file<R: Runtime>(
+pub(crate) async fn read_file<R: Runtime>(
     app_handle: AppHandle<R>,
     widget_id: String,
     path: String,
@@ -49,7 +49,7 @@ pub(crate) fn read_file<R: Runtime>(
 }
 
 #[command]
-pub(crate) fn write_file<R: Runtime>(
+pub(crate) async fn write_file<R: Runtime>(
     app_handle: AppHandle<R>,
     widget_id: String,
     path: String,
@@ -62,7 +62,7 @@ pub(crate) fn write_file<R: Runtime>(
 }
 
 #[command]
-pub(crate) fn append_file<R: Runtime>(
+pub(crate) async fn append_file<R: Runtime>(
     app_handle: AppHandle<R>,
     widget_id: String,
     path: String,
@@ -79,7 +79,7 @@ pub(crate) fn append_file<R: Runtime>(
 }
 
 #[command]
-pub(crate) fn remove_file<R: Runtime>(
+pub(crate) async fn remove_file<R: Runtime>(
     app_handle: AppHandle<R>,
     widget_id: String,
     path: String,
@@ -91,7 +91,7 @@ pub(crate) fn remove_file<R: Runtime>(
 }
 
 #[command]
-pub(crate) fn create_dir<R: Runtime>(
+pub(crate) async fn create_dir<R: Runtime>(
     app_handle: AppHandle<R>,
     widget_id: String,
     path: String,
@@ -103,7 +103,7 @@ pub(crate) fn create_dir<R: Runtime>(
 }
 
 #[command]
-pub(crate) fn remove_dir<R: Runtime>(
+pub(crate) async fn remove_dir<R: Runtime>(
     app_handle: AppHandle<R>,
     widget_id: String,
     path: String,
@@ -131,7 +131,7 @@ mod tests {
     }
 
     #[rstest]
-    fn test_exists() {
+    async fn test_exists() {
         // Test the `fs::exists` command
         let (base_dir, app_handle) = setup_mock_env();
         let widget_dir = setup_widget_directory(base_dir.path(), "dummy");
@@ -142,7 +142,8 @@ mod tests {
             app_handle.clone(),
             "dummy".to_string(),
             "dummy_file.txt".to_string(),
-        );
+        )
+        .await;
         assert!(result.is_ok());
         assert!(!result.unwrap());
 
@@ -152,13 +153,14 @@ mod tests {
             app_handle.clone(),
             "dummy".to_string(),
             "dummy_file.txt".to_string(),
-        );
+        )
+        .await;
         assert!(result.is_ok());
         assert!(result.unwrap());
     }
 
     #[rstest]
-    fn test_is_file_or_dir() {
+    async fn test_is_file_or_dir() {
         // Test the `fs::is_file` and `fs::is_dir` commands
         let (base_dir, app_handle) = setup_mock_env();
         let widget_dir = setup_widget_directory(base_dir.path(), "dummy");
@@ -174,30 +176,34 @@ mod tests {
             app_handle.clone(),
             "dummy".to_string(),
             "dummy_file.txt".to_string(),
-        );
+        )
+        .await;
         assert!(result.is_ok());
         assert!(result.unwrap());
         let result = is_dir(
             app_handle.clone(),
             "dummy".to_string(),
             "dummy_file.txt".to_string(),
-        );
+        )
+        .await;
         assert!(result.is_ok());
         assert!(!result.unwrap());
 
         // Check that `is_file` gives false and `is_dir` gives true for the directory
         let result =
-            is_file(app_handle.clone(), "dummy".to_string(), "dummy_dir".to_string());
+            is_file(app_handle.clone(), "dummy".to_string(), "dummy_dir".to_string())
+                .await;
         assert!(result.is_ok());
         assert!(!result.unwrap());
         let result =
-            is_dir(app_handle.clone(), "dummy".to_string(), "dummy_dir".to_string());
+            is_dir(app_handle.clone(), "dummy".to_string(), "dummy_dir".to_string())
+                .await;
         assert!(result.is_ok());
         assert!(result.unwrap());
     }
 
     #[rstest]
-    fn test_read_file() {
+    async fn test_read_file() {
         // Test the `fs::read_file` command
         let (base_dir, app_handle) = setup_mock_env();
         let widget_dir = setup_widget_directory(base_dir.path(), "dummy");
@@ -208,7 +214,8 @@ mod tests {
             app_handle.clone(),
             "dummy".to_string(),
             "dummy_file.txt".to_string(),
-        );
+        )
+        .await;
         assert!(result.is_err());
         assert!(result.unwrap_err().contains(
             format!("Failed to read file '{}'", file_path.display()).as_str()
@@ -224,13 +231,14 @@ mod tests {
             app_handle.clone(),
             "dummy".to_string(),
             "dummy_file.txt".to_string(),
-        );
+        )
+        .await;
         assert!(result.is_ok());
         assert_eq!(result.unwrap(), content);
     }
 
     #[rstest]
-    fn test_write_file() {
+    async fn test_write_file() {
         // Test the `fs::write_file` command
         let (base_dir, app_handle) = setup_mock_env();
         let widget_dir = setup_widget_directory(base_dir.path(), "dummy");
@@ -243,7 +251,8 @@ mod tests {
             "dummy".to_string(),
             "dummy_file.txt".to_string(),
             content.to_string(),
-        );
+        )
+        .await;
         assert!(result.is_ok());
         assert_eq!(std::fs::read_to_string(&file_path).unwrap(), content);
 
@@ -254,13 +263,14 @@ mod tests {
             "dummy".to_string(),
             "dummy_file.txt".to_string(),
             new_content.to_string(),
-        );
+        )
+        .await;
         assert!(result.is_ok());
         assert_eq!(std::fs::read_to_string(&file_path).unwrap(), new_content);
     }
 
     #[rstest]
-    fn test_append_file() {
+    async fn test_append_file() {
         // Test the `fs::append_file` command
         let (base_dir, app_handle) = setup_mock_env();
         let widget_dir = setup_widget_directory(base_dir.path(), "dummy");
@@ -273,7 +283,8 @@ mod tests {
             "dummy".to_string(),
             "dummy_file.txt".to_string(),
             content.to_string(),
-        );
+        )
+        .await;
         assert!(result.is_ok());
         assert_eq!(std::fs::read_to_string(&file_path).unwrap(), content);
 
@@ -284,7 +295,8 @@ mod tests {
             "dummy".to_string(),
             "dummy_file.txt".to_string(),
             new_content.to_string(),
-        );
+        )
+        .await;
         assert!(result.is_ok());
         assert_eq!(
             std::fs::read_to_string(&file_path).unwrap(),
@@ -293,7 +305,7 @@ mod tests {
     }
 
     #[rstest]
-    fn test_create_dir() {
+    async fn test_create_dir() {
         // Test the `fs::create_dir` command
         let (base_dir, app_handle) = setup_mock_env();
         let widget_dir = setup_widget_directory(base_dir.path(), "dummy");
@@ -302,13 +314,14 @@ mod tests {
             app_handle.clone(),
             "dummy".to_string(),
             "dummy_dir".to_string(),
-        );
+        )
+        .await;
         assert!(result.is_ok());
         assert!(widget_dir.join("dummy_dir").is_dir());
     }
 
     #[rstest]
-    fn test_remove_file_or_dir() {
+    async fn test_remove_file_or_dir() {
         // Test the `fs::remove_file` and `fs::remove_dir` commands
         let (base_dir, app_handle) = setup_mock_env();
         let widget_dir = setup_widget_directory(base_dir.path(), "dummy");
@@ -318,7 +331,8 @@ mod tests {
             app_handle.clone(),
             "dummy".to_string(),
             "dummy_file.txt".to_string(),
-        );
+        )
+        .await;
         assert!(result.is_err());
         assert!(result.unwrap_err().contains(
             format!(
@@ -333,7 +347,8 @@ mod tests {
             app_handle.clone(),
             "dummy".to_string(),
             "dummy_dir".to_string(),
-        );
+        )
+        .await;
         assert!(result.is_err());
         assert!(result.unwrap_err().contains(
             format!(
@@ -354,7 +369,8 @@ mod tests {
             app_handle.clone(),
             "dummy".to_string(),
             "dummy_dir".to_string(),
-        );
+        )
+        .await;
         assert!(result.is_err());
         assert!(result.unwrap_err().contains(
             format!(
@@ -369,7 +385,8 @@ mod tests {
             app_handle.clone(),
             "dummy".to_string(),
             "dummy_file.txt".to_string(),
-        );
+        )
+        .await;
         assert!(result.is_err());
         assert!(result.unwrap_err().contains(
             format!(
@@ -384,7 +401,8 @@ mod tests {
             app_handle.clone(),
             "dummy".to_string(),
             "dummy_file.txt".to_string(),
-        );
+        )
+        .await;
         assert!(result.is_ok());
         assert!(!file_path.exists());
 
@@ -393,7 +411,8 @@ mod tests {
             app_handle.clone(),
             "dummy".to_string(),
             "dummy_dir".to_string(),
-        );
+        )
+        .await;
         assert!(result.is_ok());
         assert!(!dir_path.exists());
     }

@@ -49,7 +49,7 @@ pub(crate) struct NetworkInfo {
 }
 
 #[command]
-pub(crate) fn get_system_info() -> CommandOut<SystemInfo> {
+pub(crate) async fn get_system_info() -> CommandOut<SystemInfo> {
     let mut sys = System::new_all();
     sys.refresh_all();
     let disks_info: Vec<DiskInfo> = Disks::new_with_refreshed_list()
