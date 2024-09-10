@@ -56,7 +56,7 @@ importers:
         version: 18.3.0
       '@vitejs/plugin-react':
         specifier: ^4.3.1
-        version: 4.3.1(vite@5.4.2(@types/node@22.5.2)(sass@1.77.8)(terser@5.31.1))
+        version: 4.3.1(vite@5.4.2(@types/node@22.5.2)(sass@1.78.0)(terser@5.31.1))
       chalk:
         specifier: ^5.3.0
         version: 5.3.0
@@ -95,7 +95,7 @@ importers:
         version: 8.3.0(eslint@8.57.0)(typescript@5.5.4)
       vite:
         specifier: ^5.4.2
-        version: 5.4.2(@types/node@22.5.2)(sass@1.77.8)(terser@5.31.1)
+        version: 5.4.2(@types/node@22.5.2)(sass@1.78.0)(terser@5.31.1)
 
   tooling/apis:
     dependencies:
@@ -218,7 +218,7 @@ importers:
         version: 2.1.1
       docusaurus-plugin-sass:
         specifier: ^0.2.5
-        version: 0.2.5(@docusaurus/core@3.5.2(@docusaurus/types@3.5.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@mdx-js/react@3.0.1(@types/react@18.3.5)(react@18.3.1))(eslint@8.57.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.5.4))(sass@1.77.8)(webpack@5.92.1)
+        version: 0.2.5(@docusaurus/core@3.5.2(@docusaurus/types@3.5.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@mdx-js/react@3.0.1(@types/react@18.3.5)(react@18.3.1))(eslint@8.57.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.5.4))(sass@1.78.0)(webpack@5.92.1)
       docusaurus-plugin-typedoc:
         specifier: ^1.0.5
         version: 1.0.5(typedoc-plugin-markdown@4.2.6(typedoc@0.26.7(typescript@5.5.4)))
@@ -226,8 +226,8 @@ importers:
         specifier: ^2.4.0
         version: 2.4.0(react@18.3.1)
       sass:
-        specifier: ^1.77.8
-        version: 1.77.8
+        specifier: ^1.78.0
+        version: 1.78.0
       typedoc:
         specifier: ^0.26.7
         version: 0.26.7(typescript@5.5.4)
@@ -5812,8 +5812,8 @@ packages:
       sass:
         optional: true
 
-  sass@1.77.8:
-    resolution: {integrity: sha512-4UHg6prsrycW20fqLGPShtEvo/WyHRVRHwOP4DzkUrObWoWI05QBSfzU71TVB7PFaL104TwNaHpjlWXAZbQiNQ==}
+  sass@1.78.0:
+    resolution: {integrity: sha512-AaIqGSrjo5lA2Yg7RvFZrlXDBCp3nV4XP73GrLGvdRWWwk+8H3l0SDvq/5bA4eF+0RFPLuWUk3E+P1U/YqnpsQ==}
     engines: {node: '>=14.0.0'}
     hasBin: true
 
@@ -10001,14 +10001,14 @@ snapshots:
 
   '@ungap/structured-clone@1.2.0': {}
 
-  '@vitejs/plugin-react@4.3.1(vite@5.4.2(@types/node@22.5.2)(sass@1.77.8)(terser@5.31.1))':
+  '@vitejs/plugin-react@4.3.1(vite@5.4.2(@types/node@22.5.2)(sass@1.78.0)(terser@5.31.1))':
     dependencies:
       '@babel/core': 7.24.7
       '@babel/plugin-transform-react-jsx-self': 7.24.7(@babel/core@7.24.7)
       '@babel/plugin-transform-react-jsx-source': 7.24.1(@babel/core@7.24.7)
       '@types/babel__core': 7.20.5
       react-refresh: 0.14.2
-      vite: 5.4.2(@types/node@22.5.2)(sass@1.77.8)(terser@5.31.1)
+      vite: 5.4.2(@types/node@22.5.2)(sass@1.78.0)(terser@5.31.1)
     transitivePeerDependencies:
       - supports-color
 
@@ -10864,11 +10864,11 @@ snapshots:
     dependencies:
       esutils: 2.0.3
 
-  docusaurus-plugin-sass@0.2.5(@docusaurus/core@3.5.2(@docusaurus/types@3.5.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@mdx-js/react@3.0.1(@types/react@18.3.5)(react@18.3.1))(eslint@8.57.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.5.4))(sass@1.77.8)(webpack@5.92.1):
+  docusaurus-plugin-sass@0.2.5(@docusaurus/core@3.5.2(@docusaurus/types@3.5.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@mdx-js/react@3.0.1(@types/react@18.3.5)(react@18.3.1))(eslint@8.57.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.5.4))(sass@1.78.0)(webpack@5.92.1):
     dependencies:
       '@docusaurus/core': 3.5.2(@docusaurus/types@3.5.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@mdx-js/react@3.0.1(@types/react@18.3.5)(react@18.3.1))(debug@4.3.6)(eslint@8.57.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.5.4)
-      sass: 1.77.8
-      sass-loader: 10.5.2(sass@1.77.8)(webpack@5.92.1)
+      sass: 1.78.0
+      sass-loader: 10.5.2(sass@1.78.0)(webpack@5.92.1)
     transitivePeerDependencies:
       - fibers
       - node-sass
@@ -13616,7 +13616,7 @@ snapshots:
 
   safer-buffer@2.1.2: {}
 
-  sass-loader@10.5.2(sass@1.77.8)(webpack@5.92.1):
+  sass-loader@10.5.2(sass@1.78.0)(webpack@5.92.1):
     dependencies:
       klona: 2.0.6
       loader-utils: 2.0.4
@@ -13625,9 +13625,9 @@ snapshots:
       semver: 7.6.2
       webpack: 5.92.1
     optionalDependencies:
-      sass: 1.77.8
+      sass: 1.78.0
 
-  sass@1.77.8:
+  sass@1.78.0:
     dependencies:
       chokidar: 3.6.0
       immutable: 4.3.6
@@ -14227,7 +14227,7 @@ snapshots:
       unist-util-stringify-position: 4.0.0
       vfile-message: 4.0.2
 
-  vite@5.4.2(@types/node@22.5.2)(sass@1.77.8)(terser@5.31.1):
+  vite@5.4.2(@types/node@22.5.2)(sass@1.78.0)(terser@5.31.1):
     dependencies:
       esbuild: 0.21.5
       postcss: 8.4.41
@@ -14235,7 +14235,7 @@ snapshots:
     optionalDependencies:
       '@types/node': 22.5.2
       fsevents: 2.3.3
-      sass: 1.77.8
+      sass: 1.78.0
       terser: 5.31.1
 
   watchpack@2.4.1:

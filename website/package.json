@@ -19,7 +19,7 @@
     "docusaurus-plugin-sass": "^0.2.5",
     "docusaurus-plugin-typedoc": "^1.0.5",
     "prism-react-renderer": "^2.4.0",
-    "sass": "^1.77.8",
+    "sass": "^1.78.0",
     "typedoc": "^0.26.7",
     "typedoc-plugin-markdown": "^4.2.6"
   },
