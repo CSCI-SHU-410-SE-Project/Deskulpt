@@ -13,10 +13,10 @@ pretty_assertions = "1.4.1"
 regex = "1.10.6"
 rstest = "0.22.0"
 swc_core = { version = "0.104.2", features = ["testing_transform"] }
-tauri = { version = "2.0.0-rc.11", features = ["test"] }
+tauri = { version = "2.0.0-rc.14", features = ["test"] }
 
 [dependencies]
-tauri = { version = "2.0.0-rc.11", features = ["macos-private-api", "tray-icon"] }
+tauri = { version = "2.0.0-rc.14", features = ["macos-private-api", "tray-icon"] }
 tauri-plugin-clipboard-manager = "2.1.0-beta.7"
 tauri-plugin-global-shortcut = "2.0.0-rc.2"
 tauri-plugin-shell = "2.0.0-rc.3"
