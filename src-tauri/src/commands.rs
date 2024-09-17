@@ -396,8 +396,12 @@ mod tests {
         let new_collection = new_collection.unwrap();
 
         // Check that we have got all the expected configurations
-        let invalid_configurations =
-            ["conf_missing_field", "conf_not_readable", "package_json_not_readable"];
+        let invalid_configurations = [
+            "conf_missing_field",
+            "conf_not_readable",
+            "package_json_not_readable",
+            "default_deps_in_dependencies",
+        ];
         let valid_configurations =
             ["standard", "no_package_json", "package_json_no_dependencies"];
         assert_eq!(
