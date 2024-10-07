@@ -21,7 +21,7 @@
     "prism-react-renderer": "^2.4.0",
     "sass": "^1.78.0",
     "typedoc": "^0.26.7",
-    "typedoc-plugin-markdown": "^4.2.7"
+    "typedoc-plugin-markdown": "^4.2.9"
   },
   "devDependencies": {
     "@docusaurus/module-type-aliases": "^3.5.2",
