@@ -22,7 +22,7 @@ tauri-plugin-global-shortcut = "2.0.0-rc.2"
 tauri-plugin-shell = "2.0.0-rc.3"
 
 # Utilities
-anyhow = "1.0.87"
+anyhow = "1.0.91"
 path-clean = "1.0.1"
 serde = { version = "1.0.210", features = ["derive"] }
 serde-error = "0.1.2"
