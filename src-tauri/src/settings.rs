@@ -4,7 +4,7 @@ use crate::utils::IdMap;
 use anyhow::Error;
 use serde::{Deserialize, Serialize};
 use std::{
-    fs::{read_to_string, File},
+    fs::{create_dir_all, read_to_string, File},
     io::BufWriter,
     path::Path,
 };
@@ -67,6 +67,13 @@ pub(crate) fn write_settings(
     app_config_dir: &Path,
     settings: &Settings,
 ) -> Result<(), Error> {
+    // On certain platform, if the file directory does not exist, file creation using std::fs:;File::create will fail.
+    // See [the doc](https://doc.rust-lang.org/std/fs/struct.File.html#method.create) for detail.
+    // Thus we need to manually create app_config_dir if it doesn't exist.
+    if !app_config_dir.exists() {
+        create_dir_all(app_config_dir)?;
+    }
+
     let file = File::create(app_config_dir.join(".settings.json"))?;
     let writer = BufWriter::new(file);
     serde_json::to_writer(writer, settings)?;
