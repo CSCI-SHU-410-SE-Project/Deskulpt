@@ -44,6 +44,7 @@ swc_core = { version = "0.104.2", features = [
   "ecma_transforms_typescript",
   "ecma_visit",
 ] }
+lazy_static = "1.5.0"
 
 [target."cfg(target_os = \"macos\")".dependencies]
 objc = "0.2.7"
