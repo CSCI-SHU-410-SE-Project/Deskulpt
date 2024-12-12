@@ -3,7 +3,7 @@
 use crate::commands::CommandOut;
 use lazy_static::lazy_static;
 use serde::Serialize;
-use std::sync::{RwLock, RwLockWriteGuard};
+use std::sync::RwLock;
 use sysinfo::{Disks, Networks, System};
 use tauri::command;
 
@@ -90,7 +90,6 @@ pub(crate) fn get_system_info() -> CommandOut<SystemInfo> {
             brand: cpu.brand().to_string(),
             frequency: cpu.frequency(),
             total_cpu_usage: cpu.cpu_usage(),
-            // total_cpu_usage: sys.global_cpu_info().cpu_usage(),
         });
     }
 
