@@ -7,8 +7,9 @@ use std::{
 };
 use tauri::{
     menu::{MenuBuilder, MenuItemBuilder},
-    tray::ClickType,
-    App, AppHandle, Manager, WebviewUrl, WebviewWindowBuilder, Window, WindowEvent,
+    tray::{MouseButton, MouseButtonState, TrayIconEvent},
+    App, AppHandle, Emitter, Manager, WebviewUrl, WebviewWindowBuilder, Window,
+    WindowEvent,
 };
 
 #[cfg(target_os = "macos")]
@@ -67,7 +68,8 @@ pub(crate) fn listen_to_windows(window: &Window, event: &WindowEvent) {
 /// Initialize the Deskulpt system tray.
 ///
 /// This binds the menu and event handlers to the system tray with ID "deskulpt-tray",
-/// see `tauri.conf.json`. This tray would be intialized with the following features:
+/// see `tauri.conf.json`. Note that the cnavas click-through state is managed in this
+/// function as well! This tray would be intialized with the following features:
 ///
 /// - When left-clicking the tray icon or clicking the "toggle" menu item, toggle the
 ///   click-through state of the canvas window. Note that left-clicking is unsupported
@@ -104,8 +106,10 @@ pub(crate) fn init_system_tray(app: &App) -> Result<(), Box<dyn std::error::Erro
 
     // Register event handler for the tray icon itself
     deskulpt_tray.on_tray_icon_event(|tray, event| {
-        if event.click_type == ClickType::Left {
-            let _ = toggle_click_through_state(tray.app_handle());
+        if let TrayIconEvent::Click { button, button_state, .. } = event {
+            if button == MouseButton::Left && button_state == MouseButtonState::Down {
+                let _ = toggle_click_through_state(tray.app_handle()); // Consume error
+            }
         }
     });
 

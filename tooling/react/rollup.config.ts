@@ -1,4 +1,4 @@
-import { defineConfig, RollupLog } from "rollup";
+import { RollupLog, defineConfig } from "rollup";
 import typescript from "@rollup/plugin-typescript";
 import terser from "@rollup/plugin-terser";
 import { fileURLToPath } from "url";
@@ -21,11 +21,11 @@ export default defineConfig([
     plugins: [typescript(), terser()],
     onwarn,
   },
-  // CJS build for publishing
+  // ESM build for publishing
   {
     input: "src/index.ts",
     output: {
-      format: "cjs",
+      format: "esm",
       file: "./dist/index.js",
     },
     external: ["react"],

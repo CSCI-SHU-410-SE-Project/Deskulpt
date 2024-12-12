@@ -1,6 +1,6 @@
 {
   "name": "@deskulpt-test/react",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Deskulpt partial re-export of React.",
   "type": "module",
   "main": "./dist/index.js",
@@ -9,10 +9,10 @@
     "dist"
   ],
   "scripts": {
+    "preinstall": "npx only-allow pnpm",
     "build": "rollup -c --configPlugin typescript",
-    "pub": "npm install && npm run build && npm publish --access public",
-    "lint": "eslint --max-warnings=0 .",
-    "lint:fix": "eslint --max-warnings=0 --fix ."
+    "lint": "eslint --max-warnings=0 --fix .",
+    "lint:check": "eslint --max-warnings=0 ."
   },
   "repository": {
     "type": "git",
@@ -24,17 +24,18 @@
     "url": "https://github.com/CSCI-SHU-410-SE-Project/Deskulpt/issues"
   },
   "homepage": "https://csci-shu-410-se-project.github.io/Deskulpt/",
-  "dependencies": {
-    "@types/react": "^18.2.79",
-    "react": "^18.2.0"
-  },
   "devDependencies": {
     "@rollup/plugin-terser": "^0.4.4",
     "@rollup/plugin-typescript": "^11.1.6",
     "eslint": "^8.57.0",
-    "rollup": "^4.14.3",
-    "tslib": "^2.6.2",
-    "typescript": "^5.4.5",
-    "typescript-eslint": "^7.7.0"
+    "globals": "^15.9.0",
+    "rollup": "^4.21.3",
+    "tslib": "^2.7.0",
+    "typescript": "^5.6.2",
+    "typescript-eslint": "^8.5.0"
+  },
+  "peerDependencies": {
+    "@types/react": "^18.3.3",
+    "react": "^18.3.1"
   }
 }

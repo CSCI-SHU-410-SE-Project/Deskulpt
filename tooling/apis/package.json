@@ -8,10 +8,10 @@
     "dist"
   ],
   "scripts": {
+    "preinstall": "npx only-allow pnpm",
     "build": "rollup -c --configPlugin typescript",
-    "pub": "npm install && npm run build && npm publish --access public",
-    "lint": "eslint --max-warnings=0 .",
-    "lint:fix": "eslint --max-warnings=0 --fix ."
+    "lint": "eslint --max-warnings=0 --fix .",
+    "lint:check": "eslint --max-warnings=0 ."
   },
   "repository": {
     "type": "git",
@@ -24,16 +24,17 @@
   },
   "homepage": "https://csci-shu-410-se-project.github.io/Deskulpt/",
   "dependencies": {
-    "@tauri-apps/api": "^2.0.0-beta.11"
+    "@tauri-apps/api": "^2.0.0-rc.4"
   },
   "devDependencies": {
     "@rollup/plugin-replace": "^5.0.5",
     "@rollup/plugin-terser": "^0.4.4",
     "@rollup/plugin-typescript": "^11.1.6",
     "eslint": "^8.57.0",
-    "rollup": "^4.14.3",
-    "tslib": "^2.6.2",
-    "typescript": "^5.4.5",
-    "typescript-eslint": "^7.7.0"
+    "globals": "^15.9.0",
+    "rollup": "^4.21.3",
+    "tslib": "^2.7.0",
+    "typescript": "^5.6.2",
+    "typescript-eslint": "^8.5.0"
   }
 }

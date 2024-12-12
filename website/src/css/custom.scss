@@ -11,6 +11,8 @@
   --ifm-color-primary-lighter: #6cb9d6;
   --ifm-color-primary-lightest: #8dc8df;
   --ifm-code-font-size: 95%;
+  --ifm-tabs-padding-vertical: 0.3rem;
+  --ifm-tabs-padding-horizontal: 1.5rem;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
 }
 
@@ -27,6 +29,11 @@
   .invert-on-dark {
     filter: invert(90%) hue-rotate(170deg);
   }
+}
+
+// Icon in the navbar header
+.header-icon-lift {
+  padding-bottom: 4px;
 }
 
 // GitHub link in the header navbar, adapted from:
@@ -46,4 +53,9 @@
   &:hover::before {
     background-color: var(--ifm-navbar-link-hover-color);
   }
+}
+
+// Narrow the search bar in the navbar
+.navbar__search-input {
+  width: 7rem !important;
 }

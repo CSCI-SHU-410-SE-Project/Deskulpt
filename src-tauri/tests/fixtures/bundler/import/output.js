@@ -1,1 +1,1 @@
-function getMessage(){return"This function is successfully imported.";}import React from"@deskulpt-test/react";function Message(){return React.createElement("div",null,getMessage());}const App={render:()=>React.createElement(Message,null)};export{App as default};
+const dir="jsutils";const noext="jsutils/index";const ext="jsutils/index.js";const dir1="jsxutils";const noext1="jsxutils/index";const ext1="jsxutils/index.jsx";console.log(dir,dir1,noext,noext1,ext,ext1);

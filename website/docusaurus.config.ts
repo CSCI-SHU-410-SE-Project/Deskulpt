@@ -7,7 +7,7 @@ const config: Config = {
   tagline: "A cross-platform desktop customization tool.",
   favicon: "img/favicon.ico",
 
-  url: "https://CSCI-SHU-410-SE-Project.github.io/",
+  url: "https://CSCI-SHU-410-SE-Project.github.io",
   baseUrl: "/Deskulpt/",
   organizationName: "CSCI-SHU-410-SE-Project",
   projectName: "Deskulpt",
@@ -17,7 +17,34 @@ const config: Config = {
     locales: ["en"],
   },
 
-  plugins: ["docusaurus-plugin-sass"],
+  plugins: [
+    "docusaurus-plugin-sass",
+    [
+      "@easyops-cn/docusaurus-search-local",
+      {
+        hashed: true,
+        docsRouteBasePath: "/",
+        blogRouteBasePath: "/blog",
+        searchBarShortcutHint: false,
+      },
+    ],
+    [
+      "docusaurus-plugin-typedoc",
+      {
+        out: "./docs/tsdoc",
+        entryPoints: ["../src"],
+        entryPointStrategy: "expand",
+        outputFileStrategy: "modules",
+        tsconfig: "../tsconfig.json",
+        hidePageTitle: true,
+        parametersFormat: "table",
+        propertiesFormat: "table",
+        enumMembersFormat: "table",
+        typeDeclarationFormat: "table",
+        indexFormat: "table",
+      },
+    ],
+  ],
 
   presets: [
     [
@@ -42,11 +69,10 @@ const config: Config = {
       respectPrefersColorScheme: true,
     },
     navbar: {
-      title: "Deskulpt",
       logo: {
         alt: "Deskulpt",
-        src: "img/logo.svg",
-        className: "invert-on-dark",
+        src: "img/logo-wide.svg",
+        className: "invert-on-dark header-icon-lift",
       },
       items: [
         {
@@ -55,8 +81,17 @@ const config: Config = {
           type: "docSidebar",
         },
         {
+          label: "Development",
+          sidebarId: "development",
+          type: "docSidebar",
+        },
+        {
           label: "Blog",
           to: "/blog",
+        },
+        {
+          type: "search",
+          position: "right",
         },
         {
           href: "https://github.com/CSCI-SHU-410-SE-Project/Deskulpt",
@@ -70,8 +105,9 @@ const config: Config = {
       copyright: `Copyright © ${new Date().getFullYear()} Deskulpt developers. Built with Docusaurus.`,
     },
     prism: {
-      theme: prismThemes.github,
-      darkTheme: prismThemes.dracula,
+      theme: prismThemes.oneLight,
+      darkTheme: prismThemes.oneDark,
+      additionalLanguages: ["bash"],
     },
   } satisfies Preset.ThemeConfig,
 };

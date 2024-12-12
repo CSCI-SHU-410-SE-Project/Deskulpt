@@ -1,0 +1,47 @@
+version: 2
+updates:
+  # Node dependencies
+  - package-ecosystem: npm
+    directories:
+      - /
+      - /tooling/apis
+      - /tooling/react
+      - /tooling/ui
+      - /website
+    schedule:
+      interval: weekly
+    labels:
+      - dependencies
+    ignore:
+      - dependency-name: "eslint"
+        versions: ["9.x"]
+    groups:
+      tauri:
+        patterns:
+          - "@tauri-apps/*"
+      docusaurus:
+        patterns:
+          - "@docusaurus/*"
+          - "docusaurus-plugin-*"
+      dev:
+        dependency-type: development
+
+  # Cargo dependencies
+  - package-ecosystem: cargo
+    directory: /src-tauri
+    schedule:
+      interval: weekly
+    labels:
+      - dependencies
+    groups:
+      tauri:
+        patterns:
+          - tauri*
+      dev:
+        dependency-type: development
+
+  # GitHub Actions dependencies
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly

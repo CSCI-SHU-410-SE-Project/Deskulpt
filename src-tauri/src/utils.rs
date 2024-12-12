@@ -2,7 +2,26 @@
 
 use crate::states::CanvasClickThroughState;
 use anyhow::{bail, Error};
-use tauri::{AppHandle, Manager};
+use serde::Serialize;
+use std::collections::HashMap;
+use tauri::{AppHandle, Emitter, Manager, Runtime};
+
+/// Mapping from widget IDs to corresponding data.
+pub(crate) type IdMap<T> = HashMap<String, T>;
+
+/// Toast kind of the "show-toast" event.
+#[derive(Serialize, Clone)]
+#[serde(rename_all = "lowercase")]
+enum ToastKind {
+    Success,
+}
+
+/// Payload of the "show-toast" event.
+#[derive(Serialize, Clone)]
+struct ShowToastPayload {
+    kind: ToastKind,
+    message: String,
+}
 
 /// Toggle the click-through state of the canvas window.
 ///
@@ -12,13 +31,15 @@ use tauri::{AppHandle, Manager};
 ///
 /// - The canvas window is not found.
 /// - Fails to set the canvas to ignore/unignore cursor events.
-pub(crate) fn toggle_click_through_state(app_handle: &AppHandle) -> Result<(), Error> {
+pub(crate) fn toggle_click_through_state<R: Runtime>(
+    app_handle: &AppHandle<R>,
+) -> Result<(), Error> {
     let canvas = match app_handle.get_webview_window("canvas") {
         Some(canvas) => canvas,
         None => bail!("Canvas window not found"),
     };
 
-    let click_through_state = &app_handle.state::<CanvasClickThroughState>();
+    let click_through_state = &app_handle.state::<CanvasClickThroughState<R>>();
     let mut click_through = click_through_state.0.lock().unwrap();
     let prev_can_click_through = click_through.yes();
 
@@ -36,7 +57,13 @@ pub(crate) fn toggle_click_through_state(app_handle: &AppHandle) -> Result<(), E
     let _ = app_handle.emit_to(
         "canvas",
         "show-toast",
-        format!("Canvas {}", if prev_can_click_through { "floated" } else { "sunk" }),
+        ShowToastPayload {
+            kind: ToastKind::Success,
+            message: format!(
+                "Canvas {}.",
+                if prev_can_click_through { "floated" } else { "sunk" }
+            ),
+        },
     );
     Ok(())
 }

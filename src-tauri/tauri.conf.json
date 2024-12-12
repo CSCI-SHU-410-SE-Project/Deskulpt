@@ -1,10 +1,10 @@
 {
   "productName": "Deskulpt",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "identifier": "com.tauri.deskulpt",
   "build": {
-    "beforeDevCommand": "npm run dev",
-    "beforeBuildCommand": "npm run build",
+    "beforeDevCommand": "pnpm dev",
+    "beforeBuildCommand": "pnpm build",
     "devUrl": "http://localhost:1420",
     "frontendDist": "../dist"
   },

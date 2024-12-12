@@ -1,0 +1,44 @@
+---
+sidebar_position: 2
+description: Building and improving documentation.
+---
+
+# Documentation
+
+We are glad to accept any sort of documentation improvement. This includes API
+documentation, guide improvements, examples, tutorials, and more.
+
+## Building the Documentation
+
+1. First of all, make sure that you have properly installed the [development version](./contributing-code#building-from-source)
+   of Deskulpt. Then go to the `website/` directory where the documentation is held and
+   install the documentation dependencies, in addition to the core dependencies:
+
+   ```bash
+   cd website
+   pnpm install
+   ```
+
+2. Start the development server. This supports live-reloading, so in most cases you can
+   see the changes you make in real-time:
+
+   ```bash
+   pnpm start
+   ```
+
+3. Build and serve the documentation. The build step will generate the static files
+   that can be served by a web server. The serve step will start a web server that
+   serves the built documentation:
+
+   ```bash
+   pnpm build
+   pnpm serve             # Will use existing build
+   pnpm serve -- --build  # Will (re)build before serving
+   ```
+
+4. The [backend developer API references](https://csci-shu-410-se-project.github.io/Deskulpt/rustdoc/deskulpt/)
+   are generated separately from the main documentation. It can be built by running:
+
+   ```bash
+   pnpm rustdoc
+   ```

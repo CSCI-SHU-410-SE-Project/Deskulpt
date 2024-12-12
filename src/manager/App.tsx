@@ -1,110 +1,83 @@
-import { useEffect, useState } from "react";
-import { ManagerWidgetState } from "../types";
-import { Settings } from "../types";
-import { useToggleShortcut } from "../hooks/useToggleShortcut";
-import { getNewManagerWidgetStates, renderWidgets } from "./utils";
-import { useExitAppListener } from "../hooks/useExitAppListener";
-import { useUpdateSettingListener } from "../hooks/useUpdateSettingListener";
-import WidgetsTab from "../components/WidgetsTab";
-import SettingsTab from "../components/SettingsTab";
-import LogsTab from "../components/LogsTab";
-import AboutTab from "../components/AboutTab";
-import { Tabs } from "antd";
+import { useState } from "react";
+import WidgetsTab from "./tabs/WidgetsTab";
+import SettingsTab from "./tabs/SettingsTab";
+import AboutTab from "./tabs/AboutTab";
+import useExitAppListener from "./hooks/useExitAppListener";
+import useToggleShortcut from "./hooks/useToggleShortcut";
+import useManagerWidgetStates from "./hooks/useManagerWidgetStates";
+import useUpdateSettingListener from "./hooks/useUpdateSettingListener";
+import { Settings } from "../types/backend";
+import { Box, Tabs, Theme } from "@radix-ui/themes";
+import ManagerToaster from "./components/ManagerToaster";
+import ThemeAppearanceToggler from "./components/ThemeAppearanceToggler";
+
+export interface ManagerAppProps {
+  /** The initial settings read from the previously saved setting file. */
+  initialSettings: Settings;
+}
 
 /**
- * The main component of the widget manager window.
+ * The main component of the manager window.
  */
-export default function App(props: { initialSettings: Settings }) {
-  const { initialSettings } = props;
+export default function App({ initialSettings }: ManagerAppProps) {
+  const [themeAppearance, setThemeAppearance] = useState(
+    initialSettings.themeAppearance,
+  );
   const { toggleShortcut, setToggleShortcut } = useToggleShortcut(
     initialSettings.toggleShortcut,
   );
-  const [managerWidgetStates, setManagerWidgetStates] = useState<
-    Record<string, ManagerWidgetState>
-  >({});
+  const { managerWidgetStates, setManagerWidgetStates, rescanAndRender } =
+    useManagerWidgetStates(initialSettings.widgetSettings);
 
-  useExitAppListener(toggleShortcut, managerWidgetStates);
+  useExitAppListener(toggleShortcut, themeAppearance, managerWidgetStates);
   useUpdateSettingListener(setManagerWidgetStates);
 
-  /**
-   * Rescan the widget base directory and render newly added widgets.
-   *
-   * Newly added widgets are those that exist in the new states but does not exist in
-   * the previous states.
-   */
-  async function rescanAndRender() {
-    const newManagerWidgetStates = await getNewManagerWidgetStates(
-      managerWidgetStates,
-      initialSettings.widgetSettings,
-    );
-    const addedStates = Object.fromEntries(
-      Object.entries(newManagerWidgetStates).filter(
-        ([widgetId]) => !(widgetId in managerWidgetStates),
-      ),
-    );
-    setManagerWidgetStates(newManagerWidgetStates); // Direct replacement
-    await renderWidgets(addedStates);
-  }
-
-  useEffect(() => {
-    // The rescan is guaranteed to succeed because it triggers a command in the backend;
-    // the rendering, however, mail fail due to the canvas not being ready to receive
-    // the rendering events; this should be rare with a 1.5-second timeout
-    const timer = setTimeout(() => {
-      rescanAndRender().catch(console.error);
-    }, 1500);
-
-    return () => {
-      clearTimeout(timer);
-    };
-  }, []);
-
-  const tabItems = [
-    {
-      key: "1",
-      label: "Widgets",
-      children: (
-        <WidgetsTab
-          managerWidgetStates={managerWidgetStates}
-          setManagerWidgetStates={setManagerWidgetStates}
-          rescanAndRender={rescanAndRender}
-        />
-      ),
-    },
-    {
-      key: "2",
-      label: "Settings",
-      children: (
-        <SettingsTab
-          toggleShortcut={toggleShortcut}
-          setToggleShortcut={setToggleShortcut}
-        />
-      ),
-    },
-    {
-      key: "3",
-      label: "Logs",
-      children: <LogsTab />,
-    },
-    {
-      key: "4",
-      label: "About",
-      children: <AboutTab />,
-    },
-  ];
-
   return (
-    <Tabs
-      defaultActiveKey="1"
-      type="card"
-      items={tabItems}
-      size="small"
-      css={{
-        "& > .ant-tabs-nav > .ant-tabs-nav-wrap > .ant-tabs-nav-list > .ant-tabs-tab": {
-          width: "100px",
-          justifyContent: "center",
-        },
-      }}
-    />
+    <Theme
+      appearance={themeAppearance}
+      accentColor="indigo"
+      grayColor="slate"
+      css={{ height: "100vh" }}
+    >
+      <ManagerToaster themeAppearance={themeAppearance} />
+      <ThemeAppearanceToggler
+        themeAppearance={themeAppearance}
+        setThemeAppearance={setThemeAppearance}
+      />
+      <Tabs.Root defaultValue="widgets" asChild>
+        <Box height="100%" p="2">
+          <Tabs.List>
+            <Tabs.Trigger value="widgets">Widgets</Tabs.Trigger>
+            <Tabs.Trigger value="settings">Settings</Tabs.Trigger>
+            <Tabs.Trigger value="about">About</Tabs.Trigger>
+          </Tabs.List>
+          {/* Tab triggers have ~40px height */}
+          <Box px="1" py="3" css={{ height: "calc(100% - 40px)" }}>
+            <Tabs.Content value="widgets" asChild>
+              <Box height="100%">
+                <WidgetsTab
+                  managerWidgetStates={managerWidgetStates}
+                  setManagerWidgetStates={setManagerWidgetStates}
+                  rescanAndRender={rescanAndRender}
+                />
+              </Box>
+            </Tabs.Content>
+            <Tabs.Content value="settings" asChild>
+              <Box height="100%">
+                <SettingsTab
+                  toggleShortcut={toggleShortcut}
+                  setToggleShortcut={setToggleShortcut}
+                />
+              </Box>
+            </Tabs.Content>
+            <Tabs.Content value="about" asChild>
+              <Box height="100%">
+                <AboutTab />
+              </Box>
+            </Tabs.Content>
+          </Box>
+        </Box>
+      </Tabs.Root>
+    </Theme>
   );
 }

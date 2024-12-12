@@ -41,18 +41,80 @@ jobs:
         with:
           workspaces: ./src-tauri -> target
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
       - name: Node setup and cache
         uses: actions/setup-node@v4
         with:
           node-version: lts/*
-          cache: npm
+          cache: pnpm
 
       - name: Install frontend dependencies
-        run: npm install
+        run: pnpm install --frozen-lockfile
 
       # Without specifying `tagName` and `releaseId`, tauri-action will only build the
       # application without trying to upload any assets
       - name: Build Deskulpt
+        id: build-deskulpt
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload build artifacts
+        id: upload-artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: binaries-${{ matrix.platform }}
+          path: "${{ join(fromJSON(steps.build-deskulpt.outputs.artifactPaths), '\n') }}"
+
+  comment:
+    needs: build
+    if: ${{ !cancelled() && github.event_name == 'pull_request' }}
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+
+    steps:
+      - name: Find comment
+        id: find-comment
+        uses: peter-evans/find-comment@v3
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-author: "github-actions[bot]"
+          body-includes: |
+            .github/workflows/build.yaml
+
+      - name: Construct comment body
+        id: comment-body
+        run: |
+          shortsha=$(echo ${{ github.event.pull_request.head.sha }} | cut -c 1-7)
+
+          header="✔️ Deskulpt Built Successfully!"
+          body="Deskulpt binaries have been built successfully on all supported platforms. Your pull request is in excellent shape! You may check the built Deskulpt binaries [here](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}) and download them to test locally."
+          footnote="Workflow file: \`.github/workflows/build.yaml\`. Generated for commit: [\`$shortsha\`](https://github.com/${{ github.repository }}/pull/${{ github.event.pull_request.number }}/commits/${{ github.event.pull_request.head.sha }})."
+
+          if [ "${{ needs.build.result }}" != "success" ]; then
+            header="❌ Failed to Build Deskulpt"
+            body="There seems to be some issues with the build process for certain platforms. Please check the logs in the [failing workflow run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}) for more details and fix the issues accordingly."
+          fi
+
+          echo "header=$header" >> $GITHUB_OUTPUT
+          echo "body=$body" >> $GITHUB_OUTPUT
+          echo "footnote=$footnote" >> $GITHUB_OUTPUT
+
+      - name: Post comment
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          comment-id: ${{ steps.find-comment.outputs.comment-id }}
+          issue-number: ${{ github.event.pull_request.number }}
+          edit-mode: replace
+          body: |
+            ## ${{ steps.comment-body.outputs.header }}
+
+            ${{ steps.comment-body.outputs.body }}
+
+            <sub> ${{ steps.comment-body.outputs.footnote }} </sub>

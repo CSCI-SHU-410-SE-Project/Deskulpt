@@ -13,8 +13,10 @@ export default defineConfig(({ command }) => ({
       },
     }),
     importmapPlugin(command, {
-      "@deskulpt-test/react": "src/.scripts/react.js",
+      "@deskulpt-test/emotion/jsx-runtime": "src/.scripts/jsx-runtime.js",
       "@deskulpt-test/raw-apis": "src/.scripts/raw-apis.js",
+      "@deskulpt-test/react": "src/.scripts/react.js",
+      "@deskulpt-test/ui": "src/.scripts/ui.js",
     }),
   ],
   clearScreen: false,
@@ -43,7 +45,7 @@ export default defineConfig(({ command }) => ({
 }));
 
 /**
- * Cutom plugin to deal with import maps.
+ * Custom plugin to deal with import maps.
  *
  * Note that the values of `imports` must be relative to the vite server root.
  *
