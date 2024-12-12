@@ -1,19 +1,18 @@
 //! This module implements the commands for `fs` in `@deskulpt-test/apis`.
 
 use crate::commands::CommandOut;
-use lazy_static::lazy_static;
+// use lazy_static::lazy_static;
+use once_cell::sync::Lazy;
 use serde::Serialize;
 use std::sync::RwLock;
 use sysinfo::{Disks, Networks, System};
 use tauri::command;
 
-lazy_static! {
-    /// A System instance shared between all the commands.
-    ///
-    /// We share a single system instance instead of creating it everytime a command is called.
-    /// This is to get a more accurate usage (see doc https://docs.rs/sysinfo/latest/sysinfo/#usage)
-    static ref SYSINFO: RwLock<System> = RwLock::new(System::new_all());
-}
+/// A System instance shared between all the commands.
+///
+/// We share a single system instance instead of creating it everytime a command is called.
+/// This is to get a more accurate usage (see doc https://docs.rs/sysinfo/latest/sysinfo/#usage)
+static SYSINFO: Lazy<RwLock<System>> = Lazy::new(|| RwLock::new(System::new_all()));
 
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
