@@ -59,13 +59,12 @@ pub(crate) struct NetworkInfo {
 }
 
 #[command]
-pub(crate) fn get_system_info() -> CommandOut<SystemInfo> {
+pub(crate) async fn get_system_info() -> CommandOut<SystemInfo> {
     let mut sys = SYSINFO
         .lock()
         .map_err(|e| anyhow::anyhow!("Mutex poisoned: {}", e))
         .context("Failed to obtain sysinfo mutex")
         .map_err(|e| cmderr!(e))?;
-
     sys.refresh_all();
     let disks_info: Vec<DiskInfo> = Disks::new_with_refreshed_list()
         .iter()

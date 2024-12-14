@@ -81,7 +81,7 @@ macro_rules! cmdbail {
 /// of the command. Instead, the widget ID will correspond to an error message instead
 /// of a widget configuration.
 #[command]
-pub(crate) fn refresh_widget_collection<R: Runtime>(
+pub(crate) async fn refresh_widget_collection<R: Runtime>(
     app_handle: AppHandle<R>,
 ) -> CommandOut<WidgetConfigCollection> {
     let widget_base = &app_handle.state::<WidgetBaseDirectoryState>().0;
@@ -149,7 +149,7 @@ pub(crate) fn refresh_widget_collection<R: Runtime>(
 ///   instead of a widget configuration.
 /// - There is an error when bundling the widget.
 #[command]
-pub(crate) fn bundle_widget<R: Runtime>(
+pub(crate) async fn bundle_widget<R: Runtime>(
     app_handle: AppHandle<R>,
     widget_id: String,
     apis_blob_url: String,
@@ -183,7 +183,8 @@ pub(crate) fn bundle_widget<R: Runtime>(
 
 /// Register or unregister a global shortcut for toggling the click-through state.
 ///
-/// If `reverse` this will register the shortcut, otherwise it will unregister it.
+/// If `reverse` is `false` this will register the shortcut, otherwise it will
+/// unregister it.
 ///
 /// This command will fail if:
 ///
@@ -191,7 +192,7 @@ pub(crate) fn bundle_widget<R: Runtime>(
 /// - The shortcut is not registered yet but we want to unregister it.
 /// - There is an error registering or unregistering the shortcut.
 #[command]
-pub(crate) fn register_toggle_shortcut<R: Runtime>(
+pub(crate) async fn register_toggle_shortcut<R: Runtime>(
     app_handle: AppHandle<R>,
     shortcut: String,
     reverse: bool,
@@ -235,7 +236,7 @@ pub(crate) fn register_toggle_shortcut<R: Runtime>(
 /// - The given widget ID is not found in the widget collection.
 /// - Tauri fails to open the resource.
 #[command]
-pub(crate) fn open_widget_resource<R: Runtime>(
+pub(crate) async fn open_widget_resource<R: Runtime>(
     app_handle: AppHandle<R>,
     widget_id: Option<String>,
     path: Option<PathBuf>,
@@ -265,7 +266,7 @@ pub(crate) fn open_widget_resource<R: Runtime>(
 /// This command tries to load the previously stored settings. It never fails, but
 /// instead returns the default settings upon any error.
 #[command]
-pub(crate) fn init_settings<R: Runtime>(
+pub(crate) async fn init_settings<R: Runtime>(
     app_handle: AppHandle<R>,
 ) -> CommandOut<Settings> {
     let app_config_dir = match app_handle.path().app_config_dir() {
@@ -280,7 +281,7 @@ pub(crate) fn init_settings<R: Runtime>(
 /// This command will try to save the widget internals for persistence before exiting
 /// the application, but failure to do so will not prevent the application from exiting.
 #[command]
-pub(crate) fn exit_app<R: Runtime>(
+pub(crate) async fn exit_app<R: Runtime>(
     app_handle: AppHandle<R>,
     settings: Settings,
 ) -> CommandOut<()> {
@@ -380,7 +381,7 @@ mod tests {
     }
 
     #[rstest]
-    fn test_refresh_widget_collection() {
+    async fn test_refresh_widget_collection() {
         // Test the `refresh_widget_collection` command
         let (base_dir, app_handle) = setup_mock_env();
 
@@ -391,7 +392,7 @@ mod tests {
         copy_dir(fixture_dir().join("config"), &widget_base).unwrap();
 
         // The command should not fail just because contents of any configuration file
-        let new_collection = refresh_widget_collection(app_handle.clone());
+        let new_collection = refresh_widget_collection(app_handle.clone()).await;
         assert!(new_collection.is_ok());
         let new_collection = new_collection.unwrap();
 
@@ -430,13 +431,14 @@ mod tests {
     }
 
     #[rstest]
-    fn test_bundle_widget_pass(
+    async fn test_bundle_widget_pass(
         setup_bundle_widget_env: &(TempDir, AppHandle<MockRuntime>),
     ) {
         // Test that the `bundle_widget` command bundles a widget correctly
         let (_base_dir, app_handle) = setup_bundle_widget_env;
         let result =
-            bundle_widget(app_handle.clone(), "pass".to_string(), Default::default());
+            bundle_widget(app_handle.clone(), "pass".to_string(), Default::default())
+                .await;
 
         // We only check that the result is Ok; the actual bundled content should be
         // checked in the bundler unit tests
@@ -444,13 +446,14 @@ mod tests {
     }
 
     #[rstest]
-    fn test_bundle_widget_bundling_error(
+    async fn test_bundle_widget_bundling_error(
         setup_bundle_widget_env: &(TempDir, AppHandle<MockRuntime>),
     ) {
         // Test that the `bundle_widget` command raises upon bundling error
         let (_base_dir, app_handle) = setup_bundle_widget_env;
         let result =
-            bundle_widget(app_handle.clone(), "fail".to_string(), Default::default());
+            bundle_widget(app_handle.clone(), "fail".to_string(), Default::default())
+                .await;
 
         assert!(result.is_err());
         let error = result.unwrap_err();
@@ -461,7 +464,7 @@ mod tests {
     }
 
     #[rstest]
-    fn test_bundle_widget_id_not_found(
+    async fn test_bundle_widget_id_not_found(
         setup_bundle_widget_env: &(TempDir, AppHandle<MockRuntime>),
     ) {
         // Test that the `bundle_widget` command raises for an unknown widget ID
@@ -470,7 +473,8 @@ mod tests {
             app_handle.clone(),
             "non_existent_id".to_string(),
             Default::default(),
-        );
+        )
+        .await;
 
         assert!(result.is_err());
         let error = result.unwrap_err();
@@ -478,7 +482,7 @@ mod tests {
     }
 
     #[rstest]
-    fn test_bundle_widget_invalid_conf(
+    async fn test_bundle_widget_invalid_conf(
         setup_bundle_widget_env: &(TempDir, AppHandle<MockRuntime>),
     ) {
         // Test that the `bundle_widget` command propagates the error message held in
@@ -488,7 +492,8 @@ mod tests {
             app_handle.clone(),
             "invalid_conf".to_string(),
             Default::default(),
-        );
+        )
+        .await;
 
         assert!(result.is_err());
         let error = result.unwrap_err();
