@@ -1,11 +1,10 @@
 //! This module implements the commands for `fs` in `@deskulpt-test/apis`.
 
-use crate::{cmderr, commands::CommandOut};
-use anyhow::Context;
+use crate::commands::CommandOut;
 // use lazy_static::lazy_static;
+use async_std::sync::Mutex;
 use once_cell::sync::Lazy;
 use serde::Serialize;
-use std::sync::Mutex;
 use sysinfo::{Disks, Networks, System};
 use tauri::command;
 
@@ -60,11 +59,7 @@ pub(crate) struct NetworkInfo {
 
 #[command]
 pub(crate) async fn get_system_info() -> CommandOut<SystemInfo> {
-    let mut sys = SYSINFO
-        .lock()
-        .map_err(|e| anyhow::anyhow!("Mutex poisoned: {}", e))
-        .context("Failed to obtain sysinfo mutex")
-        .map_err(|e| cmderr!(e))?;
+    let mut sys = SYSINFO.lock().await;
     sys.refresh_all();
     let disks_info: Vec<DiskInfo> = Disks::new_with_refreshed_list()
         .iter()
