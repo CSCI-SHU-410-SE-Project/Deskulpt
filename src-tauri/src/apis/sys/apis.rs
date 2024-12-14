@@ -1,10 +1,11 @@
 //! This module implements the commands for `fs` in `@deskulpt-test/apis`.
 
-use crate::commands::CommandOut;
+use crate::{cmderr, commands::CommandOut};
+use anyhow::Context;
 // use lazy_static::lazy_static;
 use once_cell::sync::Lazy;
 use serde::Serialize;
-use std::sync::RwLock;
+use std::sync::Mutex;
 use sysinfo::{Disks, Networks, System};
 use tauri::command;
 
@@ -12,7 +13,7 @@ use tauri::command;
 ///
 /// We share a single system instance instead of creating it everytime a command is called.
 /// This is to get a more accurate usage (see doc https://docs.rs/sysinfo/latest/sysinfo/#usage)
-static SYSINFO: Lazy<RwLock<System>> = Lazy::new(|| RwLock::new(System::new_all()));
+static SYSINFO: Lazy<Mutex<System>> = Lazy::new(|| Mutex::new(System::new_all()));
 
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -59,8 +60,11 @@ pub(crate) struct NetworkInfo {
 
 #[command]
 pub(crate) fn get_system_info() -> CommandOut<SystemInfo> {
-    let sys_guard = SYSINFO.write().unwrap();
-    let mut sys = sys_guard;
+    let mut sys = SYSINFO
+        .lock()
+        .map_err(|e| anyhow::anyhow!("Mutex poisoned: {}", e))
+        .context("Failed to obtain sysinfo mutex")
+        .map_err(|e| cmderr!(e))?;
 
     sys.refresh_all();
     let disks_info: Vec<DiskInfo> = Disks::new_with_refreshed_list()
