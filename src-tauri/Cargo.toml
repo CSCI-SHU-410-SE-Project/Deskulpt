@@ -8,33 +8,33 @@ tauri-build = { version = "2.0.0-beta.13", features = ["codegen"] }
 
 [dev-dependencies]
 async-std = { version = "1.12.0", features = ["attributes"] }
-cargo-llvm-cov = "0.6.11"
+cargo-llvm-cov = "0.6.13"
 copy_dir = "0.1.3"
-pretty_assertions = "1.4.0"
+pretty_assertions = "1.4.1"
 regex = "1.10.6"
 rstest = "0.22.0"
-swc_core = { version = "0.102.2", features = ["testing_transform"] }
-tauri = { version = "2.0.0-rc.8", features = ["test"] }
+swc_core = { version = "0.104.2", features = ["testing_transform"] }
+tauri = { version = "2.0.0-rc.11", features = ["test"] }
 
 [dependencies]
-tauri = { version = "2.0.0-rc.8", features = ["macos-private-api", "tray-icon"] }
+tauri = { version = "2.0.0-rc.11", features = ["macos-private-api", "tray-icon"] }
 tauri-plugin-clipboard-manager = "2.1.0-beta.7"
 tauri-plugin-global-shortcut = "2.0.0-rc.2"
 tauri-plugin-shell = "2.0.0-rc.3"
 
 # Utilities
-anyhow = "1.0.86"
+anyhow = "1.0.87"
 path-clean = "1.0.1"
-serde = { version = "1.0.209", features = ["derive"] }
+serde = { version = "1.0.210", features = ["derive"] }
 serde-error = "0.1.2"
-serde_json = "1.0.127"
+serde_json = "1.0.128"
 tempfile = "3.12.0"
 
 # APIs
 sysinfo = "0.31.4"
 
 # SWC crates
-swc_core = { version = "0.102.2", features = [
+swc_core = { version = "0.104.2", features = [
   "__common",
   "bundler",
   "ecma_ast",
