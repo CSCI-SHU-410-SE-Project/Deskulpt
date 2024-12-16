@@ -30,7 +30,7 @@
   },
   "devDependencies": {
     "@rollup/plugin-terser": "^0.4.4",
-    "@rollup/plugin-typescript": "^11.1.6",
+    "@rollup/plugin-typescript": "^12.1.2",
     "eslint": "^8.57.0",
     "globals": "^15.9.0",
     "rollup": "^4.21.3",
