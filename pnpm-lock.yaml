@@ -15,11 +15,11 @@ importers:
         specifier: ^3.1.3
         version: 3.1.3(@types/react-dom@18.3.0)(@types/react@18.3.6)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@tauri-apps/api':
-        specifier: ^2.0.0-rc.4
-        version: 2.0.0-rc.4
+        specifier: ^2.1.1
+        version: 2.1.1
       '@tauri-apps/plugin-clipboard-manager':
-        specifier: ^2.1.0-beta.6
-        version: 2.1.0-beta.6
+        specifier: ^2.2.0
+        version: 2.2.0
       react:
         specifier: ^18.3.1
         version: 18.3.1
@@ -100,8 +100,8 @@ importers:
   tooling/apis:
     dependencies:
       '@tauri-apps/api':
-        specifier: ^2.0.0-rc.4
-        version: 2.0.0-rc.4
+        specifier: ^2.1.1
+        version: 2.1.1
     devDependencies:
       '@rollup/plugin-replace':
         specifier: ^5.0.5
@@ -2439,8 +2439,8 @@ packages:
     resolution: {integrity: sha512-+PmQX0PiAYPMeVYe237LJAYvOMYW1j2rH5YROyS3b4CTVJum34HfRvKvAzozHAQG0TnHNdUfY9nCeUyRAs//cw==}
     engines: {node: '>=14.16'}
 
-  '@tauri-apps/api@2.0.0-rc.4':
-    resolution: {integrity: sha512-UNiIhhKG08j4ooss2oEEVexffmWkgkYlC2M3GcX3VPtNsqFgVNL8Mcw/4Y7rO9M9S+ffAMnLOF5ypzyuyb8tyg==}
+  '@tauri-apps/api@2.1.1':
+    resolution: {integrity: sha512-fzUfFFKo4lknXGJq8qrCidkUcKcH2UHhfaaCNt4GzgzGaW2iS26uFOg4tS3H4P8D6ZEeUxtiD5z0nwFF0UN30A==}
 
   '@tauri-apps/cli-darwin-arm64@2.0.0-rc.15':
     resolution: {integrity: sha512-WuzQRELJTeSHe/uLu6IClCCEkwQy4qtZdHUmcAW3baKD217WCytn4jQ5+NFs2GxhK1a2GLHMQtQZSFTLkKiXkw==}
@@ -2507,8 +2507,8 @@ packages:
     engines: {node: '>= 10'}
     hasBin: true
 
-  '@tauri-apps/plugin-clipboard-manager@2.1.0-beta.6':
-    resolution: {integrity: sha512-MBuoVXPcq1yab4z6DGx7D44ntvr21taoozJnf1IHeXg864MnlCPeZj6fuDm+vF2o+3ac2sSZDZmo6PvrkLC8lQ==}
+  '@tauri-apps/plugin-clipboard-manager@2.2.0':
+    resolution: {integrity: sha512-sIBrW/HioKq2vqomwwcU/Y8ygAv3DlS32yKPBX5XijCc0IyQKiDxYpGqmvE9DC5Y0lNJ/G53dfS961B31wjJ1g==}
 
   '@trysound/sax@0.2.0':
     resolution: {integrity: sha512-L7z9BgrNEcYyUYtF+HaEfiS5ebkh9jXqbszz7pC0hRBPaatV0XjSD3+eHrpqFemQfgwiFF0QPIarnIihIDn7OA==}
@@ -3681,6 +3681,7 @@ packages:
   eslint@8.57.0:
     resolution: {integrity: sha512-dZ6+mexnaTIbSBZWgou51U6OmzIhYM2VcNdtiTtI7qPNZm35Akpr0f6vtw3w1Kmn5PYo+tZVfh13WrhpS6oLqQ==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
+    deprecated: This version is no longer supported. Please see https://eslint.org/version-support for other options.
     hasBin: true
 
   espree@9.6.1:
@@ -7819,7 +7820,7 @@ snapshots:
       '@docusaurus/core': 3.5.2(@docusaurus/types@3.5.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@mdx-js/react@3.0.1(@types/react@18.3.6)(react@18.3.1))(debug@4.3.6)(eslint@8.57.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.2)
       '@docusaurus/logger': 3.5.2
       '@docusaurus/mdx-loader': 3.5.2(@docusaurus/types@3.5.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.2)
-      '@docusaurus/plugin-content-docs': 3.5.2(@mdx-js/react@3.0.1(@types/react@18.3.6)(react@18.3.1))(eslint@8.57.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.2)
+      '@docusaurus/plugin-content-docs': 3.5.2(@mdx-js/react@3.0.1(@types/react@18.3.6)(react@18.3.1))(debug@4.3.6)(eslint@8.57.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.2)
       '@docusaurus/theme-common': 3.5.2(@docusaurus/plugin-content-docs@3.5.2(@mdx-js/react@3.0.1(@types/react@18.3.6)(react@18.3.1))(eslint@8.57.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.2))(@docusaurus/types@3.5.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.2)
       '@docusaurus/types': 3.5.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@docusaurus/utils': 3.5.2(@docusaurus/types@3.5.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(typescript@5.6.2)
@@ -7857,46 +7858,6 @@ snapshots:
       - webpack-cli
 
   '@docusaurus/plugin-content-docs@3.5.2(@mdx-js/react@3.0.1(@types/react@18.3.6)(react@18.3.1))(debug@4.3.6)(eslint@8.57.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.2)':
-    dependencies:
-      '@docusaurus/core': 3.5.2(@docusaurus/types@3.5.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@mdx-js/react@3.0.1(@types/react@18.3.6)(react@18.3.1))(debug@4.3.6)(eslint@8.57.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.2)
-      '@docusaurus/logger': 3.5.2
-      '@docusaurus/mdx-loader': 3.5.2(@docusaurus/types@3.5.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.2)
-      '@docusaurus/module-type-aliases': 3.5.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@docusaurus/theme-common': 3.5.2(@docusaurus/plugin-content-docs@3.5.2(@mdx-js/react@3.0.1(@types/react@18.3.6)(react@18.3.1))(debug@4.3.6)(eslint@8.57.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.2))(@docusaurus/types@3.5.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.2)
-      '@docusaurus/types': 3.5.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@docusaurus/utils': 3.5.2(@docusaurus/types@3.5.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(typescript@5.6.2)
-      '@docusaurus/utils-common': 3.5.2(@docusaurus/types@3.5.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1))
-      '@docusaurus/utils-validation': 3.5.2(@docusaurus/types@3.5.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(typescript@5.6.2)
-      '@types/react-router-config': 5.0.11
-      combine-promises: 1.2.0
-      fs-extra: 11.2.0
-      js-yaml: 4.1.0
-      lodash: 4.17.21
-      react: 18.3.1
-      react-dom: 18.3.1(react@18.3.1)
-      tslib: 2.7.0
-      utility-types: 3.11.0
-      webpack: 5.92.1
-    transitivePeerDependencies:
-      - '@mdx-js/react'
-      - '@parcel/css'
-      - '@rspack/core'
-      - '@swc/core'
-      - '@swc/css'
-      - bufferutil
-      - csso
-      - debug
-      - esbuild
-      - eslint
-      - lightningcss
-      - supports-color
-      - typescript
-      - uglify-js
-      - utf-8-validate
-      - vue-template-compiler
-      - webpack-cli
-
-  '@docusaurus/plugin-content-docs@3.5.2(@mdx-js/react@3.0.1(@types/react@18.3.6)(react@18.3.1))(eslint@8.57.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.2)':
     dependencies:
       '@docusaurus/core': 3.5.2(@docusaurus/types@3.5.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@mdx-js/react@3.0.1(@types/react@18.3.6)(react@18.3.1))(debug@4.3.6)(eslint@8.57.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.2)
       '@docusaurus/logger': 3.5.2
@@ -8114,7 +8075,7 @@ snapshots:
     dependencies:
       '@docusaurus/core': 3.5.2(@docusaurus/types@3.5.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@mdx-js/react@3.0.1(@types/react@18.3.6)(react@18.3.1))(debug@4.3.6)(eslint@8.57.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.2)
       '@docusaurus/plugin-content-blog': 3.5.2(@docusaurus/plugin-content-docs@3.5.2(@mdx-js/react@3.0.1(@types/react@18.3.6)(react@18.3.1))(eslint@8.57.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.2))(@mdx-js/react@3.0.1(@types/react@18.3.6)(react@18.3.1))(eslint@8.57.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.2)
-      '@docusaurus/plugin-content-docs': 3.5.2(@mdx-js/react@3.0.1(@types/react@18.3.6)(react@18.3.1))(eslint@8.57.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.2)
+      '@docusaurus/plugin-content-docs': 3.5.2(@mdx-js/react@3.0.1(@types/react@18.3.6)(react@18.3.1))(debug@4.3.6)(eslint@8.57.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.2)
       '@docusaurus/plugin-content-pages': 3.5.2(@mdx-js/react@3.0.1(@types/react@18.3.6)(react@18.3.1))(eslint@8.57.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.2)
       '@docusaurus/plugin-debug': 3.5.2(@mdx-js/react@3.0.1(@types/react@18.3.6)(react@18.3.1))(eslint@8.57.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.2)
       '@docusaurus/plugin-google-analytics': 3.5.2(@mdx-js/react@3.0.1(@types/react@18.3.6)(react@18.3.1))(eslint@8.57.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.2)
@@ -8160,7 +8121,7 @@ snapshots:
       '@docusaurus/mdx-loader': 3.5.2(@docusaurus/types@3.5.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.2)
       '@docusaurus/module-type-aliases': 3.5.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@docusaurus/plugin-content-blog': 3.5.2(@docusaurus/plugin-content-docs@3.5.2(@mdx-js/react@3.0.1(@types/react@18.3.6)(react@18.3.1))(eslint@8.57.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.2))(@mdx-js/react@3.0.1(@types/react@18.3.6)(react@18.3.1))(eslint@8.57.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.2)
-      '@docusaurus/plugin-content-docs': 3.5.2(@mdx-js/react@3.0.1(@types/react@18.3.6)(react@18.3.1))(eslint@8.57.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.2)
+      '@docusaurus/plugin-content-docs': 3.5.2(@mdx-js/react@3.0.1(@types/react@18.3.6)(react@18.3.1))(debug@4.3.6)(eslint@8.57.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.2)
       '@docusaurus/plugin-content-pages': 3.5.2(@mdx-js/react@3.0.1(@types/react@18.3.6)(react@18.3.1))(eslint@8.57.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.2)
       '@docusaurus/theme-common': 3.5.2(@docusaurus/plugin-content-docs@3.5.2(@mdx-js/react@3.0.1(@types/react@18.3.6)(react@18.3.1))(eslint@8.57.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.2))(@docusaurus/types@3.5.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.2)
       '@docusaurus/theme-translations': 3.5.2
@@ -8202,37 +8163,11 @@ snapshots:
       - vue-template-compiler
       - webpack-cli
 
-  '@docusaurus/theme-common@3.5.2(@docusaurus/plugin-content-docs@3.5.2(@mdx-js/react@3.0.1(@types/react@18.3.6)(react@18.3.1))(debug@4.3.6)(eslint@8.57.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.2))(@docusaurus/types@3.5.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.2)':
-    dependencies:
-      '@docusaurus/mdx-loader': 3.5.2(@docusaurus/types@3.5.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.2)
-      '@docusaurus/module-type-aliases': 3.5.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@docusaurus/plugin-content-docs': 3.5.2(@mdx-js/react@3.0.1(@types/react@18.3.6)(react@18.3.1))(debug@4.3.6)(eslint@8.57.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.2)
-      '@docusaurus/utils': 3.5.2(@docusaurus/types@3.5.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(typescript@5.6.2)
-      '@docusaurus/utils-common': 3.5.2(@docusaurus/types@3.5.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1))
-      '@types/history': 4.7.11
-      '@types/react': 18.3.6
-      '@types/react-router-config': 5.0.11
-      clsx: 2.1.1
-      parse-numeric-range: 1.3.0
-      prism-react-renderer: 2.4.0(react@18.3.1)
-      react: 18.3.1
-      react-dom: 18.3.1(react@18.3.1)
-      tslib: 2.7.0
-      utility-types: 3.11.0
-    transitivePeerDependencies:
-      - '@docusaurus/types'
-      - '@swc/core'
-      - esbuild
-      - supports-color
-      - typescript
-      - uglify-js
-      - webpack-cli
-
   '@docusaurus/theme-common@3.5.2(@docusaurus/plugin-content-docs@3.5.2(@mdx-js/react@3.0.1(@types/react@18.3.6)(react@18.3.1))(eslint@8.57.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.2))(@docusaurus/types@3.5.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.2)':
     dependencies:
       '@docusaurus/mdx-loader': 3.5.2(@docusaurus/types@3.5.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.2)
       '@docusaurus/module-type-aliases': 3.5.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@docusaurus/plugin-content-docs': 3.5.2(@mdx-js/react@3.0.1(@types/react@18.3.6)(react@18.3.1))(eslint@8.57.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.2)
+      '@docusaurus/plugin-content-docs': 3.5.2(@mdx-js/react@3.0.1(@types/react@18.3.6)(react@18.3.1))(debug@4.3.6)(eslint@8.57.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.2)
       '@docusaurus/utils': 3.5.2(@docusaurus/types@3.5.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(typescript@5.6.2)
       '@docusaurus/utils-common': 3.5.2(@docusaurus/types@3.5.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1))
       '@types/history': 4.7.11
@@ -8259,7 +8194,7 @@ snapshots:
       '@docsearch/react': 3.6.0(@algolia/client-search@4.24.0)(@types/react@18.3.6)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(search-insights@2.14.0)
       '@docusaurus/core': 3.5.2(@docusaurus/types@3.5.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@mdx-js/react@3.0.1(@types/react@18.3.6)(react@18.3.1))(debug@4.3.6)(eslint@8.57.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.2)
       '@docusaurus/logger': 3.5.2
-      '@docusaurus/plugin-content-docs': 3.5.2(@mdx-js/react@3.0.1(@types/react@18.3.6)(react@18.3.1))(eslint@8.57.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.2)
+      '@docusaurus/plugin-content-docs': 3.5.2(@mdx-js/react@3.0.1(@types/react@18.3.6)(react@18.3.1))(debug@4.3.6)(eslint@8.57.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.2)
       '@docusaurus/theme-common': 3.5.2(@docusaurus/plugin-content-docs@3.5.2(@mdx-js/react@3.0.1(@types/react@18.3.6)(react@18.3.1))(eslint@8.57.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.2))(@docusaurus/types@3.5.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.2)
       '@docusaurus/theme-translations': 3.5.2
       '@docusaurus/utils': 3.5.2(@docusaurus/types@3.5.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(typescript@5.6.2)
@@ -9671,7 +9606,7 @@ snapshots:
     dependencies:
       defer-to-connect: 2.0.1
 
-  '@tauri-apps/api@2.0.0-rc.4': {}
+  '@tauri-apps/api@2.1.1': {}
 
   '@tauri-apps/cli-darwin-arm64@2.0.0-rc.15':
     optional: true
@@ -9716,9 +9651,9 @@ snapshots:
       '@tauri-apps/cli-win32-ia32-msvc': 2.0.0-rc.15
       '@tauri-apps/cli-win32-x64-msvc': 2.0.0-rc.15
 
-  '@tauri-apps/plugin-clipboard-manager@2.1.0-beta.6':
+  '@tauri-apps/plugin-clipboard-manager@2.2.0':
     dependencies:
-      '@tauri-apps/api': 2.0.0-rc.4
+      '@tauri-apps/api': 2.1.1
 
   '@trysound/sax@0.2.0': {}
 
