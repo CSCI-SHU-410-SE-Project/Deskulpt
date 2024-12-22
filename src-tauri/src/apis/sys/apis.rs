@@ -1,7 +1,6 @@
 //! This module implements the commands for `fs` in `@deskulpt-test/apis`.
 
 use crate::commands::CommandOut;
-// use lazy_static::lazy_static;
 use async_std::sync::Mutex;
 use once_cell::sync::Lazy;
 use serde::Serialize;
