@@ -28,12 +28,12 @@ const features: FeatureItem[] = [
     ),
   },
   {
-    title: "Highly Customizable",
+    title: "Simple and Powerful",
     Svg: MdOutlineDashboardCustomize,
     description: (
       <>
-        Deskulpt allows writing <a href="https://react.dev/">React</a> code to design
-        your desktop widgets, unlocking infinite possibilities for customization.
+        Deskulpt defines desktop widget with <a href="https://react.dev/">React</a>,
+        being highly customizable while imposing zero learning curve for web developers.
       </>
     ),
   },
