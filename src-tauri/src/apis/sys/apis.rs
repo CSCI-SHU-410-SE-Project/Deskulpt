@@ -11,7 +11,8 @@ use crate::commands::CommandOut;
 /// A System instance shared between all the commands.
 ///
 /// We share a single system instance instead of creating it everytime a command
-/// is called. This is to get a more accurate usage (see doc https://docs.rs/sysinfo/latest/sysinfo/#usage)
+/// is called. This is to get a more accurate usage; see
+/// https://docs.rs/sysinfo/latest/sysinfo/#usage
 static SYSINFO: Lazy<Mutex<System>> = Lazy::new(|| Mutex::new(System::new_all()));
 
 #[derive(Serialize)]

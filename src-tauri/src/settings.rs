@@ -68,8 +68,9 @@ pub(crate) fn read_settings(app_config_dir: &Path) -> Settings {
 /// does.
 pub(crate) fn write_settings(app_config_dir: &Path, settings: &Settings) -> Result<(), Error> {
     // On certain platform, if the file directory does not exist, file creation
-    // using std::fs:;File::create will fail. See [the doc](https://doc.rust-lang.org/std/fs/struct.File.html#method.create) for detail.
-    // Thus we need to manually create app_config_dir if it doesn't exist.
+    // using std::fs::File::create will fail, in which case we need to manually
+    // create the directory; see
+    // https://doc.rust-lang.org/std/fs/struct.File.html#method.create
     if !app_config_dir.exists() {
         create_dir_all(app_config_dir)?;
     }

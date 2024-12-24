@@ -3,8 +3,7 @@
 use swc_core::ecma::ast::ImportDecl;
 use swc_core::ecma::visit::{noop_visit_mut_type, VisitMut, VisitMutWith};
 
-/// An AST transformer that redirects widget APIs imports to the specified blob
-/// URL.
+/// An AST transformer that redirects widget APIs imports to a blob URL.
 pub(super) struct ApisImportRenamer(
     /// The blob URL to redirect APIs imports to.
     pub(super) String,

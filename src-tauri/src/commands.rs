@@ -190,8 +190,7 @@ pub(crate) async fn bundle_widget<R: Runtime>(
     cmdbail!("Widget '{widget_id}' is not found in the collection")
 }
 
-/// Register or unregister a global shortcut for toggling the click-through
-/// state.
+/// (Un)register a global shortcut for toggling the click-through state.
 ///
 /// If `reverse` is `false` this will register the shortcut, otherwise it will
 /// unregister it.
