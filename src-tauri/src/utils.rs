@@ -1,10 +1,12 @@
 //! This module contains utilities that does not fit into any other module.
 
-use crate::states::CanvasClickThroughState;
+use std::collections::HashMap;
+
 use anyhow::{bail, Error};
 use serde::Serialize;
-use std::collections::HashMap;
 use tauri::{AppHandle, Emitter, Manager, Runtime};
+
+use crate::states::CanvasClickThroughState;
 
 /// Mapping from widget IDs to corresponding data.
 pub(crate) type IdMap<T> = HashMap<String, T>;
@@ -25,9 +27,9 @@ struct ShowToastPayload {
 
 /// Toggle the click-through state of the canvas window.
 ///
-/// This will toggle whether the canvas window ignores cursor events and update the
-/// state accordingly. If the canvas is toggled to not click-through, it will try to
-/// regain focus automatically. The function will fail if:
+/// This will toggle whether the canvas window ignores cursor events and update
+/// the state accordingly. If the canvas is toggled to not click-through, it
+/// will try to regain focus automatically. The function will fail if:
 ///
 /// - The canvas window is not found.
 /// - Fails to set the canvas to ignore/unignore cursor events.
@@ -50,7 +52,8 @@ pub(crate) fn toggle_click_through_state<R: Runtime>(
     // If the canvas is previously click-through, meaning that it is now set to not
     // click-through, try to regain focus to avoid flickering on the first click
     if prev_can_click_through {
-        let _ = canvas.set_focus(); // Consume any error because this is not critical
+        let _ = canvas.set_focus(); // Consume any error because this is not
+                                    // critical
     }
 
     // Try to let canvas show the toast message
@@ -61,7 +64,11 @@ pub(crate) fn toggle_click_through_state<R: Runtime>(
             kind: ToastKind::Success,
             message: format!(
                 "Canvas {}.",
-                if prev_can_click_through { "floated" } else { "sunk" }
+                if prev_can_click_through {
+                    "floated"
+                } else {
+                    "sunk"
+                }
             ),
         },
     );
