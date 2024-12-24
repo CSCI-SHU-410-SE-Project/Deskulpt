@@ -20,7 +20,7 @@ export default {
   // manually fix or use `pnpm lint:rs`
   "**/*.rs": (filenames) => {
     const fileArgs = escape(filenames);
-    return [`rustfmt -- ${fileArgs}`];
+    return [`rustfmt +nightly -- ${fileArgs}`];
   },
 };
 

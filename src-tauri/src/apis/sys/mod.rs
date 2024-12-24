@@ -1,10 +1,7 @@
 //! The widget API plugin for `sys` in `@deskulpt-test/apis`.
 
-use tauri::{
-    generate_handler,
-    plugin::{Builder, TauriPlugin},
-    Runtime,
-};
+use tauri::plugin::{Builder, TauriPlugin};
+use tauri::{generate_handler, Runtime};
 
 mod apis;
 

@@ -1,16 +1,18 @@
 //! This module implements the commands for `fs` in `@deskulpt-test/apis`.
 
-use crate::commands::CommandOut;
 use async_std::sync::Mutex;
 use once_cell::sync::Lazy;
 use serde::Serialize;
 use sysinfo::{Disks, Networks, System};
 use tauri::command;
 
+use crate::commands::CommandOut;
+
 /// A System instance shared between all the commands.
 ///
-/// We share a single system instance instead of creating it everytime a command is called.
-/// This is to get a more accurate usage (see doc https://docs.rs/sysinfo/latest/sysinfo/#usage)
+/// We share a single system instance instead of creating it everytime a command
+/// is called. This is to get a more accurate usage; see
+/// https://docs.rs/sysinfo/latest/sysinfo/#usage
 static SYSINFO: Lazy<Mutex<System>> = Lazy::new(|| Mutex::new(System::new_all()));
 
 #[derive(Serialize)]

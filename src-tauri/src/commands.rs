@@ -1,25 +1,28 @@
 //! The module provides the commands used internally by Deskulpt.
 
-use crate::{
-    bundler::bundle,
-    config::{read_widget_config, WidgetConfigCollection},
-    settings::{read_settings, write_settings, Settings},
-    states::{WidgetBaseDirectoryState, WidgetConfigCollectionState},
-    utils::toggle_click_through_state,
-};
+use std::collections::HashMap;
+use std::fs::read_dir;
+use std::path::PathBuf;
+
 use anyhow::{Context, Error};
-use std::{collections::HashMap, fs::read_dir, path::PathBuf};
 use tauri::{command, AppHandle, Manager, Runtime};
 use tauri_plugin_global_shortcut::{GlobalShortcutExt, ShortcutState};
 use tauri_plugin_shell::ShellExt;
+
+use crate::bundler::bundle;
+use crate::config::{read_widget_config, WidgetConfigCollection};
+use crate::settings::{read_settings, write_settings, Settings};
+use crate::states::{WidgetBaseDirectoryState, WidgetConfigCollectionState};
+use crate::utils::toggle_click_through_state;
 
 /// The return type of all Tauri commands in Deskulpt.
 pub(crate) type CommandOut<T> = Result<T, String>;
 
 /// Stringify an [`Error`].
 ///
-/// This is a similar representation to that one gets by default if returning an error
-/// from `fn main`, except that it never includes the backtrace to not be too verbose.
+/// This is a similar representation to that one gets by default if returning an
+/// error from `fn main`, except that it never includes the backtrace to not be
+/// too verbose.
 pub(crate) fn stringify_anyhow(err: Error) -> String {
     err.chain()
         .enumerate()
@@ -66,10 +69,10 @@ macro_rules! cmdbail {
 
 /// Command for refreshing the state of the widget collection.
 ///
-/// This command will scan through the widget base directory and update the current
-/// widget collection state with the new widgets found. It will also return the updated
-/// widget collection, intended to be used by the frontend to refresh the rendering of
-/// the widgets.
+/// This command will scan through the widget base directory and update the
+/// current widget collection state with the new widgets found. It will also
+/// return the updated widget collection, intended to be used by the frontend to
+/// refresh the rendering of the widgets.
 ///
 /// This command will fail if:
 ///
@@ -77,9 +80,9 @@ macro_rules! cmdbail {
 /// - There is an error getting some entry in the widget base directory.
 /// - There is an error inferring the widget ID from the path of the entry.
 ///
-/// Note that failure to load a widget configuration will not lead to an overall failure
-/// of the command. Instead, the widget ID will correspond to an error message instead
-/// of a widget configuration.
+/// Note that failure to load a widget configuration will not lead to an overall
+/// failure of the command. Instead, the widget ID will correspond to an error
+/// message instead of a widget configuration.
 #[command]
 pub(crate) async fn refresh_widget_collection<R: Runtime>(
     app_handle: AppHandle<R>,
@@ -129,24 +132,29 @@ pub(crate) async fn refresh_widget_collection<R: Runtime>(
 
     // Update the widget collection state
     let widget_collection = app_handle.state::<WidgetConfigCollectionState>();
-    widget_collection.0.lock().unwrap().clone_from(&new_widget_collection);
+    widget_collection
+        .0
+        .lock()
+        .unwrap()
+        .clone_from(&new_widget_collection);
     Ok(new_widget_collection)
 }
 
 /// Command for bundling the specified widget.
 ///
-/// The widget configuration will be obtained by searching the managed widget collection
-/// for the given widget ID. The widget will be bundled into a string of ESM code if the
-/// ID is found in the collection.
+/// The widget configuration will be obtained by searching the managed widget
+/// collection for the given widget ID. The widget will be bundled into a string
+/// of ESM code if the ID is found in the collection.
 ///
-/// The command also requires the URL of the APIs blob of the widget. This is used for
-/// replacing the imports of `@deskulpt-test/apis` by the actual URL to import from.
+/// The command also requires the URL of the APIs blob of the widget. This is
+/// used for replacing the imports of `@deskulpt-test/apis` by the actual URL to
+/// import from.
 ///
 /// This command will fail if:
 ///
 /// - The widget ID is not found in the state of the widget collection.
-/// - The widget collection state corresponding to the widget ID is an error message
-///   instead of a widget configuration.
+/// - The widget collection state corresponding to the widget ID is an error
+///   message instead of a widget configuration.
 /// - There is an error when bundling the widget.
 #[command]
 pub(crate) async fn bundle_widget<R: Runtime>(
@@ -163,8 +171,9 @@ pub(crate) async fn bundle_widget<R: Runtime>(
             Err(e) => cmdbail!(e.clone()),
         };
         // Obtain the absolute path of the widget entry point
-        let widget_entry =
-            &widget_config.directory.join(&widget_config.deskulpt_conf.entry);
+        let widget_entry = &widget_config
+            .directory
+            .join(&widget_config.deskulpt_conf.entry);
 
         // Wrap the bundled code if success, otherwise let the error propagate
         return bundle(
@@ -181,7 +190,7 @@ pub(crate) async fn bundle_widget<R: Runtime>(
     cmdbail!("Widget '{widget_id}' is not found in the collection")
 }
 
-/// Register or unregister a global shortcut for toggling the click-through state.
+/// (Un)register a global shortcut for toggling the click-through state.
 ///
 /// If `reverse` is `false` this will register the shortcut, otherwise it will
 /// unregister it.
@@ -226,9 +235,10 @@ pub(crate) async fn register_toggle_shortcut<R: Runtime>(
 
 /// Command for opening a widget-related resource.
 ///
-/// If widget ID is `None`, this command will open the widget base directory. Otherwise,
-/// it checks whether the widget ID. If `path` is `None`, it opens the corresponding
-/// widget directory; otherwise it opens the specified path within the widget directory.
+/// If widget ID is `None`, this command will open the widget base directory.
+/// Otherwise, it checks whether the widget ID. If `path` is `None`, it opens
+/// the corresponding widget directory; otherwise it opens the specified path
+/// within the widget directory.
 ///
 ///
 /// This command will fail if:
@@ -258,17 +268,18 @@ pub(crate) async fn open_widget_resource<R: Runtime>(
         None => widget_base.to_path_buf(),
     };
 
-    app_handle.shell().open(open_path.to_string_lossy(), None).map_err(|e| cmderr!(e))
+    app_handle
+        .shell()
+        .open(open_path.to_string_lossy(), None)
+        .map_err(|e| cmderr!(e))
 }
 
 /// Command for initializing the settings.
 ///
-/// This command tries to load the previously stored settings. It never fails, but
-/// instead returns the default settings upon any error.
+/// This command tries to load the previously stored settings. It never fails,
+/// but instead returns the default settings upon any error.
 #[command]
-pub(crate) async fn init_settings<R: Runtime>(
-    app_handle: AppHandle<R>,
-) -> CommandOut<Settings> {
+pub(crate) async fn init_settings<R: Runtime>(app_handle: AppHandle<R>) -> CommandOut<Settings> {
     let app_config_dir = match app_handle.path().app_config_dir() {
         Ok(app_config_dir) => app_config_dir,
         Err(_) => return Ok(Default::default()),
@@ -278,8 +289,9 @@ pub(crate) async fn init_settings<R: Runtime>(
 
 /// Command for cleaning up and exiting the application.
 ///
-/// This command will try to save the widget internals for persistence before exiting
-/// the application, but failure to do so will not prevent the application from exiting.
+/// This command will try to save the widget internals for persistence before
+/// exiting the application, but failure to do so will not prevent the
+/// application from exiting.
 #[command]
 pub(crate) async fn exit_app<R: Runtime>(
     app_handle: AppHandle<R>,
@@ -300,18 +312,19 @@ pub(crate) async fn exit_app<R: Runtime>(
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use crate::{
-        config::{DeskulptConf, WidgetConfig},
-        testing::setup_mock_env,
-    };
+    use std::env::current_dir;
+    use std::path::PathBuf;
+
     use anyhow::anyhow;
     use copy_dir::copy_dir;
     use pretty_assertions::assert_eq;
     use rstest::{fixture, rstest};
-    use std::{env::current_dir, path::PathBuf};
     use tauri::test::MockRuntime;
     use tempfile::TempDir;
+
+    use super::*;
+    use crate::config::{DeskulptConf, WidgetConfig};
+    use crate::testing::setup_mock_env;
 
     /// Get the absolute path to the fixture directory.
     fn fixture_dir() -> PathBuf {
@@ -397,10 +410,16 @@ mod tests {
         let new_collection = new_collection.unwrap();
 
         // Check that we have got all the expected configurations
-        let invalid_configurations =
-            ["conf_missing_field", "conf_not_readable", "package_json_not_readable"];
-        let valid_configurations =
-            ["standard", "no_package_json", "package_json_no_dependencies"];
+        let invalid_configurations = [
+            "conf_missing_field",
+            "conf_not_readable",
+            "package_json_not_readable",
+        ];
+        let valid_configurations = [
+            "standard",
+            "no_package_json",
+            "package_json_no_dependencies",
+        ];
         assert_eq!(
             new_collection.len(),
             invalid_configurations.len() + valid_configurations.len(),
@@ -431,14 +450,11 @@ mod tests {
     }
 
     #[rstest]
-    async fn test_bundle_widget_pass(
-        setup_bundle_widget_env: &(TempDir, AppHandle<MockRuntime>),
-    ) {
+    async fn test_bundle_widget_pass(setup_bundle_widget_env: &(TempDir, AppHandle<MockRuntime>)) {
         // Test that the `bundle_widget` command bundles a widget correctly
         let (_base_dir, app_handle) = setup_bundle_widget_env;
         let result =
-            bundle_widget(app_handle.clone(), "pass".to_string(), Default::default())
-                .await;
+            bundle_widget(app_handle.clone(), "pass".to_string(), Default::default()).await;
 
         // We only check that the result is Ok; the actual bundled content should be
         // checked in the bundler unit tests
@@ -452,8 +468,7 @@ mod tests {
         // Test that the `bundle_widget` command raises upon bundling error
         let (_base_dir, app_handle) = setup_bundle_widget_env;
         let result =
-            bundle_widget(app_handle.clone(), "fail".to_string(), Default::default())
-                .await;
+            bundle_widget(app_handle.clone(), "fail".to_string(), Default::default()).await;
 
         assert!(result.is_err());
         let error = result.unwrap_err();
@@ -478,7 +493,10 @@ mod tests {
 
         assert!(result.is_err());
         let error = result.unwrap_err();
-        assert_eq!(error, "Widget 'non_existent_id' is not found in the collection");
+        assert_eq!(
+            error,
+            "Widget 'non_existent_id' is not found in the collection"
+        );
     }
 
     #[rstest]

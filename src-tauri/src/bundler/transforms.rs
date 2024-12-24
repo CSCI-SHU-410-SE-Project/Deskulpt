@@ -1,11 +1,9 @@
 //! This module implements custom AST transforms.
 
-use swc_core::ecma::{
-    ast::ImportDecl,
-    visit::{noop_visit_mut_type, VisitMut, VisitMutWith},
-};
+use swc_core::ecma::ast::ImportDecl;
+use swc_core::ecma::visit::{noop_visit_mut_type, VisitMut, VisitMutWith};
 
-/// An AST transformer that redirects widget APIs imports to the specified blob URL.
+/// An AST transformer that redirects widget APIs imports to a blob URL.
 pub(super) struct ApisImportRenamer(
     /// The blob URL to redirect APIs imports to.
     pub(super) String,
@@ -25,11 +23,13 @@ impl VisitMut for ApisImportRenamer {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use swc_core::ecma::{transforms::testing::test_inline, visit::as_folder};
+    use swc_core::ecma::transforms::testing::test_inline;
+    use swc_core::ecma::visit::as_folder;
 
-    // Test that the `ApisImportRenamer` transformer correctly renames the imports of
-    // `@deskulpt-test/apis` to the specified blob URL
+    use super::*;
+
+    // Test that the `ApisImportRenamer` transformer correctly renames the imports
+    // of `@deskulpt-test/apis` to the specified blob URL
     test_inline!(
         Default::default(),
         |_| as_folder(ApisImportRenamer("blob://dummy-url".into())),

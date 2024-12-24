@@ -1,10 +1,13 @@
 //! This module implements the commands for `fs` in `@deskulpt-test/apis`.
 
-use super::utils::get_resource_path;
-use crate::{cmderr, commands::CommandOut};
-use anyhow::Context;
 use std::io::Write;
+
+use anyhow::Context;
 use tauri::{command, AppHandle, Runtime};
+
+use super::utils::get_resource_path;
+use crate::cmderr;
+use crate::commands::CommandOut;
 
 #[command]
 pub(crate) async fn exists<R: Runtime>(
@@ -98,7 +101,10 @@ pub(crate) async fn create_dir<R: Runtime>(
 ) -> CommandOut<()> {
     let folder_path = get_resource_path(&app_handle, &widget_id, &path)?;
     std::fs::create_dir_all(&folder_path)
-        .context(format!("Failed to create directory '{}'", folder_path.display()))
+        .context(format!(
+            "Failed to create directory '{}'",
+            folder_path.display()
+        ))
         .map_err(|e| cmderr!(e))
 }
 
@@ -110,23 +116,27 @@ pub(crate) async fn remove_dir<R: Runtime>(
 ) -> CommandOut<()> {
     let folder_path = get_resource_path(&app_handle, &widget_id, &path)?;
     std::fs::remove_dir_all(&folder_path)
-        .context(format!("Failed to delete directory '{}'", folder_path.display()))
+        .context(format!(
+            "Failed to delete directory '{}'",
+            folder_path.display()
+        ))
         .map_err(|e| cmderr!(e))
 }
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use crate::testing::setup_mock_env;
+    use std::path::{Path, PathBuf};
+
     use pretty_assertions::assert_eq;
     use rstest::rstest;
-    use std::path::{Path, PathBuf};
+
+    use super::*;
+    use crate::testing::setup_mock_env;
 
     /// Set up a widget directory with the given ID.
     fn setup_widget_directory(base_dir: &Path, widget_id: &str) -> PathBuf {
         let widget_dir = base_dir.join("widgets").join(widget_id);
-        std::fs::create_dir_all(&widget_dir)
-            .expect("Failed to create widget directory");
+        std::fs::create_dir_all(&widget_dir).expect("Failed to create widget directory");
         widget_dir
     }
 
@@ -190,14 +200,20 @@ mod tests {
         assert!(!result.unwrap());
 
         // Check that `is_file` gives false and `is_dir` gives true for the directory
-        let result =
-            is_file(app_handle.clone(), "dummy".to_string(), "dummy_dir".to_string())
-                .await;
+        let result = is_file(
+            app_handle.clone(),
+            "dummy".to_string(),
+            "dummy_dir".to_string(),
+        )
+        .await;
         assert!(result.is_ok());
         assert!(!result.unwrap());
-        let result =
-            is_dir(app_handle.clone(), "dummy".to_string(), "dummy_dir".to_string())
-                .await;
+        let result = is_dir(
+            app_handle.clone(),
+            "dummy".to_string(),
+            "dummy_dir".to_string(),
+        )
+        .await;
         assert!(result.is_ok());
         assert!(result.unwrap());
     }
@@ -217,9 +233,9 @@ mod tests {
         )
         .await;
         assert!(result.is_err());
-        assert!(result.unwrap_err().contains(
-            format!("Failed to read file '{}'", file_path.display()).as_str()
-        ));
+        assert!(result
+            .unwrap_err()
+            .contains(format!("Failed to read file '{}'", file_path.display()).as_str()));
 
         // Create the file with some content and should return the content
         let content = "Hello, world!";

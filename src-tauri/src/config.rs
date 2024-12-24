@@ -1,13 +1,13 @@
 //! The module implements configuration-related utilities and structures.
 
-use crate::utils::IdMap;
+use std::collections::HashMap;
+use std::fs::read_to_string;
+use std::path::{Path, PathBuf};
+
 use anyhow::{bail, Context, Error};
 use serde::{Deserialize, Serialize};
-use std::{
-    collections::HashMap,
-    fs::read_to_string,
-    path::{Path, PathBuf},
-};
+
+use crate::utils::IdMap;
 
 /// The collection of widget configurations or errors.
 pub(crate) type WidgetConfigCollection = IdMap<Result<WidgetConfig, String>>;
@@ -23,9 +23,9 @@ pub(crate) struct WidgetConfig {
     pub(crate) external_deps: HashMap<String, String>,
     /// Absolute path to the widget directory.
     ///
-    /// It is absolute so that we do not need to query the widget base directory state
-    /// [`crate::states::WidgetBaseDirectoryState`] and call join to be able to obtain
-    /// the absolute path.
+    /// It is absolute so that we do not need to query the widget base directory
+    /// state [`crate::states::WidgetBaseDirectoryState`] and call join to
+    /// be able to obtain the absolute path.
     pub(crate) directory: PathBuf,
 }
 
@@ -39,7 +39,8 @@ pub(crate) struct DeskulptConf {
     pub(crate) entry: String,
     /// Whether to ignore the widget.
     ///
-    /// Setting this to `true` will exclude the widget from the widget collection.
+    /// Setting this to `true` will exclude the widget from the widget
+    /// collection.
     pub(crate) ignore: bool,
 }
 
@@ -50,12 +51,13 @@ struct PackageJson {
 
 /// Read a widget directory into a widget configuration.
 ///
-/// This function reads the `deskulpt.conf.json` file and optionally the `package.json`
-/// file in the given widget directory `path`.
+/// This function reads the `deskulpt.conf.json` file and optionally the
+/// `package.json` file in the given widget directory `path`.
 ///
-/// If widget configuration is loaded successfully, it will return `Ok(Some(config))`.
-/// If the directory does not represent a widget that is meant to be rendered, it will
-/// return `Ok(None)`. Any failure to load the configuration will return an error.
+/// If widget configuration is loaded successfully, it will return
+/// `Ok(Some(config))`. If the directory does not represent a widget that is
+/// meant to be rendered, it will return `Ok(None)`. Any failure to load the
+/// configuration will return an error.
 ///
 /// The cases where a directory is not meant to be rendered include:
 /// - `deskulpt.conf.json` is not found.
@@ -96,8 +98,8 @@ pub(crate) fn read_widget_config(path: &Path) -> Result<Option<WidgetConfig>, Er
     let external_deps = if package_json_path.exists() {
         let package_json_str =
             read_to_string(package_json_path).context("Failed to read package.json")?;
-        let package_json: PackageJson = serde_json::from_str(&package_json_str)
-            .context("Failed to interpret package.json")?;
+        let package_json: PackageJson =
+            serde_json::from_str(&package_json_str).context("Failed to interpret package.json")?;
         package_json.dependencies.unwrap_or_default()
     } else {
         Default::default()
@@ -112,12 +114,14 @@ pub(crate) fn read_widget_config(path: &Path) -> Result<Option<WidgetConfig>, Er
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use crate::testing::{assert_err_eq, ChainReason};
+    use std::env::current_dir;
+
     use path_clean::PathClean;
     use pretty_assertions::assert_eq;
     use rstest::rstest;
-    use std::env::current_dir;
+
+    use super::*;
+    use crate::testing::{assert_err_eq, ChainReason};
 
     /// Get the absolute path to the fixture directory.
     fn fixture_dir() -> PathBuf {
@@ -165,12 +169,9 @@ mod tests {
     #[case::no_conf(fixture_dir().join("no_conf"), None)]
     // Widget is explicitly ignored
     #[case::ignore_true(fixture_dir().join("ignore_true"), None)]
-    fn test_read_ok(
-        #[case] path: PathBuf,
-        #[case] expected_config: Option<WidgetConfig>,
-    ) {
-        let result = read_widget_config(&path)
-            .expect("Expected successful read of widget configuration");
+    fn test_read_ok(#[case] path: PathBuf, #[case] expected_config: Option<WidgetConfig>) {
+        let result =
+            read_widget_config(&path).expect("Expected successful read of widget configuration");
         assert_eq!(result, expected_config);
     }
 
@@ -223,12 +224,9 @@ mod tests {
             ChainReason::IOError,
         ],
     )]
-    fn test_read_error(
-        #[case] path: PathBuf,
-        #[case] expected_error: Vec<ChainReason>,
-    ) {
-        let error = read_widget_config(&path)
-            .expect_err("Expected an error reading widget configuration");
+    fn test_read_error(#[case] path: PathBuf, #[case] expected_error: Vec<ChainReason>) {
+        let error =
+            read_widget_config(&path).expect_err("Expected an error reading widget configuration");
         assert_err_eq(error, expected_error);
     }
 }

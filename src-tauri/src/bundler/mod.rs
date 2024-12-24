@@ -1,25 +1,28 @@
 //! The module implements the Deskulpt bundler based on SWC.
 //!
-//! Note that this is not a general-purpose bundler; it is specifically designed for
-//! the use case of bundling Deskulpt widgets and their external dependencies.
+//! Note that this is not a general-purpose bundler; it is specifically designed
+//! for the use case of bundling Deskulpt widgets and their external
+//! dependencies.
+
+use std::collections::HashMap;
+use std::path::Path;
 
 use anyhow::Error;
-use std::{collections::HashMap, path::Path};
-use swc_core::{
-    common::{sync::Lrc, FilePathMapping, Globals, SourceMap, GLOBALS},
-    ecma::visit::{as_folder, FoldWith},
-};
+use swc_core::common::sync::Lrc;
+use swc_core::common::{FilePathMapping, Globals, SourceMap, GLOBALS};
+use swc_core::ecma::visit::{as_folder, FoldWith};
 
 mod common;
 mod transforms;
 
 /// Bundle a widget into a single ESM string given its entry point.
 ///
-/// The `dependency_map` argument is an optional mapping with keys being the module
-/// specifiers to ignore. The import statements with these module specifiers will be
-/// left as is in the bundled code without path resolution. This should commonly be the
-/// list of external dependencies, since Deskulpt requires widget developers to bundle
-/// their external dependencies (if any) to be included directly in the Webview.
+/// The `dependency_map` argument is an optional mapping with keys being the
+/// module specifiers to ignore. The import statements with these module
+/// specifiers will be left as is in the bundled code without path resolution.
+/// This should commonly be the list of external dependencies, since Deskulpt
+/// requires widget developers to bundle their external dependencies (if any) to
+/// be included directly in the Webview.
 pub(crate) fn bundle(
     root: &Path,
     target: &Path,
@@ -29,13 +32,8 @@ pub(crate) fn bundle(
     let globals = Globals::default();
     let cm = Lrc::new(SourceMap::new(FilePathMapping::empty()));
 
-    let module = common::bundle_into_raw_module(
-        root,
-        target,
-        dependency_map,
-        &globals,
-        cm.clone(),
-    )?;
+    let module =
+        common::bundle_into_raw_module(root, target, dependency_map, &globals, cm.clone())?;
 
     let code = GLOBALS.set(&globals, || {
         // Redirect widget APIs imports to the APIs blob URL
@@ -53,28 +51,30 @@ pub(crate) fn bundle(
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use crate::testing::{assert_err_eq, ChainReason};
+    use std::fs::{create_dir, read_to_string};
+    use std::path::PathBuf;
+
     use pretty_assertions::assert_eq;
     use rstest::rstest;
-    use std::{
-        fs::{create_dir, read_to_string},
-        path::PathBuf,
-    };
     use tempfile::{tempdir, TempDir};
+
+    use super::*;
+    use crate::testing::{assert_err_eq, ChainReason};
 
     /// Get the absolute path to the fixture directory.
     ///
-    /// The paths used within the SWC bundler are all canonicalized (and thus verbatim
-    /// with the `\\?\` prefix on Windows), so canonicalize here to match them. Note
-    /// that this is not the case elsewhere in the codebase.
+    /// The paths used within the SWC bundler are all canonicalized (and thus
+    /// verbatim with the `\\?\` prefix on Windows), so canonicalize here to
+    /// match them. Note that this is not the case elsewhere in the
+    /// codebase.
     fn fixture_dir() -> PathBuf {
         Path::new("tests/fixtures/bundler").canonicalize().unwrap()
     }
 
     /// Setup a temporary directory for testing.
     ///
-    /// This would create a temporary directory and an `input` directory inside it.
+    /// This would create a temporary directory and an `input` directory inside
+    /// it.
     fn setup_temp_dir() -> TempDir {
         let temp_dir = tempdir().unwrap();
         create_dir(temp_dir.path().join("input")).unwrap();
@@ -211,16 +211,19 @@ mod tests {
         std::fs::write(&utils_path, "export const foo = 42;").unwrap();
 
         // Test the bundling error
-        let error =
-            bundle(&bundle_root, &index_path, Default::default(), &Default::default())
-                .expect_err("Expected bundling error");
+        let error = bundle(
+            &bundle_root,
+            &index_path,
+            Default::default(),
+            &Default::default(),
+        )
+        .expect_err("Expected bundling error");
         let expected_error = vec![
             ChainReason::Skip,
             ChainReason::Skip,
             ChainReason::Skip,
             ChainReason::Exact(
-                "Absolute imports are not supported; use relative imports instead"
-                    .to_string(),
+                "Absolute imports are not supported; use relative imports instead".to_string(),
             ),
         ];
         assert_err_eq(error, expected_error);

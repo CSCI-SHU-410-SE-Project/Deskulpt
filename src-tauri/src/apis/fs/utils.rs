@@ -1,9 +1,12 @@
 //! This module contains the utilities for `fs` in `@deskulpt-test/apis`.
 
-use crate::{cmdbail, states::WidgetBaseDirectoryState};
-use path_clean::PathClean;
 use std::path::PathBuf;
+
+use path_clean::PathClean;
 use tauri::{AppHandle, Manager, Runtime};
+
+use crate::cmdbail;
+use crate::states::WidgetBaseDirectoryState;
 
 /// Validate the file system resource (file or folder) path.
 ///
@@ -17,8 +20,8 @@ use tauri::{AppHandle, Manager, Runtime};
 ///
 /// - $widget_base/$widget_id/$path is not within the widget directory
 ///
-/// Note, however, that this function does not check if the resource exists or not,
-/// since the file or folder may not exist yet, and could be created later.
+/// Note, however, that this function does not check if the resource exists or
+/// not, since the file or folder may not exist yet, and could be created later.
 pub(super) fn get_resource_path<R: Runtime>(
     app_handle: &AppHandle<R>,
     widget_id: &str,
@@ -53,16 +56,17 @@ pub(super) fn get_resource_path<R: Runtime>(
 
 #[cfg(test)]
 mod tests {
+    use std::path::{Path, PathBuf};
+
+    use rstest::rstest;
+
     use super::*;
     use crate::testing::setup_mock_env;
-    use rstest::rstest;
-    use std::path::{Path, PathBuf};
 
     /// Set up a widget directory with the given ID.
     fn setup_widget_directory(base_dir: &Path, widget_id: &str) -> PathBuf {
         let widget_dir = base_dir.join("widgets").join(widget_id);
-        std::fs::create_dir_all(&widget_dir)
-            .expect("Failed to create widget directory");
+        std::fs::create_dir_all(&widget_dir).expect("Failed to create widget directory");
         widget_dir
     }
 
@@ -101,10 +105,7 @@ mod tests {
         let dir_path = widget_dir.join("dummy/subdummy");
         std::fs::create_dir_all(dir_path).unwrap();
     })]
-    fn test_get_resource_path_invalid_id(
-        #[case] widget_id: &str,
-        #[case] setup: fn(PathBuf),
-    ) {
+    fn test_get_resource_path_invalid_id(#[case] widget_id: &str, #[case] setup: fn(PathBuf)) {
         // Test that `get_resource_path` raises an error when the widget ID is invalid
         let (base_dir, app_handle) = setup_mock_env();
         let widget_base = base_dir.path().join("widgets");
