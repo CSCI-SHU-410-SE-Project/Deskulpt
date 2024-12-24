@@ -9,10 +9,9 @@
     html_favicon_url = "https://github.com/CSCI-SHU-410-SE-Project/Deskulpt/raw/main/src-tauri/icons/icon.png"
 )]
 
-use tauri::{generate_handler, tauri_build_context, Builder, Manager};
-
 #[cfg(target_os = "macos")]
 use tauri::ActivationPolicy;
+use tauri::{generate_handler, tauri_build_context, Builder, Manager};
 
 mod apis;
 mod bundler;
@@ -31,7 +30,9 @@ fn main() {
     Builder::default()
         // Additional application setup
         .setup(|app| {
-            app.manage(states::WidgetBaseDirectoryState::init(app.path().app_data_dir().unwrap()));
+            app.manage(states::WidgetBaseDirectoryState::init(
+                app.path().app_data_dir().unwrap(),
+            ));
             setup::init_system_tray(app)?;
             setup::create_canvas(app)?;
 

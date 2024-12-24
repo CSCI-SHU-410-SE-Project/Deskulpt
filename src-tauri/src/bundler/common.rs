@@ -1,32 +1,26 @@
 //! This module contains common bundling routines and utilities.
 
+use std::collections::{HashMap, HashSet};
+use std::fs::File;
+use std::io::{Read, Write};
+use std::path::{Component, Path, PathBuf};
+
 use anyhow::{bail, Context, Error};
 use path_clean::PathClean;
-use std::{
-    collections::{HashMap, HashSet},
-    fs::File,
-    io::{Read, Write},
-    path::{Component, Path, PathBuf},
-};
-use swc_core::{
-    atoms::Atom,
-    bundler::{Bundler, Hook, Load, ModuleData, ModuleRecord, Resolve},
-    common::{
-        comments::SingleThreadedComments, errors::Handler, sync::Lrc, FileName,
-        Globals, Mark, SourceMap, Span,
-    },
-    ecma::{
-        ast::{KeyValueProp, Module, Program},
-        codegen::{
-            text_writer::{JsWriter, WriteJs},
-            Emitter,
-        },
-        loader::resolve::Resolution,
-        parser::{parse_file_as_module, EsSyntax, Syntax, TsSyntax},
-        transforms::{react::react, typescript::typescript},
-        visit::FoldWith,
-    },
-};
+use swc_core::atoms::Atom;
+use swc_core::bundler::{Bundler, Hook, Load, ModuleData, ModuleRecord, Resolve};
+use swc_core::common::comments::SingleThreadedComments;
+use swc_core::common::errors::Handler;
+use swc_core::common::sync::Lrc;
+use swc_core::common::{FileName, Globals, Mark, SourceMap, Span};
+use swc_core::ecma::ast::{KeyValueProp, Module, Program};
+use swc_core::ecma::codegen::text_writer::{JsWriter, WriteJs};
+use swc_core::ecma::codegen::Emitter;
+use swc_core::ecma::loader::resolve::Resolution;
+use swc_core::ecma::parser::{parse_file_as_module, EsSyntax, Syntax, TsSyntax};
+use swc_core::ecma::transforms::react::react;
+use swc_core::ecma::transforms::typescript::typescript;
+use swc_core::ecma::visit::FoldWith;
 use tempfile::NamedTempFile;
 
 /// The file extensions to try when an import is given without an extension
@@ -34,8 +28,8 @@ static EXTENSIONS: &[&str] = &["js", "jsx", "ts", "tsx"];
 
 /// Bundle the entry point into a raw module.
 ///
-/// It does not apply AST transforms and ignores default/external dependencies without
-/// bundling them.
+/// It does not apply AST transforms and ignores default/external dependencies
+/// without bundling them.
 pub(super) fn bundle_into_raw_module(
     root: &Path,
     target: &Path,
@@ -48,7 +42,8 @@ pub(super) fn bundle_into_raw_module(
     }
 
     // Get the list of external modules not to resolve; this should include default
-    // dependencies and (if any) external dependencies obtained from the dependency map
+    // dependencies and (if any) external dependencies obtained from the dependency
+    // map
     let external_modules = {
         let mut dependencies = HashSet::from([
             Atom::from("@deskulpt-test/apis"),
@@ -60,9 +55,9 @@ pub(super) fn bundle_into_raw_module(
         Vec::from_iter(dependencies)
     };
 
-    // The root of the path resolver will be used to determine whether a resolved import
-    // goes beyond the root; the comparison is done via path prefixes so we must be
-    // consistent with how SWC resolves paths, see:
+    // The root of the path resolver will be used to determine whether a resolved
+    // import goes beyond the root; the comparison is done via path prefixes so
+    // we must be consistent with how SWC resolves paths, see:
     // https://github.com/swc-project/swc/blob/f584ef76d75e86da15d0725ac94be35a88a1c946/crates/swc_bundler/src/bundler/mod.rs#L159-L166
     #[cfg(target_os = "windows")]
     let path_resolver_root = root.canonicalize()?;
@@ -75,13 +70,16 @@ pub(super) fn bundle_into_raw_module(
         PathLoader(cm.clone()),
         PathResolver(path_resolver_root),
         // Do not resolve the external modules
-        swc_core::bundler::Config { external_modules, ..Default::default() },
+        swc_core::bundler::Config {
+            external_modules,
+            ..Default::default()
+        },
         Box::new(NoopHook),
     );
 
-    // SWC bundler requires a map of entries to bundle; we provide a single entry point
-    // and expect there to be only one generated bundle; we use the target path as the
-    // key for convenience
+    // SWC bundler requires a map of entries to bundle; we provide a single entry
+    // point and expect there to be only one generated bundle; we use the target
+    // path as the key for convenience
     let mut entries = HashMap::new();
     entries.insert(
         target.to_string_lossy().to_string(),
@@ -109,8 +107,8 @@ pub(super) fn emit_module_to_buf<W: Write>(module: Module, cm: Lrc<SourceMap>, b
 
 /// Deskulpt-customized path loader for SWC bundler.
 ///
-/// It is in charge of parsing the source file into a module AST. TypeScript types are
-/// stripped off and JSX syntax is transformed during the parsing.
+/// It is in charge of parsing the source file into a module AST. TypeScript
+/// types are stripped off and JSX syntax is transformed during the parsing.
 struct PathLoader(Lrc<SourceMap>);
 
 impl Load for PathLoader {
@@ -122,10 +120,14 @@ impl Load for PathLoader {
         let fm = self.0.load_file(path)?;
 
         let syntax = match path.extension() {
-            Some(ext) if ext == "ts" || ext == "tsx" => {
-                Syntax::Typescript(TsSyntax { tsx: true, ..Default::default() })
-            },
-            _ => Syntax::Es(EsSyntax { jsx: true, ..Default::default() }),
+            Some(ext) if ext == "ts" || ext == "tsx" => Syntax::Typescript(TsSyntax {
+                tsx: true,
+                ..Default::default()
+            }),
+            _ => Syntax::Es(EsSyntax {
+                jsx: true,
+                ..Default::default()
+            }),
         };
 
         // Parse the file as a module
@@ -135,11 +137,8 @@ impl Load for PathLoader {
                 let top_level_mark = Mark::new();
 
                 // Strip off TypeScript types
-                let mut ts_transform = typescript::typescript(
-                    Default::default(),
-                    unresolved_mark,
-                    top_level_mark,
-                );
+                let mut ts_transform =
+                    typescript::typescript(Default::default(), unresolved_mark, top_level_mark);
 
                 // We use the automatic JSX transform (in contrast to the classic
                 // transform) here so that there is no need to bring anything into scope
@@ -151,9 +150,7 @@ impl Load for PathLoader {
                     self.0.clone(),
                     None,
                     swc_core::ecma::transforms::react::Options {
-                        runtime: Some(
-                            swc_core::ecma::transforms::react::Runtime::Automatic,
-                        ),
+                        runtime: Some(swc_core::ecma::transforms::react::Runtime::Automatic),
                         import_source: Some("@deskulpt-test/emotion".to_string()),
                         ..Default::default()
                     },
@@ -166,9 +163,11 @@ impl Load for PathLoader {
                     .fold_with(&mut jsx_transform)
                     .module()
                 {
-                    Some(module) => {
-                        Ok(ModuleData { fm, module, helpers: Default::default() })
-                    },
+                    Some(module) => Ok(ModuleData {
+                        fm,
+                        module,
+                        helpers: Default::default(),
+                    }),
                     None => bail!("Failed to parse the file as a module"),
                 }
             },
@@ -188,10 +187,8 @@ impl Load for PathLoader {
                     );
                     let buffer = NamedTempFile::new().context(context.clone())?;
                     let buffer_path = buffer.path().to_path_buf();
-                    let handler = Handler::with_emitter_writer(
-                        Box::new(buffer),
-                        Some(self.0.clone()),
-                    );
+                    let handler =
+                        Handler::with_emitter_writer(Box::new(buffer), Some(self.0.clone()));
                     err.into_diagnostic(&handler).emit();
                     File::open(buffer_path)
                         .context(context.clone())?
@@ -206,9 +203,9 @@ impl Load for PathLoader {
 
 /// The Deskulpt-customized path resolver for SWC bundler.
 ///
-/// It is in charge of resolving the module specifiers in the import statements. Note
-/// that module specifiers that are ignored in the first place will not go through this
-/// resolver at all.
+/// It is in charge of resolving the module specifiers in the import statements.
+/// Note that module specifiers that are ignored in the first place will not go
+/// through this resolver at all.
 ///
 /// This path resolver intends to resolve the following types of imports:
 ///
@@ -226,8 +223,8 @@ struct PathResolver(PathBuf);
 impl PathResolver {
     /// Helper function for resolving a path by treating it as a file.
     ///
-    /// If `path` refers to a file then it is directly returned. Otherwise, `path` with
-    /// each extension in [`EXTENSIONS`] is tried in order.
+    /// If `path` refers to a file then it is directly returned. Otherwise,
+    /// `path` with each extension in [`EXTENSIONS`] is tried in order.
     fn resolve_as_file(&self, path: &Path) -> Result<PathBuf, Error> {
         if path.is_file() {
             // Early return if `path` is directly a file
@@ -251,14 +248,11 @@ impl PathResolver {
 
     /// Helper function for the [`Resolve`] trait.
     ///
-    /// Note that errors emitted here do not need to provide information about `base`
-    /// and `module_specifier` because the call to this function should have already
-    /// been wrapped in an SWC context that provides this information.
-    fn resolve_filename(
-        &self,
-        base: &FileName,
-        module_specifier: &str,
-    ) -> Result<FileName, Error> {
+    /// Note that errors emitted here do not need to provide information about
+    /// `base` and `module_specifier` because the call to this function
+    /// should have already been wrapped in an SWC context that provides
+    /// this information.
+    fn resolve_filename(&self, base: &FileName, module_specifier: &str) -> Result<FileName, Error> {
         let base = match base {
             FileName::Real(v) => v,
             _ => bail!("Invalid base for resolution: '{base}'"),
@@ -309,13 +303,12 @@ impl PathResolver {
 }
 
 impl Resolve for PathResolver {
-    fn resolve(
-        &self,
-        base: &FileName,
-        module_specifier: &str,
-    ) -> Result<Resolution, Error> {
+    fn resolve(&self, base: &FileName, module_specifier: &str) -> Result<Resolution, Error> {
         self.resolve_filename(base, module_specifier)
-            .map(|filename| Resolution { filename, slug: None })
+            .map(|filename| Resolution {
+                filename,
+                slug: None,
+            })
     }
 }
 
@@ -323,11 +316,7 @@ impl Resolve for PathResolver {
 struct NoopHook;
 
 impl Hook for NoopHook {
-    fn get_import_meta_props(
-        &self,
-        _: Span,
-        _: &ModuleRecord,
-    ) -> Result<Vec<KeyValueProp>, Error> {
+    fn get_import_meta_props(&self, _: Span, _: &ModuleRecord) -> Result<Vec<KeyValueProp>, Error> {
         // XXX: figure out a better way than panicking
         unimplemented!();
     }
