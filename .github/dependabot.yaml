@@ -1,5 +1,20 @@
 version: 2
 updates:
+  # Rust dependencies
+  - package-ecosystem: cargo
+    directory: /src-tauri
+    schedule:
+      interval: weekly
+    labels:
+      - dependencies
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-patch"]
+    groups:
+      rust:
+        patterns:
+          - "*"
+
   # Node dependencies
   - package-ecosystem: npm
     directories:
@@ -7,41 +22,44 @@ updates:
       - /tooling/apis
       - /tooling/react
       - /tooling/ui
-      - /website
     schedule:
       interval: weekly
     labels:
       - dependencies
     ignore:
-      - dependency-name: "eslint"
-        versions: ["9.x"]
+      - dependency-name: "*"
+        update-types: ["version-update:semver-patch"]
     groups:
-      tauri:
+      node:
         patterns:
-          - "@tauri-apps/*"
-      docusaurus:
-        patterns:
-          - "@docusaurus/*"
-          - "docusaurus-plugin-*"
-      dev:
-        dependency-type: development
+          - "*"
 
-  # Cargo dependencies
-  - package-ecosystem: cargo
-    directory: /src-tauri
+  # Documentation dependencies
+  - package-ecosystem: npm
+    directory: /website
     schedule:
       interval: weekly
     labels:
       - dependencies
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-patch"]
     groups:
-      tauri:
+      documentation:
         patterns:
-          - tauri*
-      dev:
-        dependency-type: development
+          - "*"
 
-  # GitHub Actions dependencies
+  # CI dependencies
   - package-ecosystem: github-actions
     directory: /
     schedule:
       interval: weekly
+    labels:
+      - dependencies
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-patch"]
+    groups:
+      ci:
+        patterns:
+          - "*"
