@@ -35,7 +35,7 @@ const config: Config = {
         entryPoints: ["../src"],
         entryPointStrategy: "expand",
         outputFileStrategy: "modules",
-        tsconfig: "../tsconfig.json",
+        tsconfig: "../src/tsconfig.json",
         hidePageTitle: true,
         parametersFormat: "table",
         propertiesFormat: "table",
