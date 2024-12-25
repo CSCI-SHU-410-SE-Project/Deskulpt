@@ -16,12 +16,17 @@ updates:
           - "*"
 
   # Node dependencies
+  # TODO: Documentation dependencies should have a separate group, but we cannot
+  # because of the issue with pnpm workspace:
+  # https://github.com/dependabot/dependabot-core/issues/7501
+  # We may also want to rework the documentation setup in the future
   - package-ecosystem: npm
     directories:
       - /
       - /tooling/apis
       - /tooling/react
       - /tooling/ui
+      - /website
     schedule:
       interval: weekly
     labels:
@@ -31,21 +36,6 @@ updates:
         update-types: ["version-update:semver-patch"]
     groups:
       node:
-        patterns:
-          - "*"
-
-  # Documentation dependencies
-  - package-ecosystem: npm
-    directory: /website
-    schedule:
-      interval: weekly
-    labels:
-      - dependencies
-    ignore:
-      - dependency-name: "*"
-        update-types: ["version-update:semver-patch"]
-    groups:
-      documentation:
         patterns:
           - "*"
 
