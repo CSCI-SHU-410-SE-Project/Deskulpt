@@ -24,7 +24,7 @@ impl VisitMut for ApisImportRenamer {
 #[cfg(test)]
 mod tests {
     use swc_core::ecma::transforms::testing::test_inline;
-    use swc_core::ecma::visit::as_folder;
+    use swc_core::ecma::visit::visit_mut_pass;
 
     use super::*;
 
@@ -32,7 +32,7 @@ mod tests {
     // of `@deskulpt-test/apis` to the specified blob URL
     test_inline!(
         Default::default(),
-        |_| as_folder(ApisImportRenamer("blob://dummy-url".into())),
+        |_| visit_mut_pass(ApisImportRenamer("blob://dummy-url".into())),
         test_transform_apis_import_renamer,
         r#"import "@deskulpt-test/apis";"#,
         r#"import "blob://dummy-url";"#

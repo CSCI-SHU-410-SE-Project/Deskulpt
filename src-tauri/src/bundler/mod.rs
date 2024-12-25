@@ -10,7 +10,8 @@ use std::path::Path;
 use anyhow::Error;
 use swc_core::common::sync::Lrc;
 use swc_core::common::{FilePathMapping, Globals, SourceMap, GLOBALS};
-use swc_core::ecma::visit::{as_folder, FoldWith};
+use swc_core::ecma::ast::Program;
+use swc_core::ecma::visit::visit_mut_pass;
 
 mod common;
 mod transforms;
@@ -37,8 +38,9 @@ pub(crate) fn bundle(
 
     let code = GLOBALS.set(&globals, || {
         // Redirect widget APIs imports to the APIs blob URL
-        let mut rename_apis = as_folder(transforms::ApisImportRenamer(apis_blob_url));
-        let module = module.fold_with(&mut rename_apis);
+        let rename_apis = visit_mut_pass(transforms::ApisImportRenamer(apis_blob_url));
+        let program = Program::Module(module);
+        let module = program.apply(rename_apis).expect_module();
 
         // Emit the bundled module as string into a buffer
         let mut buf = vec![];
