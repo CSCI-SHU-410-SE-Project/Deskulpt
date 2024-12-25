@@ -10,6 +10,6 @@
     "allow-open-widget-resource",
     "allow-refresh-widget-collection",
     "allow-register-toggle-shortcut",
-    "shell:allow-open"
+    "opener:allow-open-path"
   ]
 }

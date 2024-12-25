@@ -7,7 +7,7 @@ use std::path::PathBuf;
 use anyhow::{Context, Error};
 use tauri::{command, AppHandle, Manager, Runtime};
 use tauri_plugin_global_shortcut::{GlobalShortcutExt, ShortcutState};
-use tauri_plugin_shell::ShellExt;
+use tauri_plugin_opener::OpenerExt;
 
 use crate::bundler::bundle;
 use crate::config::{read_widget_config, WidgetConfigCollection};
@@ -269,8 +269,8 @@ pub(crate) async fn open_widget_resource<R: Runtime>(
     };
 
     app_handle
-        .shell()
-        .open(open_path.to_string_lossy(), None)
+        .opener()
+        .open_path(open_path.to_string_lossy(), None::<&str>)
         .map_err(|e| cmderr!(e))
 }
 

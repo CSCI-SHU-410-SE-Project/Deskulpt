@@ -20,7 +20,6 @@ use swc_core::ecma::loader::resolve::Resolution;
 use swc_core::ecma::parser::{parse_file_as_module, EsSyntax, Syntax, TsSyntax};
 use swc_core::ecma::transforms::react::react;
 use swc_core::ecma::transforms::typescript::typescript;
-use swc_core::ecma::visit::FoldWith;
 use tempfile::NamedTempFile;
 
 /// The file extensions to try when an import is given without an extension
@@ -137,7 +136,7 @@ impl Load for PathLoader {
                 let top_level_mark = Mark::new();
 
                 // Strip off TypeScript types
-                let mut ts_transform =
+                let ts_transform =
                     typescript::typescript(Default::default(), unresolved_mark, top_level_mark);
 
                 // We use the automatic JSX transform (in contrast to the classic
@@ -146,7 +145,7 @@ impl Load for PathLoader {
                 // Emotion, we specify the import source to be `@deskulpt-test/emotion`,
                 // so that the JSX runtime utilities will be automatically imported from
                 // `@deskulpt-test/emotion/jsx-runtime`
-                let mut jsx_transform = react::<SingleThreadedComments>(
+                let jsx_transform = react::<SingleThreadedComments>(
                     self.0.clone(),
                     None,
                     swc_core::ecma::transforms::react::Options {
@@ -159,8 +158,8 @@ impl Load for PathLoader {
                 );
 
                 match Program::Module(module)
-                    .fold_with(&mut ts_transform)
-                    .fold_with(&mut jsx_transform)
+                    .apply(ts_transform)
+                    .apply(jsx_transform)
                     .module()
                 {
                     Some(module) => Ok(ModuleData {
