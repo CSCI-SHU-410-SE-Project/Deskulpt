@@ -1,4 +1,4 @@
-import { PropsWithChildren, useRef } from "react";
+import { PropsWithChildren, RefObject, useRef } from "react";
 import Draggable, { DraggableData, DraggableEvent } from "react-draggable";
 import { ErrorBoundary } from "react-error-boundary";
 import ErrorDisplay from "./ErrorDisplay";
@@ -39,7 +39,7 @@ export default function WidgetContainer({
   height,
   children,
 }: PropsWithChildren<WidgetContainerProps>) {
-  const containerRef = useRef(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   let retried = false;
 
   function updateContainerPos(_: DraggableEvent, data: DraggableData) {
@@ -48,7 +48,9 @@ export default function WidgetContainer({
 
   return (
     <Draggable
-      nodeRef={containerRef}
+      // TODO: remove the `as` part which is workaround for React 19:
+      // https://github.com/react-grid-layout/react-draggable/issues/768
+      nodeRef={containerRef as RefObject<HTMLDivElement>}
       onStop={updateContainerPos}
       bounds="body"
       handle=".draggable-handle"
