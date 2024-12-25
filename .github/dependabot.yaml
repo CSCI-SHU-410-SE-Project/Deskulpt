@@ -21,12 +21,7 @@ updates:
   # https://github.com/dependabot/dependabot-core/issues/7501
   # We may also want to rework the documentation setup in the future
   - package-ecosystem: npm
-    directories:
-      - /
-      - /tooling/apis
-      - /tooling/react
-      - /tooling/ui
-      - /website
+    directory: /
     schedule:
       interval: weekly
     labels:

@@ -1,6 +1,6 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-//! [![](https://github.com/CSCI-SHU-410-SE-Project/Deskulpt/raw/main/public/deskulpt-full.png)](https://csci-shu-410-se-project.github.io/Deskulpt/)
+//! [![](https://github.com/CSCI-SHU-410-SE-Project/Deskulpt/raw/main/src/public/deskulpt-full.png)](https://csci-shu-410-se-project.github.io/Deskulpt/)
 //!
 //! The backend documentation for developers of Deskulpt.
 
