@@ -31,7 +31,10 @@ jobs:
       - name: Rust setup
         uses: dtolnay/rust-toolchain@stable
         with:
-          components: clippy, rustfmt
+          components: clippy
+
+      - name: Install nightly rustfmt
+        run: rustup toolchain install nightly --component rustfmt --profile minimal --no-self-update
 
       - name: Rust cache
         uses: swatinem/rust-cache@v2
