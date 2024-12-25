@@ -30,7 +30,7 @@ export default defineConfig([
     input: "src/index.ts",
     output: {
       format: "esm",
-      file: "../../public/.wrap-apis.js.txt",
+      file: "../../src/public/.wrap-apis.js.txt",
     },
     external: ["@tauri-apps/api/core", "@deskulpt-test/raw-apis"],
     plugins: [

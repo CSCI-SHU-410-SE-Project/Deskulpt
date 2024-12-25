@@ -9,15 +9,7 @@ import tseslint from "typescript-eslint";
 
 export default tseslint.config(
   {
-    ignores: [
-      "**/dist/**",
-      "**/fixtures/**",
-      "**/target/**",
-      "**/website/**",
-      "**/tooling/**",
-      "src/.scripts/**",
-      "vite.config.ts",
-    ],
+    ignores: ["**/dist/**", ".scripts/**", "vite.config.ts"],
   },
 
   // --- Language Options -------------------------------------------------------------

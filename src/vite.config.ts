@@ -13,19 +13,16 @@ export default defineConfig(({ command }) => ({
       },
     }),
     importmapPlugin(command, {
-      "@deskulpt-test/emotion/jsx-runtime": "src/.scripts/jsx-runtime.js",
-      "@deskulpt-test/raw-apis": "src/.scripts/raw-apis.js",
-      "@deskulpt-test/react": "src/.scripts/react.js",
-      "@deskulpt-test/ui": "src/.scripts/ui.js",
+      "@deskulpt-test/emotion/jsx-runtime": ".scripts/jsx-runtime.js",
+      "@deskulpt-test/raw-apis": ".scripts/raw-apis.js",
+      "@deskulpt-test/react": ".scripts/react.js",
+      "@deskulpt-test/ui": ".scripts/ui.js",
     }),
   ],
   clearScreen: false,
   server: {
     port: 1420,
     strictPort: true,
-    watch: {
-      ignored: ["**/src-tauri/**", "**/website/**", "**/tooling/**"],
-    },
   },
   build: {
     rollupOptions: {

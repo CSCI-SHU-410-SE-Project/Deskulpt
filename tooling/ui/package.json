@@ -29,6 +29,7 @@
     "@emotion/react": "^11.13.3"
   },
   "devDependencies": {
+    "@types/node": "^22.5.5",
     "@rollup/plugin-terser": "^0.4.4",
     "@rollup/plugin-typescript": "^11.1.6",
     "eslint": "^8.57.0",
