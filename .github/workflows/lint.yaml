@@ -1,4 +1,4 @@
-name: Lint Deskulpt core
+name: Lint Deskulpt
 
 on:
   push:
