@@ -11,7 +11,7 @@ updates:
       - dependency-name: "*"
         update-types: ["version-update:semver-patch"]
     groups:
-      all:
+      rust:
         patterns:
           - "*"
 
@@ -30,7 +30,7 @@ updates:
       - dependency-name: "*"
         update-types: ["version-update:semver-patch"]
     groups:
-      all:
+      node:
         patterns:
           - "*"
 
@@ -45,7 +45,7 @@ updates:
       - dependency-name: "*"
         update-types: ["version-update:semver-patch"]
     groups:
-      all:
+      documentation:
         patterns:
           - "*"
 
@@ -60,6 +60,6 @@ updates:
       - dependency-name: "*"
         update-types: ["version-update:semver-patch"]
     groups:
-      all:
+      ci:
         patterns:
           - "*"
