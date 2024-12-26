@@ -27,6 +27,7 @@ mod transforms;
 pub(crate) fn bundle(
     root: &Path,
     target: &Path,
+    base_url: String,
     apis_blob_url: String,
     dependency_map: &HashMap<String, String>,
 ) -> Result<String, Error> {
@@ -37,10 +38,13 @@ pub(crate) fn bundle(
         common::bundle_into_raw_module(root, target, dependency_map, &globals, cm.clone())?;
 
     let code = GLOBALS.set(&globals, || {
-        // Redirect widget APIs imports to the APIs blob URL
-        let rename_apis = visit_mut_pass(transforms::ApisImportRenamer(apis_blob_url));
+        // Redirect `@deskulpt-test/*` imports
+        let import_renamer = visit_mut_pass(transforms::ImportRenamer {
+            base_url,
+            apis_blob_url,
+        });
         let program = Program::Module(module);
-        let module = program.apply(rename_apis).expect_module();
+        let module = program.apply(import_renamer).expect_module();
 
         // Emit the bundled module as string into a buffer
         let mut buf = vec![];
@@ -100,6 +104,7 @@ mod tests {
         let result = bundle(
             &bundle_root,
             &bundle_root.join(entry),
+            "http://localhost:1420".to_string(),
             "blob://dummy-url".to_string(),
             &Default::default(),
         )
@@ -172,6 +177,7 @@ mod tests {
             &bundle_root,
             &bundle_root.join("index.jsx"),
             Default::default(),
+            Default::default(),
             &Default::default(),
         )
         .expect_err("Expected bundling error");
@@ -186,6 +192,7 @@ mod tests {
         let _ = bundle(
             &bundle_root,
             &bundle_root.join("index.jsx"),
+            Default::default(),
             Default::default(),
             &Default::default(),
         );
@@ -216,6 +223,7 @@ mod tests {
         let error = bundle(
             &bundle_root,
             &index_path,
+            Default::default(),
             Default::default(),
             &Default::default(),
         )

@@ -1,1 +1,1 @@
-import t from"@deskulpt-test/raw-apis";var o=function(t,o){const n={};for(const r in o){n[r]={};const s=o[r];for(const o in s){const c=s[o];"function"==typeof c&&(n[r][o]=(...o)=>c(t,...o))}}return n}("__DESKULPT_WIDGET_ID__",t);export{o as default};
+import o from"__RAW_APIS_URL__";var n=function(o,n){const t={};for(const _ in n){t[_]={};const r=n[_];for(const n in r){const c=r[n];"function"==typeof c&&(t[_][n]=(...n)=>c(o,...n))}}return t}("__DESKULPT_WIDGET_ID__",o);export{n as default};

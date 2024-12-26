@@ -1,22 +1,14 @@
-import { Plugin, defineConfig } from "vite";
-import { posix, resolve } from "path";
+import { defineConfig } from "vite";
+import { resolve } from "path";
 import react from "@vitejs/plugin-react";
 
-const buildAssets = "assets";
-
-export default defineConfig(({ command }) => ({
+export default defineConfig({
   plugins: [
     react({
       jsxImportSource: "@emotion/react",
       babel: {
         plugins: ["@emotion/babel-plugin"],
       },
-    }),
-    importmapPlugin(command, {
-      "@deskulpt-test/emotion/jsx-runtime": ".scripts/jsx-runtime.js",
-      "@deskulpt-test/raw-apis": ".scripts/raw-apis.js",
-      "@deskulpt-test/react": ".scripts/react.js",
-      "@deskulpt-test/ui": ".scripts/ui.js",
     }),
   ],
   clearScreen: false,
@@ -29,76 +21,21 @@ export default defineConfig(({ command }) => ({
       input: {
         manager: resolve(__dirname, "views/manager.html"),
         canvas: resolve(__dirname, "views/canvas.html"),
+        // Make the scripts entrypoints so that they are preserved even if not imported
+        ".scripts/jsx-runtime": resolve(__dirname, ".scripts/jsx-runtime.js"),
+        ".scripts/raw-apis": resolve(__dirname, ".scripts/raw-apis.js"),
+        ".scripts/react": resolve(__dirname, ".scripts/react.js"),
+        ".scripts/ui": resolve(__dirname, ".scripts/ui.js"),
       },
       output: {
-        preserveModules: true,
-        entryFileNames: `${buildAssets}/[name].js`,
-        chunkFileNames: `${buildAssets}/[name].js`,
-        assetFileNames: `${buildAssets}/[name].[ext]`,
+        // Make sure scripts are at the root of the build output so that their import
+        // paths are consistent with in the dev server
+        entryFileNames: ({ name }) =>
+          name.startsWith(".scripts/") ? `[name].js` : `assets/[name].js`,
       },
+      // Make sure exports of the scripts are preserved so that they can be imported
+      // deterministically
       preserveEntrySignatures: "allow-extension",
     },
   },
-}));
-
-/**
- * Custom plugin to deal with import maps.
- *
- * Note that the values of `imports` must be relative to the vite server root.
- *
- * @param command The vite command, either "serve" or "build".
- * @param imports The "imports" entry of the import map.
- * @returns The plugin object.
- */
-function importmapPlugin(
-  command: "serve" | "build",
-  imports: Record<string, string>,
-): Plugin {
-  return {
-    name: "vite-plugin-importmap",
-
-    config: () => {
-      if (command === "build") {
-        // In production build, add import map targets as input entries to make sure
-        // they are included in the final bundle
-        return {
-          build: {
-            rollupOptions: {
-              input: Object.fromEntries(
-                Object.values(imports).map((v) => {
-                  const { dir, name } = posix.parse(v);
-                  return [posix.join(dir, name), resolve(__dirname, v)];
-                }),
-              ),
-            },
-          },
-        };
-      }
-    },
-
-    transformIndexHtml: {
-      order: "pre",
-      handler: (html) => {
-        // In production build, import map targets are relative to the build assets; in
-        // development build they start at the server root
-        const base = command === "build" ? posix.join("/", buildAssets) : "/";
-        const importPaths = Object.fromEntries(
-          Object.entries(imports).map(([k, v]) => [k, posix.join(base, v)]),
-        );
-
-        return {
-          html,
-          tags: [
-            // Inject the import map into the HTML head
-            {
-              tag: "script",
-              attrs: { type: "importmap" },
-              children: JSON.stringify({ imports: importPaths }, null, 2),
-              injectTo: "head-prepend",
-            },
-          ],
-        };
-      },
-    },
-  };
-}
+});
