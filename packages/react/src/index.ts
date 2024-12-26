@@ -10,7 +10,6 @@ export {
   cloneElement,
   createContext,
   createElement,
-  createFactory,
   createRef,
   forwardRef,
   isValidElement,
