@@ -24,7 +24,7 @@
     "test:rs": "cd src-tauri && cargo test",
     "cov:js": "echo 'Not implemented yet'",
     "cov:rs": "cd src-tauri && cargo llvm-cov --html",
-    "build:tooling": "pnpm run --filter \"@deskulpt-test/*\" build"
+    "build:packages": "pnpm run --filter \"@deskulpt-test/*\" build"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^2.1.0",

@@ -171,7 +171,7 @@ export default function useRenderWidgetListener(
  * the actual widget ID.
  */
 async function getWidgetApisCode(widgetId: string) {
-  // The template is in the public directory, bundled from `tooling/apis`
+  // The template is in the public directory, bundled from `packages/apis`
   const response = await fetch("/.wrap-apis.js.txt");
   const template = await response.text();
   return template.replace("__DESKULPT_WIDGET_ID__", widgetId);
