@@ -18,7 +18,7 @@
     "type": "git",
     "url": "git+https://github.com/CSCI-SHU-410-SE-Project/Deskulpt.git"
   },
-  "author": "Yao Xiao, Xinyu Li, Yuchen Zhou, Frank Zhu",
+  "author": "The Deskulpt Development Team",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/CSCI-SHU-410-SE-Project/Deskulpt/issues"
@@ -36,7 +36,7 @@
     "typescript-eslint": "^8.18.2"
   },
   "peerDependencies": {
-    "@types/react": "^18.3.3",
-    "react": "^18.3.1"
+    "@types/react": "^19.0.2",
+    "react": "^19.0.0"
   }
 }
