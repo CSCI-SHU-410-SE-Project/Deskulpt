@@ -1,1 +1,1 @@
-import apis from"blob://dummy-url";import{css}from"@deskulpt-test/ui";import React,{useState}from"@deskulpt-test/react";console.log(apis,css,React,useState);
+import apis from"blob://dummy-url";import{css}from"http://tauri.localhost/.scripts/ui.js";import React,{useState}from"http://tauri.localhost/.scripts/react.js";console.log(apis,css,React,useState);

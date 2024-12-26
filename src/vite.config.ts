@@ -31,7 +31,7 @@ export default defineConfig({
         // Make sure scripts are at the root of the build output so that their import
         // paths are consistent with in the dev server
         entryFileNames: ({ name }) =>
-          name.startsWith(".scripts/") ? `[name].js` : `assets/[name].js`,
+          name.startsWith(".scripts/") ? "[name].js" : "assets/[name].js",
       },
       // Make sure exports of the scripts are preserved so that they can be imported
       // deterministically

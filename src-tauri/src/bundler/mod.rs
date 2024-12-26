@@ -104,7 +104,7 @@ mod tests {
         let result = bundle(
             &bundle_root,
             &bundle_root.join(entry),
-            "http://localhost:1420".to_string(),
+            "http://tauri.localhost".to_string(),
             "blob://dummy-url".to_string(),
             &Default::default(),
         )

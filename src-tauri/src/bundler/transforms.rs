@@ -43,11 +43,23 @@ mod tests {
     test_inline!(
         Default::default(),
         |_| visit_mut_pass(ImportRenamer {
-            base_url: "http://localhost:1420".into(),
+            base_url: "http://tauri.localhost".into(),
             apis_blob_url: "blob://dummy-url".into()
         }),
         test_transform_apis_import_renamer,
-        r#"import "@deskulpt-test/apis";import "@deskulpt-test/emotion/jsx-runtime";"#,
-        r#"import "blob://dummy-url";import "http://localhost:1420/.scripts/jsx-runtime.js";"#
+        concat!(
+            r#"import "@deskulpt-test/apis";"#,
+            r#"import "@deskulpt-test/emotion/jsx-runtime";"#,
+            r#"import "@deskulpt-test/raw-apis";"#,
+            r#"import "@deskulpt-test/react";"#,
+            r#"import "@deskulpt-test/ui";"#
+        ),
+        concat!(
+            r#"import "blob://dummy-url";"#,
+            r#"import "http://tauri.localhost/.scripts/jsx-runtime.js";"#,
+            r#"import "http://tauri.localhost/.scripts/raw-apis.js";"#,
+            r#"import "http://tauri.localhost/.scripts/react.js";"#,
+            r#"import "http://tauri.localhost/.scripts/ui.js";"#
+        )
     );
 }
