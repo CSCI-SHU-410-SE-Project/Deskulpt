@@ -23,19 +23,18 @@ export default defineConfig([
     onwarn,
   },
   // ESM build of wrapped APIs, but with raw APIs externalized; essentially we replace
-  // the relative import of raw APIs with `@deskulpt-test/raw-apis` and externalize it;
-  // `@deskulpt-test/raw-apis` does not really exist but should be mapped to the actual
-  // raw APIs bundled above
+  // the relative import of raw APIs with a placeholder `__RAW_APIS_URL__` and
+  // externalize it, which will be replaced by the actual URL at runtime
   {
     input: "src/index.ts",
     output: {
       format: "esm",
       file: "../../src/public/.wrap-apis.js.txt",
     },
-    external: ["@tauri-apps/api/core", "@deskulpt-test/raw-apis"],
+    external: ["@tauri-apps/api/core", "__RAW_APIS_URL__"],
     plugins: [
       replace({
-        "./raw": "@deskulpt-test/raw-apis",
+        "./raw": "__RAW_APIS_URL__",
         delimiters: ["", ""],
         preventAssignment: true,
       }),

@@ -146,9 +146,8 @@ pub(crate) async fn refresh_widget_collection<R: Runtime>(
 /// collection for the given widget ID. The widget will be bundled into a string
 /// of ESM code if the ID is found in the collection.
 ///
-/// The command also requires the URL of the APIs blob of the widget. This is
-/// used for replacing the imports of `@deskulpt-test/apis` by the actual URL to
-/// import from.
+/// The command also requires the base URL and the URL of the APIs blob of the
+/// widget. These are used for resolving the imports of `@deskulpt-test/*`.
 ///
 /// This command will fail if:
 ///
@@ -160,6 +159,7 @@ pub(crate) async fn refresh_widget_collection<R: Runtime>(
 pub(crate) async fn bundle_widget<R: Runtime>(
     app_handle: AppHandle<R>,
     widget_id: String,
+    base_url: String,
     apis_blob_url: String,
 ) -> CommandOut<String> {
     let widget_collection_state = &app_handle.state::<WidgetConfigCollectionState>();
@@ -179,6 +179,7 @@ pub(crate) async fn bundle_widget<R: Runtime>(
         return bundle(
             &widget_config.directory,
             widget_entry,
+            base_url,
             apis_blob_url,
             &widget_config.external_deps,
         )
@@ -453,8 +454,13 @@ mod tests {
     async fn test_bundle_widget_pass(setup_bundle_widget_env: &(TempDir, AppHandle<MockRuntime>)) {
         // Test that the `bundle_widget` command bundles a widget correctly
         let (_base_dir, app_handle) = setup_bundle_widget_env;
-        let result =
-            bundle_widget(app_handle.clone(), "pass".to_string(), Default::default()).await;
+        let result = bundle_widget(
+            app_handle.clone(),
+            "pass".to_string(),
+            Default::default(),
+            Default::default(),
+        )
+        .await;
 
         // We only check that the result is Ok; the actual bundled content should be
         // checked in the bundler unit tests
@@ -467,8 +473,13 @@ mod tests {
     ) {
         // Test that the `bundle_widget` command raises upon bundling error
         let (_base_dir, app_handle) = setup_bundle_widget_env;
-        let result =
-            bundle_widget(app_handle.clone(), "fail".to_string(), Default::default()).await;
+        let result = bundle_widget(
+            app_handle.clone(),
+            "fail".to_string(),
+            Default::default(),
+            Default::default(),
+        )
+        .await;
 
         assert!(result.is_err());
         let error = result.unwrap_err();
@@ -487,6 +498,7 @@ mod tests {
         let result = bundle_widget(
             app_handle.clone(),
             "non_existent_id".to_string(),
+            Default::default(),
             Default::default(),
         )
         .await;
@@ -509,6 +521,7 @@ mod tests {
         let result = bundle_widget(
             app_handle.clone(),
             "invalid_conf".to_string(),
+            Default::default(),
             Default::default(),
         )
         .await;

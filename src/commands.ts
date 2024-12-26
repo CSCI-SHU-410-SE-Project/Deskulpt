@@ -11,8 +11,12 @@ import { Settings, WidgetConfigCollection } from "./types/backend";
 /**
  * Invoke the [`bundle_widget`](https://csci-shu-410-se-project.github.io/Deskulpt/rustdoc/deskulpt/commands/fn.bundle_widget.html) command.
  */
-export async function invokeBundleWidget(widgetId: string, apisBlobUrl: string) {
-  return invoke<string>("bundle_widget", { widgetId, apisBlobUrl });
+export async function invokeBundleWidget(
+  widgetId: string,
+  baseUrl: string,
+  apisBlobUrl: string,
+) {
+  return invoke<string>("bundle_widget", { widgetId, baseUrl, apisBlobUrl });
 }
 
 /**
