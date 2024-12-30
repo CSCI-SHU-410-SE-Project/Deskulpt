@@ -1,8 +1,4 @@
-//! The module implements the Deskulpt bundler based on SWC.
-//!
-//! Note that this is not a general-purpose bundler; it is specifically designed
-//! for the use case of bundling Deskulpt widgets and their external
-//! dependencies.
+//! This module contains utilities that does not fit into any other module.
 
 #![doc(
     html_logo_url = "https://github.com/CSCI-SHU-410-SE-Project/Deskulpt/raw/main/crates/deskulpt/icons/icon.png",
