@@ -23,7 +23,7 @@ export default {
         {
           type: "link",
           label: "Backend",
-          href: "https://csci-shu-410-se-project.github.io/Deskulpt/rustdoc/deskulpt/",
+          href: "https://csci-shu-410-se-project.github.io/Deskulpt/rustdoc/deskulpt_test/",
           description: "Rust documentation for the Deskulpt backend.",
         },
         {

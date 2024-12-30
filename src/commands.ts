@@ -6,24 +6,24 @@
  */
 
 import { invoke } from "@tauri-apps/api/core";
-import { Settings, WidgetConfigCollection } from "./types/backend";
+import { Settings, WidgetConfigMap } from "./types/backend";
 
 /**
- * Invoke the [`bundle_widget`](https://csci-shu-410-se-project.github.io/Deskulpt/rustdoc/deskulpt/commands/fn.bundle_widget.html) command.
+ * Invoke the `bundle_widget` command.
  */
 export async function invokeBundleWidget(widgetId: string, apisBlobUrl: string) {
   return invoke<string>("bundle_widget", { widgetId, apisBlobUrl });
 }
 
 /**
- * Invoke the [`exit_app`](https://csci-shu-410-se-project.github.io/Deskulpt/rustdoc/deskulpt/commands/fn.exit_app.html) command.
+ * Invoke the `exit_app` command.
  */
 export async function invokeExitApp(settings: Settings) {
   return invoke<void>("exit_app", { settings });
 }
 
 /**
- * Invoke the [`open_widget_resource`](https://csci-shu-410-se-project.github.io/Deskulpt/rustdoc/deskulpt/commands/fn.open_widget_resource.html) command.
+ * Invoke the `open_widget_resource` command.
  */
 export async function invokeOpenWidgetResource(
   widgetId: string | null,
@@ -33,21 +33,21 @@ export async function invokeOpenWidgetResource(
 }
 
 /**
- * Invoke the [`init_settings`](https://csci-shu-410-se-project.github.io/Deskulpt/rustdoc/deskulpt/commands/fn.init_settings.html) command.
+ * Invoke the `init_settings` command.
  */
 export async function invokeInitSettings() {
   return invoke<Settings>("init_settings");
 }
 
 /**
- * Invoke the [`refresh_widget_collection`](https://csci-shu-410-se-project.github.io/Deskulpt/rustdoc/deskulpt/commands/fn.refresh_widget_collection.html) command.
+ * Invoke the `refresh_widget_collection` command.
  */
 export async function invokeRefreshWidgetCollection() {
-  return invoke<WidgetConfigCollection>("refresh_widget_collection");
+  return invoke<WidgetConfigMap>("refresh_widget_collection");
 }
 
 /**
- * Invoke the [`register_toggle_shortcut`](https://csci-shu-410-se-project.github.io/Deskulpt/rustdoc/deskulpt/commands/fn.register_toggle_shortcut.html) command.
+ * Invoke the `register_toggle_shortcut` command.
  */
 export async function invokeRegisterToggleShortcut(shortcut: string, reverse: boolean) {
   return invoke<void>("register_toggle_shortcut", { shortcut, reverse });

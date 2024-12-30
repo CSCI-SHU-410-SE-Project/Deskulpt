@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "preinstall": "npx only-allow pnpm",
-    "rustdoc": "cd .. && cargo doc --workspace --exclude app --no-deps --open",
+    "rustdoc": "cd .. && cargo doc --workspace --no-deps --open",
     "start": "docusaurus start",
     "build": "docusaurus build",
     "serve": "docusaurus serve",
