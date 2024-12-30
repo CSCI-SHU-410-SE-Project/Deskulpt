@@ -1,0 +1,18 @@
+[package]
+name        = "deskulpt-test-plugin-sys"
+version     = { workspace = true }
+authors     = { workspace = true }
+description = { workspace = true }
+edition     = { workspace = true }
+homepage    = { workspace = true }
+license     = { workspace = true }
+readme      = { workspace = true }
+repository  = { workspace = true }
+
+[dependencies]
+async-std           = { workspace = true }
+deskulpt-test-utils = { workspace = true }
+once_cell           = { workspace = true }
+serde               = { workspace = true, features = ["derive"] }
+sysinfo             = { workspace = true }
+tauri               = { workspace = true }

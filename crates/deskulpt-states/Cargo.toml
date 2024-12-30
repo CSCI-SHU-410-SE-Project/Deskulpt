@@ -1,0 +1,16 @@
+[package]
+name        = "deskulpt-test-states"
+version     = { workspace = true }
+authors     = { workspace = true }
+description = { workspace = true }
+edition     = { workspace = true }
+homepage    = { workspace = true }
+license     = { workspace = true }
+readme      = { workspace = true }
+repository  = { workspace = true }
+
+[dependencies]
+anyhow               = { workspace = true }
+deskulpt-test-config = { workspace = true }
+serde                = { workspace = true, features = ["derive"] }
+tauri                = { workspace = true }
