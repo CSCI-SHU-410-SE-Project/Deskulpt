@@ -27,7 +27,7 @@ impl MockerBuilder {
         let data_dir = tempdir().expect("Failed to create temporary directory");
 
         if let Some(widgets_dir_src) = &self.widgets_dir {
-            copy_dir(widgets_dir_src, &data_dir.path().join("widgets"))
+            copy_dir(widgets_dir_src, data_dir.path().join("widgets"))
                 .expect("Failed to copy widgets directory");
         }
 
