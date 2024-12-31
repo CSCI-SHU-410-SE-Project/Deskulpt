@@ -1,4 +1,4 @@
-//! The module includes the setup utilities of Deskulpt.
+//! The setup utilities for Deskulpt.
 
 use std::thread::{sleep, spawn};
 use std::time::Duration;

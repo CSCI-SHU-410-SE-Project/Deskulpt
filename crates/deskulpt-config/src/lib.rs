@@ -121,47 +121,45 @@ mod tests {
 
     use super::*;
 
-    /// Get the standard Deskulpt configuration.
-    fn get_standard_deskulpt_conf() -> DeskulptConf {
-        DeskulptConf {
-            name: "sample".to_string(),
-            entry: "index.jsx".to_string(),
-            ignore: false,
-        }
-    }
-
     #[rstest]
-    // A standard configuration with both `deskulpt.conf.json` and `package.json`
-    #[case::standard(
-        fixture_path("config/standard"),
+    #[case::all_fields(
+        fixture_path("deskulpt-config/widgets/all_fields"),
         Some(WidgetConfig {
-            directory: fixture_path("config/standard"),
-            deskulpt_conf: get_standard_deskulpt_conf(),
+            directory: fixture_path("deskulpt-config/widgets/all_fields"),
+            deskulpt_conf: DeskulptConf {
+                name: "all_fields".to_string(),
+                entry: "index.jsx".to_string(),
+                ignore: false,
+            },
             external_deps: [("express".to_string(), "^4.17.1".to_string())].into(),
         }),
     )]
-    // A standard configuration with `deskulpt.conf.json` but no `package.json`
-    #[case::no_package_json(
-        fixture_path("config/no_package_json"),
+    #[case::package_json_none(
+        fixture_path("deskulpt-config/widgets/package_json_none"),
         Some(WidgetConfig {
-            directory: fixture_path("config/no_package_json"),
-            deskulpt_conf: get_standard_deskulpt_conf(),
+            directory: fixture_path("deskulpt-config/widgets/package_json_none"),
+            deskulpt_conf: DeskulptConf {
+                name: "package_json_none".to_string(),
+                entry: "index.jsx".to_string(),
+                ignore: false,
+            },
             external_deps: HashMap::new(),
         }),
     )]
-    // `package.json` does not contain `dependencies` field
-    #[case::package_json_no_dependencies(
-        fixture_path("config/package_json_no_dependencies"),
+    #[case::package_json_no_deps(
+        fixture_path("deskulpt-config/widgets/package_json_no_deps"),
         Some(WidgetConfig {
-            directory: fixture_path("config/package_json_no_dependencies"),
-            deskulpt_conf: get_standard_deskulpt_conf(),
+            directory: fixture_path("deskulpt-config/widgets/package_json_no_deps"),
+            deskulpt_conf: DeskulptConf {
+                name: "package_json_no_deps".to_string(),
+                entry: "index.jsx".to_string(),
+                ignore: false,
+            },
             external_deps: HashMap::new(),
         }),
     )]
-    // No configuration file, should not be treated as a widget
-    #[case::no_conf(fixture_path("config/no_conf"), None)]
-    // Widget is explicitly ignored
-    #[case::ignore_true(fixture_path("config/ignore_true"), None)]
+    #[case::not_a_widget(fixture_path("deskulpt-config/widgets/not_a_widget"), None)]
+    #[case::ignored_widget(fixture_path("deskulpt-config/widgets/ignored_widget"), None)]
     fn test_read_ok(#[case] path: PathBuf, #[case] expected_config: Option<WidgetConfig>) {
         let result =
             read_widget_config(&path).expect("Expected successful read of widget configuration");
@@ -171,31 +169,31 @@ mod tests {
     #[rstest]
     // Input path is not absolute
     #[case::not_absolute(
-        "config/not_absolute",
+        "deskulpt-config/widgets/not_absolute",
         vec![ChainReason::Exact(
             "Absolute path to an existing directory is expected; got: \
-            config/not_absolute".to_string()
+            deskulpt-config/widgets/not_absolute".to_string()
         )],
     )]
     // Input path is not a directory
     #[case::not_dir(
-        fixture_path("config/not_a_directory"),
+        fixture_path("deskulpt-config/widgets/not_a_directory"),
         vec![ChainReason::Exact(format!(
             "Absolute path to an existing directory is expected; got: {}",
-            fixture_path("config/not_a_directory").display(),
+            fixture_path("deskulpt-config/widgets/not_a_directory").display(),
         ))],
     )]
     // Input path does not exist
     #[case::non_existent(
-        fixture_path("config/non_existent"),
+        fixture_path("deskulpt-config/widgets/non_existent"),
         vec![ChainReason::Exact(format!(
             "Absolute path to an existing directory is expected; got: {}",
-            fixture_path("config/non_existent").display(),
+            fixture_path("deskulpt-config/widgets/non_existent").display(),
         ))],
     )]
     // `deskulpt.conf.json` is not readable (is a directory)
     #[case::conf_not_readable(
-        fixture_path("config/conf_not_readable"),
+        fixture_path("deskulpt-config/widgets/conf_not_readable"),
         vec![
             ChainReason::Exact("Failed to read deskulpt.conf.json".to_string()),
             ChainReason::IOError,
@@ -203,7 +201,7 @@ mod tests {
     )]
     // `deskulpt.conf.json` is missing a field
     #[case::conf_missing_field(
-        fixture_path("config/conf_missing_field"),
+        fixture_path("deskulpt-config/widgets/conf_missing_field"),
         vec![
             ChainReason::Exact("Failed to interpret deskulpt.conf.json".to_string()),
             ChainReason::SerdeError,
@@ -211,7 +209,7 @@ mod tests {
     )]
     // `package.json` is not readable (is a directory)
     #[case::package_json_not_readable(
-        fixture_path("config/package_json_not_readable"),
+        fixture_path("deskulpt-config/widgets/package_json_not_readable"),
         vec![
             ChainReason::Exact("Failed to read package.json".to_string()),
             ChainReason::IOError,

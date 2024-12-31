@@ -1,5 +1,5 @@
 {
-  "name": "sample",
+  "name": "ignored_widget",
   "entry": "index.jsx",
   "ignore": true
 }

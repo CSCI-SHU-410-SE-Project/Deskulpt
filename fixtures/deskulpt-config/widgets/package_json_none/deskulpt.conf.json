@@ -1,5 +1,5 @@
 {
-  "name": "sample",
+  "name": "package_json_none",
   "entry": "index.jsx",
   "ignore": false
 }

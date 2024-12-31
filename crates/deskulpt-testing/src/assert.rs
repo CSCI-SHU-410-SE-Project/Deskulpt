@@ -1,5 +1,7 @@
+//! Re-export of `pretty_assertions` with extra assertion utilities.
+
 use anyhow::Error;
-pub use pretty_assertions::assert_eq;
+pub use pretty_assertions::*;
 use regex::Regex;
 
 pub enum ChainReason {
@@ -25,7 +27,7 @@ pub fn assert_err_eq(error: Error, chain: Vec<ChainReason>) {
 
         match expected_reason {
             ChainReason::Exact(msg) => {
-                assert_eq!(
+                self::assert_eq!(
                     reason.to_string(),
                     msg,
                     "Expected reason to be: {msg:?}; got: {reason:?}"

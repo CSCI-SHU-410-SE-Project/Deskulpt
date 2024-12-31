@@ -1174,6 +1174,7 @@ name = "deskulpt-test-testing"
 version = "0.0.1"
 dependencies = [
  "anyhow",
+ "copy_dir",
  "deskulpt-test-states",
  "path-clean",
  "pretty_assertions",

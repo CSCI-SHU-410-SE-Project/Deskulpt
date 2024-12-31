@@ -124,33 +124,30 @@ pub async fn remove_dir<R: Runtime>(
 
 #[cfg(test)]
 mod tests {
-    use std::path::{Path, PathBuf};
-
     use deskulpt_test_testing::assert::assert_eq;
-    use deskulpt_test_testing::mock::setup_mock_env;
-    use rstest::rstest;
+    use deskulpt_test_testing::fixture_path;
+    use deskulpt_test_testing::mock::{Mocker, MockerBuilder};
+    use rstest::{fixture, rstest};
 
     use super::*;
 
-    /// Set up a widget directory with the given ID.
-    fn setup_widget_directory(base_dir: &Path, widget_id: &str) -> PathBuf {
-        let widget_dir = base_dir.join("widgets").join(widget_id);
-        std::fs::create_dir_all(&widget_dir).expect("Failed to create widget directory");
-        widget_dir
+    #[fixture]
+    fn mocker() -> Mocker {
+        MockerBuilder::default()
+            .with_widgets_dir(fixture_path("deskulpt-plugin-fs/widgets"))
+            .build()
     }
 
     #[rstest]
-    async fn test_exists() {
+    async fn test_exists(mocker: Mocker) {
         // Test the `fs::exists` command
-        let (base_dir, app_handle) = setup_mock_env();
-        let widget_dir = setup_widget_directory(base_dir.path(), "dummy");
-        let file_path = widget_dir.join("dummy_file.txt");
+        let file_path = mocker.widgets_path("dummy/new_file.txt");
 
         // The file does not exist yet and should return false
         let result = exists(
-            app_handle.clone(),
+            mocker.handle().clone(),
             "dummy".to_string(),
-            "dummy_file.txt".to_string(),
+            "new_file.txt".to_string(),
         )
         .await;
         assert!(result.is_ok());
@@ -159,9 +156,9 @@ mod tests {
         // Create the file and should return true
         std::fs::File::create(file_path).unwrap();
         let result = exists(
-            app_handle.clone(),
+            mocker.handle().clone(),
             "dummy".to_string(),
-            "dummy_file.txt".to_string(),
+            "new_file.txt".to_string(),
         )
         .await;
         assert!(result.is_ok());
@@ -169,30 +166,22 @@ mod tests {
     }
 
     #[rstest]
-    async fn test_is_file_or_dir() {
+    async fn test_is_file_or_dir(mocker: Mocker) {
         // Test the `fs::is_file` and `fs::is_dir` commands
-        let (base_dir, app_handle) = setup_mock_env();
-        let widget_dir = setup_widget_directory(base_dir.path(), "dummy");
-
-        // Create a file and a directory
-        let file_path = widget_dir.join("dummy_file.txt");
-        let dir_path = widget_dir.join("dummy_dir");
-        std::fs::File::create(file_path).unwrap();
-        std::fs::create_dir(dir_path).unwrap();
 
         // Check that `is_file` gives true and `is_dir` gives false for the file
         let result = is_file(
-            app_handle.clone(),
+            mocker.handle().clone(),
             "dummy".to_string(),
-            "dummy_file.txt".to_string(),
+            "file.txt".to_string(),
         )
         .await;
         assert!(result.is_ok());
         assert!(result.unwrap());
         let result = is_dir(
-            app_handle.clone(),
+            mocker.handle().clone(),
             "dummy".to_string(),
-            "dummy_file.txt".to_string(),
+            "file.txt".to_string(),
         )
         .await;
         assert!(result.is_ok());
@@ -200,17 +189,17 @@ mod tests {
 
         // Check that `is_file` gives false and `is_dir` gives true for the directory
         let result = is_file(
-            app_handle.clone(),
+            mocker.handle().clone(),
             "dummy".to_string(),
-            "dummy_dir".to_string(),
+            "dir".to_string(),
         )
         .await;
         assert!(result.is_ok());
         assert!(!result.unwrap());
         let result = is_dir(
-            app_handle.clone(),
+            mocker.handle().clone(),
             "dummy".to_string(),
-            "dummy_dir".to_string(),
+            "dir".to_string(),
         )
         .await;
         assert!(result.is_ok());
@@ -218,17 +207,15 @@ mod tests {
     }
 
     #[rstest]
-    async fn test_read_file() {
+    async fn test_read_file(mocker: Mocker) {
         // Test the `fs::read_file` command
-        let (base_dir, app_handle) = setup_mock_env();
-        let widget_dir = setup_widget_directory(base_dir.path(), "dummy");
-        let file_path = widget_dir.join("dummy_file.txt");
+        let file_path = mocker.widgets_path("dummy/new_file.txt");
 
         // The file does not exist yet and should return an error
         let result = read_file(
-            app_handle.clone(),
+            mocker.handle().clone(),
             "dummy".to_string(),
-            "dummy_file.txt".to_string(),
+            "new_file.txt".to_string(),
         )
         .await;
         assert!(result.is_err());
@@ -243,9 +230,9 @@ mod tests {
             .write_all(content.as_bytes())
             .unwrap();
         let result = read_file(
-            app_handle.clone(),
+            mocker.handle().clone(),
             "dummy".to_string(),
-            "dummy_file.txt".to_string(),
+            "new_file.txt".to_string(),
         )
         .await;
         assert!(result.is_ok());
@@ -253,18 +240,16 @@ mod tests {
     }
 
     #[rstest]
-    async fn test_write_file() {
+    async fn test_write_file(mocker: Mocker) {
         // Test the `fs::write_file` command
-        let (base_dir, app_handle) = setup_mock_env();
-        let widget_dir = setup_widget_directory(base_dir.path(), "dummy");
-        let file_path = widget_dir.join("dummy_file.txt");
+        let file_path = mocker.widgets_path("dummy/new_file.txt");
 
         // Writing to a non-existent path should create the file
         let content = "Hello, world!";
         let result = write_file(
-            app_handle.clone(),
+            mocker.handle().clone(),
             "dummy".to_string(),
-            "dummy_file.txt".to_string(),
+            "new_file.txt".to_string(),
             content.to_string(),
         )
         .await;
@@ -274,9 +259,9 @@ mod tests {
         // Writing to an existing file should overwrite the content
         let new_content = "Hello, new world!";
         let result = write_file(
-            app_handle.clone(),
+            mocker.handle().clone(),
             "dummy".to_string(),
-            "dummy_file.txt".to_string(),
+            "new_file.txt".to_string(),
             new_content.to_string(),
         )
         .await;
@@ -285,18 +270,16 @@ mod tests {
     }
 
     #[rstest]
-    async fn test_append_file() {
+    async fn test_append_file(mocker: Mocker) {
         // Test the `fs::append_file` command
-        let (base_dir, app_handle) = setup_mock_env();
-        let widget_dir = setup_widget_directory(base_dir.path(), "dummy");
-        let file_path = widget_dir.join("dummy_file.txt");
+        let file_path = mocker.widgets_path("dummy/new_file.txt");
 
         // Appending to a non-existent path should create the file
         let content = "Hello, world!\n";
         let result = append_file(
-            app_handle.clone(),
+            mocker.handle().clone(),
             "dummy".to_string(),
-            "dummy_file.txt".to_string(),
+            "new_file.txt".to_string(),
             content.to_string(),
         )
         .await;
@@ -306,9 +289,9 @@ mod tests {
         // Appending to an existing file should append the content
         let new_content = "Hello, new world!\n";
         let result = append_file(
-            app_handle.clone(),
+            mocker.handle().clone(),
             "dummy".to_string(),
-            "dummy_file.txt".to_string(),
+            "new_file.txt".to_string(),
             new_content.to_string(),
         )
         .await;
@@ -320,102 +303,86 @@ mod tests {
     }
 
     #[rstest]
-    async fn test_create_dir() {
+    async fn test_create_dir(mocker: Mocker) {
         // Test the `fs::create_dir` command
-        let (base_dir, app_handle) = setup_mock_env();
-        let widget_dir = setup_widget_directory(base_dir.path(), "dummy");
-
         let result = create_dir(
-            app_handle.clone(),
+            mocker.handle().clone(),
             "dummy".to_string(),
-            "dummy_dir".to_string(),
+            "new_dir".to_string(),
         )
         .await;
         assert!(result.is_ok());
-        assert!(widget_dir.join("dummy_dir").is_dir());
+        assert!(mocker.widgets_path("dummy/new_dir").is_dir());
     }
 
     #[rstest]
-    async fn test_remove_file_or_dir() {
+    async fn test_remove_file_or_dir(mocker: Mocker) {
         // Test the `fs::remove_file` and `fs::remove_dir` commands
-        let (base_dir, app_handle) = setup_mock_env();
-        let widget_dir = setup_widget_directory(base_dir.path(), "dummy");
 
         // Removing a non-existent file should raise an error
         let result = remove_file(
-            app_handle.clone(),
+            mocker.handle().clone(),
             "dummy".to_string(),
-            "dummy_file.txt".to_string(),
+            "new_file.txt".to_string(),
         )
         .await;
         assert!(result.is_err());
-        assert!(result.unwrap_err().contains(
+        assert!(result.clone().unwrap_err().contains(
             format!(
                 "Failed to delete file '{}'",
-                widget_dir.join("dummy_file.txt").display()
+                mocker.widgets_path("dummy/new_file.txt").display()
             )
             .as_str()
         ));
 
         // Removing a non-existent directory should raise an error
         let result = remove_dir(
-            app_handle.clone(),
+            mocker.handle().clone(),
             "dummy".to_string(),
-            "dummy_dir".to_string(),
+            "new_dir".to_string(),
         )
         .await;
         assert!(result.is_err());
         assert!(result.unwrap_err().contains(
             format!(
                 "Failed to delete directory '{}'",
-                widget_dir.join("dummy_dir").display()
+                mocker.widgets_path("dummy/new_dir").display()
             )
             .as_str()
         ));
 
-        // Create a file and a directory
-        let file_path = widget_dir.join("dummy_file.txt");
-        let dir_path = widget_dir.join("dummy_dir");
-        std::fs::File::create(&file_path).unwrap();
-        std::fs::create_dir(&dir_path).unwrap();
+        let file_path = mocker.widgets_path("dummy/file.txt");
+        let dir_path = mocker.widgets_path("dummy/dir");
 
         // Removing a directory using `remove_file` should raise an error
         let result = remove_file(
-            app_handle.clone(),
+            mocker.handle().clone(),
             "dummy".to_string(),
-            "dummy_dir".to_string(),
+            "dir".to_string(),
         )
         .await;
         assert!(result.is_err());
-        assert!(result.unwrap_err().contains(
-            format!(
-                "Failed to delete file '{}'",
-                widget_dir.join("dummy_dir").display()
-            )
-            .as_str()
-        ));
+        assert!(result
+            .unwrap_err()
+            .contains(format!("Failed to delete file '{}'", dir_path.display()).as_str()));
 
         // Removing a file using `remove_dir` should raise an error
         let result = remove_dir(
-            app_handle.clone(),
+            mocker.handle().clone(),
             "dummy".to_string(),
-            "dummy_file.txt".to_string(),
+            "file.txt".to_string(),
         )
         .await;
         assert!(result.is_err());
-        assert!(result.unwrap_err().contains(
-            format!(
-                "Failed to delete directory '{}'",
-                widget_dir.join("dummy_file.txt").display()
-            )
-            .as_str()
-        ));
+        assert!(result
+            .unwrap_err()
+            .contains(format!("Failed to delete directory '{}'", file_path.display()).as_str()));
 
         // Remove the file correctly
         let result = remove_file(
-            app_handle.clone(),
+            mocker.handle().clone(),
             "dummy".to_string(),
-            "dummy_file.txt".to_string(),
+            "file.txt".to_string(),
         )
         .await;
         assert!(result.is_ok());
@@ -423,9 +390,9 @@ mod tests {
 
         // Remove the directory correctly
         let result = remove_dir(
-            app_handle.clone(),
+            mocker.handle().clone(),
             "dummy".to_string(),
-            "dummy_dir".to_string(),
+            "dir".to_string(),
         )
         .await;
         assert!(result.is_ok());

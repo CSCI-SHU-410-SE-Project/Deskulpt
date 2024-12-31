@@ -63,22 +63,12 @@ mod tests {
     use deskulpt_test_testing::assert::{assert_eq, assert_err_eq, ChainReason};
     use deskulpt_test_testing::fixture_path;
     use rstest::rstest;
-    use tempfile::{tempdir, TempDir};
+    use tempfile::tempdir;
 
     use super::*;
 
-    /// Setup a temporary directory for testing.
-    ///
-    /// This would create a temporary directory and an `input` directory inside
-    /// it.
-    fn setup_temp_dir() -> TempDir {
-        let temp_dir = tempdir().unwrap();
-        create_dir(temp_dir.path().join("input")).unwrap();
-        temp_dir
-    }
-
     #[rstest]
-    // Use correct JSX runtime for `jsx`, `jsxs`, and `Fragment`
+    // Use correct runtime for `jsx`, `jsxs`, and `Fragment`
     #[case::jsx_runtime("jsx_runtime", "index.jsx")]
     // Correctly resolve JS/JSX imports with and without extensions, or as index files
     // of a directory
@@ -89,7 +79,7 @@ mod tests {
     // should be replaced with the blob URL
     #[case::default_deps("default_deps", "index.js")]
     fn test_bundle_ok(#[case] case: &str, #[case] entry: &str) {
-        let case_dir = fixture_path("bundler").join(case);
+        let case_dir = fixture_path("deskulpt-bundler/widgets").join(case);
         let bundle_root = case_dir.join("input");
         let result = bundle(
             &bundle_root,
@@ -160,7 +150,7 @@ mod tests {
         ]
     )]
     fn test_bundle_error(#[case] case: &str, #[case] expected_error: Vec<ChainReason>) {
-        let case_dir = fixture_path("bundler").join(case);
+        let case_dir = fixture_path("deskulpt-bundler/widgets").join(case);
         let bundle_root = case_dir.join("input");
         let error = bundle(
             &bundle_root,
@@ -176,7 +166,7 @@ mod tests {
     #[should_panic]
     fn test_bundle_import_meta_panic() {
         // Test that accessing `import.meta` is not supported
-        let bundle_root = fixture_path("bundler/import_meta/input");
+        let bundle_root = fixture_path("deskulpt-bundler/widgets/import_meta/input");
         let _ = bundle(
             &bundle_root,
             &bundle_root.join("index.jsx"),
@@ -188,7 +178,8 @@ mod tests {
     #[rstest]
     fn test_bundle_absolute_import_error() {
         // Test that an absolute import raises a proper error
-        let temp_dir = setup_temp_dir();
+        let temp_dir = tempdir().unwrap();
+        create_dir(temp_dir.path().join("input")).unwrap();
 
         // Create the following structure in the temporary directory:
         //     input/

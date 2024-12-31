@@ -37,16 +37,16 @@ pub(super) fn get_resource_path<R: Runtime>(
         base_component_count + 1 != dir_component_count
     } {
         cmdbail!(
-            "Invalid widget ID: '{widget_id}'; widget ID must correspond to a direct \
-            subdirectory of the widget base directory."
+            "Invalid widget ID: '{widget_id}'; widget ID must correspond to a \
+            direct subdirectory of the widget base directory."
         );
     }
 
     let resource_path = widget_dir.join(path).clean();
     if !resource_path.starts_with(&widget_dir) {
         cmdbail!(
-            "Invalid resource path: '{path}'; resource path must stay within its \
-            corresponding widget directory."
+            "Invalid resource path: '{path}'; resource path must stay within \
+            its corresponding widget directory."
         );
     }
 
@@ -55,89 +55,60 @@ pub(super) fn get_resource_path<R: Runtime>(
 
 #[cfg(test)]
 mod tests {
-    use std::path::{Path, PathBuf};
-
-    use deskulpt_test_testing::mock::setup_mock_env;
-    use rstest::rstest;
+    use deskulpt_test_testing::fixture_path;
+    use deskulpt_test_testing::mock::{Mocker, MockerBuilder};
+    use rstest::{fixture, rstest};
 
     use super::*;
 
-    /// Set up a widget directory with the given ID.
-    fn setup_widget_directory(base_dir: &Path, widget_id: &str) -> PathBuf {
-        let widget_dir = base_dir.join("widgets").join(widget_id);
-        std::fs::create_dir_all(&widget_dir).expect("Failed to create widget directory");
-        widget_dir
+    #[fixture]
+    fn mocker() -> Mocker {
+        MockerBuilder::default()
+            .with_widgets_dir(fixture_path("deskulpt-plugin-fs/widgets"))
+            .build()
     }
 
     #[rstest]
-    fn test_get_resource_path() {
-        // Test that `get_resource_path` returns the correct path, given that the widget
-        // ID and the given path are both valid
-        let (base_dir, app_handle) = setup_mock_env();
-        let widget_dir = setup_widget_directory(base_dir.path(), "dummy");
-        let file_path = widget_dir.join("dummy_file.txt");
-
-        // We did not really create the file but the function should not fail
-        let result = get_resource_path(&app_handle, "dummy", "dummy_file.txt");
+    fn test_get_resource_path(mocker: Mocker) {
+        // Test that `get_resource_path` returns the correct path when valid
+        let result = get_resource_path(mocker.handle(), "dummy", "file.txt");
         assert!(result.is_ok());
-        assert_eq!(result.unwrap(), file_path);
+        assert_eq!(result.unwrap(), mocker.widgets_path("dummy/file.txt"));
     }
 
     #[rstest]
     // Widget ID corresponds to a non-existent directory
-    #[case::non_existent("dummy", |_: PathBuf| {})]
+    #[case::non_existent("non_existent")]
     // Widget ID corresponds to a file instead of a directory
-    #[case::not_a_directory("dummy", |widget_dir: PathBuf| {
-        let file_path = widget_dir.join("dummy");
-        std::fs::File::create(file_path).unwrap();
-    })]
+    #[case::not_a_directory("not_a_directory")]
     // Widget ID corresponds to a directory that is beyond the widget base directory
-    #[case::beyond_base("../dummy", |widget_dir: PathBuf| {
-        // We can safely create a directory one level outside the widget base directory,
-        // since that would still be inside the temporary directory 
-        let dir_path = widget_dir.join("../dummy");
-        std::fs::create_dir(dir_path).unwrap();
-    })]
+    #[case::beyond_base("orphan")]
     // Widget ID corresponds to a directory that is not a direct descendant of the
     // widget base directory
-    #[case::not_direct_descendant("dummy/subdummy", |widget_dir: PathBuf| {
-        let dir_path = widget_dir.join("dummy/subdummy");
-        std::fs::create_dir_all(dir_path).unwrap();
-    })]
-    fn test_get_resource_path_invalid_id(#[case] widget_id: &str, #[case] setup: fn(PathBuf)) {
+    #[case::not_direct_descendant("nested/dummy")]
+    fn test_get_resource_path_invalid_id(#[case] widget_id: &str, mocker: Mocker) {
         // Test that `get_resource_path` raises an error when the widget ID is invalid
-        let (base_dir, app_handle) = setup_mock_env();
-        let widget_base = base_dir.path().join("widgets");
-        std::fs::create_dir(&widget_base).unwrap();
-        setup(widget_base);
-
-        let result = get_resource_path(&app_handle, widget_id, "dummy_file.txt");
+        let result = get_resource_path(mocker.handle(), widget_id, "file.txt");
         assert!(result.is_err());
         assert_eq!(
             result.unwrap_err(),
             format!(
-                "Invalid widget ID: '{widget_id}'; widget ID must correspond to a direct \
-                subdirectory of the widget base directory."
+                "Invalid widget ID: '{widget_id}'; widget ID must correspond \
+                to a direct subdirectory of the widget base directory."
             )
         );
     }
 
     #[rstest]
-    fn test_get_resource_path_invalid_path() {
+    fn test_get_resource_path_invalid_path(mocker: Mocker) {
         // Test that `get_resource_path` raises an error when the widget ID is valid but
         // the given relative resource path is invalid
-        let (base_dir, app_handle) = setup_mock_env();
-        let widget_dir = setup_widget_directory(base_dir.path(), "dummy");
-        std::fs::File::create(widget_dir.join("../dummy_file.txt")).unwrap();
-
-        // The resource path is outside the widget directory, so the validation should
-        // not pass even if that resource actually exists
-        let result = get_resource_path(&app_handle, "dummy", "../dummy_file.txt");
+        let result = get_resource_path(mocker.handle(), "dummy", "../orphan");
         assert!(result.is_err());
         assert_eq!(
             result.unwrap_err(),
             format!(
-                "Invalid resource path: '../dummy_file.txt'; resource path must stay \
+                "Invalid resource path: '../orphan'; resource path must stay \
                 within its corresponding widget directory."
             )
         );
