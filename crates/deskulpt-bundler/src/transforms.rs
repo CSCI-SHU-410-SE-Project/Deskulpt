@@ -4,9 +4,9 @@ use swc_core::ecma::ast::ImportDecl;
 use swc_core::ecma::visit::{noop_visit_mut_type, VisitMut, VisitMutWith};
 
 /// An AST transformer that redirects widget APIs imports to a blob URL.
-pub(super) struct ApisImportRenamer(
+pub struct ApisImportRenamer(
     /// The blob URL to redirect APIs imports to.
-    pub(super) String,
+    pub String,
 );
 
 impl VisitMut for ApisImportRenamer {

@@ -5,7 +5,7 @@ use std::fs::read_dir;
 use std::path::PathBuf;
 
 use anyhow::Context;
-use deskulpt_test_bundler::bundle;
+use deskulpt_test_bundler::WidgetBundler;
 use deskulpt_test_config::{read_widget_config, WidgetConfigMap};
 use deskulpt_test_settings::{read_settings, write_settings, Settings};
 use deskulpt_test_states::{
@@ -120,19 +120,21 @@ pub async fn bundle_widget<R: Runtime>(
             Err(e) => cmdbail!(e.clone()),
         };
         // Obtain the absolute path of the widget entry point
-        let widget_entry = &widget_config
+        let widget_entry = widget_config
             .directory
             .join(&widget_config.deskulpt_conf.entry);
 
         // Wrap the bundled code if success, otherwise let the error propagate
-        return bundle(
-            &widget_config.directory,
+        let bundler = WidgetBundler::new(
+            widget_config.directory.clone(),
             widget_entry,
             apis_blob_url,
-            &widget_config.external_deps,
-        )
-        .context(format!("Failed to bundle widget (id={})", widget_id))
-        .map_err(|e| cmderr!(e));
+            widget_config.external_deps.keys().cloned().collect(),
+        );
+        return bundler
+            .bundle()
+            .context(format!("Failed to bundle widget (id={})", widget_id))
+            .map_err(|e| cmderr!(e));
     }
 
     // Error out if the widget ID is not found in the collection

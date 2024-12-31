@@ -1,18 +1,16 @@
 //! This module contains common bundling routines and utilities.
 
-use std::collections::{HashMap, HashSet};
 use std::fs::File;
 use std::io::{Read, Write};
 use std::path::{Component, Path, PathBuf};
 
 use anyhow::{bail, Context, Error};
 use path_clean::PathClean;
-use swc_core::atoms::Atom;
-use swc_core::bundler::{Bundler, Hook, Load, ModuleData, ModuleRecord, Resolve};
+use swc_core::bundler::{Hook, Load, ModuleData, ModuleRecord, Resolve};
 use swc_core::common::comments::SingleThreadedComments;
 use swc_core::common::errors::Handler;
 use swc_core::common::sync::Lrc;
-use swc_core::common::{FileName, Globals, Mark, SourceMap, Span};
+use swc_core::common::{FileName, Mark, SourceMap, Span};
 use swc_core::ecma::ast::{KeyValueProp, Module, Program};
 use swc_core::ecma::codegen::text_writer::{JsWriter, WriteJs};
 use swc_core::ecma::codegen::Emitter;
@@ -25,90 +23,29 @@ use tempfile::NamedTempFile;
 /// The file extensions to try when an import is given without an extension
 static EXTENSIONS: &[&str] = &["js", "jsx", "ts", "tsx"];
 
-/// Bundle the entry point into a raw module.
-///
-/// It does not apply AST transforms and ignores default/external dependencies
-/// without bundling them.
-pub(super) fn bundle_into_raw_module(
-    root: &Path,
-    target: &Path,
-    dependency_map: &HashMap<String, String>,
-    globals: &Globals,
-    cm: Lrc<SourceMap>,
-) -> Result<Module, Error> {
-    if !target.exists() {
-        bail!("Entry point does not exist: '{}'", target.display());
-    }
-
-    // Get the list of external modules not to resolve; this should include default
-    // dependencies and (if any) external dependencies obtained from the dependency
-    // map
-    let external_modules = {
-        let mut dependencies = HashSet::from([
-            Atom::from("@deskulpt-test/apis"),
-            Atom::from("@deskulpt-test/emotion/jsx-runtime"),
-            Atom::from("@deskulpt-test/react"),
-            Atom::from("@deskulpt-test/ui"),
-        ]);
-        dependencies.extend(dependency_map.keys().map(|k| Atom::from(k.clone())));
-        Vec::from_iter(dependencies)
-    };
-
-    // The root of the path resolver will be used to determine whether a resolved
-    // import goes beyond the root; the comparison is done via path prefixes so
-    // we must be consistent with how SWC resolves paths, see:
-    // https://github.com/swc-project/swc/blob/f584ef76d75e86da15d0725ac94be35a88a1c946/crates/swc_bundler/src/bundler/mod.rs#L159-L166
-    #[cfg(target_os = "windows")]
-    let path_resolver_root = root.canonicalize()?;
-    #[cfg(not(target_os = "windows"))]
-    let path_resolver_root = root.to_path_buf();
-
-    let mut bundler = Bundler::new(
-        globals,
-        cm.clone(),
-        PathLoader(cm.clone()),
-        PathResolver(path_resolver_root),
-        // Do not resolve the external modules
-        swc_core::bundler::Config {
-            external_modules,
-            ..Default::default()
-        },
-        Box::new(NoopHook),
-    );
-
-    // SWC bundler requires a map of entries to bundle; we provide a single entry
-    // point and expect there to be only one generated bundle; we use the target
-    // path as the key for convenience
-    let mut entries = HashMap::new();
-    entries.insert(
-        target.to_string_lossy().to_string(),
-        FileName::Real(target.to_path_buf()),
-    );
-
-    let mut bundles = bundler.bundle(entries)?;
-    if bundles.len() != 1 {
-        bail!("Expected a single bundle, got {}", bundles.len());
-    }
-    Ok(bundles.pop().unwrap().module)
+pub trait ModuleExt {
+    /// Emit a module into a buffer.
+    fn emit_to_buf<W: Write>(&self, cm: Lrc<SourceMap>, buf: W);
 }
 
-/// Emit a module into a buffer.
-pub(super) fn emit_module_to_buf<W: Write>(module: Module, cm: Lrc<SourceMap>, buf: W) {
-    let wr = JsWriter::new(cm.clone(), "\n", buf, None);
-    let mut emitter = Emitter {
-        cfg: swc_core::ecma::codegen::Config::default().with_minify(true),
-        cm: cm.clone(),
-        comments: None,
-        wr: Box::new(wr) as Box<dyn WriteJs>,
-    };
-    emitter.emit_module(&module).unwrap();
+impl ModuleExt for Module {
+    fn emit_to_buf<W: Write>(&self, cm: Lrc<SourceMap>, buf: W) {
+        let wr = JsWriter::new(cm.clone(), "\n", buf, None);
+        let mut emitter = Emitter {
+            cfg: swc_core::ecma::codegen::Config::default().with_minify(true),
+            cm: cm.clone(),
+            comments: None,
+            wr: Box::new(wr) as Box<dyn WriteJs>,
+        };
+        emitter.emit_module(self).unwrap();
+    }
 }
 
 /// Deskulpt-customized path loader for SWC bundler.
 ///
 /// It is in charge of parsing the source file into a module AST. TypeScript
 /// types are stripped off and JSX syntax is transformed during the parsing.
-struct PathLoader(Lrc<SourceMap>);
+pub struct PathLoader(pub Lrc<SourceMap>);
 
 impl Load for PathLoader {
     fn load(&self, file: &FileName) -> Result<ModuleData, Error> {
@@ -217,7 +154,7 @@ impl Load for PathLoader {
 /// - URL imports, e.g., `import foo from "https://example.com/foo"`
 /// - Node resolution imports, e.g., `import globals from "globals"`
 /// - Relative imports that go beyond the root
-struct PathResolver(PathBuf);
+pub struct PathResolver(pub PathBuf);
 
 impl PathResolver {
     /// Helper function for resolving a path by treating it as a file.
@@ -312,7 +249,7 @@ impl Resolve for PathResolver {
 }
 
 /// A no-op hook for SWC bundler.
-struct NoopHook;
+pub struct NoopHook;
 
 impl Hook for NoopHook {
     fn get_import_meta_props(&self, _: Span, _: &ModuleRecord) -> Result<Vec<KeyValueProp>, Error> {

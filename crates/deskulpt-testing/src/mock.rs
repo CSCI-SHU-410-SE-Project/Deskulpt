@@ -16,6 +16,7 @@ pub struct MockerBuilder {
 }
 
 impl MockerBuilder {
+    /// Copy the contents of a directory to the mock widgets directory.
     pub fn with_widgets_dir<T: AsRef<Path>>(mut self, widgets_dir: T) -> Self {
         self.widgets_dir = Some(widgets_dir.as_ref().to_path_buf());
         self

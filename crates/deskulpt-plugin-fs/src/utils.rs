@@ -21,7 +21,7 @@ use tauri::{AppHandle, Manager, Runtime};
 ///
 /// Note, however, that this function does not check if the resource exists or
 /// not, since the file or folder may not exist yet, and could be created later.
-pub(super) fn get_resource_path<R: Runtime>(
+pub fn get_resource_path<R: Runtime>(
     app_handle: &AppHandle<R>,
     widget_id: &str,
     path: &str,
