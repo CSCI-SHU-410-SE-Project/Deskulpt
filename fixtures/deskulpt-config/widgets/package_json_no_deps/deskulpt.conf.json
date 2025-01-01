@@ -1,5 +1,4 @@
 {
   "name": "package_json_no_deps",
-  "entry": "index.jsx",
-  "ignore": false
+  "entry": "index.jsx"
 }

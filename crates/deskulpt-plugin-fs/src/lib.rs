@@ -1,4 +1,8 @@
-//! The widget API plugin for `fs` in `@deskulpt-test/apis`.
+#![doc = include_str!("../README.md")]
+#![doc(
+    html_logo_url = "https://github.com/CSCI-SHU-410-SE-Project/Deskulpt/raw/main/crates/deskulpt/icons/icon.png",
+    html_favicon_url = "https://github.com/CSCI-SHU-410-SE-Project/Deskulpt/raw/main/crates/deskulpt/icons/icon.png"
+)]
 
 use tauri::plugin::{Builder, TauriPlugin};
 use tauri::{generate_handler, Runtime};

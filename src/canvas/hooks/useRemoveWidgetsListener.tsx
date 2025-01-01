@@ -1,7 +1,6 @@
 import { Dispatch, SetStateAction, useEffect } from "react";
 import { listenToRemoveWidgets } from "../../events";
 import { CanvasWidgetState } from "../../types/frontend";
-import { IdMap } from "../../types/backend";
 
 /**
  * Listen and react to the "remove-widgets" event.
@@ -10,8 +9,8 @@ import { IdMap } from "../../types/backend";
  * @param setCanvasWidgetStates Setter for the canvas widget states.
  */
 export default function useRemoveWidgetsListener(
-  canvasWidgetStates: IdMap<CanvasWidgetState>,
-  setCanvasWidgetStates: Dispatch<SetStateAction<IdMap<CanvasWidgetState>>>,
+  canvasWidgetStates: Record<string, CanvasWidgetState>,
+  setCanvasWidgetStates: Dispatch<SetStateAction<Record<string, CanvasWidgetState>>>,
 ) {
   useEffect(() => {
     const unlisten = listenToRemoveWidgets((event) => {

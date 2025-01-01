@@ -1,5 +1,4 @@
 {
   "name": "package_json_not_readable",
-  "entry": "index.jsx",
-  "ignore": false
+  "entry": "index.jsx"
 }

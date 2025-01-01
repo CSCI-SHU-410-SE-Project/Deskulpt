@@ -3,7 +3,7 @@
 use std::path::{Path, PathBuf};
 
 use copy_dir::copy_dir;
-use deskulpt_test_states::{WidgetBaseDirectoryState, WidgetConfigMapState};
+use deskulpt_test_states::{WidgetBaseDirectoryState, WidgetCollectionState};
 use path_clean::PathClean;
 use tauri::test::{mock_app, MockRuntime};
 use tauri::{App, AppHandle, Manager};
@@ -36,7 +36,7 @@ impl MockerBuilder {
         app_handle.manage(WidgetBaseDirectoryState::init(
             data_dir.path().to_path_buf(),
         ));
-        app_handle.manage(WidgetConfigMapState::default());
+        app_handle.manage(WidgetCollectionState::default());
 
         Mocker { app, data_dir }
     }

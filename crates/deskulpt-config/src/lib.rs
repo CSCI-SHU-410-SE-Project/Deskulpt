@@ -1,116 +1,111 @@
-//! The module implements configuration-related utilities and structures.
-
+#![doc = include_str!("../README.md")]
 #![doc(
     html_logo_url = "https://github.com/CSCI-SHU-410-SE-Project/Deskulpt/raw/main/crates/deskulpt/icons/icon.png",
     html_favicon_url = "https://github.com/CSCI-SHU-410-SE-Project/Deskulpt/raw/main/crates/deskulpt/icons/icon.png"
 )]
 
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::fs::read_to_string;
 use std::path::{Path, PathBuf};
 
 use anyhow::{bail, Context, Error};
-use deskulpt_test_utils::IdMap;
+use path_clean::PathClean;
 use serde::{Deserialize, Serialize};
 
-/// The collection of widget configurations or errors.
-pub type WidgetConfigMap = IdMap<Result<WidgetConfig, String>>;
-
-/// Full configuration of a widget.
-#[derive(Clone, Serialize, PartialEq, Debug)]
-#[serde(rename_all = "camelCase")]
-pub struct WidgetConfig {
-    /// Deskulpt configuration [`DeskulptConf`].
-    pub deskulpt_conf: DeskulptConf,
-    /// External dependencies, empty if None.
-    pub external_deps: HashMap<String, String>,
-    /// Absolute path to the widget directory.
-    ///
-    /// It is absolute so that we do not need to query the widget base directory
-    /// state and call join to be able to obtain the absolute path.
-    pub directory: PathBuf,
+/// Deserialized `deskulpt.conf.json`.
+#[derive(Clone, Deserialize, Serialize)]
+struct DeskulptConf {
+    name: String,
+    entry: String,
+    #[serde(default)]
+    ignore: bool,
 }
 
-/// Deskulpt configuration of a widget, corresponding to `deskulpt.conf.json`.
-#[derive(Clone, Deserialize, Serialize, PartialEq, Debug)]
-pub struct DeskulptConf {
-    /// The name of the widget.
-    pub name: String,
-    /// The entry file of the widget, relative to the widget directory.
-    pub entry: String,
-    /// Whether to ignore the widget.
-    ///
-    /// Setting this to `true` will exclude the widget from the widget
-    /// collection.
-    pub ignore: bool,
-}
-
+/// Deserialized `package.json`.
 #[derive(Deserialize)]
 struct PackageJson {
     dependencies: Option<HashMap<String, String>>,
 }
 
-/// Read a widget directory into a widget configuration.
-///
-/// This function reads the `deskulpt.conf.json` file and optionally the
-/// `package.json` file in the given widget directory `path`.
-///
-/// If widget configuration is loaded successfully, it will return
-/// `Ok(Some(config))`. If the directory does not represent a widget that is
-/// meant to be rendered, it will return `Ok(None)`. Any failure to load the
-/// configuration will return an error.
-///
-/// The cases where a directory is not meant to be rendered include:
-/// - `deskulpt.conf.json` is not found.
-/// - The `ignore` flag in `deskulpt.conf.json` is set to `true`.
-pub fn read_widget_config(path: &Path) -> Result<Option<WidgetConfig>, Error> {
-    if !path.is_absolute() || !path.is_dir() {
-        // We require absolute path because it will be directly used as the widget
-        // directory in the configuration; there is no need to check path existence
-        // because `is_dir` already does that
-        bail!(
-            "Absolute path to an existing directory is expected; got: {}",
-            path.display()
-        );
+/// Full configuration of a widget.
+#[derive(Clone, Serialize, PartialEq, Debug)]
+pub struct WidgetConfig {
+    name: String,
+    entry: String,
+    ignore: bool,
+    dependencies: HashMap<String, String>,
+    directory: PathBuf,
+}
+
+impl WidgetConfig {
+    /// Try to read widget configuration from a directory.
+    ///
+    /// The widget directory must be given as an absolute path. None is returned
+    /// if the directory is not a widget or an ignored widget.
+    pub fn try_read<P: AsRef<Path>>(path: P) -> Result<Option<Self>, Error> {
+        let path = path.as_ref();
+        if !path.is_absolute() || !path.is_dir() {
+            bail!(
+                "Absolute path to an existing directory is expected; got: {}",
+                path.display()
+            );
+        }
+
+        let deskulpt_conf_path = path.join("deskulpt.conf.json");
+        let deskulpt_conf_str = match read_to_string(deskulpt_conf_path) {
+            Ok(deskulpt_conf_str) => deskulpt_conf_str,
+            Err(e) => {
+                match e.kind() {
+                    // If the configuration file is not found we consider it not a widget
+                    // and ignore it without raising an error; in other cases, we do find
+                    // the configuration file but failed to read it, thus the error
+                    std::io::ErrorKind::NotFound => return Ok(None),
+                    _ => return Err(e).context("Failed to read deskulpt.conf.json"),
+                }
+            },
+        };
+        let deskulpt_conf: DeskulptConf = serde_json::from_str(&deskulpt_conf_str)
+            .context("Failed to interpret deskulpt.conf.json")?;
+
+        // Respect the `ignore` flag in configuration
+        if deskulpt_conf.ignore {
+            return Ok(None);
+        }
+
+        let package_json_path = path.join("package.json");
+        let dependencies = if package_json_path.exists() {
+            let package_json_str =
+                read_to_string(package_json_path).context("Failed to read package.json")?;
+            let package_json: PackageJson = serde_json::from_str(&package_json_str)
+                .context("Failed to interpret package.json")?;
+            package_json.dependencies.unwrap_or_default()
+        } else {
+            Default::default()
+        };
+
+        Ok(Some(WidgetConfig {
+            directory: path.to_path_buf(),
+            name: deskulpt_conf.name,
+            entry: deskulpt_conf.entry,
+            ignore: deskulpt_conf.ignore,
+            dependencies,
+        }))
     }
 
-    let deskulpt_conf_path = path.join("deskulpt.conf.json");
-    let deskulpt_conf_str = match read_to_string(deskulpt_conf_path) {
-        Ok(deskulpt_conf_str) => deskulpt_conf_str,
-        Err(e) => {
-            match e.kind() {
-                // If the configuration file is not found we consider it not a widget
-                // and ignore it without raising an error; in other cases, we do find
-                // the configuration file but failed to read it, thus the error
-                std::io::ErrorKind::NotFound => return Ok(None),
-                _ => return Err(e).context("Failed to read deskulpt.conf.json"),
-            }
-        },
-    };
-    let deskulpt_conf: DeskulptConf = serde_json::from_str(&deskulpt_conf_str)
-        .context("Failed to interpret deskulpt.conf.json")?;
-
-    // Respect the `ignore` flag in configuration
-    if deskulpt_conf.ignore {
-        return Ok(None);
+    /// Get the directory path of the widget.
+    pub fn directory(&self) -> &Path {
+        &self.directory
     }
 
-    let package_json_path = path.join("package.json");
-    let external_deps = if package_json_path.exists() {
-        let package_json_str =
-            read_to_string(package_json_path).context("Failed to read package.json")?;
-        let package_json: PackageJson =
-            serde_json::from_str(&package_json_str).context("Failed to interpret package.json")?;
-        package_json.dependencies.unwrap_or_default()
-    } else {
-        Default::default()
-    };
+    /// Get the absolute path to the entry file of the widget.
+    pub fn entry_path(&self) -> PathBuf {
+        self.directory.join(&self.entry).clean()
+    }
 
-    Ok(Some(WidgetConfig {
-        directory: path.to_path_buf(),
-        deskulpt_conf,
-        external_deps,
-    }))
+    /// Get the external dependencies of the widget.
+    pub fn external_deps(&self) -> HashSet<String> {
+        self.dependencies.keys().cloned().collect()
+    }
 }
 
 #[cfg(test)]
@@ -126,43 +121,40 @@ mod tests {
         fixture_path("deskulpt-config/widgets/all_fields"),
         Some(WidgetConfig {
             directory: fixture_path("deskulpt-config/widgets/all_fields"),
-            deskulpt_conf: DeskulptConf {
-                name: "all_fields".to_string(),
-                entry: "index.jsx".to_string(),
-                ignore: false,
-            },
-            external_deps: [("express".to_string(), "^4.17.1".to_string())].into(),
+            name: "all_fields".to_string(),
+            entry: "index.jsx".to_string(),
+            ignore: false,
+            dependencies: [("express".to_string(), "^4.17.1".to_string())].into(),
         }),
     )]
     #[case::package_json_none(
         fixture_path("deskulpt-config/widgets/package_json_none"),
         Some(WidgetConfig {
             directory: fixture_path("deskulpt-config/widgets/package_json_none"),
-            deskulpt_conf: DeskulptConf {
-                name: "package_json_none".to_string(),
-                entry: "index.jsx".to_string(),
-                ignore: false,
-            },
-            external_deps: HashMap::new(),
+            name: "package_json_none".to_string(),
+            entry: "index.jsx".to_string(),
+            ignore: false,
+            dependencies: HashMap::new(),
         }),
     )]
     #[case::package_json_no_deps(
         fixture_path("deskulpt-config/widgets/package_json_no_deps"),
         Some(WidgetConfig {
             directory: fixture_path("deskulpt-config/widgets/package_json_no_deps"),
-            deskulpt_conf: DeskulptConf {
-                name: "package_json_no_deps".to_string(),
-                entry: "index.jsx".to_string(),
-                ignore: false,
-            },
-            external_deps: HashMap::new(),
+            name: "package_json_no_deps".to_string(),
+            entry: "index.jsx".to_string(),
+            ignore: false,
+            dependencies: HashMap::new(),
         }),
     )]
     #[case::not_a_widget(fixture_path("deskulpt-config/widgets/not_a_widget"), None)]
     #[case::ignored_widget(fixture_path("deskulpt-config/widgets/ignored_widget"), None)]
-    fn test_read_ok(#[case] path: PathBuf, #[case] expected_config: Option<WidgetConfig>) {
-        let result =
-            read_widget_config(&path).expect("Expected successful read of widget configuration");
+    fn test_widget_config_read_from_ok(
+        #[case] path: PathBuf,
+        #[case] expected_config: Option<WidgetConfig>,
+    ) {
+        let result = WidgetConfig::try_read(&path)
+            .expect("Expected successful read of widget configuration");
         assert_eq!(result, expected_config);
     }
 
@@ -215,9 +207,12 @@ mod tests {
             ChainReason::IOError,
         ],
     )]
-    fn test_read_error(#[case] path: PathBuf, #[case] expected_error: Vec<ChainReason>) {
-        let error =
-            read_widget_config(&path).expect_err("Expected an error reading widget configuration");
+    fn test_widget_config_read_from_err(
+        #[case] path: PathBuf,
+        #[case] expected_error: Vec<ChainReason>,
+    ) {
+        let error = WidgetConfig::try_read(&path)
+            .expect_err("Expected an error reading widget configuration");
         assert_err_eq(error, expected_error);
     }
 }

@@ -1,21 +1,20 @@
 [package]
 name        = "deskulpt-test-config"
+description = "Deskulpt widget configurations."
 version     = { workspace = true }
 authors     = { workspace = true }
-description = { workspace = true }
 edition     = { workspace = true }
 homepage    = { workspace = true }
 license     = { workspace = true }
-readme      = { workspace = true }
 repository  = { workspace = true }
 
 [dependencies]
 anyhow              = { workspace = true }
 deskulpt-test-utils = { workspace = true }
+path-clean          = { workspace = true }
 serde               = { workspace = true, features = ["derive"] }
 serde_json          = { workspace = true }
 
 [dev-dependencies]
-path-clean            = { workspace = true }
 rstest                = { workspace = true }
 deskulpt-test-testing = { workspace = true }

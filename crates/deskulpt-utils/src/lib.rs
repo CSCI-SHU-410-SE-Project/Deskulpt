@@ -1,17 +1,12 @@
-//! This module contains utilities that does not fit into any other module.
-
+#![doc = include_str!("../README.md")]
 #![doc(
     html_logo_url = "https://github.com/CSCI-SHU-410-SE-Project/Deskulpt/raw/main/crates/deskulpt/icons/icon.png",
     html_favicon_url = "https://github.com/CSCI-SHU-410-SE-Project/Deskulpt/raw/main/crates/deskulpt/icons/icon.png"
 )]
 
-use std::collections::HashMap;
-
 use anyhow::Error;
 
 pub type CommandOut<T> = Result<T, String>;
-
-pub type IdMap<T> = HashMap<String, T>;
 
 /// Stringify an [`Error`].
 ///

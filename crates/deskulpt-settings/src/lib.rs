@@ -1,17 +1,15 @@
-//! This module invludes the global and per-widget settings and relevant
-//! utilities.
-
+#![doc = include_str!("../README.md")]
 #![doc(
     html_logo_url = "https://github.com/CSCI-SHU-410-SE-Project/Deskulpt/raw/main/crates/deskulpt/icons/icon.png",
     html_favicon_url = "https://github.com/CSCI-SHU-410-SE-Project/Deskulpt/raw/main/crates/deskulpt/icons/icon.png"
 )]
 
+use std::collections::HashMap;
 use std::fs::{create_dir_all, read_to_string, File};
 use std::io::BufWriter;
 use std::path::Path;
 
 use anyhow::Error;
-use deskulpt_test_utils::IdMap;
 use serde::{Deserialize, Serialize};
 
 /// The theme appearance.
@@ -32,7 +30,7 @@ pub struct Settings {
     /// The keyboard shortcut for toggling the canvas.
     toggle_shortcut: Option<String>,
     /// The collection of per-widget settings.
-    widget_settings: IdMap<WidgetSetting>,
+    widget_settings: HashMap<String, WidgetSetting>,
 }
 
 /// The per-widget settings.

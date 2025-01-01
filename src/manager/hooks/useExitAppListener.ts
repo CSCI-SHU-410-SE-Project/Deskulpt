@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { listenToExitApp } from "../../events";
 import { invokeExitApp } from "../../commands";
 import { ManagerWidgetState } from "../../types/frontend";
-import { IdMap, ThemeAppearance } from "../../types/backend";
+import { ThemeAppearance } from "../../types/backend";
 
 /**
  * Listen and react to the "exit-app" event.
@@ -17,7 +17,7 @@ import { IdMap, ThemeAppearance } from "../../types/backend";
 export default function useExitAppListener(
   toggleShortcut: string | null,
   themeAppearance: ThemeAppearance,
-  managerWidgetStates: IdMap<ManagerWidgetState>,
+  managerWidgetStates: Record<string, ManagerWidgetState>,
 ) {
   useEffect(() => {
     const unlisten = listenToExitApp(() => {

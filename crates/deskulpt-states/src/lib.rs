@@ -1,29 +1,28 @@
-//! The module provides the types for state management in Tauri.
-//!
-//! In Tauri, different states are distinguished by their unique types, thus we
-//! always use structs to mark the states.
-
+#![doc = include_str!("../README.md")]
 #![doc(
     html_logo_url = "https://github.com/CSCI-SHU-410-SE-Project/Deskulpt/raw/main/crates/deskulpt/icons/icon.png",
     html_favicon_url = "https://github.com/CSCI-SHU-410-SE-Project/Deskulpt/raw/main/crates/deskulpt/icons/icon.png"
 )]
 
+use std::collections::HashMap;
 use std::fs::create_dir_all;
 use std::path::PathBuf;
 use std::sync::Mutex;
 
 use anyhow::{bail, Error};
-use deskulpt_test_config::WidgetConfigMap;
+use deskulpt_test_config::WidgetConfig;
 use serde::Serialize;
 use tauri::menu::MenuItem;
 use tauri::{AppHandle, Emitter, Manager, Runtime};
+
+pub type WidgetCollection = HashMap<String, Result<WidgetConfig, String>>;
 
 /// The type for the state of the collection of widget configurations.
 ///
 /// The managed state will be updated at runtime and is thus protected by a
 /// mutex.
 #[derive(Default)]
-pub struct WidgetConfigMapState(pub Mutex<WidgetConfigMap>);
+pub struct WidgetCollectionState(pub Mutex<WidgetCollection>);
 
 /// The type for the state of the widget base directory.
 ///

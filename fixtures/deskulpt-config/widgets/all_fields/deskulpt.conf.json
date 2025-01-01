@@ -1,5 +1,4 @@
 {
   "name": "all_fields",
-  "entry": "index.jsx",
-  "ignore": false
+  "entry": "index.jsx"
 }

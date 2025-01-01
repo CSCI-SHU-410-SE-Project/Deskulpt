@@ -1,7 +1,7 @@
 import { Dispatch, SetStateAction, useEffect } from "react";
 import { listenToRenderWidget } from "../../events";
 import { CanvasWidgetState, WidgetModule } from "../../types/frontend";
-import { IdMap, WidgetSetting } from "../../types/backend";
+import { WidgetSetting } from "../../types/backend";
 import { invokeBundleWidget } from "../../commands";
 import ErrorDisplay from "../components/ErrorDisplay";
 import { grabErrorInfo } from "../utils";
@@ -18,8 +18,8 @@ const defaultContainerHeight = "150px";
  * @param setCanvasWidgetStates Setter for the canvas widget states.
  */
 export default function useRenderWidgetListener(
-  canvasWidgetStates: IdMap<CanvasWidgetState>,
-  setCanvasWidgetStates: Dispatch<SetStateAction<IdMap<CanvasWidgetState>>>,
+  canvasWidgetStates: Record<string, CanvasWidgetState>,
+  setCanvasWidgetStates: Dispatch<SetStateAction<Record<string, CanvasWidgetState>>>,
 ) {
   useEffect(() => {
     const unlisten = listenToRenderWidget((event) => {

@@ -1,12 +1,11 @@
 [package]
 name        = "deskulpt-test-states"
+description = "Deskulpt internal states."
 version     = { workspace = true }
 authors     = { workspace = true }
-description = { workspace = true }
 edition     = { workspace = true }
 homepage    = { workspace = true }
 license     = { workspace = true }
-readme      = { workspace = true }
 repository  = { workspace = true }
 
 [dependencies]

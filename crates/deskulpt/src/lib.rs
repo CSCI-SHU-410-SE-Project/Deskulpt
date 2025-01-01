@@ -1,9 +1,4 @@
-//! Deskulpt is a cross-platform desktop customization tool that allows you to
-//! write React code to define widgets on your desktop. This is the umbrella
-//! crate re-exporting all the sub-crates of Deskulpt. It also adds higher-level
-//! APIs for stitching the sub-crates together that are not exposed in the
-//! sub-crates themselves.
-
+#![doc = include_str!("../README.md")]
 #![doc(
     html_logo_url = "https://github.com/CSCI-SHU-410-SE-Project/Deskulpt/raw/main/crates/deskulpt/icons/icon.png",
     html_favicon_url = "https://github.com/CSCI-SHU-410-SE-Project/Deskulpt/raw/main/crates/deskulpt/icons/icon.png"
@@ -39,7 +34,7 @@ pub fn run() {
 
             Ok(())
         })
-        .manage(states::WidgetConfigMapState::default())
+        .manage(states::WidgetCollectionState::default())
         .on_window_event(setup::listen_to_windows)
         // Register internal command handlers
         .invoke_handler(generate_handler![

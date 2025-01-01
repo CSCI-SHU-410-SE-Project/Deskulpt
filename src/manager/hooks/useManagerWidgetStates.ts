@@ -1,14 +1,14 @@
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { ManagerWidgetState } from "../../types/frontend";
-import { IdMap, WidgetSetting } from "../../types/backend";
+import { WidgetSetting } from "../../types/backend";
 import { invokeRefreshWidgetCollection } from "../../commands";
 import { emitRemoveWidgetsToCanvas, emitRenderWidgetToCanvas } from "../../events";
 
 export interface UseManagerWidgetStatesOutput {
   /** The manager widget states. */
-  managerWidgetStates: IdMap<ManagerWidgetState>;
+  managerWidgetStates: Record<string, ManagerWidgetState>;
   /** Setter for the manager widget states. */
-  setManagerWidgetStates: Dispatch<SetStateAction<IdMap<ManagerWidgetState>>>;
+  setManagerWidgetStates: Dispatch<SetStateAction<Record<string, ManagerWidgetState>>>;
   /** Function that scans the widget base directory and renders newly added widgets. */
   rescanAndRender: () => Promise<number>;
 }
@@ -24,10 +24,10 @@ export interface UseManagerWidgetStatesOutput {
  * @param initialWidgetSettings The initial collection of per-widget settings.
  */
 export default function useManagerWidgetStates(
-  initialWidgetSettings: IdMap<WidgetSetting>,
+  initialWidgetSettings: Record<string, WidgetSetting>,
 ): UseManagerWidgetStatesOutput {
   const [managerWidgetStates, setManagerWidgetStates] = useState<
-    IdMap<ManagerWidgetState>
+    Record<string, ManagerWidgetState>
   >({});
 
   /**

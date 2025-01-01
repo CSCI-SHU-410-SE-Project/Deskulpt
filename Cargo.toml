@@ -5,11 +5,9 @@ members = ["crates/*"]
 [workspace.package]
 version = "0.0.1"
 authors = ["The Deskulpt Development Team"]
-description = "A cross-platform desktop customization tool."
 edition = "2021"
 homepage = "https://csci-shu-410-se-project.github.io/Deskulpt/"
 license = "MIT"
-readme = "README.md"
 repository = "https://github.com/CSCI-SHU-410-SE-Project/Deskulpt"
 
 [workspace.dependencies]

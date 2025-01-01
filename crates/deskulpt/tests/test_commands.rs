@@ -1,5 +1,5 @@
 use deskulpt_test::commands::{bundle_widget, refresh_widget_collection};
-use deskulpt_test_states::WidgetConfigMapState;
+use deskulpt_test_states::WidgetCollectionState;
 use deskulpt_test_testing::assert::assert_eq;
 use deskulpt_test_testing::fixture_path;
 use deskulpt_test_testing::mock::MockerBuilder;
@@ -29,24 +29,17 @@ async fn test_refresh_widget_collection() {
         invalid_configs.len() + valid_configs.len()
     );
 
-    // Check the invalid configurations are recorded as errors; details should
-    // be covered in deskulpt-config tests
+    // Check that configurations are correctly recorded as Ok or Err; details
+    // should be covered in deskulpt-config tests
     for name in invalid_configs {
         assert!(collection[name].is_err());
     }
-
-    // Check that valid configurations are recorded with the correct directory;
-    // details should be covered in deskulpt-config tests
     for name in valid_configs {
         assert!(collection[name].is_ok());
-        assert_eq!(
-            collection[name].as_ref().unwrap().directory,
-            mocker.widgets_path(name),
-        );
     }
 
     // Check that the widget collection state has been updated
-    let state_collection = mocker.handle().state::<WidgetConfigMapState>();
+    let state_collection = mocker.handle().state::<WidgetCollectionState>();
     let state_collection = state_collection.0.lock().unwrap();
     assert_eq!(state_collection.clone(), collection);
 }

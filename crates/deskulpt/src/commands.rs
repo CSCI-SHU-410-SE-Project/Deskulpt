@@ -6,10 +6,10 @@ use std::path::PathBuf;
 
 use anyhow::Context;
 use deskulpt_test_bundler::WidgetBundler;
-use deskulpt_test_config::{read_widget_config, WidgetConfigMap};
+use deskulpt_test_config::WidgetConfig;
 use deskulpt_test_settings::{read_settings, write_settings, Settings};
 use deskulpt_test_states::{
-    toggle_click_through_state, WidgetBaseDirectoryState, WidgetConfigMapState,
+    toggle_click_through_state, WidgetBaseDirectoryState, WidgetCollection, WidgetCollectionState,
 };
 use deskulpt_test_utils::{cmdbail, cmderr, CommandOut};
 use tauri::{command, AppHandle, Manager, Runtime};
@@ -35,7 +35,7 @@ use tauri_plugin_opener::OpenerExt;
 #[command]
 pub async fn refresh_widget_collection<R: Runtime>(
     app_handle: AppHandle<R>,
-) -> CommandOut<WidgetConfigMap> {
+) -> CommandOut<WidgetCollection> {
     let widget_base = &app_handle.state::<WidgetBaseDirectoryState>().0;
     let mut new_widget_collection = HashMap::new();
 
@@ -61,7 +61,7 @@ pub async fn refresh_widget_collection<R: Runtime>(
         };
 
         // Load the widget configuration and raise on error
-        let widget_config = match read_widget_config(&path) {
+        let widget_config = match WidgetConfig::try_read(&path) {
             Ok(widget_config) => widget_config,
             Err(e) => {
                 // We should not fail the whole command if some widget configuration
@@ -80,7 +80,7 @@ pub async fn refresh_widget_collection<R: Runtime>(
     }
 
     // Update the widget collection state
-    let widget_collection = app_handle.state::<WidgetConfigMapState>();
+    let widget_collection = app_handle.state::<WidgetCollectionState>();
     widget_collection
         .0
         .lock()
@@ -111,7 +111,7 @@ pub async fn bundle_widget<R: Runtime>(
     widget_id: String,
     apis_blob_url: String,
 ) -> CommandOut<String> {
-    let widget_collection_state = &app_handle.state::<WidgetConfigMapState>();
+    let widget_collection_state = &app_handle.state::<WidgetCollectionState>();
     let widget_collection = widget_collection_state.0.lock().unwrap();
 
     if let Some(widget_config) = widget_collection.get(&widget_id) {
@@ -119,17 +119,13 @@ pub async fn bundle_widget<R: Runtime>(
             Ok(widget_config) => widget_config,
             Err(e) => cmdbail!(e.clone()),
         };
-        // Obtain the absolute path of the widget entry point
-        let widget_entry = widget_config
-            .directory
-            .join(&widget_config.deskulpt_conf.entry);
 
         // Wrap the bundled code if success, otherwise let the error propagate
         let bundler = WidgetBundler::new(
-            widget_config.directory.clone(),
-            widget_entry,
+            widget_config.directory().to_path_buf(),
+            widget_config.entry_path(),
             apis_blob_url,
-            widget_config.external_deps.keys().cloned().collect(),
+            widget_config.external_deps(),
         );
         return bundler
             .bundle()
@@ -206,7 +202,7 @@ pub async fn open_widget_resource<R: Runtime>(
 
     let open_path = match widget_id {
         Some(widget_id) => {
-            let widget_collection = app_handle.state::<WidgetConfigMapState>();
+            let widget_collection = app_handle.state::<WidgetCollectionState>();
             if !widget_collection.0.lock().unwrap().contains_key(&widget_id) {
                 cmdbail!("Widget '{}' is not found in the collection", widget_id)
             }

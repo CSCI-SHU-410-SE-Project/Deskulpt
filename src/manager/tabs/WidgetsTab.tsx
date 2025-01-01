@@ -4,7 +4,6 @@ import { invokeOpenWidgetResource } from "../../commands";
 import { Flex, ScrollArea, Tabs } from "@radix-ui/themes";
 import { toast } from "sonner";
 import { ManagerWidgetState } from "../../types/frontend";
-import { IdMap } from "../../types/backend";
 import WidgetTrigger from "../components/WidgetTrigger";
 import WidgetContent from "../components/WidgetContent";
 import FloatButton from "../components/FloatButton";
@@ -12,9 +11,9 @@ import { emitRenderWidgetToCanvas } from "../../events";
 
 export interface WidgetsTabProps {
   /** The manager widget states. */
-  managerWidgetStates: IdMap<ManagerWidgetState>;
+  managerWidgetStates: Record<string, ManagerWidgetState>;
   /** Setter for the manager widget states. */
-  setManagerWidgetStates: Dispatch<SetStateAction<IdMap<ManagerWidgetState>>>;
+  setManagerWidgetStates: Dispatch<SetStateAction<Record<string, ManagerWidgetState>>>;
   /** The function for refreshing the widget collection. */
   rescanAndRender: () => Promise<number>;
 }
