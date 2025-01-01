@@ -5,7 +5,7 @@ use tauri_build::{
 const INTERNAL_COMMANDS: &[&str] = &[
     "bundle_widget",
     "exit_app",
-    "init_settings",
+    "init_global_setting",
     "open_widget_resource",
     "refresh_widget_collection",
     "register_toggle_shortcut",

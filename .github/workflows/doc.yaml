@@ -19,7 +19,7 @@ jobs:
       - uses: ./.github/actions/setup
 
       - name: Build Rust docs
-        run: cargo doc --workspace --no-deps
+        run: cargo doc --workspace --no-deps --document-private-items
 
       - name: Build docs
         run: |

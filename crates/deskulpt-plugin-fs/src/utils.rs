@@ -2,22 +2,22 @@
 
 use std::path::PathBuf;
 
-use deskulpt_test_states::WidgetBaseDirectoryState;
+use deskulpt_test_states::StatesExt;
 use deskulpt_test_utils::cmdbail;
 use path_clean::PathClean;
-use tauri::{AppHandle, Manager, Runtime};
+use tauri::{AppHandle, Runtime};
 
 /// Validate the file system resource (file or folder) path.
 ///
 /// This raises an error if the widget ID is invalid, in cases where:
 ///
-/// - $widget_base/$widget_id does not exist
-/// - $widget_base/$widget_id is not a directory
-/// - $widget_base/$widget_id is not a direct subdirectory of $widget_base
+/// - $widgets_dir/$widget_id does not exist
+/// - $widgets_dir/$widget_id is not a directory
+/// - $widgets_dir/$widget_id is not a direct subdirectory of $widgets_dir
 ///
 /// or if the resource path is invalid, in cases where:
 ///
-/// - $widget_base/$widget_id/$path is not within the widget directory
+/// - $widgets_dir/$widget_id/$path is not within the widget directory
 ///
 /// Note, however, that this function does not check if the resource exists or
 /// not, since the file or folder may not exist yet, and could be created later.
@@ -26,13 +26,13 @@ pub fn get_resource_path<R: Runtime>(
     widget_id: &str,
     path: &str,
 ) -> Result<PathBuf, String> {
-    let widget_base = app_handle.state::<WidgetBaseDirectoryState>().0.clone();
-    let widget_dir = widget_base.join(widget_id).clean();
+    let widgets_dir = app_handle.widgets_dir();
+    let widget_dir = widgets_dir.join(widget_id).clean();
 
-    if !widget_dir.is_dir() || !widget_dir.starts_with(&widget_base) || {
+    if !widget_dir.is_dir() || !widget_dir.starts_with(&widgets_dir) || {
         // Count the number of path components to make sure that the widget directory
         // is a direct descendant of the widget base directory
-        let base_component_count = widget_base.iter().count();
+        let base_component_count = widgets_dir.iter().count();
         let dir_component_count = widget_dir.iter().count();
         base_component_count + 1 != dir_component_count
     } {

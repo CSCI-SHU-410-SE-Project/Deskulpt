@@ -4,25 +4,28 @@
     html_favicon_url = "https://github.com/CSCI-SHU-410-SE-Project/Deskulpt/raw/main/crates/deskulpt/icons/icon.png"
 )]
 
+use deskulpt_test_states::StatesExt;
 #[cfg(target_os = "macos")]
 use tauri::ActivationPolicy;
-use tauri::{generate_handler, tauri_build_context, Builder, Manager};
+use tauri::{generate_handler, tauri_build_context, Builder};
 pub use {
     deskulpt_test_bundler as bundler, deskulpt_test_config as config,
-    deskulpt_test_settings as settings, deskulpt_test_states as states,
-    deskulpt_test_utils as utils,
+    deskulpt_test_events as events, deskulpt_test_settings as settings,
+    deskulpt_test_states as states, deskulpt_test_utils as utils,
 };
 
-pub mod commands;
-pub mod setup;
+mod commands;
+mod setup;
 
+/// Entry point for the Deskulpt application.
 pub fn run() {
     Builder::default()
         // Additional application setup
         .setup(|app| {
-            app.manage(states::WidgetBaseDirectoryState::init(
-                app.path().app_data_dir().unwrap(),
-            ));
+            app.manage_widget_collection();
+            app.manage_widgets_directory();
+            app.manage_canvas_click_through();
+
             setup::init_system_tray(app)?;
             setup::create_canvas(app)?;
 
@@ -34,13 +37,12 @@ pub fn run() {
 
             Ok(())
         })
-        .manage(states::WidgetCollectionState::default())
         .on_window_event(setup::listen_to_windows)
         // Register internal command handlers
         .invoke_handler(generate_handler![
             commands::bundle_widget,
             commands::exit_app,
-            commands::init_settings,
+            commands::init_global_setting,
             commands::open_widget_resource,
             commands::refresh_widget_collection,
             commands::register_toggle_shortcut,

@@ -24,24 +24,37 @@ struct DeskulptConf {
 /// Deserialized `package.json`.
 #[derive(Deserialize)]
 struct PackageJson {
-    dependencies: Option<HashMap<String, String>>,
+    #[serde(default)]
+    dependencies: HashMap<String, String>,
 }
 
-/// Full configuration of a widget.
+/// Full configuration of a Deskulpt widget.
 #[derive(Clone, Serialize, PartialEq, Debug)]
 pub struct WidgetConfig {
+    /// Name of the widget.
     name: String,
+    /// Entry file of the widget, relative to the widget directory.
     entry: String,
+    /// Whether the widget is ignored.
     ignore: bool,
+    /// The dependency mapping from package name to version.
     dependencies: HashMap<String, String>,
+    /// The absolute path of the widget directory.
     directory: PathBuf,
 }
+
+/// The widget collection.
+///
+/// This is a mapping from widget IDs to either widget configurations if valid
+/// or configuration error messages otherwise.
+pub type WidgetCollection = HashMap<String, Result<WidgetConfig, String>>;
 
 impl WidgetConfig {
     /// Try to read widget configuration from a directory.
     ///
-    /// The widget directory must be given as an absolute path. None is returned
-    /// if the directory is not a widget or an ignored widget.
+    /// The directory must be given as an absolute path. None is returned if the
+    /// directory is not a widget or an ignored widget. Error is returned if the
+    /// directory is not absolute or the reading fails.
     pub fn try_read<P: AsRef<Path>>(path: P) -> Result<Option<Self>, Error> {
         let path = path.as_ref();
         if !path.is_absolute() || !path.is_dir() {
@@ -78,13 +91,13 @@ impl WidgetConfig {
                 read_to_string(package_json_path).context("Failed to read package.json")?;
             let package_json: PackageJson = serde_json::from_str(&package_json_str)
                 .context("Failed to interpret package.json")?;
-            package_json.dependencies.unwrap_or_default()
+            package_json.dependencies
         } else {
             Default::default()
         };
 
         Ok(Some(WidgetConfig {
-            directory: path.to_path_buf(),
+            directory: path.clean(),
             name: deskulpt_conf.name,
             entry: deskulpt_conf.entry,
             ignore: deskulpt_conf.ignore,

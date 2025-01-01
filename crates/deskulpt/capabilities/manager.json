@@ -6,7 +6,7 @@
   "windows": ["manager"],
   "permissions": [
     "allow-exit-app",
-    "allow-init-settings",
+    "allow-init-global-setting",
     "allow-open-widget-resource",
     "allow-refresh-widget-collection",
     "allow-register-toggle-shortcut",

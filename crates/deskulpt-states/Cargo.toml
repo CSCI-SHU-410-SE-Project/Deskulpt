@@ -11,5 +11,9 @@ repository  = { workspace = true }
 [dependencies]
 anyhow               = { workspace = true }
 deskulpt-test-config = { workspace = true }
+deskulpt-test-events = { workspace = true }
 serde                = { workspace = true, features = ["derive"] }
 tauri                = { workspace = true }
+
+[features]
+testing = []

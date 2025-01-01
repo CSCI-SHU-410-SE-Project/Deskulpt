@@ -3,7 +3,7 @@
 use std::thread::{sleep, spawn};
 use std::time::Duration;
 
-use deskulpt_test_states::{toggle_click_through_state, CanvasClickThroughState};
+use deskulpt_test_states::StatesExt;
 #[cfg(target_os = "macos")]
 use objc::{
     msg_send,
@@ -77,14 +77,10 @@ pub fn listen_to_windows(window: &Window, event: &WindowEvent) {
 pub fn init_system_tray(app: &App) -> Result<(), Box<dyn std::error::Error>> {
     let deskulpt_tray = app.tray_by_id("deskulpt-tray").unwrap();
 
-    // Be consistent with the default of `CanvasClickThroughState`
-    let item_toggle = MenuItemBuilder::with_id("toggle", "Float").build(app)?;
-    app.manage(CanvasClickThroughState::init(true, item_toggle.clone()));
-
     // Set up the tray menu
     let tray_menu = MenuBuilder::new(app)
         .items(&[
-            &item_toggle,
+            &MenuItemBuilder::with_id("toggle", "Float").build(app)?,
             &MenuItemBuilder::with_id("manage", "Manage").build(app)?,
             &MenuItemBuilder::with_id("exit", "Exit").build(app)?,
         ])
@@ -94,8 +90,7 @@ pub fn init_system_tray(app: &App) -> Result<(), Box<dyn std::error::Error>> {
     // Register event handler for the tray menu
     deskulpt_tray.on_menu_event(move |app_handle, event| match event.id().as_ref() {
         "toggle" => {
-            let _ = toggle_click_through_state(app_handle); // Consume potential
-                                                            // error
+            let _ = app_handle.toggle_canvas_click_through();
         },
         "manage" => show_manager_window(app_handle),
         "exit" => on_app_exit(app_handle),
@@ -111,7 +106,7 @@ pub fn init_system_tray(app: &App) -> Result<(), Box<dyn std::error::Error>> {
         } = event
         {
             if button == MouseButton::Left && button_state == MouseButtonState::Down {
-                let _ = toggle_click_through_state(tray.app_handle()); // Consume error
+                let _ = tray.app_handle().toggle_canvas_click_through();
             }
         }
     });

@@ -6,7 +6,7 @@
  */
 
 import { invoke } from "@tauri-apps/api/core";
-import { Settings, WidgetConfigMap } from "./types/backend";
+import { GlobalSetting, WidgetCollection } from "./types/backend";
 
 /**
  * Invoke the `bundle_widget` command.
@@ -18,8 +18,8 @@ export async function invokeBundleWidget(widgetId: string, apisBlobUrl: string) 
 /**
  * Invoke the `exit_app` command.
  */
-export async function invokeExitApp(settings: Settings) {
-  return invoke<void>("exit_app", { settings });
+export async function invokeExitApp(globalSetting: GlobalSetting) {
+  return invoke<void>("exit_app", { globalSetting });
 }
 
 /**
@@ -33,17 +33,17 @@ export async function invokeOpenWidgetResource(
 }
 
 /**
- * Invoke the `init_settings` command.
+ * Invoke the `init_global_setting` command.
  */
-export async function invokeInitSettings() {
-  return invoke<Settings>("init_settings");
+export async function invokeInitGlobalSetting() {
+  return invoke<GlobalSetting>("init_global_setting");
 }
 
 /**
  * Invoke the `refresh_widget_collection` command.
  */
 export async function invokeRefreshWidgetCollection() {
-  return invoke<WidgetConfigMap>("refresh_widget_collection");
+  return invoke<WidgetCollection>("refresh_widget_collection");
 }
 
 /**

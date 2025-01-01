@@ -1,12 +1,13 @@
 //! Mocking utilities for Deskulpt components.
 
+use std::fs::create_dir;
 use std::path::{Path, PathBuf};
 
 use copy_dir::copy_dir;
-use deskulpt_test_states::{WidgetBaseDirectoryState, WidgetCollectionState};
+use deskulpt_test_states::StatesExt;
 use path_clean::PathClean;
 use tauri::test::{mock_app, MockRuntime};
-use tauri::{App, AppHandle, Manager};
+use tauri::{App, AppHandle};
 use tempfile::{tempdir, TempDir};
 
 /// Builder for the Deskulpt mocker.
@@ -17,35 +18,38 @@ pub struct MockerBuilder {
 
 impl MockerBuilder {
     /// Copy the contents of a directory to the mock widgets directory.
-    pub fn with_widgets_dir<T: AsRef<Path>>(mut self, widgets_dir: T) -> Self {
+    pub fn with_widgets_dir<P: AsRef<Path>>(mut self, widgets_dir: P) -> Self {
         self.widgets_dir = Some(widgets_dir.as_ref().to_path_buf());
         self
     }
 
     /// Build a new mocker instance.
+    ///
+    /// The mock application will be set up with mock directories and states.
     pub fn build(&self) -> Mocker {
         let app = mock_app();
-        let data_dir = tempdir().expect("Failed to create temporary directory");
+        let resource_dir = tempdir().expect("Failed to create temporary directory");
 
+        let widgets_dir = resource_dir.path().join("widgets");
         if let Some(widgets_dir_src) = &self.widgets_dir {
-            copy_dir(widgets_dir_src, data_dir.path().join("widgets"))
-                .expect("Failed to copy widgets directory");
+            copy_dir(widgets_dir_src, &widgets_dir).expect("Failed to copy widgets directory");
+        } else {
+            create_dir(&widgets_dir).expect("Failed to create widgets directory");
         }
 
         let app_handle = app.handle();
-        app_handle.manage(WidgetBaseDirectoryState::init(
-            data_dir.path().to_path_buf(),
-        ));
-        app_handle.manage(WidgetCollectionState::default());
+        app_handle.manage_widget_collection();
+        app_handle.manage_widgets_directory_at(widgets_dir);
+        app_handle.manage_canvas_click_through();
 
-        Mocker { app, data_dir }
+        Mocker { app, resource_dir }
     }
 }
 
 /// The Deskulpt mocker.
 pub struct Mocker {
     app: App<MockRuntime>,
-    data_dir: TempDir,
+    resource_dir: TempDir,
 }
 
 impl Mocker {
@@ -56,6 +60,6 @@ impl Mocker {
 
     /// Absolutize a relative path within the mock widgets directory.
     pub fn widgets_path<P: AsRef<Path>>(&self, path: P) -> PathBuf {
-        self.data_dir.path().join("widgets").join(path).clean()
+        self.resource_dir.path().join("widgets").join(path).clean()
     }
 }

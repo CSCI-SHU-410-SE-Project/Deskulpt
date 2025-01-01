@@ -4,147 +4,122 @@
     html_favicon_url = "https://github.com/CSCI-SHU-410-SE-Project/Deskulpt/raw/main/crates/deskulpt/icons/icon.png"
 )]
 
-use std::collections::HashMap;
 use std::fs::create_dir_all;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Mutex;
 
-use anyhow::{bail, Error};
-use deskulpt_test_config::WidgetConfig;
-use serde::Serialize;
-use tauri::menu::MenuItem;
-use tauri::{AppHandle, Emitter, Manager, Runtime};
+use anyhow::Error;
+use deskulpt_test_config::WidgetCollection;
+use deskulpt_test_events::{EventsExt, ShowToastPayload};
+use tauri::{App, AppHandle, Manager, Runtime};
 
-pub type WidgetCollection = HashMap<String, Result<WidgetConfig, String>>;
-
-/// The type for the state of the collection of widget configurations.
-///
-/// The managed state will be updated at runtime and is thus protected by a
-/// mutex.
+/// Managed state for the widget collection.
 #[derive(Default)]
-pub struct WidgetCollectionState(pub Mutex<WidgetCollection>);
+struct WidgetCollectionState(Mutex<WidgetCollection>);
 
-/// The type for the state of the widget base directory.
-///
-/// This contains the path to the base directory `$APPDATA/widgets/` where all
-/// widgets should be locally stored. This state is static and should not be
-/// changed during the runtime.
-pub struct WidgetBaseDirectoryState(pub PathBuf);
+/// Managed state for the widgets directory.
+struct WidgetsDirState(PathBuf);
 
-impl WidgetBaseDirectoryState {
-    /// Initialize the widget base directory state.
+/// Managed state for whether the canvas is click-through.
+struct CanvasClickThroughState(AtomicBool);
+
+/// Extension trait for state management in Deskulpt.
+pub trait StatesExt<R: Runtime>: Manager<R> + EventsExt<R> {
+    /// Initialize state management for the widget collection.
+    fn manage_widget_collection(&self) {
+        self.manage(WidgetCollectionState::default());
+    }
+
+    /// Initialize state management for the widgets directory.
     ///
-    /// This creates the widget base directory if it does not exist.
-    pub fn init(base: PathBuf) -> Self {
-        let widget_base_dir = base.join("widgets");
-        if !widget_base_dir.exists() {
-            create_dir_all(&widget_base_dir).unwrap();
+    /// This will create the widgets directory if it does not exist.
+    fn manage_widgets_directory(&self) {
+        let resource_dir = self.path().resource_dir().unwrap();
+        let widgets_dir = resource_dir.join("widgets");
+        if !widgets_dir.exists() {
+            create_dir_all(&widgets_dir).unwrap();
         }
-        Self(widget_base_dir)
+        self.manage(WidgetsDirState(widgets_dir));
     }
-}
 
-/// Canvas click-through state information.
-pub struct CanvasClickThrough<R: Runtime> {
-    /// Whether the canvas is click-through.
-    yes: bool,
-    /// The menu item for toggling the canvas click-through state.
-    menu_item: MenuItem<R>,
-}
-
-impl<R: Runtime> CanvasClickThrough<R> {
-    /// Try to toggle the canvas click-through state.
+    /// Initialize state management for the widgets directory at a custom path.
     ///
-    /// This is guaranteed to update whether the canvas is click-through or not.
-    /// It may, however, fail to update the menu item text without an error
-    /// beccause it is not worth panicking for such a minor thing.
-    pub fn toggle(&mut self) {
-        self.yes = !self.yes;
-        let _ = self
-            .menu_item
-            .set_text(if self.yes { "Float" } else { "Sink" });
+    /// This is intended for testing purposes.
+    #[cfg(feature = "testing")]
+    fn manage_widgets_directory_at<P: AsRef<Path>>(&self, widgets_dir: P) {
+        self.manage(WidgetsDirState(widgets_dir.as_ref().to_path_buf()));
     }
 
-    /// Get whether the canvas is click-through.
-    pub fn yes(&self) -> bool {
-        self.yes
+    /// Initialize state management for whether the canvas is click-through.
+    ///
+    /// The canvas is click-through by default.
+    fn manage_canvas_click_through(&self) {
+        self.manage(CanvasClickThroughState(AtomicBool::new(true)));
+    }
+
+    /// Provide reference to the widget collection for a closure.
+    ///
+    /// This will lock the widget collection state. The return value of the
+    /// closure will be propagated.
+    fn with_widget_collection<F, T>(&self, f: F) -> T
+    where
+        F: FnOnce(&WidgetCollection) -> T,
+    {
+        let state = self.state::<WidgetCollectionState>();
+        let widget_collection = state.0.lock().unwrap();
+        f(&widget_collection)
+    }
+
+    /// Provide mutable reference to the widget collection for a closure.
+    ///
+    /// This will lock the widget collection state. The return value of the
+    /// closure will be propagated.
+    fn with_widget_collection_mut<F, T>(&self, f: F) -> T
+    where
+        F: FnOnce(&mut WidgetCollection) -> T,
+    {
+        let state = self.state::<WidgetCollectionState>();
+        let mut widget_collection = state.0.lock().unwrap();
+        f(&mut widget_collection)
+    }
+
+    /// Get the widgets directory.
+    ///
+    /// This involves a cheap cloning operation.
+    fn widgets_dir(&self) -> PathBuf {
+        self.state::<WidgetsDirState>().0.clone()
+    }
+
+    /// Toggle the click-through state of the canvas window.
+    fn toggle_canvas_click_through(&self) -> Result<(), Error> {
+        let canvas = self
+            .get_webview_window("canvas")
+            .expect("Canvas window not found");
+
+        let state = self.state::<CanvasClickThroughState>();
+        let prev_click_through = state.0.load(Ordering::Relaxed);
+        canvas.set_ignore_cursor_events(!prev_click_through)?;
+        state.0.store(!prev_click_through, Ordering::Relaxed);
+
+        // If the canvas is toggled to not click-through, try to regain focus to
+        // avoid flickering on the first click; consume any error because this
+        // is not critical
+        if prev_click_through {
+            let _ = canvas.set_focus();
+        }
+
+        // Show a toast message on the canvas
+        let message = if prev_click_through {
+            "Canvas floated."
+        } else {
+            "Canvas sunk."
+        };
+        let _ = self.emit_show_toast_to_canvas(ShowToastPayload::Success(message.to_string()));
+        Ok(())
     }
 }
 
-/// The type for the state of whether the canvas can be clicked through.
-///
-/// The managed state will be updated at runtime and is thus protected by a
-/// mutex.
-pub struct CanvasClickThroughState<R: Runtime>(pub Mutex<CanvasClickThrough<R>>);
+impl<R: Runtime> StatesExt<R> for AppHandle<R> {}
 
-impl<R: Runtime> CanvasClickThroughState<R> {
-    /// Initialize the canvas click-through state.
-    pub fn init(is_click_through: bool, menu_item: MenuItem<R>) -> Self {
-        Self(Mutex::new(CanvasClickThrough {
-            yes: is_click_through,
-            menu_item,
-        }))
-    }
-}
-
-/// Toast kind of the "show-toast" event.
-#[derive(Serialize, Clone)]
-#[serde(rename_all = "lowercase")]
-enum ToastKind {
-    Success,
-}
-
-/// Payload of the "show-toast" event.
-#[derive(Serialize, Clone)]
-struct ShowToastPayload {
-    kind: ToastKind,
-    message: String,
-}
-
-/// Toggle the click-through state of the canvas window.
-///
-/// This will toggle whether the canvas window ignores cursor events and update
-/// the state accordingly. If the canvas is toggled to not click-through, it
-/// will try to regain focus automatically. The function will fail if:
-///
-/// - The canvas window is not found.
-/// - Fails to set the canvas to ignore/unignore cursor events.
-pub fn toggle_click_through_state<R: Runtime>(app_handle: &AppHandle<R>) -> Result<(), Error> {
-    let canvas = match app_handle.get_webview_window("canvas") {
-        Some(canvas) => canvas,
-        None => bail!("Canvas window not found"),
-    };
-
-    let click_through_state = &app_handle.state::<CanvasClickThroughState<R>>();
-    let mut click_through = click_through_state.0.lock().unwrap();
-    let prev_can_click_through = click_through.yes();
-
-    // Try to toggle the click through state
-    canvas.set_ignore_cursor_events(!prev_can_click_through)?;
-    click_through.toggle();
-
-    // If the canvas is previously click-through, meaning that it is now set to not
-    // click-through, try to regain focus to avoid flickering on the first click
-    if prev_can_click_through {
-        let _ = canvas.set_focus(); // Consume any error because this is not
-                                    // critical
-    }
-
-    // Try to let canvas show the toast message
-    let _ = app_handle.emit_to(
-        "canvas",
-        "show-toast",
-        ShowToastPayload {
-            kind: ToastKind::Success,
-            message: format!(
-                "Canvas {}.",
-                if prev_can_click_through {
-                    "floated"
-                } else {
-                    "sunk"
-                }
-            ),
-        },
-    );
-    Ok(())
-}
+impl<R: Runtime> StatesExt<R> for App<R> {}

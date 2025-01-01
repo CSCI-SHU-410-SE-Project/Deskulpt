@@ -12,6 +12,7 @@ repository  = { workspace = true }
 anyhow                         = { workspace = true }
 deskulpt-test-bundler          = { workspace = true }
 deskulpt-test-config           = { workspace = true }
+deskulpt-test-events           = { workspace = true }
 deskulpt-test-plugin-fs        = { workspace = true }
 deskulpt-test-plugin-sys       = { workspace = true }
 deskulpt-test-settings         = { workspace = true }
@@ -38,3 +39,6 @@ tempfile              = { workspace = true }
 
 [build-dependencies]
 tauri-build = { workspace = true, features = ["codegen"] }
+
+[package.metadata.docs.rs]
+rustdoc-args = ["--document-private-items"]

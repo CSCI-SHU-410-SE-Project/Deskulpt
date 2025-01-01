@@ -1,4 +1,4 @@
-//! The commands for the Deskulpt core.
+//! Deskulpt core commands.
 
 use std::collections::HashMap;
 use std::fs::read_dir;
@@ -6,11 +6,9 @@ use std::path::PathBuf;
 
 use anyhow::Context;
 use deskulpt_test_bundler::WidgetBundler;
-use deskulpt_test_config::WidgetConfig;
-use deskulpt_test_settings::{read_settings, write_settings, Settings};
-use deskulpt_test_states::{
-    toggle_click_through_state, WidgetBaseDirectoryState, WidgetCollection, WidgetCollectionState,
-};
+use deskulpt_test_config::{WidgetCollection, WidgetConfig};
+use deskulpt_test_settings::GlobalSetting;
+use deskulpt_test_states::StatesExt;
 use deskulpt_test_utils::{cmdbail, cmderr, CommandOut};
 use tauri::{command, AppHandle, Manager, Runtime};
 use tauri_plugin_global_shortcut::{GlobalShortcutExt, ShortcutState};
@@ -36,10 +34,10 @@ use tauri_plugin_opener::OpenerExt;
 pub async fn refresh_widget_collection<R: Runtime>(
     app_handle: AppHandle<R>,
 ) -> CommandOut<WidgetCollection> {
-    let widget_base = &app_handle.state::<WidgetBaseDirectoryState>().0;
+    let widgets_dir = app_handle.widgets_dir();
     let mut new_widget_collection = HashMap::new();
 
-    let entries = match read_dir(widget_base) {
+    let entries = match read_dir(widgets_dir) {
         Ok(entries) => entries,
         Err(e) => cmdbail!(e),
     };
@@ -80,12 +78,9 @@ pub async fn refresh_widget_collection<R: Runtime>(
     }
 
     // Update the widget collection state
-    let widget_collection = app_handle.state::<WidgetCollectionState>();
-    widget_collection
-        .0
-        .lock()
-        .unwrap()
-        .clone_from(&new_widget_collection);
+    app_handle.with_widget_collection_mut(|collection| {
+        collection.clone_from(&new_widget_collection);
+    });
     Ok(new_widget_collection)
 }
 
@@ -111,30 +106,27 @@ pub async fn bundle_widget<R: Runtime>(
     widget_id: String,
     apis_blob_url: String,
 ) -> CommandOut<String> {
-    let widget_collection_state = &app_handle.state::<WidgetCollectionState>();
-    let widget_collection = widget_collection_state.0.lock().unwrap();
+    let bundler = app_handle.with_widget_collection(|collection| {
+        if let Some(config) = collection.get(&widget_id) {
+            match config.as_ref() {
+                Ok(config) => Ok(WidgetBundler::new(
+                    config.directory().to_path_buf(),
+                    config.entry_path(),
+                    apis_blob_url,
+                    config.external_deps(),
+                )),
+                // Propagate widget configuration error
+                Err(e) => cmdbail!(e.clone()),
+            }
+        } else {
+            cmdbail!("Widget '{widget_id}' is not found in the collection")
+        }
+    })?;
 
-    if let Some(widget_config) = widget_collection.get(&widget_id) {
-        let widget_config = match widget_config.as_ref() {
-            Ok(widget_config) => widget_config,
-            Err(e) => cmdbail!(e.clone()),
-        };
-
-        // Wrap the bundled code if success, otherwise let the error propagate
-        let bundler = WidgetBundler::new(
-            widget_config.directory().to_path_buf(),
-            widget_config.entry_path(),
-            apis_blob_url,
-            widget_config.external_deps(),
-        );
-        return bundler
-            .bundle()
-            .context(format!("Failed to bundle widget (id={})", widget_id))
-            .map_err(|e| cmderr!(e));
-    }
-
-    // Error out if the widget ID is not found in the collection
-    cmdbail!("Widget '{widget_id}' is not found in the collection")
+    bundler
+        .bundle()
+        .context(format!("Failed to bundle widget (id={})", widget_id))
+        .map_err(|e| cmderr!(e))
 }
 
 /// (Un)register a global shortcut for toggling the click-through state.
@@ -168,12 +160,11 @@ pub async fn register_toggle_shortcut<R: Runtime>(
             cmdbail!("'{shortcut}' is registered and cannot be registered again");
         }
         manager
-            .on_shortcut(shortcut, |handle, _, event| {
+            .on_shortcut(shortcut, |app_handle, _, event| {
                 if event.state == ShortcutState::Pressed {
                     // We must only react to press events, otherwise we would toggle
-                    // again on release; also consume errors because they are not
-                    // allowed to propagate
-                    let _ = toggle_click_through_state(handle);
+                    // back on release
+                    let _ = app_handle.toggle_canvas_click_through();
                 }
             })
             .map_err(|e| cmderr!(e))
@@ -198,21 +189,20 @@ pub async fn open_widget_resource<R: Runtime>(
     widget_id: Option<String>,
     path: Option<PathBuf>,
 ) -> CommandOut<()> {
-    let widget_base = &app_handle.state::<WidgetBaseDirectoryState>().0;
+    let widgets_dir = app_handle.widgets_dir();
 
     let open_path = match widget_id {
-        Some(widget_id) => {
-            let widget_collection = app_handle.state::<WidgetCollectionState>();
-            if !widget_collection.0.lock().unwrap().contains_key(&widget_id) {
+        Some(widget_id) => app_handle.with_widget_collection(|collection| {
+            if !collection.contains_key(&widget_id) {
                 cmdbail!("Widget '{}' is not found in the collection", widget_id)
             }
-            let widget_dir = widget_base.join(widget_id);
+            let widget_dir = widgets_dir.join(widget_id);
             match path {
-                Some(path) => widget_dir.join(path),
-                None => widget_dir,
+                Some(path) => Ok(widget_dir.join(path)),
+                None => Ok(widget_dir),
             }
-        },
-        None => widget_base.to_path_buf(),
+        })?,
+        None => widgets_dir.to_path_buf(),
     };
 
     app_handle
@@ -221,17 +211,19 @@ pub async fn open_widget_resource<R: Runtime>(
         .map_err(|e| cmderr!(e))
 }
 
-/// Command for initializing the settings.
+/// Command for initializing the global settings.
 ///
 /// This command tries to load the previously stored settings. It never fails,
 /// but instead returns the default settings upon any error.
 #[command]
-pub async fn init_settings<R: Runtime>(app_handle: AppHandle<R>) -> CommandOut<Settings> {
-    let app_config_dir = match app_handle.path().app_config_dir() {
-        Ok(app_config_dir) => app_config_dir,
+pub async fn init_global_setting<R: Runtime>(
+    app_handle: AppHandle<R>,
+) -> CommandOut<GlobalSetting> {
+    let app_data_dir = match app_handle.path().app_data_dir() {
+        Ok(app_data_dir) => app_data_dir,
         Err(_) => return Ok(Default::default()),
     };
-    Ok(read_settings(&app_config_dir))
+    Ok(GlobalSetting::read(&app_data_dir))
 }
 
 /// Command for cleaning up and exiting the application.
@@ -240,16 +232,131 @@ pub async fn init_settings<R: Runtime>(app_handle: AppHandle<R>) -> CommandOut<S
 /// exiting the application, but failure to do so will not prevent the
 /// application from exiting.
 #[command]
-pub async fn exit_app<R: Runtime>(app_handle: AppHandle<R>, settings: Settings) -> CommandOut<()> {
-    let app_config_dir = match app_handle.path().app_config_dir() {
-        Ok(app_config_dir) => app_config_dir,
+pub async fn exit_app<R: Runtime>(
+    app_handle: AppHandle<R>,
+    global_setting: GlobalSetting,
+) -> CommandOut<()> {
+    let app_data_dir = match app_handle.path().app_data_dir() {
+        Ok(app_data_dir) => app_data_dir,
         Err(_) => {
             app_handle.exit(0);
             return Ok(());
         },
     };
 
-    let _ = write_settings(&app_config_dir, &settings);
+    let _ = global_setting.try_write(app_data_dir);
     app_handle.exit(0);
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use deskulpt_test_testing::fixture_path;
+    use deskulpt_test_testing::mock::MockerBuilder;
+    use rstest::rstest;
+
+    use super::*;
+
+    #[rstest]
+    async fn test_refresh_widget_collection() {
+        let mocker = MockerBuilder::default()
+            .with_widgets_dir(fixture_path("deskulpt-config/widgets"))
+            .build();
+
+        // The command should not fail regardless of the contents of any widget
+        let collection = refresh_widget_collection(mocker.handle().clone()).await;
+        assert!(collection.is_ok());
+        let collection = collection.unwrap();
+
+        // Check that the widget collection state is consistent with the
+        // returned collection
+        mocker
+            .handle()
+            .with_widget_collection(|collection_in_state| {
+                assert_eq!(collection_in_state.clone(), collection);
+            });
+
+        // Check that we have got the expected number of widgets
+        let invalid_configs = [
+            "conf_missing_field",
+            "conf_not_readable",
+            "package_json_not_readable",
+        ];
+        let valid_configs = ["all_fields", "package_json_no_deps", "package_json_none"];
+        assert_eq!(
+            collection.len(),
+            invalid_configs.len() + valid_configs.len()
+        );
+
+        // Check that configurations are correctly recorded as Ok or Err; details
+        // should be covered in deskulpt-config tests
+        for name in invalid_configs {
+            assert!(collection[name].is_err());
+        }
+        for name in valid_configs {
+            assert!(collection[name].is_ok());
+        }
+    }
+
+    #[rstest]
+    async fn test_bundle_widget() {
+        let mocker = MockerBuilder::default()
+            .with_widgets_dir(fixture_path("deskulpt-config/widgets"))
+            .build();
+        let collection = refresh_widget_collection(mocker.handle().clone())
+            .await
+            .unwrap();
+
+        // Check that error is raised for non-existent widget ID
+        let result = bundle_widget(
+            mocker.handle().clone(),
+            "non_existent".to_string(),
+            Default::default(),
+        )
+        .await;
+        assert!(result.is_err());
+        assert_eq!(
+            result.unwrap_err(),
+            "Widget 'non_existent' is not found in the collection"
+        );
+
+        // Check that error message for invalid configuration gets propagated
+        let result = bundle_widget(
+            mocker.handle().clone(),
+            "conf_missing_field".to_string(),
+            Default::default(),
+        )
+        .await;
+        let err_msg = collection
+            .get("conf_missing_field")
+            .unwrap()
+            .as_ref()
+            .unwrap_err();
+        assert!(result.is_err());
+        assert_eq!(result.unwrap_err(), err_msg.clone());
+
+        // Check that bundling error is raised (in this case we have bundling error
+        // because the entry point file is missing)
+        let result = bundle_widget(
+            mocker.handle().clone(),
+            "all_fields".to_string(),
+            Default::default(),
+        )
+        .await;
+        assert!(result.is_err());
+        assert!(result
+            .unwrap_err()
+            .contains("Failed to bundle widget (id=all_fields)"));
+
+        // Create the entry point file and expect Ok result; details should be
+        // covered in deskulpt-bundler tests
+        std::fs::write(mocker.widgets_path("all_fields/index.jsx"), "").unwrap();
+        let result = bundle_widget(
+            mocker.handle().clone(),
+            "all_fields".to_string(),
+            Default::default(),
+        )
+        .await;
+        assert!(result.is_ok());
+    }
 }

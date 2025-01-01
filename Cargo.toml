@@ -13,6 +13,7 @@ repository = "https://github.com/CSCI-SHU-410-SE-Project/Deskulpt"
 [workspace.dependencies]
 anyhow                         = "1.0.87"
 async-std                      = "1.13.0"
+bincode                        = "1.3.3"
 copy_dir                       = "0.1.3"
 path-clean                     = "1.0.1"
 pretty_assertions              = "1.4.1"
@@ -34,6 +35,7 @@ tempfile                       = "3.14.0"
 # Deskulpt core
 deskulpt-test-bundler  = { version = "0.0.1", path = "crates/deskulpt-bundler" }
 deskulpt-test-config   = { version = "0.0.1", path = "crates/deskulpt-config" }
+deskulpt-test-events   = { version = "0.0.1", path = "crates/deskulpt-events" }
 deskulpt-test-settings = { version = "0.0.1", path = "crates/deskulpt-settings" }
 deskulpt-test-states   = { version = "0.0.1", path = "crates/deskulpt-states" }
 deskulpt-test-testing  = { version = "0.0.1", path = "crates/deskulpt-testing" }

@@ -6,28 +6,28 @@ import useExitAppListener from "./hooks/useExitAppListener";
 import useToggleShortcut from "./hooks/useToggleShortcut";
 import useManagerWidgetStates from "./hooks/useManagerWidgetStates";
 import useUpdateSettingListener from "./hooks/useUpdateSettingListener";
-import { Settings } from "../types/backend";
+import { GlobalSetting } from "../types/backend";
 import { Box, Tabs, Theme } from "@radix-ui/themes";
 import ManagerToaster from "./components/ManagerToaster";
 import ThemeAppearanceToggler from "./components/ThemeAppearanceToggler";
 
 export interface ManagerAppProps {
   /** The initial settings read from the previously saved setting file. */
-  initialSettings: Settings;
+  initialGlobalSetting: GlobalSetting;
 }
 
 /**
  * The main component of the manager window.
  */
-export default function App({ initialSettings }: ManagerAppProps) {
+export default function App({ initialGlobalSetting }: ManagerAppProps) {
   const [themeAppearance, setThemeAppearance] = useState(
-    initialSettings.themeAppearance,
+    initialGlobalSetting.themeAppearance,
   );
   const { toggleShortcut, setToggleShortcut } = useToggleShortcut(
-    initialSettings.toggleShortcut,
+    initialGlobalSetting.toggleShortcut,
   );
   const { managerWidgetStates, setManagerWidgetStates, rescanAndRender } =
-    useManagerWidgetStates(initialSettings.widgetSettings);
+    useManagerWidgetStates(initialGlobalSetting.widgetSettings);
 
   useExitAppListener(toggleShortcut, themeAppearance, managerWidgetStates);
   useUpdateSettingListener(setManagerWidgetStates);

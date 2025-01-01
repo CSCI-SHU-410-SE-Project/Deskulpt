@@ -11,7 +11,7 @@ repository  = { workspace = true }
 [dependencies]
 anyhow               = { workspace = true }
 copy_dir             = { workspace = true }
-deskulpt-test-states = { workspace = true }
+deskulpt-test-states = { workspace = true, features = ["testing"] }
 path-clean           = { workspace = true }
 pretty_assertions    = { workspace = true }
 regex                = { workspace = true }
