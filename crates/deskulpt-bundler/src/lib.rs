@@ -21,17 +21,24 @@ mod transforms;
 
 /// The Deskulpt widget bundler.
 pub struct WidgetBundler {
+    /// Absolute path to the widget directory.
     root: PathBuf,
+    /// Absolute path to the entry file of the widget.
+    ///
+    /// This file must be within the `root` directory and share the exact same
+    /// path prefix.
     entry: PathBuf,
+    /// URL to the widget APIs blob.
     apis_blob_url: String,
+    /// External dependencies.
     external_deps: HashSet<String>,
 }
 
 impl WidgetBundler {
     /// Create a new bundler instance.
     ///
-    /// Note that `root` and `entry` should be absolute paths, and `entry` must
-    /// be within the `root` directory.
+    /// Note that `root` and `entry` must be absolute paths, and `entry` must
+    /// be within the `root` directory and share the exact same path prefix.
     pub fn new(
         root: PathBuf,
         entry: PathBuf,

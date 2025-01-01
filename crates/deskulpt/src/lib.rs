@@ -8,22 +8,21 @@ use deskulpt_test_states::StatesExt;
 #[cfg(target_os = "macos")]
 use tauri::ActivationPolicy;
 use tauri::{generate_handler, tauri_build_context, Builder};
-pub use {
-    deskulpt_test_bundler as bundler, deskulpt_test_config as config,
-    deskulpt_test_events as events, deskulpt_test_settings as settings,
-    deskulpt_test_states as states, deskulpt_test_utils as utils,
-};
 
 mod commands;
 mod setup;
 
 /// Entry point for the Deskulpt application.
+///
+/// ```ignore
+#[doc = include_str!("./main.rs")]
+/// ```
 pub fn run() {
     Builder::default()
         // Additional application setup
         .setup(|app| {
             app.manage_widget_collection();
-            app.manage_widgets_directory();
+            app.manage_widgets_dir();
             app.manage_canvas_click_through();
 
             setup::init_system_tray(app)?;

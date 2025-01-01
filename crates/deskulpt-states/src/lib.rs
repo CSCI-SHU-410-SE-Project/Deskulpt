@@ -34,7 +34,7 @@ pub trait StatesExt<R: Runtime>: Manager<R> + EventsExt<R> {
     /// Initialize state management for the widgets directory.
     ///
     /// This will create the widgets directory if it does not exist.
-    fn manage_widgets_directory(&self) {
+    fn manage_widgets_dir(&self) {
         let resource_dir = self.path().resource_dir().unwrap();
         let widgets_dir = resource_dir.join("widgets");
         if !widgets_dir.exists() {
@@ -47,7 +47,7 @@ pub trait StatesExt<R: Runtime>: Manager<R> + EventsExt<R> {
     ///
     /// This is intended for testing purposes.
     #[cfg(feature = "testing")]
-    fn manage_widgets_directory_at<P: AsRef<Path>>(&self, widgets_dir: P) {
+    fn manage_widgets_dir_at<P: AsRef<Path>>(&self, widgets_dir: P) {
         self.manage(WidgetsDirState(widgets_dir.as_ref().to_path_buf()));
     }
 

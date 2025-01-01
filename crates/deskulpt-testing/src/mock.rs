@@ -39,7 +39,7 @@ impl MockerBuilder {
 
         let app_handle = app.handle();
         app_handle.manage_widget_collection();
-        app_handle.manage_widgets_directory_at(widgets_dir);
+        app_handle.manage_widgets_dir_at(widgets_dir);
         app_handle.manage_canvas_click_through();
 
         Mocker { app, resource_dir }

@@ -1,4 +1,4 @@
-This is the umbrella crate re-exporting all the sub-crates of Deskulpt. It also adds higher-level APIs for stitching the sub-crates together that are not exposed in the sub-crates themselves.
+This is the main crate of Deskulpt. On top of the sub-crates, it implements the core commands and additional setups of the Deskulpt application. It exposes the `run` entry point for launching the backend of the Deskulpt application.
 
 ## ⚠️ Deskulpt Internal Crate
 
