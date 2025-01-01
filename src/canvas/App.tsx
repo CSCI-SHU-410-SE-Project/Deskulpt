@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { CanvasWidgetState } from "../types/frontend";
-import { IdMap, WidgetSetting } from "../types/backend";
+import { WidgetSetting } from "../types/backend";
 import { emitUpdateSettingToManager } from "../events";
 import WidgetContainer from "./components/WidgetContainer";
 import useRenderWidgetListener from "./hooks/useRenderWidgetListener";
@@ -15,7 +15,7 @@ import useThemeAppearanceListener from "./hooks/useThemeAppearanceListener";
  */
 export default function App() {
   const [canvasWidgetStates, setCanvasWidgetStates] = useState<
-    IdMap<CanvasWidgetState>
+    Record<string, CanvasWidgetState>
   >({});
   const appearance = useThemeAppearanceListener();
 

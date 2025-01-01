@@ -29,20 +29,18 @@ export default function WidgetContentConfigList({
       </DataList.Item>
       <DataList.Item>
         <DataList.Label>Name</DataList.Label>
-        <DataList.Value>{config.deskulptConf.name}</DataList.Value>
+        <DataList.Value>{config.name}</DataList.Value>
       </DataList.Item>
       <DataList.Item>
         <DataList.Label>Entry</DataList.Label>
         <DataList.Value>
           <Flex align="center" gap="2">
-            <Code>{config.deskulptConf.entry}</Code>
+            <Code>{config.entry}</Code>
             <Tooltip content="Open" side="right">
               <IconButton
                 variant="ghost"
                 size="1"
-                onClick={() =>
-                  invokeOpenWidgetResource(widgetId, config.deskulptConf.entry)
-                }
+                onClick={() => invokeOpenWidgetResource(widgetId, config.entry)}
               >
                 <MdOpenInNew />
               </IconButton>
@@ -53,7 +51,7 @@ export default function WidgetContentConfigList({
       <DataList.Item>
         <DataList.Label>Dependencies</DataList.Label>
         <DataList.Value>
-          <WidgetDependencies dependencies={config.externalDeps} />
+          <WidgetDependencies dependencies={config.dependencies} />
         </DataList.Value>
       </DataList.Item>
     </DataList.Root>

@@ -1,5 +1,5 @@
 import { Dispatch, SetStateAction } from "react";
-import { IdMap, WidgetSetting } from "../../types/backend";
+import { WidgetSetting } from "../../types/backend";
 import { ManagerWidgetState } from "../../types/frontend";
 import { emitRenderWidgetToCanvas } from "../../events";
 import { DataList, Flex } from "@radix-ui/themes";
@@ -12,7 +12,7 @@ export interface WidgetContentSettingListProps {
   /** The widget-specific setting. */
   setting: WidgetSetting;
   /** Setter for the manager widget states. */
-  setManagerWidgetStates: Dispatch<SetStateAction<IdMap<ManagerWidgetState>>>;
+  setManagerWidgetStates: Dispatch<SetStateAction<Record<string, ManagerWidgetState>>>;
 }
 
 /**

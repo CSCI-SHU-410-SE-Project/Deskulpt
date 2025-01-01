@@ -1,0 +1,14 @@
+[package]
+name        = "deskulpt-test-events"
+description = "Deskulpt events."
+version     = { workspace = true }
+authors     = { workspace = true }
+edition     = { workspace = true }
+homepage    = { workspace = true }
+license     = { workspace = true }
+repository  = { workspace = true }
+
+[dependencies]
+anyhow = { workspace = true }
+serde  = { workspace = true, features = ["derive"] }
+tauri  = { workspace = true }

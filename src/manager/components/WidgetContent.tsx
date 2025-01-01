@@ -1,7 +1,7 @@
 import { Badge, Box, Flex, ScrollArea, Separator, Tabs, Text } from "@radix-ui/themes";
 import { LuFolderOpen, LuRepeat } from "react-icons/lu";
 import { invokeOpenWidgetResource } from "../../commands";
-import { IdMap, Result, WidgetConfig, WidgetSetting } from "../../types/backend";
+import { Result, WidgetConfig, WidgetSetting } from "../../types/backend";
 import { emitRenderWidgetToCanvas } from "../../events";
 import { Dispatch, SetStateAction } from "react";
 import { ManagerWidgetState } from "../../types/frontend";
@@ -20,7 +20,7 @@ export interface WidgetContentProps {
   /** The widget-specific settings. */
   setting: WidgetSetting;
   /** Setter for the manager widget states. */
-  setManagerWidgetStates: Dispatch<SetStateAction<IdMap<ManagerWidgetState>>>;
+  setManagerWidgetStates: Dispatch<SetStateAction<Record<string, ManagerWidgetState>>>;
 }
 
 /**

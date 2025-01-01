@@ -1,7 +1,6 @@
 import { Dispatch, SetStateAction, useEffect } from "react";
 import { listenToUpdateSetting } from "../../events";
 import { ManagerWidgetState } from "../../types/frontend";
-import { IdMap } from "../../types/backend";
 
 /**
  * Listen and react to the "update-setting" event.
@@ -13,7 +12,7 @@ import { IdMap } from "../../types/backend";
  * @param setManagerWidgetStates Setter for the manager widget states.
  */
 export default function useUpdateSettingListener(
-  setManagerWidgetStates: Dispatch<SetStateAction<IdMap<ManagerWidgetState>>>,
+  setManagerWidgetStates: Dispatch<SetStateAction<Record<string, ManagerWidgetState>>>,
 ) {
   useEffect(() => {
     const unlisten = listenToUpdateSetting((event) => {

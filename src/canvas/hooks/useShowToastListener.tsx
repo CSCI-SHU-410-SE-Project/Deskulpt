@@ -8,9 +8,10 @@ import { toast } from "sonner";
 export default function useShowToastListener() {
   useEffect(() => {
     const unlisten = listenToShowToast((event) => {
-      const { kind, message } = event.payload;
-      if (kind === "success") {
-        void toast.success(message);
+      if ("success" in event.payload) {
+        void toast.success(event.payload.success);
+      } else if ("error" in event.payload) {
+        void toast.error(event.payload.error);
       }
     });
 

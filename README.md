@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://csci-shu-410-se-project.github.io/Deskulpt/">
-    <img alt="Deskulpt" src="./src/public/deskulpt-full.png" width="100%" />
+    <img alt="Deskulpt" src="https://github.com/CSCI-SHU-410-SE-Project/Deskulpt/raw/main/src/public/deskulpt-full.png" width="100%" />
   </a>
 </p>
 
@@ -38,7 +38,7 @@ Currently, Deskulpt supports the following platforms:
 - MacOS
 - Linux (X11, tested on Ubuntu)
 
-Website: https://csci-shu-410-se-project.github.io/Deskulpt/
+Website: [https://csci-shu-410-se-project.github.io/Deskulpt/](https://csci-shu-410-se-project.github.io/Deskulpt/)
 
 ## Download
 

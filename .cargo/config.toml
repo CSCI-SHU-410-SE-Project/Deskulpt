@@ -1,0 +1,4 @@
+[env]
+# Workaround for `STATUS_ENTRYPOINT_NOT_FOUND` in tests
+# https://github.com/tauri-apps/tauri/discussions/11179
+__DESKULPT_WORKSPACE__ = "true"
