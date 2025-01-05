@@ -26,14 +26,8 @@ tempfile                       = { workspace = true }
 thiserror                      = { workspace = true }
 tokio                          = { workspace = true }
 
-[dev-dependencies]
-async-std = { workspace = true, features = ["attributes"] }
-copy_dir  = { workspace = true }
-rstest    = { workspace = true }
-tauri     = { workspace = true, features = ["test"] }
-
-[build-dependencies]
-tauri-build = { workspace = true, features = ["codegen"] }
+[target."cfg(target_os = \"macos\")".dependencies]
+objc = { workspace = true }
 
 [package.metadata.docs.rs]
-rustdoc-args = ["--document-private-items"]
+rustdoc-args = ["--document-private-items", "--extend-css", "../rustdoc.css"]

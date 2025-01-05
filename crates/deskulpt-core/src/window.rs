@@ -50,6 +50,9 @@ macro_rules! shared_impl {
 
                 #[cfg(target_os = "macos")]
                 {
+                    use objc::{msg_send, sel, sel_impl};
+                    use objc::runtime::{Object, NO};
+
                     // Disable the window shadow on macOS; there will be shadows left on
                     // movement for transparent and undecorated windows that we are using;
                     // it seems that disabling shadows does not have significant visual impacts

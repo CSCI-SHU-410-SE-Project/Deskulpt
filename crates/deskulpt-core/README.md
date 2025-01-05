@@ -1,4 +1,14 @@
-This crate implements the core of the Deskulpt backend built with [Tauri](https://v2.tauri.app/).
+<div align="center">
+
+<img id="deskulpt-logo" alt="Deskulpt" src="https://github.com/CSCI-SHU-410-SE-Project/Deskulpt/raw/main/src/public/deskulpt-wide.svg" width="300px" />
+
+**A cross-platform desktop customization tool.**
+
+<br>
+
+</div>
+
+This crate implements the core of the Deskulpt backend.
 
 ## ⚠️ Deskulpt Internal Crate
 
