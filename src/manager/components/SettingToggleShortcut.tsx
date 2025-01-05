@@ -16,7 +16,7 @@ import useKeyboardListener from "../hooks/useKeyboardListener";
 
 export interface SettingToggleShortcutProps {
   /** Setter for the toggle shortcut state. */
-  setToggleShortcut: Dispatch<SetStateAction<string | null>>;
+  setToggleShortcut: Dispatch<SetStateAction<string | undefined>>;
 }
 
 /**
@@ -155,7 +155,9 @@ export default function SettingToggleShortcut({
               highContrast
               disabled={!disableShortcut && (!hasModifier || !hasKey)}
               onClick={() => {
-                setToggleShortcut(disableShortcut ? null : listenedShortcut.join("+"));
+                setToggleShortcut(
+                  disableShortcut ? undefined : listenedShortcut.join("+"),
+                );
                 setPopoverOpen(false);
               }}
             >

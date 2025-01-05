@@ -10,27 +10,6 @@
   },
   "app": {
     "macOSPrivateApi": true,
-    "windows": [
-      {
-        "label": "manager",
-        "title": "Deskulpt Manager",
-        "url": "views/manager.html",
-        "width": 750,
-        "height": 500,
-        "center": true,
-        "resizable": false,
-        "maximizable": false,
-        "minimizable": false,
-        "visible": false
-      }
-    ],
-    "trayIcon": {
-      "id": "deskulpt-tray",
-      "iconPath": "icons/icon.png",
-      "iconAsTemplate": true,
-      "menuOnLeftClick": false,
-      "tooltip": "Deskulpt"
-    },
     "security": {
       "csp": null
     }

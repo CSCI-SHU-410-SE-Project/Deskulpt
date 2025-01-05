@@ -16,15 +16,15 @@ export interface WidgetConfig {
   directory: string;
 }
 
-export type ThemeAppearance = "light" | "dark";
+export type Appearance = "light" | "dark";
 
-export interface GlobalSetting {
-  themeAppearance: ThemeAppearance;
-  toggleShortcut: string | null;
-  widgetSettings: Record<string, WidgetSetting>;
+export interface Settings {
+  appearance: Appearance;
+  toggleShortcut?: string;
+  widgetSettingsMap: Record<string, WidgetSettings>;
 }
 
-export interface WidgetSetting {
+export interface WidgetSettings {
   x: number;
   y: number;
   opacity: number;

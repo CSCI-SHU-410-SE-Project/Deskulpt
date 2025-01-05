@@ -2,7 +2,7 @@ import { Code, DataList, Flex, IconButton, Tooltip } from "@radix-ui/themes";
 import { WidgetConfig } from "../../types/backend";
 import WidgetDependencies from "./WidgetDependencies";
 import { MdOpenInNew } from "react-icons/md";
-import { invokeOpenWidgetResource } from "../../commands";
+import { invokeOpenInWidgetsDir } from "../../commands";
 
 export interface WidgetContentConfigListProps {
   /** The widget ID. */
@@ -40,7 +40,9 @@ export default function WidgetContentConfigList({
               <IconButton
                 variant="ghost"
                 size="1"
-                onClick={() => invokeOpenWidgetResource(widgetId, config.entry)}
+                onClick={() =>
+                  invokeOpenInWidgetsDir({ components: [widgetId, config.entry] })
+                }
               >
                 <MdOpenInNew />
               </IconButton>

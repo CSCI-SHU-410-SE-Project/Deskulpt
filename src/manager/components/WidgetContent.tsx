@@ -1,14 +1,14 @@
 import { Badge, Box, Flex, ScrollArea, Separator, Tabs, Text } from "@radix-ui/themes";
 import { LuFolderOpen, LuRepeat } from "react-icons/lu";
-import { invokeOpenWidgetResource } from "../../commands";
-import { Result, WidgetConfig, WidgetSetting } from "../../types/backend";
+import { invokeOpenInWidgetsDir } from "../../commands";
+import { Result, WidgetConfig, WidgetSettings } from "../../types/backend";
 import { emitRenderWidgetToCanvas } from "../../events";
 import { Dispatch, SetStateAction } from "react";
 import { ManagerWidgetState } from "../../types/frontend";
 import WidgetContentHeading from "./WidgetContentHeading";
 import { toast } from "sonner";
 import WidgetContentConfigList from "./WidgetContentConfigList";
-import WidgetContentSettingList from "./WidgetContentSettingList";
+import WidgetContentSettingsList from "./WidgetContentSettingsList";
 
 export interface WidgetContentProps {
   /** The index of the widget in the collection. */
@@ -18,7 +18,7 @@ export interface WidgetContentProps {
   /** The widget configuration or error. */
   config: Result<WidgetConfig, string>;
   /** The widget-specific settings. */
-  setting: WidgetSetting;
+  settings: WidgetSettings;
   /** Setter for the manager widget states. */
   setManagerWidgetStates: Dispatch<SetStateAction<Record<string, ManagerWidgetState>>>;
 }
@@ -28,13 +28,13 @@ export interface WidgetContentProps {
  *
  * It is rendered as the content of a tab. It consists of a configuration section
  * {@link WidgetContentConfigList} and a setting section
- * {@link WidgetContentSettingList}.
+ * {@link WidgetContentSettingsList}.
  */
 export default function WidgetContent({
   index,
   widgetId,
   config,
-  setting,
+  settings,
   setManagerWidgetStates,
 }: WidgetContentProps) {
   return (
@@ -48,7 +48,7 @@ export default function WidgetContent({
           }
           actionIcon={<LuFolderOpen />}
           actionText="Edit"
-          action={() => invokeOpenWidgetResource(widgetId, null)}
+          action={() => invokeOpenInWidgetsDir({ components: [widgetId] })}
         />
         <ScrollArea scrollbars="vertical" asChild>
           <Box px="2" css={{ flex: 3 }}>
@@ -70,15 +70,15 @@ export default function WidgetContent({
           actionIcon={<LuRepeat />}
           actionText="Re-render"
           action={() =>
-            emitRenderWidgetToCanvas({ widgetId, setting, bundle: true }).then(() =>
+            emitRenderWidgetToCanvas({ widgetId, settings, bundle: true }).then(() =>
               toast.success(`Re-rendered widget "${widgetId}".`),
             )
           }
         />
         <Box px="2" css={{ flex: 4 }}>
-          <WidgetContentSettingList
+          <WidgetContentSettingsList
             widgetId={widgetId}
-            setting={setting}
+            settings={settings}
             setManagerWidgetStates={setManagerWidgetStates}
           />
         </Box>

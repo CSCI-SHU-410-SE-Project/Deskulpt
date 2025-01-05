@@ -6,10 +6,9 @@
   "windows": ["manager"],
   "permissions": [
     "allow-exit-app",
-    "allow-init-global-setting",
-    "allow-open-widget-resource",
-    "allow-refresh-widget-collection",
-    "allow-register-toggle-shortcut",
-    "opener:allow-open-path"
+    "allow-load-settings",
+    "allow-open-in-widgets-dir",
+    "allow-rescan-widgets",
+    "allow-update-toggle-shortcut"
   ]
 }

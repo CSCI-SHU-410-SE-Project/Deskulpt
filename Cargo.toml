@@ -19,31 +19,23 @@ path-clean                     = "1.0.1"
 pretty_assertions              = "1.4.1"
 objc                           = "0.2.7"
 once_cell                      = "1.20.2"
+open                           = "5.3.1"
 regex                          = "1.11.1"
 rstest                         = "0.22.0"
 serde                          = "1.0.210"
 serde_json                     = "1.0.128"
 swc_core                       = "9.0.2"
 sysinfo                        = "0.33.0"
-tauri                          = "2.1.0"
+tauri                          = "2.2.0"
 tauri-build                    = "2.0.3"
 tauri-plugin-clipboard-manager = "2.2.0"
 tauri-plugin-global-shortcut   = "2.2.0"
-tauri-plugin-opener            = "2.2.0"
 tempfile                       = "3.14.0"
+thiserror                      = "2.0.9"
+tokio                          = "1.42.0"
 
-# Deskulpt core
-deskulpt-test-bundler  = { version = "0.0.1", path = "crates/deskulpt-bundler" }
-deskulpt-test-config   = { version = "0.0.1", path = "crates/deskulpt-config" }
-deskulpt-test-events   = { version = "0.0.1", path = "crates/deskulpt-events" }
-deskulpt-test-settings = { version = "0.0.1", path = "crates/deskulpt-settings" }
-deskulpt-test-states   = { version = "0.0.1", path = "crates/deskulpt-states" }
-deskulpt-test-testing  = { version = "0.0.1", path = "crates/deskulpt-testing" }
-deskulpt-test-utils    = { version = "0.0.1", path = "crates/deskulpt-utils" }
-
-# Deskulpt plugins
-deskulpt-test-plugin-fs  = { version = "0.0.1", path = "crates/deskulpt-plugin-fs" }
-deskulpt-test-plugin-sys = { version = "0.0.1", path = "crates/deskulpt-plugin-sys" }
+# Deskulpt crates
+deskulpt-core = { version = "0.0.1", path = "crates/deskulpt-core" }
 
 [profile.dev]
 incremental = true

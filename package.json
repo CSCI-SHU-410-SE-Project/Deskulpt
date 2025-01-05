@@ -22,8 +22,6 @@
     "test": "pnpm test:js && pnpm test:rs",
     "test:js": "echo 'Not implemented yet'",
     "test:rs": "cargo test --workspace --lib",
-    "cov:js": "echo 'Not implemented yet'",
-    "cov:rs": "cargo llvm-cov --html",
     "build:packages": "pnpm run --filter \"@deskulpt-test/*\" build"
   },
   "devDependencies": {

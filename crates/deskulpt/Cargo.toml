@@ -1,6 +1,6 @@
 [package]
-name        = "deskulpt-test"
-description = "Deskulpt main crate."
+name        = "deskulpt"
+description = "Deskulpt, a cross-platform desktop customization tool."
 version     = { workspace = true }
 authors     = { workspace = true }
 edition     = { workspace = true }
@@ -10,21 +10,13 @@ repository  = { workspace = true }
 
 [dependencies]
 anyhow                         = { workspace = true }
-deskulpt-test-bundler          = { workspace = true }
-deskulpt-test-config           = { workspace = true }
-deskulpt-test-events           = { workspace = true }
-deskulpt-test-plugin-fs        = { workspace = true }
-deskulpt-test-plugin-sys       = { workspace = true }
-deskulpt-test-settings         = { workspace = true }
-deskulpt-test-states           = { workspace = true }
-deskulpt-test-utils            = { workspace = true }
+deskulpt-core                  = { workspace = true }
 path-clean                     = { workspace = true }
 serde                          = { workspace = true, features = ["derive"] }
 serde_json                     = { workspace = true }
 tauri                          = { workspace = true, features = ["macos-private-api", "tray-icon"] }
 tauri-plugin-clipboard-manager = { workspace = true }
 tauri-plugin-global-shortcut   = { workspace = true }
-tauri-plugin-opener            = { workspace = true }
 
 [target."cfg(target_os = \"macos\")".dependencies]
 objc = { workspace = true }
@@ -32,7 +24,6 @@ objc = { workspace = true }
 [dev-dependencies]
 async-std             = { workspace = true, features = ["attributes"] }
 copy_dir              = { workspace = true }
-deskulpt-test-testing = { workspace = true }
 rstest                = { workspace = true }
 tauri                 = { workspace = true, features = ["test"] }
 tempfile              = { workspace = true }

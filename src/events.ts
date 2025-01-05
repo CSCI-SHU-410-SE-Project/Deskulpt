@@ -9,9 +9,9 @@ import { EventCallback, emitTo, listen } from "@tauri-apps/api/event";
 import {
   RemoveWidgetsPayload,
   RenderWidgetPayload,
-  UpdateSettingPayload,
+  UpdateSettingsPayload,
 } from "./types/frontend";
-import { ShowToastPayload, ThemeAppearance } from "./types/backend";
+import { Appearance, ShowToastPayload } from "./types/backend";
 
 /**
  * Emit the "render-widget" event to the canvas window.
@@ -56,24 +56,24 @@ export async function listenToRemoveWidgets(
 }
 
 /**
- * Emit the "update-setting" event to the manager window.
+ * Emit the "update-settings" event to the manager window.
  *
  * @param payload The payload of the event.
  */
-export async function emitUpdateSettingToManager(payload: UpdateSettingPayload) {
-  await emitTo("manager", "update-setting", payload);
+export async function emitUpdateSettingsToManager(payload: UpdateSettingsPayload) {
+  await emitTo("manager", "update-settings", payload);
 }
 
 /**
- * Listen to the "update-setting" event.
+ * Listen to the "update-settings" event.
  *
  * @param handler The callback function to handle the event.
  * @returns A promise that resolves to a function to unlisten to the event.
  */
-export async function listenToUpdateSetting(
-  handler: EventCallback<UpdateSettingPayload>,
+export async function listenToUpdateSettings(
+  handler: EventCallback<UpdateSettingsPayload>,
 ) {
-  return listen("update-setting", handler);
+  return listen("update-settings", handler);
 }
 
 /**
@@ -81,7 +81,7 @@ export async function listenToUpdateSetting(
  *
  * @param payload The payload of the event.
  */
-export async function emitSwitchThemeAppearanceToCanvas(payload: ThemeAppearance) {
+export async function emitSwitchAppearanceToCanvas(payload: Appearance) {
   await emitTo("canvas", "switch-theme-appearance", payload);
 }
 
@@ -91,9 +91,7 @@ export async function emitSwitchThemeAppearanceToCanvas(payload: ThemeAppearance
  * @param handler The callback function to handle the event.
  * @returns A promise that resolves to a function to unlisten to the event.
  */
-export async function listenToSwitchThemeAppearance(
-  handler: EventCallback<ThemeAppearance>,
-) {
+export async function listenToSwitchAppearance(handler: EventCallback<Appearance>) {
   return listen("switch-theme-appearance", handler);
 }
 

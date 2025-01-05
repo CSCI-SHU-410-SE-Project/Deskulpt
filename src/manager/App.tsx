@@ -5,45 +5,40 @@ import AboutTab from "./tabs/AboutTab";
 import useExitAppListener from "./hooks/useExitAppListener";
 import useToggleShortcut from "./hooks/useToggleShortcut";
 import useManagerWidgetStates from "./hooks/useManagerWidgetStates";
-import useUpdateSettingListener from "./hooks/useUpdateSettingListener";
-import { GlobalSetting } from "../types/backend";
+import useUpdateSettingsListener from "./hooks/useUpdateSettingsListener";
+import { Settings } from "../types/backend";
 import { Box, Tabs, Theme } from "@radix-ui/themes";
 import ManagerToaster from "./components/ManagerToaster";
-import ThemeAppearanceToggler from "./components/ThemeAppearanceToggler";
+import AppearanceToggler from "./components/AppearanceToggler";
 
 export interface ManagerAppProps {
   /** The initial settings read from the previously saved setting file. */
-  initialGlobalSetting: GlobalSetting;
+  initialSettings: Settings;
 }
 
 /**
  * The main component of the manager window.
  */
-export default function App({ initialGlobalSetting }: ManagerAppProps) {
-  const [themeAppearance, setThemeAppearance] = useState(
-    initialGlobalSetting.themeAppearance,
-  );
+export default function App({ initialSettings }: ManagerAppProps) {
+  const [appearance, setAppearance] = useState(initialSettings.appearance);
   const { toggleShortcut, setToggleShortcut } = useToggleShortcut(
-    initialGlobalSetting.toggleShortcut,
+    initialSettings.toggleShortcut,
   );
   const { managerWidgetStates, setManagerWidgetStates, rescanAndRender } =
-    useManagerWidgetStates(initialGlobalSetting.widgetSettings);
+    useManagerWidgetStates(initialSettings.widgetSettingsMap);
 
-  useExitAppListener(toggleShortcut, themeAppearance, managerWidgetStates);
-  useUpdateSettingListener(setManagerWidgetStates);
+  useExitAppListener(toggleShortcut, appearance, managerWidgetStates);
+  useUpdateSettingsListener(setManagerWidgetStates);
 
   return (
     <Theme
-      appearance={themeAppearance}
+      appearance={appearance}
       accentColor="indigo"
       grayColor="slate"
       css={{ height: "100vh" }}
     >
-      <ManagerToaster themeAppearance={themeAppearance} />
-      <ThemeAppearanceToggler
-        themeAppearance={themeAppearance}
-        setThemeAppearance={setThemeAppearance}
-      />
+      <ManagerToaster appearance={appearance} />
+      <AppearanceToggler appearance={appearance} setAppearance={setAppearance} />
       <Tabs.Root defaultValue="widgets" asChild>
         <Box height="100%" p="2">
           <Tabs.List>

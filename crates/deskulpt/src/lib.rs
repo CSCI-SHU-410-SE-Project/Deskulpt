@@ -4,54 +4,44 @@
     html_favicon_url = "https://github.com/CSCI-SHU-410-SE-Project/Deskulpt/raw/main/crates/deskulpt/icons/icon.png"
 )]
 
-use deskulpt_test_states::StatesExt;
-#[cfg(target_os = "macos")]
-use tauri::ActivationPolicy;
+use deskulpt_core::{
+    PathExt, StatesExtCanvasClickThrough, StatesExtWidgetCollection, TrayExt, WindowExt,
+};
 use tauri::{generate_handler, tauri_build_context, Builder};
 
-mod commands;
-mod setup;
-
 /// Entry point for the Deskulpt application.
-///
-/// ```ignore
-#[doc = include_str!("./main.rs")]
-/// ```
 pub fn run() {
     Builder::default()
         // Additional application setup
         .setup(|app| {
+            app.init_widgets_dir()?;
+            app.init_persist_dir()?;
+
             app.manage_widget_collection();
-            app.manage_widgets_dir();
             app.manage_canvas_click_through();
 
-            setup::init_system_tray(app)?;
-            setup::create_canvas(app)?;
+            app.create_manager()?;
+            app.create_canvas()?;
 
-            #[cfg(target_os = "macos")]
-            // Hide the application from the dock on macOS because hide-from-taskbar is
-            // not applicable for macOS; for Windows and Linux we have already hidden
-            // the canvas window in `create_canvas`
-            app.set_activation_policy(ActivationPolicy::Accessory);
+            app.create_tray()?;
 
             Ok(())
         })
-        .on_window_event(setup::listen_to_windows)
+        .on_window_event(deskulpt_core::on_window_event)
         // Register internal command handlers
         .invoke_handler(generate_handler![
-            commands::bundle_widget,
-            commands::exit_app,
-            commands::init_global_setting,
-            commands::open_widget_resource,
-            commands::refresh_widget_collection,
-            commands::register_toggle_shortcut,
+            deskulpt_core::commands::bundle_widget,
+            deskulpt_core::commands::exit_app,
+            deskulpt_core::commands::load_settings,
+            deskulpt_core::commands::open_in_widgets_dir,
+            deskulpt_core::commands::rescan_widgets,
+            deskulpt_core::commands::update_toggle_shortcut,
         ])
         // Register plugins
         .plugin(tauri_plugin_clipboard_manager::init())
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())
-        .plugin(tauri_plugin_opener::init())
-        .plugin(deskulpt_test_plugin_fs::init())
-        .plugin(deskulpt_test_plugin_sys::init())
+        // .plugin(deskulpt_core::apis::fs::init())
+        // .plugin(deskulpt_core::apis::sys::init())
         .run(tauri_build_context!())
         .expect("Error running the Deskulpt application");
 }

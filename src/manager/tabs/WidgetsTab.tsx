@@ -1,6 +1,6 @@
 import { Dispatch, SetStateAction } from "react";
 import { LuFileScan, LuFolderOpen, LuRepeat } from "react-icons/lu";
-import { invokeOpenWidgetResource } from "../../commands";
+import { invokeOpenInWidgetsDir } from "../../commands";
 import { Flex, ScrollArea, Tabs } from "@radix-ui/themes";
 import { toast } from "sonner";
 import { ManagerWidgetState } from "../../types/frontend";
@@ -30,11 +30,12 @@ export default function WidgetsTab({
   setManagerWidgetStates,
   rescanAndRender,
 }: WidgetsTabProps) {
+  const managerWidgetStatesArray = Object.entries(managerWidgetStates);
+
   const rerenderAction = async () => {
-    const managerWidgetStatesArray = Object.entries(managerWidgetStates);
     await Promise.all(
-      managerWidgetStatesArray.map(([widgetId, { setting }]) =>
-        emitRenderWidgetToCanvas({ widgetId, setting, bundle: true }),
+      managerWidgetStatesArray.map(([widgetId, { settings }]) =>
+        emitRenderWidgetToCanvas({ widgetId, settings, bundle: true }),
       ),
     );
     toast.success(`Re-rendered ${managerWidgetStatesArray.length} widgets.`);
@@ -55,36 +56,34 @@ export default function WidgetsTab({
     <>
       <Tabs.Root orientation="vertical" defaultValue="tab0" asChild>
         <Flex gap="3" height="100%">
-          <Tabs.List
-            css={{
-              flex: 1,
-              height: "100%",
-              // Move the shadow of the tab list from bottom to right
-              boxShadow: "inset -1px 0 0 0 var(--gray-a5)",
-            }}
-          >
-            <ScrollArea scrollbars="vertical" asChild>
-              <Flex direction="column">
-                {Object.entries(managerWidgetStates).map(
-                  ([widgetId, { config }], index) => (
+          {managerWidgetStatesArray.length > 0 && (
+            <Tabs.List
+              css={{
+                flex: 1,
+                height: "100%",
+                // Move the shadow of the tab list from bottom to right
+                boxShadow: "inset -1px 0 0 0 var(--gray-a5)",
+              }}
+            >
+              <ScrollArea scrollbars="vertical" asChild>
+                <Flex direction="column">
+                  {managerWidgetStatesArray.map(([widgetId, { config }], index) => (
                     <WidgetTrigger key={widgetId} index={index} config={config} />
-                  ),
-                )}
-              </Flex>
-            </ScrollArea>
-          </Tabs.List>
-          {Object.entries(managerWidgetStates).map(
-            ([widgetId, { config, setting }], index) => (
-              <WidgetContent
-                key={widgetId}
-                index={index}
-                widgetId={widgetId}
-                config={config}
-                setting={setting}
-                setManagerWidgetStates={setManagerWidgetStates}
-              />
-            ),
+                  ))}
+                </Flex>
+              </ScrollArea>
+            </Tabs.List>
           )}
+          {managerWidgetStatesArray.map(([widgetId, { config, settings }], index) => (
+            <WidgetContent
+              key={widgetId}
+              index={index}
+              widgetId={widgetId}
+              config={config}
+              settings={settings}
+              setManagerWidgetStates={setManagerWidgetStates}
+            />
+          ))}
         </Flex>
       </Tabs.Root>
       <FloatButton
@@ -92,6 +91,7 @@ export default function WidgetsTab({
         icon={<LuRepeat />}
         tooltip="Re-render all widgets"
         onClick={rerenderAction}
+        disabled={managerWidgetStatesArray.length === 0}
       />
       <FloatButton
         order={2}
@@ -103,7 +103,7 @@ export default function WidgetsTab({
         order={1}
         icon={<LuFolderOpen />}
         tooltip="Open base directory"
-        onClick={() => invokeOpenWidgetResource(null, null)}
+        onClick={() => invokeOpenInWidgetsDir({ components: [] })}
       />
     </>
   );

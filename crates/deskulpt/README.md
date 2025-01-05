@@ -1,4 +1,4 @@
-This is the main crate of Deskulpt. On top of the sub-crates, it implements the core commands and additional setups of the Deskulpt application. It exposes the `run` entry point for launching the backend of the Deskulpt application.
+This is the main crate of Deskulpt. It exposes the `run` entry point for launching the backend of the Deskulpt application.
 
 ## ⚠️ Deskulpt Internal Crate
 

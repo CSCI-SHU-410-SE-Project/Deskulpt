@@ -6,49 +6,52 @@
  */
 
 import { invoke } from "@tauri-apps/api/core";
-import { GlobalSetting, WidgetCollection } from "./types/backend";
+import { Settings, WidgetCollection } from "./types/backend";
 
 /**
  * Invoke the `bundle_widget` command.
  */
-export async function invokeBundleWidget(widgetId: string, apisBlobUrl: string) {
-  return invoke<string>("bundle_widget", { widgetId, apisBlobUrl });
+export async function invokeBundleWidget(payload: {
+  widgetId: string;
+  apisBlobUrl: string;
+}) {
+  return invoke<string>("bundle_widget", payload);
 }
 
 /**
  * Invoke the `exit_app` command.
  */
-export async function invokeExitApp(globalSetting: GlobalSetting) {
-  return invoke<void>("exit_app", { globalSetting });
+export async function invokeExitApp(payload: { settings: Settings }) {
+  return invoke<void>("exit_app", payload);
 }
 
 /**
- * Invoke the `open_widget_resource` command.
+ * Invoke the `open_in_widgets_dir` command.
  */
-export async function invokeOpenWidgetResource(
-  widgetId: string | null,
-  path: string | null,
-) {
-  return invoke<void>("open_widget_resource", { widgetId, path });
+export async function invokeOpenInWidgetsDir(payload: { components: string[] }) {
+  return invoke<void>("open_in_widgets_dir", payload);
 }
 
 /**
- * Invoke the `init_global_setting` command.
+ * Invoke the `load_settings` command.
  */
-export async function invokeInitGlobalSetting() {
-  return invoke<GlobalSetting>("init_global_setting");
+export async function invokeLoadSettings() {
+  return invoke<Settings>("load_settings");
 }
 
 /**
- * Invoke the `refresh_widget_collection` command.
+ * Invoke the `rescan_widgets` command.
  */
-export async function invokeRefreshWidgetCollection() {
-  return invoke<WidgetCollection>("refresh_widget_collection");
+export async function invokeRescanWidgets() {
+  return invoke<WidgetCollection>("rescan_widgets");
 }
 
 /**
- * Invoke the `register_toggle_shortcut` command.
+ * Invoke the `update_toggle_shortcut` command.
  */
-export async function invokeRegisterToggleShortcut(shortcut: string, reverse: boolean) {
-  return invoke<void>("register_toggle_shortcut", { shortcut, reverse });
+export async function invokeUpdateToggleShortcut(payload: {
+  oldShortcut?: string;
+  newShortcut?: string;
+}) {
+  return invoke<void>("update_toggle_shortcut", payload);
 }

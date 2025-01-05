@@ -5,10 +5,10 @@ use tauri_build::{
 const INTERNAL_COMMANDS: &[&str] = &[
     "bundle_widget",
     "exit_app",
-    "init_global_setting",
-    "open_widget_resource",
-    "refresh_widget_collection",
-    "register_toggle_shortcut",
+    "load_settings",
+    "open_in_widgets_dir",
+    "rescan_widgets",
+    "update_toggle_shortcut",
 ];
 
 const WIDGET_APIS_FS_COMMANDS: &[&str] = &[
