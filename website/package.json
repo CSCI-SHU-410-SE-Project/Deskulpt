@@ -11,23 +11,23 @@
     "clear": "docusaurus clear && rimraf docs/tsdoc"
   },
   "dependencies": {
-    "@docusaurus/core": "^3.6.3",
-    "@docusaurus/preset-classic": "^3.6.3",
+    "@docusaurus/core": "^3.7.0",
+    "@docusaurus/preset-classic": "^3.7.0",
     "@easyops-cn/docusaurus-search-local": "^0.46.1",
     "@mdx-js/react": "^3.1.0",
     "clsx": "^2.1.1",
     "docusaurus-plugin-sass": "^0.2.5",
-    "docusaurus-plugin-typedoc": "^1.1.1",
+    "docusaurus-plugin-typedoc": "^1.2.0",
     "prism-react-renderer": "^2.4.0",
     "react-icons": "^5.4.0",
     "sass": "^1.83.0",
     "typedoc": "^0.27.5",
-    "typedoc-plugin-markdown": "^4.3.3"
+    "typedoc-plugin-markdown": "^4.4.1"
   },
   "devDependencies": {
-    "@docusaurus/module-type-aliases": "^3.6.3",
-    "@docusaurus/tsconfig": "^3.6.3",
-    "@docusaurus/types": "^3.6.3",
+    "@docusaurus/module-type-aliases": "^3.7.0",
+    "@docusaurus/tsconfig": "^3.7.0",
+    "@docusaurus/types": "^3.7.0",
     "rimraf": "^6.0.1"
   },
   "browserslist": {
