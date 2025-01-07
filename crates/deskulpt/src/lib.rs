@@ -1,4 +1,4 @@
-#![doc = include_str!("../../../README.md")]
+#![doc = include_str!("../README.md")]
 #![doc(
     html_logo_url = "https://github.com/CSCI-SHU-410-SE-Project/Deskulpt/raw/main/src/public/deskulpt.svg",
     html_favicon_url = "https://github.com/CSCI-SHU-410-SE-Project/Deskulpt/raw/main/src/public/deskulpt.svg"
@@ -9,7 +9,7 @@ use deskulpt_core::{
 };
 use tauri::{generate_context, generate_handler, Builder};
 
-/// Entry point for the Deskulpt application.
+/// Entry point for the Deskulpt backend.
 pub fn run() {
     Builder::default()
         .setup(|app| {

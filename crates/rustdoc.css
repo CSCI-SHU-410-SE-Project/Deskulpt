@@ -1,6 +1,4 @@
-html[data-theme="dark"] #deskulpt-logo,
 html[data-theme="dark"] .logo-container,
-html[data-theme="ayu"] #deskulpt-logo,
 html[data-theme="ayu"] .logo-container {
   filter: invert(90%) hue-rotate(170deg);
 }
