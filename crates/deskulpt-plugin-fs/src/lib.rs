@@ -11,5 +11,5 @@ use deskulpt_plugin::{register_commands, Plugin};
 pub struct FsPlugin;
 
 impl Plugin for FsPlugin {
-    register_commands![commands::Exists];
+    register_commands![commands::Exists, commands::IsFile];
 }
