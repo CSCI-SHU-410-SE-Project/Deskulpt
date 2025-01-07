@@ -9,22 +9,21 @@ license     = { workspace = true }
 repository  = { workspace = true }
 
 [dependencies]
-async-std                      = { workspace = true }
-anyhow                         = { workspace = true }
-bincode                        = { workspace = true }
-once_cell                      = { workspace = true }
-open                           = { workspace = true }
-path-clean                     = { workspace = true }
-serde                          = { workspace = true, features = ["derive"] }
-serde_json                     = { workspace = true }
-swc_core                       = { workspace = true, features = ["__common", "bundler", "ecma_ast", "ecma_codegen", "ecma_loader", "ecma_parser", "ecma_transforms_react", "ecma_transforms_typescript", "ecma_visit"] }
-sysinfo                        = { workspace = true }
-tauri                          = { workspace = true, features = ["macos-private-api", "tray-icon", "image-png"] }
-tauri-plugin-clipboard-manager = { workspace = true }
-tauri-plugin-global-shortcut   = { workspace = true }
-tempfile                       = { workspace = true }
-thiserror                      = { workspace = true }
-tokio                          = { workspace = true }
+anyhow                       = { workspace = true }
+bincode                      = { workspace = true }
+deskulpt-plugin              = { workspace = true }
+deskulpt-plugin-fs           = { workspace = true }
+once_cell                    = { workspace = true }
+open                         = { workspace = true }
+path-clean                   = { workspace = true }
+serde                        = { workspace = true, features = ["derive"] }
+serde_json                   = { workspace = true }
+swc_core                     = { workspace = true, features = ["__common", "bundler", "ecma_ast", "ecma_codegen", "ecma_loader", "ecma_parser", "ecma_transforms_react", "ecma_transforms_typescript", "ecma_visit"] }
+tauri                        = { workspace = true, features = ["macos-private-api", "tray-icon", "image-png"] }
+tauri-plugin-global-shortcut = { workspace = true }
+tempfile                     = { workspace = true }
+thiserror                    = { workspace = true }
+tokio                        = { workspace = true }
 
 [target."cfg(target_os = \"macos\")".dependencies]
 objc = { workspace = true }

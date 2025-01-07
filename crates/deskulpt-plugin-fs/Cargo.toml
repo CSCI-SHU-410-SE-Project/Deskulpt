@@ -1,0 +1,16 @@
+[package]
+name        = "deskulpt-plugin-fs"
+description = "Deskulpt file system plugin."
+version     = { workspace = true }
+authors     = { workspace = true }
+edition     = { workspace = true }
+homepage    = { workspace = true }
+license     = { workspace = true }
+repository  = { workspace = true }
+
+[dependencies]
+anyhow          = { workspace = true }
+deskulpt-plugin = { workspace = true }
+
+[package.metadata.docs.rs]
+rustdoc-args = ["--document-private-items", "--extend-css", "../rustdoc.css"]

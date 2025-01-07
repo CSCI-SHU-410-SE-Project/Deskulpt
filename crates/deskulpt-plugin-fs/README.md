@@ -10,8 +10,8 @@
 
 </div>
 
-This crate implements the core of the Deskulpt backend.
+This crate implements the Deskulpt file system plugin.
 
-## ⚠️ Deskulpt Internal Crate
+## ⚠️ Deskulpt Official Plugin
 
-This crate is meant to be used internally by the Deskulpt application and is not designed to support plugin authors or other users directly. Private items are documented for reference of Deskulpt developers.
+This crate is an official Deskulpt plugin. It does not provide public APIs to be consumed by plugin authors or other users directly. Private items are documented for reference of plugin authors and Deskulpt developers.

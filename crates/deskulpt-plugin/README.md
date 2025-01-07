@@ -10,8 +10,4 @@
 
 </div>
 
-This crate implements the core of the Deskulpt backend.
-
-## ⚠️ Deskulpt Internal Crate
-
-This crate is meant to be used internally by the Deskulpt application and is not designed to support plugin authors or other users directly. Private items are documented for reference of Deskulpt developers.
+This crate provides the APIs for building Deskulpt plugins.

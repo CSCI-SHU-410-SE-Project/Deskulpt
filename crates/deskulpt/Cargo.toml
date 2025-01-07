@@ -11,7 +11,7 @@ readme      = "../../README.md"
 
 [dependencies]
 deskulpt-core                  = { workspace = true }
-tauri                          = { workspace = true, features = ["macos-private-api", "tray-icon"] }
+tauri                          = { workspace = true, features = ["macos-private-api"] }
 tauri-plugin-clipboard-manager = { workspace = true }
 tauri-plugin-global-shortcut   = { workspace = true }
 
@@ -19,4 +19,4 @@ tauri-plugin-global-shortcut   = { workspace = true }
 tauri-build = { workspace = true, features = ["codegen"] }
 
 [package.metadata.docs.rs]
-rustdoc-args = ["--document-private-items", "--extend-css", "../rustdoc.css"]
+rustdoc-args = ["--extend-css", "../rustdoc.css"]

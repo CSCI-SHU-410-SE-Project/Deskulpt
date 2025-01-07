@@ -3,6 +3,8 @@
 #[doc(hidden)]
 mod bundle_widget;
 #[doc(hidden)]
+mod call_plugin;
+#[doc(hidden)]
 mod exit_app;
 #[doc(hidden)]
 mod load_settings;
@@ -16,6 +18,7 @@ mod update_toggle_shortcut;
 mod error;
 
 pub use bundle_widget::*;
+pub use call_plugin::*;
 pub use exit_app::*;
 pub use load_settings::*;
 pub use open_in_widgets_dir::*;

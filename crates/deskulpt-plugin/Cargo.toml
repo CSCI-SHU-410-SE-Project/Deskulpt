@@ -1,0 +1,17 @@
+[package]
+name        = "deskulpt-plugin"
+description = "APIs for building Deskulpt plugins."
+version     = { workspace = true }
+authors     = { workspace = true }
+edition     = { workspace = true }
+homepage    = { workspace = true }
+license     = { workspace = true }
+repository  = { workspace = true }
+
+[dependencies]
+anyhow     = { workspace = true }
+serde      = { workspace = true }
+serde_json = { workspace = true }
+
+[package.metadata.docs.rs]
+rustdoc-args = ["--extend-css", "../rustdoc.css"]

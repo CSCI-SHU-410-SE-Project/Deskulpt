@@ -1,14 +1,8 @@
 {
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "manager-capabilities",
-  "description": "Capabilities of the manager in addition to the common capabilities",
+  "description": "Capabilities of the manager window.",
   "local": true,
   "windows": ["manager"],
-  "permissions": [
-    "allow-exit-app",
-    "allow-load-settings",
-    "allow-open-in-widgets-dir",
-    "allow-rescan-widgets",
-    "allow-update-toggle-shortcut"
-  ]
+  "permissions": ["core:event:default", "clipboard-manager:allow-write-text"]
 }

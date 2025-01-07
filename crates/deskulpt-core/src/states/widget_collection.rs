@@ -1,6 +1,6 @@
 //! State management for the widget collection.
 
-use std::sync::Mutex;
+use std::sync::RwLock;
 
 use tauri::{App, AppHandle, Manager, Runtime};
 
@@ -8,7 +8,7 @@ use crate::config::WidgetCollection;
 
 /// Managed state for the widget collection.
 #[derive(Default)]
-struct WidgetCollectionState(Mutex<WidgetCollection>);
+struct WidgetCollectionState(RwLock<WidgetCollection>);
 
 /// Extension trait for operations on widget collection state.
 pub trait StatesExtWidgetCollection {
@@ -45,7 +45,7 @@ macro_rules! shared_impl {
                 F: FnOnce(&WidgetCollection) -> T,
             {
                 let state = self.state::<WidgetCollectionState>();
-                let widget_collection = state.0.lock().unwrap();
+                let widget_collection = state.0.read().unwrap();
                 f(&widget_collection)
             }
 
@@ -54,7 +54,7 @@ macro_rules! shared_impl {
                 F: FnOnce(&mut WidgetCollection) -> T,
             {
                 let state = self.state::<WidgetCollectionState>();
-                let mut widget_collection = state.0.lock().unwrap();
+                let mut widget_collection = state.0.write().unwrap();
                 f(&mut widget_collection)
             }
         }

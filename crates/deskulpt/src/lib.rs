@@ -7,12 +7,11 @@
 use deskulpt_core::{
     PathExt, StatesExtCanvasClickThrough, StatesExtWidgetCollection, TrayExt, WindowExt,
 };
-use tauri::{generate_handler, tauri_build_context, Builder};
+use tauri::{generate_context, generate_handler, Builder};
 
 /// Entry point for the Deskulpt application.
 pub fn run() {
     Builder::default()
-        // Additional application setup
         .setup(|app| {
             app.init_widgets_dir()?;
             app.init_persist_dir()?;
@@ -28,8 +27,8 @@ pub fn run() {
             Ok(())
         })
         .on_window_event(deskulpt_core::on_window_event)
-        // Register internal command handlers
         .invoke_handler(generate_handler![
+            deskulpt_core::commands::call_plugin,
             deskulpt_core::commands::bundle_widget,
             deskulpt_core::commands::exit_app,
             deskulpt_core::commands::load_settings,
@@ -37,11 +36,8 @@ pub fn run() {
             deskulpt_core::commands::rescan_widgets,
             deskulpt_core::commands::update_toggle_shortcut,
         ])
-        // Register plugins
         .plugin(tauri_plugin_clipboard_manager::init())
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())
-        // .plugin(deskulpt_core::apis::fs::init())
-        // .plugin(deskulpt_core::apis::sys::init())
-        .run(tauri_build_context!())
+        .run(generate_context!())
         .expect("Error running the Deskulpt application");
 }
