@@ -31,7 +31,7 @@ pub trait Plugin {
 /// method. Each registered command must implement the [`PluginCommand`] trait.
 ///
 /// ```no_run
-/// # use deskulpt_plugin::{register_commands, version_from_cargo, Plugin};
+/// # use deskulpt_plugin::{register_commands, Plugin};
 /// struct MyPlugin;
 ///
 /// impl Plugin for MyPlugin {
@@ -56,7 +56,7 @@ pub fn call_plugin<P: Plugin>(
 ) -> Result<serde_json::Value> {
     for plugin_command in plugin.commands() {
         if plugin_command.name() == command {
-            return Ok(plugin_command.dispatch(args.unwrap_or(serde_json::Value::Null))?);
+            return plugin_command.dispatch(args.unwrap_or(serde_json::Value::Null));
         }
     }
     bail!("Unknown command: {}", command)
