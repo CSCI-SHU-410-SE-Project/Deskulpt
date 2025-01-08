@@ -20,7 +20,7 @@ pub async fn call_plugin(
     plugin: String,
     command: String,
     widget_id: String,
-    args: Option<serde_json::Value>,
+    payload: Option<serde_json::Value>,
 ) -> CmdResult<serde_json::Value> {
     match plugin.as_str() {
         "fs" => {
@@ -30,7 +30,7 @@ pub async fn call_plugin(
                 plugin,
                 command.as_str(),
                 widget_id,
-                args,
+                payload,
             )?;
             Ok(result)
         },

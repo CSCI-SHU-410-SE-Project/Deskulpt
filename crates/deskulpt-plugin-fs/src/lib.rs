@@ -8,8 +8,14 @@ mod commands;
 
 use deskulpt_plugin::{register_commands, Plugin};
 
+/// The file system plugin.
 pub struct FsPlugin;
 
 impl Plugin for FsPlugin {
-    register_commands![commands::Exists, commands::IsFile];
+    register_commands![
+        commands::Exists,
+        commands::IsFile,
+        commands::ReadFile,
+        commands::WriteFile
+    ];
 }

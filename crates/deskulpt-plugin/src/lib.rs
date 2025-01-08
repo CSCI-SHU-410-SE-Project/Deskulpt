@@ -8,11 +8,10 @@ mod command;
 mod interface;
 
 use anyhow::{bail, Result};
-#[doc(hidden)]
-pub use command::BasePluginCommand;
 pub use command::PluginCommand;
 pub use interface::EngineInterface;
 use tauri::AppHandle;
+pub use {anyhow, serde_json};
 
 /// The API for a Deskulpt plugin.
 pub trait Plugin {
@@ -25,29 +24,10 @@ pub trait Plugin {
     }
 
     /// The commands provided by the plugin.
-    fn commands(&self) -> Vec<Box<dyn BasePluginCommand>>;
-}
-
-/// Convenience macro to register commands in a Deskulpt plugin.
-///
-/// This macro provides an automatic implementation of the [`Plugin::commands`]
-/// method. Each registered command must implement the [`PluginCommand`] trait.
-///
-/// ```no_run
-/// # use deskulpt_plugin::{register_commands, Plugin};
-/// struct MyPlugin;
-///
-/// impl Plugin for MyPlugin {
-///     register_commands![/* List of commands to register */];
-/// }
-/// ```
-#[macro_export]
-macro_rules! register_commands {
-    ($($command:path),* $(,)?) => {
-        fn commands(&self) -> Vec<Box<dyn $crate::BasePluginCommand>> {
-            vec![$(Box::new($command),)*]
-        }
-    };
+    ///
+    /// One may use the [`register_commands!`] macro for a convenient way to
+    /// implement this method.
+    fn commands(&self) -> Vec<Box<dyn PluginCommand<Plugin = Self>>>;
 }
 
 /// Call a Deskulpt plugin (🚧 TODO 🚧).
@@ -64,18 +44,117 @@ pub fn call_plugin<P: Plugin>(
     plugin: P,
     command: &str,
     widget_id: String,
-    args: Option<serde_json::Value>,
+    payload: Option<serde_json::Value>,
 ) -> Result<serde_json::Value> {
     let engine = EngineInterface::new(app_handle);
 
     for plugin_command in plugin.commands() {
         if plugin_command.name() == command {
-            return plugin_command.dispatch(
+            return plugin_command.run(
                 widget_id,
+                &plugin,
                 &engine,
-                args.unwrap_or(serde_json::Value::Null),
+                payload.unwrap_or(serde_json::Value::Null),
             );
         }
     }
     bail!("Unknown command: {}", command)
 }
+
+/// Register commands in a Deskulpt plugin.
+///
+/// This macro provides an automatic implementation of the [`Plugin::commands`]
+/// method. Each registered command must implement the [`PluginCommand`] trait.
+///
+/// ### Example
+///
+/// ```no_run
+/// use deskulpt_plugin::{register_commands, Plugin};
+///
+/// struct MyPlugin;
+///
+/// impl Plugin for MyPlugin {
+///     register_commands![/* List of commands to register */];
+/// }
+/// ```
+#[macro_export]
+macro_rules! register_commands {
+    ($($command:path),* $(,)?) => {
+        fn commands(&self) -> Vec<Box<dyn $crate::PluginCommand<Plugin = Self>>> {
+            vec![$(Box::new($command),)*]
+        }
+    };
+}
+
+/// Dispatch a Deskulpt plugin command.
+///
+/// The [`PluginCommand::run`] method requires the [`serde_json::Value`] type
+/// for command input and output so as to interoperate with calls from the
+/// widgets in the frontend. This would require manual deserialization and
+/// serialization when implementing any command.
+///
+/// When marked with `#[dispatch]`, the signature of the method remains the
+/// same, except that `input` is allowed to be any type that implements
+/// [`serde::Deserialize`], and the return type is allowed to be `Result<T, E>`
+/// for any type `T` that implements [`serde::Serialize`] and any type `E` that
+/// can be converted to [`anyhow::Error`] with the `?` operator. That said, the
+/// most convenient way would be to use [`anyhow::Result<T>`](anyhow::Result)
+/// for the return type directly.
+///
+/// ### Example
+///
+/// ```no_run
+/// use anyhow::Result;
+/// use deskulpt_plugin::{dispatch, EngineInterface, PluginCommand};
+/// # use deskulpt_plugin::{register_commands, Plugin};
+/// use serde::{Deserialize, Serialize};
+///
+/// // Implement the plugin...
+/// # struct MyPlugin;
+/// #
+/// # impl Plugin for MyPlugin {
+/// #     register_commands![MetadataCommand];
+/// # }
+///
+/// struct MetadataCommand;
+///
+/// #[derive(Deserialize)]
+/// struct InputPayload {
+///     path: std::path::PathBuf,
+/// }
+///
+/// #[derive(Serialize)]
+/// struct OutputPayload {
+///     is_dir: bool,
+///     is_file: bool,
+///     is_symlink: bool,
+///     len: u64,
+/// }
+///
+/// impl PluginCommand for MetadataCommand {
+///     // Associate types and methods...
+///     # type Plugin = MyPlugin;
+///     #
+///     # fn name(&self) -> &str {
+///     #     "metadata"
+///     # }
+///
+///     #[dispatch]
+///     fn run(
+///         &self,
+///         _widget_id: String,
+///         _plugin: &Self::Plugin,
+///         _engine: &EngineInterface,
+///         input: InputPayload,     // Custom deserializable input type
+///     ) -> Result<OutputPayload> { // Custom serializable output type
+///         let metadata = std::fs::metadata(input.path)?;
+///         Ok(OutputPayload {
+///             is_dir: metadata.is_dir(),
+///             is_file: metadata.is_file(),
+///             is_symlink: metadata.file_type().is_symlink(),
+///             len: metadata.len(),
+///         })
+///     }
+/// }
+/// ```
+pub use deskulpt_plugin_macros::dispatch;

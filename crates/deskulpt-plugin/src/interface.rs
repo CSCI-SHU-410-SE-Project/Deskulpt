@@ -24,17 +24,17 @@ impl EngineInterface {
 
     /// Get the directory of a widget (🚧 TODO 🚧).
     ///
-    /// ### 🚧 TODO 🚧
+    /// # 🚧 TODO 🚧
     ///
     /// This method is a temporary implementation. The final implementation
     /// should use IPC to communicate with the Deskulpt core to get the widget
     /// directory.
-    pub fn widget_dir(&self, widget_id: &str) -> PathBuf {
+    pub fn widget_dir<S: AsRef<str>>(&self, widget_id: S) -> PathBuf {
         self.app_handle
             .path()
             .resource_dir()
             .unwrap()
             .join("widgets")
-            .join(widget_id)
+            .join(widget_id.as_ref())
     }
 }

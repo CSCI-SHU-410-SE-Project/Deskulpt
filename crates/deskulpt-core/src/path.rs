@@ -11,7 +11,7 @@ use tauri::{App, AppHandle, Manager, Runtime};
 /// Thread-safe lazily-initialized static for the widgets directory.
 static WIDGETS_DIR: OnceCell<Arc<PathBuf>> = OnceCell::new();
 
-/// Thread-safe lazily-initialized static for the persistent directory.
+/// Thread-safe lazily-initialized static for the persistence directory.
 static PERSIST_DIR: OnceCell<Arc<PathBuf>> = OnceCell::new();
 
 /// Extension trait for path-related operations.
@@ -19,7 +19,7 @@ pub trait PathExt<R: Runtime>: Manager<R> {
     /// Initialize the widgets directory.
     ///
     /// This will create the widgets directory if it does not exist. It must be
-    /// called before calling [`PathExt::widgets_dir`].
+    /// called before calling the [`widgets_dir`](PathExt::widgets_dir) method.
     fn init_widgets_dir(&self) -> Result<()> {
         let widgets_dir = WIDGETS_DIR.get_or_init(|| {
             let resource_dir = self.path().resource_dir().unwrap();
@@ -34,18 +34,20 @@ pub trait PathExt<R: Runtime>: Manager<R> {
 
     /// Get a reference to the widgets directory.
     ///
-    /// This will panic if [`PathExt::init_widgets_dir`] has not been called.
+    /// This will panic if the [`init_widgets_dir`](PathExt::init_widgets_dir)
+    /// method has not been called.
     fn widgets_dir(&self) -> &Path {
         WIDGETS_DIR
             .get()
-            .expect("create_widgets_dir must be called first")
+            .expect("`create_widgets_dir` must be called first")
             .as_ref()
     }
 
-    /// Initialize the persistent directory.
+    /// Initialize the persistence directory.
     ///
-    /// This will create the persistent directory if it does not exist. It must
-    /// be called before calling [`PathExt::persist_dir`].
+    /// This will create the persistence directory if it does not exist. It must
+    /// be called before calling the [`persist_dir`](PathExt::persist_dir)
+    /// method.
     fn init_persist_dir(&self) -> Result<()> {
         let persist_dir = PERSIST_DIR.get_or_init(|| {
             let persist_dir = self.path().app_data_dir().unwrap();
@@ -58,13 +60,14 @@ pub trait PathExt<R: Runtime>: Manager<R> {
         Ok(())
     }
 
-    /// Get a reference to the persistent directory.
+    /// Get a reference to the persistence directory.
     ///
-    /// This will panic if [`PathExt::init_persist_dir`] has not been called.
+    /// This will panic if the [`init_persist_dir`](PathExt::init_persist_dir)
+    /// method has not been called.
     fn persist_dir(&self) -> &Path {
         PERSIST_DIR
             .get()
-            .expect("init_persist_dir must be called first")
+            .expect("`init_persist_dir` must be called first")
             .as_ref()
     }
 }
