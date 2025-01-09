@@ -18,18 +18,10 @@ jobs:
 
       - uses: ./.github/actions/setup
 
-      - name: Build Rust docs
-        run: cargo doc --workspace --no-deps
-
       - name: Build docs
         run: |
           cd website
           pnpm build
-
-      - name: Copy Rust docs to build directory
-        run: |
-          rm -f target/doc/.lock
-          cp -r target/doc website/build/rustdoc
 
       - name: Upload build artifact
         uses: actions/upload-pages-artifact@v3
