@@ -41,7 +41,7 @@ pub trait Plugin {
 /// for reference.
 pub fn call_plugin<P: Plugin>(
     app_handle: AppHandle,
-    plugin: P,
+    plugin: &P,
     command: &str,
     widget_id: String,
     payload: Option<serde_json::Value>,
@@ -52,7 +52,7 @@ pub fn call_plugin<P: Plugin>(
         if plugin_command.name() == command {
             return plugin_command.run(
                 widget_id,
-                &plugin,
+                plugin,
                 &engine,
                 payload.unwrap_or(serde_json::Value::Null),
             );

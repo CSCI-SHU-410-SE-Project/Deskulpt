@@ -44,9 +44,12 @@ pub fn proc_dispatch(_attr: TokenStream, item: TokenStream) -> TokenStream {
 
     let original_body = meth.block.clone();
     meth.block = Box::new(parse_quote!({
-        let input: #input_type = ::deskulpt_plugin::serde_json::from_value(input)?;
+        let context = format!("Failed to deserialize input: {:?}", input);
+        let input: #input_type = ::deskulpt_plugin::anyhow::Context::context(::deskulpt_plugin::serde_json::from_value(input), context)?;
         let result: #output_type = #original_body;
-        let output = ::deskulpt_plugin::serde_json::to_value(result?)?;
+        let result = result?;
+        let context = format!("Failed to serialize output: {:?}", result);
+        let output = ::deskulpt_plugin::anyhow::Context::context(::deskulpt_plugin::serde_json::to_value(result), context)?;
         Ok(output)
     }));
 

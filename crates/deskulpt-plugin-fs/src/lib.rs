@@ -8,14 +8,24 @@ mod commands;
 
 use deskulpt_plugin::{register_commands, Plugin};
 
-/// The file system plugin.
+/// The file system plugin (🚧 TODO 🚧).
+///
+/// ### 🚧 TODO 🚧
+///
+/// Redesign the exposed APIs, possibly referring to the APIs of the
+/// [Tauri file system plugin](https://v2.tauri.app/plugin/file-system).
 pub struct FsPlugin;
 
 impl Plugin for FsPlugin {
     register_commands![
+        commands::AppendFile,
+        commands::CreateDir,
         commands::Exists,
+        commands::IsDir,
         commands::IsFile,
         commands::ReadFile,
-        commands::WriteFile
+        commands::RemoveDir,
+        commands::RemoveFile,
+        commands::WriteFile,
     ];
 }
