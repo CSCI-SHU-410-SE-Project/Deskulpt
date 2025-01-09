@@ -63,7 +63,7 @@ macro_rules! shared_impl {
 
                     // Hide the application from the dock on macOS because skipping taskbar
                     // is not applicable for macOS; note this is app-wide setting
-                    self.set_activation_policy(tauri::ActivationPolicy::Accessory);
+                    self.set_activation_policy(tauri::ActivationPolicy::Accessory)?;
                 }
 
                 // TODO: Remove when the following issue is fixed:
