@@ -30,7 +30,7 @@ deskulpt-plugin-sys = { workspace = true }
 sysinfo             = { workspace = true }
 
 [target."cfg(target_os = \"macos\")".dependencies]
-objc = { workspace = true }
+objc2 = { workspace = true }
 
 [package.metadata.docs.rs]
 rustdoc-args = ["--document-private-items", "--extend-css", "../rustdoc.css"]

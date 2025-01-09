@@ -50,15 +50,15 @@ macro_rules! shared_impl {
 
                 #[cfg(target_os = "macos")]
                 {
-                    use objc::{msg_send, sel, sel_impl};
-                    use objc::runtime::{Object, NO};
+                    use objc2::msg_send;
+                    use objc2::runtime::{AnyObject, Bool};
 
                     // Disable the window shadow on macOS; there will be shadows left on
                     // movement for transparent and undecorated windows that we are using;
                     // it seems that disabling shadows does not have significant visual impacts
                     unsafe {
-                        let ns_window = canvas.ns_window()? as *mut Object;
-                        let () = msg_send![ns_window, setHasShadow:NO];
+                        let ns_window = canvas.ns_window()? as *mut AnyObject;
+                        let () = msg_send![ns_window, setHasShadow:Bool::NO];
                     }
                 }
 

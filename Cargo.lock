@@ -832,7 +832,7 @@ dependencies = [
  "deskulpt-plugin",
  "deskulpt-plugin-fs",
  "deskulpt-plugin-sys",
- "objc",
+ "objc2",
  "once_cell",
  "open",
  "path-clean",
