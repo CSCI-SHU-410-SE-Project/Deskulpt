@@ -30,6 +30,7 @@ jobs:
       - uses: ./.github/actions/setup
         with:
           lint: true
+          format: ${{ matrix.platform == 'ubuntu-latest' }}
           platform: ${{ matrix.platform }}
 
       - name: Check code formatting

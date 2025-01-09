@@ -16,6 +16,11 @@ inputs:
     type: boolean
     required: true
     default: false
+  format:
+    description: Whether to do additional setup for formatting.
+    type: boolean
+    required: true
+    default: false
 
 runs:
   using: composite
@@ -33,7 +38,7 @@ runs:
         components: ${{ inputs.lint == 'true' && 'clippy' || '' }}
 
     - name: Install nightly rustfmt
-      if: inputs.lint == 'true'
+      if: inputs.format == 'true'
       shell: bash
       run: rustup toolchain install nightly --component rustfmt --profile minimal --no-self-update
 
