@@ -33,7 +33,7 @@ jobs:
           platform: ${{ matrix.platform }}
 
       - name: Check code formatting
-        if: ${{ matrix.platform }} == 'ubuntu-latest'
+        if: matrix.platform == 'ubuntu-latest'
         run: pnpm format:check
 
       - name: Check code linting

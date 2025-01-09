@@ -23,6 +23,11 @@ pub fn run() {
             app.manage_widget_collection();
             app.manage_canvas_click_through();
 
+            #[cfg(target_os = "macos")]
+            // Hide the application from the dock on macOS because skipping
+            // taskbar is not applicable for macOS
+            app.set_activation_policy(tauri::ActivationPolicy::Accessory);
+
             app.create_manager()?;
             app.create_canvas()?;
 

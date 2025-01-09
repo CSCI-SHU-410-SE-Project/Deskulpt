@@ -60,10 +60,6 @@ macro_rules! shared_impl {
                         let ns_window = canvas.ns_window()? as *mut Object;
                         let () = msg_send![ns_window, setHasShadow:NO];
                     }
-
-                    // Hide the application from the dock on macOS because skipping taskbar
-                    // is not applicable for macOS; note this is app-wide setting
-                    self.set_activation_policy(tauri::ActivationPolicy::Accessory)?;
                 }
 
                 // TODO: Remove when the following issue is fixed:
