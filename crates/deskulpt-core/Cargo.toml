@@ -11,8 +11,6 @@ repository  = { workspace = true }
 [dependencies]
 anyhow                       = { workspace = true }
 bincode                      = { workspace = true }
-deskulpt-plugin              = { workspace = true } # TODO: Remove when final (maybe)
-deskulpt-plugin-fs           = { workspace = true } # TODO: Remove when final
 once_cell                    = { workspace = true }
 open                         = { workspace = true }
 path-clean                   = { workspace = true }
@@ -24,6 +22,12 @@ tauri-plugin-global-shortcut = { workspace = true }
 tempfile                     = { workspace = true }
 thiserror                    = { workspace = true }
 tokio                        = { workspace = true }
+
+# TODO: Remove these when finalized
+deskulpt-plugin     = { workspace = true } # maybe remove
+deskulpt-plugin-fs  = { workspace = true }
+deskulpt-plugin-sys = { workspace = true }
+sysinfo             = { workspace = true }
 
 [target."cfg(target_os = \"macos\")".dependencies]
 objc = { workspace = true }

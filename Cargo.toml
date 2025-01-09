@@ -29,12 +29,14 @@ thiserror                      = "2.0.9"
 tokio                          = "1.42.0"
 
 # Deskulpt crates
-deskulpt-core      = { version = "0.0.1", path = "crates/deskulpt-core" }
-deskulpt-plugin    = { version = "0.0.1", path = "crates/deskulpt-plugin" }
+deskulpt-core          = { version = "0.0.1", path = "crates/deskulpt-core" }
+deskulpt-plugin        = { version = "0.0.1", path = "crates/deskulpt-plugin" }
 deskulpt-plugin-macros = { version = "0.0.1", path = "crates/deskulpt-plugin-macros" }
 
 # TODO: Remove these since they will not be dependencies of other crates when finalized
-deskulpt-plugin-fs = { version = "0.0.1", path = "crates/deskulpt-plugin-fs" }
+deskulpt-plugin-fs  = { version = "0.0.1", path = "crates/deskulpt-plugin-fs" }
+deskulpt-plugin-sys = { version = "0.0.1", path = "crates/deskulpt-plugin-sys" }
+sysinfo             = "0.33.1"
 
 [profile.dev]
 incremental = true

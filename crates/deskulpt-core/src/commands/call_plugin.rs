@@ -1,21 +1,16 @@
-use std::sync::RwLock;
-
 use once_cell::sync::Lazy;
 use tauri::{command, AppHandle};
+use tokio::sync::Mutex;
 
 use super::error::{cmdbail, CmdResult};
 
-/// A single file system plugin instance (🚧 TODO 🚧).
-///
-/// ### 🚧 TODO 🚧
-///
-/// This is a temporary implementation and should be removed in the final
-/// implementation. The Deskulpt core will not keep an instance of the plugin,
-/// but start the plugin as a separate process and communicate with it
-/// throughout its lifecycle. This, same as this temporary implementation, will
-/// only instantiate the plugin once and reuse it for all plugin calls.
-static FS_PLUGIN: Lazy<RwLock<deskulpt_plugin_fs::FsPlugin>> =
-    Lazy::new(|| RwLock::new(deskulpt_plugin_fs::FsPlugin));
+// TODO: Remove this temporary implementation
+static FS_PLUGIN: Lazy<Mutex<deskulpt_plugin_fs::FsPlugin>> =
+    Lazy::new(|| Mutex::new(deskulpt_plugin_fs::FsPlugin));
+
+// TODO: Remove this temporary implementation
+static SYS_PLUGIN: Lazy<Mutex<deskulpt_plugin_sys::SysPlugin>> =
+    Lazy::new(|| Mutex::new(Default::default()));
 
 /// Call a plugin command (🚧 TODO 🚧).
 ///
@@ -39,7 +34,18 @@ pub async fn call_plugin(
 ) -> CmdResult<serde_json::Value> {
     match plugin.as_str() {
         "fs" => {
-            let plugin = FS_PLUGIN.read().unwrap();
+            let plugin = FS_PLUGIN.lock().await;
+            let result = deskulpt_plugin::call_plugin(
+                app_handle,
+                &*plugin,
+                command.as_str(),
+                widget_id,
+                payload,
+            )?;
+            Ok(result)
+        },
+        "sys" => {
+            let plugin = SYS_PLUGIN.lock().await;
             let result = deskulpt_plugin::call_plugin(
                 app_handle,
                 &*plugin,
