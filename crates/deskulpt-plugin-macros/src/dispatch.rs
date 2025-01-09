@@ -48,8 +48,7 @@ pub fn proc_dispatch(_attr: TokenStream, item: TokenStream) -> TokenStream {
         let input: #input_type = ::deskulpt_plugin::anyhow::Context::context(::deskulpt_plugin::serde_json::from_value(input), context)?;
         let result: #output_type = #original_body;
         let result = result?;
-        let context = format!("Failed to serialize output: {:?}", result);
-        let output = ::deskulpt_plugin::anyhow::Context::context(::deskulpt_plugin::serde_json::to_value(result), context)?;
+        let output = ::deskulpt_plugin::anyhow::Context::context(::deskulpt_plugin::serde_json::to_value(result), "Failed to serialize output")?;
         Ok(output)
     }));
 

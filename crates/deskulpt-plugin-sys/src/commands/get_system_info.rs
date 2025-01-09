@@ -7,7 +7,7 @@ use crate::SysPlugin;
 
 pub struct GetSystemInfo;
 
-#[derive(Serialize, Debug)]
+#[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct CpuInfo {
     vendor_id: String,
@@ -16,7 +16,7 @@ pub struct CpuInfo {
     total_cpu_usage: f32,
 }
 
-#[derive(Serialize, Debug)]
+#[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct DiskInfo {
     name: String,
@@ -25,7 +25,7 @@ pub struct DiskInfo {
     mount_point: String,
 }
 
-#[derive(Serialize, Debug)]
+#[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct NetworkInfo {
     interface_name: String,
@@ -33,7 +33,7 @@ pub struct NetworkInfo {
     total_transmitted: u64,
 }
 
-#[derive(Serialize, Debug)]
+#[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct GetSystemInfoOutputPayload {
     total_swap: u64,
