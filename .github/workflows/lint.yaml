@@ -17,7 +17,11 @@ concurrency:
 
 jobs:
   lint:
-    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [macos-latest, ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.platform }}
 
     steps:
       - name: Checkout repository
@@ -26,6 +30,7 @@ jobs:
       - uses: ./.github/actions/setup
         with:
           lint: true
+          platform: ${{ matrix.platform }}
 
       - name: Check code formatting
         run: pnpm format:check

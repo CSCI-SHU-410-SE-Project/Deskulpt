@@ -17,7 +17,7 @@ path-clean                   = { workspace = true }
 serde                        = { workspace = true, features = ["derive"] }
 serde_json                   = { workspace = true }
 swc_core                     = { workspace = true, features = ["__common", "bundler", "ecma_ast", "ecma_codegen", "ecma_loader", "ecma_parser", "ecma_transforms_react", "ecma_transforms_typescript", "ecma_visit"] }
-tauri                        = { workspace = true, features = ["macos-private-api", "tray-icon", "image-png"] }
+tauri                        = { workspace = true, features = ["tray-icon"] }
 tauri-plugin-global-shortcut = { workspace = true }
 tempfile                     = { workspace = true }
 thiserror                    = { workspace = true }

@@ -16,14 +16,14 @@ use crate::window::WindowExt;
 /// Extention trait for system tray-related operations.
 pub trait TrayExt {
     /// Create the system tray.
-    fn create_tray(&self) -> Result<()>;
+    fn create_tray(&self, icon: Image) -> Result<()>;
 }
 
 /// Shared implementation of [`TrayExt`].
 macro_rules! shared_impl {
     ($app: ty) => {
         impl<R: Runtime> TrayExt for $app {
-            fn create_tray(&self) -> Result<()> {
+            fn create_tray(&self, icon: Image) -> Result<()> {
                 // Store the menu item for toggling canvas click-through
                 let menu_item_toggle =
                     MenuItemBuilder::with_id("tray-toggle", "Float").build(self)?;
@@ -40,7 +40,7 @@ macro_rules! shared_impl {
 
                 // Build the system tray icon
                 TrayIconBuilder::with_id("tray")
-                    .icon(Image::from_path("icons/icon.png")?)
+                    .icon(icon)
                     .icon_as_template(true)
                     .show_menu_on_left_click(false)
                     .tooltip("Deskulpt")

@@ -50,7 +50,7 @@ pub trait PathExt<R: Runtime>: Manager<R> {
     /// method.
     fn init_persist_dir(&self) -> Result<()> {
         let persist_dir = PERSIST_DIR.get_or_init(|| {
-            let persist_dir = self.path().app_data_dir().unwrap();
+            let persist_dir = self.path().app_local_data_dir().unwrap();
             Arc::new(persist_dir)
         });
 

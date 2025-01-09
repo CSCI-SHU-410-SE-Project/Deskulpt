@@ -7,7 +7,11 @@
 use deskulpt_core::{
     PathExt, StatesExtCanvasClickThrough, StatesExtWidgetCollection, TrayExt, WindowExt,
 };
-use tauri::{generate_context, generate_handler, Builder};
+use tauri::image::Image;
+use tauri::{generate_context, generate_handler, include_image, Builder};
+
+/// Image object for the Deskulpt icon.
+const DESKULPT_ICON: Image = include_image!("./icons/icon.png");
 
 /// Entry point for the Deskulpt backend.
 pub fn run() {
@@ -22,7 +26,7 @@ pub fn run() {
             app.create_manager()?;
             app.create_canvas()?;
 
-            app.create_tray()?;
+            app.create_tray(DESKULPT_ICON)?;
 
             Ok(())
         })
