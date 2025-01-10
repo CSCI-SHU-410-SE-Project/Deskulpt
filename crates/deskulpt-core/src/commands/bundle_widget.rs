@@ -17,6 +17,7 @@ use crate::states::StatesExtWidgetCollection;
 pub async fn bundle_widget<R: Runtime>(
     app_handle: AppHandle<R>,
     widget_id: String,
+    base_url: String,
     apis_blob_url: String,
 ) -> CmdResult<String> {
     let widgets_dir = app_handle.widgets_dir();
@@ -31,6 +32,7 @@ pub async fn bundle_widget<R: Runtime>(
                 WidgetBundler::new(
                     widget_dir.to_path_buf(),
                     widget_dir.join(config.entry()),
+                    base_url,
                     apis_blob_url,
                     config.external_deps(),
                 )

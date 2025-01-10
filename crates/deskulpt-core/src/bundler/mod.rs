@@ -24,6 +24,8 @@ pub struct WidgetBundler {
     /// This file must be within the `root` directory and share the exact same
     /// path prefix.
     entry: PathBuf,
+    /// The base URL to resolve local path imports.
+    base_url: String,
     /// URL to the widget APIs blob.
     apis_blob_url: String,
     /// External dependencies.
@@ -38,12 +40,14 @@ impl WidgetBundler {
     pub fn new(
         root: PathBuf,
         entry: PathBuf,
+        base_url: String,
         apis_blob_url: String,
         external_deps: HashSet<String>,
     ) -> Self {
         Self {
             root,
             entry,
+            base_url,
             apis_blob_url,
             external_deps,
         }
@@ -117,11 +121,13 @@ impl WidgetBundler {
 
         let module = self.bundle_into_raw_module(&globals, cm.clone())?;
         let code = GLOBALS.set(&globals, || {
-            // Redirect widget APIs imports to the APIs blob URL
-            let rename_apis =
-                visit_mut_pass(transforms::ApisImportRenamer(self.apis_blob_url.clone()));
+            // Redirect `@deskulpt-test/*` imports
+            let import_renamer = visit_mut_pass(transforms::ImportRenamer {
+                base_url: self.base_url.clone(),
+                apis_blob_url: self.apis_blob_url.clone(),
+            });
             let program = Program::Module(module);
-            let module = program.apply(rename_apis).expect_module();
+            let module = program.apply(import_renamer).expect_module();
 
             // Emit the bundled module as string into a buffer
             let mut buf = vec![];

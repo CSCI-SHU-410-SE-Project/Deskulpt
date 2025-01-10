@@ -11,6 +11,9 @@ import { grabErrorInfo } from "../utils";
 const defaultContainerWidth = "300px";
 const defaultContainerHeight = "150px";
 
+// The base URL used for resolving local path imports
+const baseUrl = new URL(import.meta.url).origin;
+
 /**
  * Listen and react to the "render-widget" event.
  *
@@ -76,7 +79,7 @@ export default function useRenderWidgetListener(
     // Bundle the widget and get the output code
     let moduleCode: string;
     try {
-      moduleCode = await invokeBundleWidget({ widgetId, apisBlobUrl });
+      moduleCode = await invokeBundleWidget({ widgetId, baseUrl, apisBlobUrl });
     } catch (err) {
       setCanvasWidgetStates((prev) => ({
         ...prev,
@@ -166,14 +169,16 @@ export default function useRenderWidgetListener(
 /**
  * Get the code for the widget-specific APIs.
  *
- * This function fetches the template of widget APIs and replaces the placeholder with
- * the actual widget ID.
+ * This function fetches the template of widget APIs and replaces the placeholders with
+ * the actual widget ID and the resolved raw APIs URL.
  */
 async function getWidgetApisCode(widgetId: string) {
   // The template is in the public directory, bundled from `packages/apis`
   const response = await fetch("/.wrap-apis.js.txt");
   const template = await response.text();
-  return template.replace("__DESKULPT_WIDGET_ID__", widgetId);
+  return template
+    .replace("__DESKULPT_WIDGET_ID__", widgetId)
+    .replace("__RAW_APIS_URL__", new URL("/.scripts/raw-apis.js", baseUrl).href);
 }
 
 /**

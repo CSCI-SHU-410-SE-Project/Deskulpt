@@ -13,6 +13,7 @@ import { Settings, WidgetCollection } from "./types/backend";
  */
 export async function invokeBundleWidget(payload: {
   widgetId: string;
+  baseUrl: string;
   apisBlobUrl: string;
 }) {
   return invoke<string>("bundle_widget", payload);
