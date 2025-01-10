@@ -1,6 +1,6 @@
 {
   "name": "@deskulpt-test/ui",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Deskulpt widget UI.",
   "type": "module",
   "main": "./dist/index.js",
@@ -10,6 +10,7 @@
   ],
   "scripts": {
     "preinstall": "npx only-allow pnpm",
+    "prepublishOnly": "pnpm build",
     "build": "rollup -c --configPlugin typescript",
     "lint": "eslint --max-warnings=0 --fix .",
     "lint:check": "eslint --max-warnings=0 ."

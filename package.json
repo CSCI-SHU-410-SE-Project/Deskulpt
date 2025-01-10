@@ -1,7 +1,6 @@
 {
-  "name": "deskulpt-test",
+  "name": "monorepo",
   "private": true,
-  "version": "0.0.0",
   "type": "module",
   "scripts": {
     "preinstall": "npx only-allow pnpm",
@@ -11,19 +10,17 @@
     "format:check": "pnpm format:js:check && pnpm format:rs:check",
     "format:js": "prettier --write .",
     "format:js:check": "prettier --check .",
-    "format:rs": "cd src-tauri && cargo +nightly fmt",
-    "format:rs:check": "cd src-tauri && cargo +nightly fmt -- --check",
+    "format:rs": "cargo +nightly fmt",
+    "format:rs:check": "cargo +nightly fmt -- --check",
     "lint": "pnpm lint:js && pnpm lint:rs",
     "lint:check": "pnpm lint:js:check && pnpm lint:rs:check",
     "lint:js": "pnpm run -r lint",
     "lint:js:check": "pnpm run -r lint:check",
-    "lint:rs": "cd src-tauri && cargo clippy --fix --allow-dirty --allow-staged -- -D warnings",
-    "lint:rs:check": "cd src-tauri && cargo clippy -- -D warnings",
+    "lint:rs": "cargo clippy --fix --allow-dirty --allow-staged -- -D warnings",
+    "lint:rs:check": "cargo clippy -- -D warnings",
     "test": "pnpm test:js && pnpm test:rs",
     "test:js": "echo 'Not implemented yet'",
-    "test:rs": "cd src-tauri && cargo test",
-    "cov:js": "echo 'Not implemented yet'",
-    "cov:rs": "cd src-tauri && cargo llvm-cov --html",
+    "test:rs": "cargo test --workspace",
     "build:packages": "pnpm run --filter \"@deskulpt-test/*\" build"
   },
   "devDependencies": {

@@ -1,0 +1,36 @@
+[package]
+name        = "deskulpt-core"
+description = "Deskulpt backend core."
+version     = { workspace = true }
+authors     = { workspace = true }
+edition     = { workspace = true }
+homepage    = { workspace = true }
+license     = { workspace = true }
+repository  = { workspace = true }
+
+[dependencies]
+anyhow                       = { workspace = true }
+bincode                      = { workspace = true }
+once_cell                    = { workspace = true }
+open                         = { workspace = true }
+path-clean                   = { workspace = true }
+serde                        = { workspace = true, features = ["derive"] }
+serde_json                   = { workspace = true }
+swc_core                     = { workspace = true, features = ["__common", "bundler", "ecma_ast", "ecma_codegen", "ecma_loader", "ecma_parser", "ecma_transforms_react", "ecma_transforms_typescript", "ecma_visit"] }
+tauri                        = { workspace = true, features = ["tray-icon"] }
+tauri-plugin-global-shortcut = { workspace = true }
+tempfile                     = { workspace = true }
+thiserror                    = { workspace = true }
+tokio                        = { workspace = true }
+
+# TODO: Remove these when finalized
+deskulpt-plugin     = { workspace = true } # maybe remove
+deskulpt-plugin-fs  = { workspace = true }
+deskulpt-plugin-sys = { workspace = true }
+sysinfo             = { workspace = true }
+
+[target."cfg(target_os = \"macos\")".dependencies]
+objc2 = { workspace = true }
+
+[package.metadata.docs.rs]
+rustdoc-args = ["--document-private-items", "--extend-css", "../rustdoc.css"]

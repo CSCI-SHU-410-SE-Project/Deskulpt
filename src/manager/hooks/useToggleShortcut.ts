@@ -1,11 +1,11 @@
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { invokeRegisterToggleShortcut } from "../../commands";
+import { invokeUpdateToggleShortcut } from "../../commands";
 
 export interface UseToggleShortcutOutput {
   /** The current toggle shortcut. */
-  toggleShortcut: string | null;
+  toggleShortcut?: string;
   /** Setter for the toggle shortcut state. */
-  setToggleShortcut: Dispatch<SetStateAction<string | null>>;
+  setToggleShortcut: Dispatch<SetStateAction<string | undefined>>;
 }
 
 /**
@@ -18,25 +18,15 @@ export interface UseToggleShortcutOutput {
  * @param initialToggleShortcut The initial toggle shortcut to use.
  */
 export default function useToggleShortcut(
-  initialToggleShortcut: string | null,
+  initialToggleShortcut?: string,
 ): UseToggleShortcutOutput {
-  const [toggleShortcut, setToggleShortcut] = useState<string | null>(
-    initialToggleShortcut,
-  );
+  const [toggleShortcut, setToggleShortcut] = useState(initialToggleShortcut);
 
   useEffect(() => {
-    if (toggleShortcut === null) {
-      return;
-    }
-
-    invokeRegisterToggleShortcut(toggleShortcut, false).catch(console.error);
-    console.log("Registered shortcut", toggleShortcut);
+    invokeUpdateToggleShortcut({ newShortcut: toggleShortcut }).catch(console.error);
 
     return () => {
-      if (toggleShortcut !== null) {
-        console.log("Unregistering shortcut", toggleShortcut);
-        invokeRegisterToggleShortcut(toggleShortcut, true).catch(console.error);
-      }
+      invokeUpdateToggleShortcut({ oldShortcut: toggleShortcut }).catch(console.error);
     };
   }, [toggleShortcut]);
 

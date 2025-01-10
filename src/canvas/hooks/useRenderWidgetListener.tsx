@@ -1,7 +1,7 @@
 import { Dispatch, SetStateAction, useEffect } from "react";
 import { listenToRenderWidget } from "../../events";
 import { CanvasWidgetState, WidgetModule } from "../../types/frontend";
-import { IdMap, WidgetSetting } from "../../types/backend";
+import { WidgetSettings } from "../../types/backend";
 import { invokeBundleWidget } from "../../commands";
 import ErrorDisplay from "../components/ErrorDisplay";
 import { grabErrorInfo } from "../utils";
@@ -21,32 +21,32 @@ const baseUrl = new URL(import.meta.url).origin;
  * @param setCanvasWidgetStates Setter for the canvas widget states.
  */
 export default function useRenderWidgetListener(
-  canvasWidgetStates: IdMap<CanvasWidgetState>,
-  setCanvasWidgetStates: Dispatch<SetStateAction<IdMap<CanvasWidgetState>>>,
+  canvasWidgetStates: Record<string, CanvasWidgetState>,
+  setCanvasWidgetStates: Dispatch<SetStateAction<Record<string, CanvasWidgetState>>>,
 ) {
   useEffect(() => {
     const unlisten = listenToRenderWidget((event) => {
-      const { widgetId, bundle, setting } = event.payload;
+      const { widgetId, bundle, settings } = event.payload;
       const isTracked = widgetId in canvasWidgetStates;
 
       // We do not wish to bundle the widget
       if (!bundle) {
-        // Make sure that we do not update setting of a not-yet-rendered widget; note
+        // Make sure that we do not update settings of a not-yet-rendered widget; note
         // that is not an errorneous case because users can update settings in the
         // manager without having rendered them on the canvas; the case is, when the
-        // manager finally requests to bundle, it will carry the latest setting in the
+        // manager finally requests to bundle, it will carry the latest settings in the
         // payload so the canvas can still get the correct information
         if (isTracked) {
           setCanvasWidgetStates((prev) => ({
             ...prev,
-            [widgetId]: { ...prev[widgetId], setting },
+            [widgetId]: { ...prev[widgetId], settings },
           }));
         }
         return;
       }
 
       // We do wish to bundle the widget
-      bundleWidget(widgetId, setting, isTracked).catch(console.error);
+      bundleWidget(widgetId, settings, isTracked).catch(console.error);
     });
 
     return () => {
@@ -63,7 +63,7 @@ export default function useRenderWidgetListener(
    */
   async function bundleWidget(
     widgetId: string,
-    setting: WidgetSetting,
+    settings: WidgetSettings,
     isTracked: boolean,
   ) {
     // Get the widget APIs blob URL, reusing if applicable
@@ -79,7 +79,7 @@ export default function useRenderWidgetListener(
     // Bundle the widget and get the output code
     let moduleCode: string;
     try {
-      moduleCode = await invokeBundleWidget(widgetId, baseUrl, apisBlobUrl);
+      moduleCode = await invokeBundleWidget({ widgetId, baseUrl, apisBlobUrl });
     } catch (err) {
       setCanvasWidgetStates((prev) => ({
         ...prev,
@@ -92,8 +92,7 @@ export default function useRenderWidgetListener(
           ),
           width: defaultContainerWidth,
           height: defaultContainerHeight,
-          moduleBlobUrl: null,
-          setting,
+          settings,
           apisBlobUrl,
         },
       }));
@@ -123,7 +122,7 @@ export default function useRenderWidgetListener(
             width: defaultContainerWidth,
             height: defaultContainerHeight,
             moduleBlobUrl,
-            setting,
+            settings,
             apisBlobUrl,
           },
         }));
@@ -142,7 +141,7 @@ export default function useRenderWidgetListener(
           width: module.default.width,
           height: module.default.height,
           moduleBlobUrl,
-          setting,
+          settings,
           apisBlobUrl,
         },
       }));
@@ -159,7 +158,7 @@ export default function useRenderWidgetListener(
           width: defaultContainerWidth,
           height: defaultContainerHeight,
           moduleBlobUrl,
-          setting,
+          settings,
           apisBlobUrl,
         },
       }));

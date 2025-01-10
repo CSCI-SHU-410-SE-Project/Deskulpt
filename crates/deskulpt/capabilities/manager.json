@@ -1,0 +1,8 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "manager-capabilities",
+  "description": "Capabilities of the manager window.",
+  "local": true,
+  "windows": ["manager"],
+  "permissions": ["core:event:default", "clipboard-manager:allow-write-text"]
+}

@@ -4,7 +4,7 @@
  */
 
 import { ReactNode } from "react";
-import { Result, WidgetConfig, WidgetSetting } from "./backend";
+import { Result, WidgetConfig, WidgetSettings } from "./backend";
 
 /**
  * The user-defined widget interface.
@@ -27,8 +27,8 @@ export interface Widget {
 export interface ManagerWidgetState {
   /** Configuration or configuration error of the widget. */
   config: Result<WidgetConfig, string>;
-  /** Setting of the widget. */
-  setting: WidgetSetting;
+  /** Settings of the widget. */
+  settings: WidgetSettings;
 }
 
 /**
@@ -41,12 +41,12 @@ export interface CanvasWidgetState {
   width: Widget["width"];
   /** The height of the widget container, as exported from the widget module. */
   height: Widget["height"];
-  /** Setting of the widget. */
-  setting: WidgetSetting;
+  /** Settings of the widget. */
+  settings: WidgetSettings;
   /** The URL of the blob of widget APIs. */
   apisBlobUrl: string;
   /** The URL of the blob of the widget module. */
-  moduleBlobUrl: string | null;
+  moduleBlobUrl?: string;
 }
 
 /**
@@ -65,8 +65,8 @@ export interface RenderWidgetPayload {
   widgetId: string;
   /** Whether to call the backend to bundle the widget. */
   bundle: boolean;
-  /** The widget-specific setting. */
-  setting: WidgetSetting;
+  /** The widget-specific settings. */
+  settings: WidgetSettings;
 }
 
 /**
@@ -78,11 +78,11 @@ export interface RemoveWidgetsPayload {
 }
 
 /**
- * The payload of the "update-setting" event.
+ * The payload of the "update-settings" event.
  */
-export interface UpdateSettingPayload {
+export interface UpdateSettingsPayload {
   /** The widget ID. */
   widgetId: string;
-  /** The widget-specific settting to update. */
-  setting: WidgetSetting;
+  /** The widget-specific settings to update. */
+  settings: WidgetSettings;
 }

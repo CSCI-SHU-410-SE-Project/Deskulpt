@@ -10,6 +10,8 @@ export interface FloatButtonProps {
   tooltip: string;
   /** The click action of the float button. */
   onClick: () => void;
+  /** Whether the float button is disabled. */
+  disabled?: boolean;
 }
 
 /**
@@ -23,11 +25,17 @@ export default function FloatButton({
   icon,
   tooltip,
   onClick,
+  disabled,
 }: FloatButtonProps) {
   return (
     <Box position="absolute" right="0" bottom={`${(order - 1) * 40}px`}>
       <Tooltip content={tooltip} side="left">
-        <IconButton variant="surface" radius="full" onClick={onClick}>
+        <IconButton
+          variant="surface"
+          radius="full"
+          disabled={disabled}
+          onClick={onClick}
+        >
           {icon}
         </IconButton>
       </Tooltip>

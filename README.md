@@ -1,14 +1,19 @@
-<p align="center">
-  <a href="https://csci-shu-410-se-project.github.io/Deskulpt/">
-    <img alt="Deskulpt" src="./src/public/deskulpt-full.png" width="100%" />
-  </a>
-</p>
+<div align="center">
 
-|            |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
-| ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Project    | [![status](https://img.shields.io/badge/status-alpha-red.svg)](https://github.com/CSCI-SHU-410-SE-Project/Deskulpt) [![license](https://img.shields.io/github/license/CSCI-SHU-410-SE-Project/Deskulpt)](https://github.com/CSCI-SHU-410-SE-Project/Deskulpt/blob/main/LICENSE.md) [![hompage](https://img.shields.io/badge/homepage-Deskulpt-blue.svg)](https://csci-shu-410-se-project.github.io/Deskulpt/)                                                                                                                                                                                                                                                        |
-| Repository | [![build](https://img.shields.io/github/actions/workflow/status/CSCI-SHU-410-SE-Project/Deskulpt/build.yaml?label=build&logo=github)](https://github.com/CSCI-SHU-410-SE-Project/Deskulpt/actions/workflows/build.yaml) [![test-core](https://img.shields.io/github/actions/workflow/status/CSCI-SHU-410-SE-Project/Deskulpt/test-core.yaml?label=test%20core&logo=github)](https://github.com/CSCI-SHU-410-SE-Project/Deskulpt/actions/workflows/test-core.yaml)                                                                                                                                                                                                    |
-| Release    | [![release](https://img.shields.io/github/v/release/CSCI-SHU-410-SE-Project/Deskulpt)](https://github.com/CSCI-SHU-410-SE-Project/Deskulpt/releases/latest) [![windows](https://img.shields.io/badge/Windows-000000?style=flat&logo=windows&logoColor=white)](https://github.com/CSCI-SHU-410-SE-Project/Deskulpt/releases/latest) [![macos](https://img.shields.io/badge/MacOS-000000?style=flat&logo=macos&logoColor=white)](https://github.com/CSCI-SHU-410-SE-Project/Deskulpt/releases/latest) [![linux](https://img.shields.io/badge/Linux-000000?style=flat&logo=macos&logoColor=white)](https://github.com/CSCI-SHU-410-SE-Project/Deskulpt/releases/latest) |
+<a href="https://csci-shu-410-se-project.github.io/Deskulpt/">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://github.com/CSCI-SHU-410-SE-Project/Deskulpt/raw/main/src/public/deskulpt-wide-dark.svg" />
+    <img alt="Deskulpt" src="https://github.com/CSCI-SHU-410-SE-Project/Deskulpt/raw/main/src/public/deskulpt-wide.svg" width="300px" />
+  </picture>
+</a>
+
+**A cross-platform desktop customization tool.**
+
+<br />
+
+[![release](https://img.shields.io/github/v/release/CSCI-SHU-410-SE-Project/Deskulpt)](https://github.com/CSCI-SHU-410-SE-Project/Deskulpt/releases/latest) [![build](https://img.shields.io/github/actions/workflow/status/CSCI-SHU-410-SE-Project/Deskulpt/build.yaml?label=build&logo=github)](https://github.com/CSCI-SHU-410-SE-Project/Deskulpt/actions/workflows/build.yaml) [![hompage](https://img.shields.io/badge/homepage-Deskulpt-blue.svg)](https://csci-shu-410-se-project.github.io/Deskulpt/)
+
+</div>
 
 ## Introduction
 
@@ -38,7 +43,7 @@ Currently, Deskulpt supports the following platforms:
 - MacOS
 - Linux (X11, tested on Ubuntu)
 
-Website: https://csci-shu-410-se-project.github.io/Deskulpt/
+Website: [https://csci-shu-410-se-project.github.io/Deskulpt/](https://csci-shu-410-se-project.github.io/Deskulpt/)
 
 ## Download
 

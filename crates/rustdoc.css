@@ -1,0 +1,4 @@
+html[data-theme="dark"] .logo-container,
+html[data-theme="ayu"] .logo-container {
+  filter: invert(90%) hue-rotate(170deg);
+}

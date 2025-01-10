@@ -18,20 +18,10 @@ jobs:
 
       - uses: ./.github/actions/setup
 
-      - name: Build Rust docs
-        run: |
-          cd src-tauri
-          cargo doc --no-deps
-
       - name: Build docs
         run: |
           cd website
           pnpm build
-
-      - name: Copy Rust docs to build directory
-        run: |
-          rm -f src-tauri/target/doc/.lock
-          cp -r src-tauri/target/doc website/build/rustdoc
 
       - name: Upload build artifact
         uses: actions/upload-pages-artifact@v3

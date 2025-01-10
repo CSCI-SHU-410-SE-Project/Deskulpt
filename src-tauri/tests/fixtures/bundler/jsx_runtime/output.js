@@ -1,1 +1,0 @@
-import{jsx as _jsx,jsxs as _jsxs,Fragment as _Fragment}from"http://tauri.localhost/.scripts/jsx-runtime.js";function render(){return _jsxs(_Fragment,{children:[_jsx("div",{children:"Testing"}),_jsxs("div",{children:[_jsx("span",{children:"Hello,"}),_jsx("span",{children:"World!"})]})]});}export{render as default};

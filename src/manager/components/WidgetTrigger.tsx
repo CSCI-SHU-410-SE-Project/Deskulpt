@@ -44,11 +44,7 @@ export default function WidgetTrigger({ index, config }: WidgetTriggerProps) {
           }}
         />
         <Text>
-          {"Ok" in config ? (
-            config.Ok.deskulptConf.name
-          ) : (
-            <Badge color="red">Error</Badge>
-          )}
+          {"Ok" in config ? config.Ok.name : <Badge color="red">Error</Badge>}
         </Text>
       </Flex>
     </Tabs.Trigger>

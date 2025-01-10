@@ -1,0 +1,21 @@
+[package]
+name        = "deskulpt"
+description = "Deskulpt, a cross-platform desktop customization tool."
+version     = { workspace = true }
+authors     = { workspace = true }
+edition     = { workspace = true }
+homepage    = { workspace = true }
+license     = { workspace = true }
+repository  = { workspace = true }
+
+[dependencies]
+deskulpt-core                  = { workspace = true }
+tauri                          = { workspace = true, features = ["macos-private-api"] }
+tauri-plugin-clipboard-manager = { workspace = true }
+tauri-plugin-global-shortcut   = { workspace = true }
+
+[build-dependencies]
+tauri-build = { workspace = true, features = ["codegen"] }
+
+[package.metadata.docs.rs]
+rustdoc-args = ["--extend-css", "../rustdoc.css"]
