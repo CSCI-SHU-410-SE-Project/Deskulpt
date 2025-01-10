@@ -1,14 +1,14 @@
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { ManagerWidgetState } from "../../types/frontend";
-import { IdMap, WidgetSetting } from "../../types/backend";
-import { invokeRefreshWidgetCollection } from "../../commands";
+import { WidgetSettings } from "../../types/backend";
+import { invokeRescanWidgets } from "../../commands";
 import { emitRemoveWidgetsToCanvas, emitRenderWidgetToCanvas } from "../../events";
 
 export interface UseManagerWidgetStatesOutput {
   /** The manager widget states. */
-  managerWidgetStates: IdMap<ManagerWidgetState>;
+  managerWidgetStates: Record<string, ManagerWidgetState>;
   /** Setter for the manager widget states. */
-  setManagerWidgetStates: Dispatch<SetStateAction<IdMap<ManagerWidgetState>>>;
+  setManagerWidgetStates: Dispatch<SetStateAction<Record<string, ManagerWidgetState>>>;
   /** Function that scans the widget base directory and renders newly added widgets. */
   rescanAndRender: () => Promise<number>;
 }
@@ -24,10 +24,10 @@ export interface UseManagerWidgetStatesOutput {
  * @param initialWidgetSettings The initial collection of per-widget settings.
  */
 export default function useManagerWidgetStates(
-  initialWidgetSettings: IdMap<WidgetSetting>,
+  initialWidgetSettings: Record<string, WidgetSettings>,
 ): UseManagerWidgetStatesOutput {
   const [managerWidgetStates, setManagerWidgetStates] = useState<
-    IdMap<ManagerWidgetState>
+    Record<string, ManagerWidgetState>
   >({});
 
   /**
@@ -38,7 +38,7 @@ export default function useManagerWidgetStates(
    * as detected configurations, wrapped with either existing or initial settings.
    */
   async function getNewManagerWidgetStates() {
-    const detectedConfigs = await invokeRefreshWidgetCollection();
+    const detectedConfigs = await invokeRescanWidgets();
 
     // If a widget exists in the previous states but does not exist in the new detected
     // configurations, we consider it as removed from the collection
@@ -54,18 +54,18 @@ export default function useManagerWidgetStates(
     // only caring about the detected configurations
     return Object.fromEntries(
       Object.entries(detectedConfigs).map(([widgetId, config]) => {
-        let setting: WidgetSetting;
+        let settings: WidgetSettings;
         if (widgetId in managerWidgetStates) {
           // The widget state already exists, from which we can get its settings
-          setting = managerWidgetStates[widgetId].setting;
+          settings = managerWidgetStates[widgetId].settings;
         } else if (widgetId in initialWidgetSettings) {
           // There is an initial setting for the widget
-          setting = initialWidgetSettings[widgetId];
+          settings = initialWidgetSettings[widgetId];
         } else {
           // Fall back to the default setting
-          setting = { x: 0, y: 0, opacity: 100 };
+          settings = { x: 0, y: 0, opacity: 100 };
         }
-        return [widgetId, { config, setting }];
+        return [widgetId, { config, settings }];
       }),
     );
   }
@@ -84,8 +84,8 @@ export default function useManagerWidgetStates(
     );
     setManagerWidgetStates(newManagerWidgetStates); // Direct replacement
     await Promise.all(
-      addedStates.map(([widgetId, { setting }]) =>
-        emitRenderWidgetToCanvas({ widgetId, setting, bundle: true }),
+      addedStates.map(([widgetId, { settings }]) =>
+        emitRenderWidgetToCanvas({ widgetId, settings, bundle: true }),
       ),
     );
     return addedStates.length;

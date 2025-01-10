@@ -1,20 +1,5 @@
 import { invoke } from "@tauri-apps/api/core";
 
-interface SystemInfo {
-  totalSwap: number;
-  usedSwap: number;
-  systemName?: string;
-  kernelVersion?: string;
-  osVersion?: string;
-  hostName?: string;
-  cpuCount: number;
-  cpuInfo: CpuInfo[];
-  disks: DiskInfo[];
-  networks: NetworkInfo[];
-  totalMemory: number;
-  usedMemory: number;
-}
-
 interface CpuInfo {
   vendorId: string;
   brand: string;
@@ -35,8 +20,27 @@ interface NetworkInfo {
   totalTransmitted: number;
 }
 
-function getSystemInfo() {
-  return invoke<SystemInfo>("plugin:apis-sys|get_system_info");
+interface GetSystemInfoOutputPayload {
+  totalSwap: number;
+  usedSwap: number;
+  systemName?: string;
+  kernelVersion?: string;
+  osVersion?: string;
+  hostName?: string;
+  cpuCount: number;
+  cpuInfo: CpuInfo[];
+  disks: DiskInfo[];
+  networks: NetworkInfo[];
+  totalMemory: number;
+  usedMemory: number;
+}
+
+function getSystemInfo(widgetId: string) {
+  return invoke<GetSystemInfoOutputPayload>("call_plugin", {
+    plugin: "sys",
+    command: "get_system_info",
+    widgetId,
+  });
 }
 
 export { getSystemInfo };

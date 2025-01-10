@@ -1,0 +1,34 @@
+use std::path::PathBuf;
+
+use anyhow::Result;
+use deskulpt_plugin::{dispatch, EngineInterface, PluginCommand};
+use serde::Deserialize;
+
+use crate::FsPlugin;
+
+pub struct IsDir;
+
+#[derive(Deserialize)]
+pub struct IsDirInputPayload {
+    path: PathBuf,
+}
+
+impl PluginCommand for IsDir {
+    type Plugin = FsPlugin;
+
+    fn name(&self) -> &str {
+        "is_dir"
+    }
+
+    #[dispatch]
+    fn run(
+        &self,
+        widget_id: String,
+        _plugin: &Self::Plugin,
+        engine: &EngineInterface,
+        input: IsDirInputPayload,
+    ) -> Result<bool> {
+        let path = engine.widget_dir(widget_id.as_str()).join(input.path);
+        Ok(path.is_dir())
+    }
+}

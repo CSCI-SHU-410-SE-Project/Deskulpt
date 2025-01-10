@@ -1,1 +1,0 @@
-const dir="jsutils";const noext="jsutils/index";const ext="jsutils/index.js";const dir1="jsxutils";const noext1="jsxutils/index";const ext1="jsxutils/index.jsx";console.log(dir,dir1,noext,noext1,ext,ext1);

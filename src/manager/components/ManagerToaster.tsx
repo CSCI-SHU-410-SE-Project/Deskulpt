@@ -1,9 +1,9 @@
 import { Toaster } from "sonner";
-import { ThemeAppearance } from "../../types/backend";
+import { Appearance } from "../../types/backend";
 
 export interface ManagerToasterProps {
   /** The theme appearance. */
-  themeAppearance: ThemeAppearance;
+  appearance: Appearance;
 }
 
 /**
@@ -12,11 +12,11 @@ export interface ManagerToasterProps {
  * This is styled on top of [`Toaster`](https://sonner.emilkowal.ski/toaster), rendered
  * in the bottom center of the manager window.
  */
-export default function ManagerToaster({ themeAppearance }: ManagerToasterProps) {
+export default function ManagerToaster({ appearance }: ManagerToasterProps) {
   return (
     <Toaster
       position="bottom-center"
-      theme={themeAppearance}
+      theme={appearance}
       gap={6}
       toastOptions={{
         style: {

@@ -1,1 +1,0 @@
-import{jsx as _jsx,jsxs as _jsxs,Fragment as _Fragment}from"@deskulpt-test/emotion/jsx-runtime";function render(){return _jsxs(_Fragment,{children:[_jsx("div",{children:"Testing"}),_jsxs("div",{children:[_jsx("span",{children:"Hello,"}),_jsx("span",{children:"World!"})]})]});}export{render as default};

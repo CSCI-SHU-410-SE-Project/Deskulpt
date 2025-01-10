@@ -1,6 +1,6 @@
 {
   "name": "@deskulpt-test/apis",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "description": "Deskulpt widget APIs.",
   "type": "module",
   "types": "./dist/index.d.ts",
@@ -9,6 +9,7 @@
   ],
   "scripts": {
     "preinstall": "npx only-allow pnpm",
+    "prepublishOnly": "pnpm build",
     "build": "rollup -c --configPlugin typescript",
     "lint": "eslint --max-warnings=0 --fix .",
     "lint:check": "eslint --max-warnings=0 ."

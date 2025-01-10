@@ -6,49 +6,52 @@
  */
 
 import { invoke } from "@tauri-apps/api/core";
-import { Settings, WidgetConfigCollection } from "./types/backend";
+import { Settings, WidgetCollection } from "./types/backend";
 
 /**
- * Invoke the [`bundle_widget`](https://csci-shu-410-se-project.github.io/Deskulpt/rustdoc/deskulpt/commands/fn.bundle_widget.html) command.
+ * Invoke the `bundle_widget` command.
  */
-export async function invokeBundleWidget(widgetId: string, apisBlobUrl: string) {
-  return invoke<string>("bundle_widget", { widgetId, apisBlobUrl });
+export async function invokeBundleWidget(payload: {
+  widgetId: string;
+  apisBlobUrl: string;
+}) {
+  return invoke<string>("bundle_widget", payload);
 }
 
 /**
- * Invoke the [`exit_app`](https://csci-shu-410-se-project.github.io/Deskulpt/rustdoc/deskulpt/commands/fn.exit_app.html) command.
+ * Invoke the `exit_app` command.
  */
-export async function invokeExitApp(settings: Settings) {
-  return invoke<void>("exit_app", { settings });
+export async function invokeExitApp(payload: { settings: Settings }) {
+  return invoke<void>("exit_app", payload);
 }
 
 /**
- * Invoke the [`open_widget_resource`](https://csci-shu-410-se-project.github.io/Deskulpt/rustdoc/deskulpt/commands/fn.open_widget_resource.html) command.
+ * Invoke the `open_in_widgets_dir` command.
  */
-export async function invokeOpenWidgetResource(
-  widgetId: string | null,
-  path: string | null,
-) {
-  return invoke<void>("open_widget_resource", { widgetId, path });
+export async function invokeOpenInWidgetsDir(payload: { components: string[] }) {
+  return invoke<void>("open_in_widgets_dir", payload);
 }
 
 /**
- * Invoke the [`init_settings`](https://csci-shu-410-se-project.github.io/Deskulpt/rustdoc/deskulpt/commands/fn.init_settings.html) command.
+ * Invoke the `load_settings` command.
  */
-export async function invokeInitSettings() {
-  return invoke<Settings>("init_settings");
+export async function invokeLoadSettings() {
+  return invoke<Settings>("load_settings");
 }
 
 /**
- * Invoke the [`refresh_widget_collection`](https://csci-shu-410-se-project.github.io/Deskulpt/rustdoc/deskulpt/commands/fn.refresh_widget_collection.html) command.
+ * Invoke the `rescan_widgets` command.
  */
-export async function invokeRefreshWidgetCollection() {
-  return invoke<WidgetConfigCollection>("refresh_widget_collection");
+export async function invokeRescanWidgets() {
+  return invoke<WidgetCollection>("rescan_widgets");
 }
 
 /**
- * Invoke the [`register_toggle_shortcut`](https://csci-shu-410-se-project.github.io/Deskulpt/rustdoc/deskulpt/commands/fn.register_toggle_shortcut.html) command.
+ * Invoke the `update_toggle_shortcut` command.
  */
-export async function invokeRegisterToggleShortcut(shortcut: string, reverse: boolean) {
-  return invoke<void>("register_toggle_shortcut", { shortcut, reverse });
+export async function invokeUpdateToggleShortcut(payload: {
+  oldShortcut?: string;
+  newShortcut?: string;
+}) {
+  return invoke<void>("update_toggle_shortcut", payload);
 }

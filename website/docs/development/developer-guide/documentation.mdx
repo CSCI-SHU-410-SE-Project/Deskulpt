@@ -37,8 +37,9 @@ documentation, guide improvements, examples, tutorials, and more.
    ```
 
 4. The [backend developer API references](https://csci-shu-410-se-project.github.io/Deskulpt/rustdoc/deskulpt/)
-   are generated separately from the main documentation. It can be built by running:
+   are generated separately from the main documentation. It can be built by running the
+   following command from the root directory:
 
    ```bash
-   pnpm rustdoc
+   cargo doc --workspace --no-deps --open
    ```

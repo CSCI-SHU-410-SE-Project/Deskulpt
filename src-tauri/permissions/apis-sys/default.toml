@@ -1,5 +1,0 @@
-[default]
-description = "Allow full permissions for the plugin."
-permissions = [
-    "allow-get-system-info",
-]

@@ -1,43 +1,43 @@
 import { useState } from "react";
 import { CanvasWidgetState } from "../types/frontend";
-import { IdMap, WidgetSetting } from "../types/backend";
-import { emitUpdateSettingToManager } from "../events";
+import { WidgetSettings } from "../types/backend";
+import { emitUpdateSettingsToManager } from "../events";
 import WidgetContainer from "./components/WidgetContainer";
 import useRenderWidgetListener from "./hooks/useRenderWidgetListener";
 import useRemoveWidgetsListener from "./hooks/useRemoveWidgetsListener";
 import useShowToastListener from "./hooks/useShowToastListener";
 import { Toaster } from "sonner";
 import { Theme } from "@radix-ui/themes";
-import useThemeAppearanceListener from "./hooks/useThemeAppearanceListener";
+import useAppearanceListener from "./hooks/useAppearanceListener";
 
 /**
  * The main component of the canvas window.
  */
 export default function App() {
   const [canvasWidgetStates, setCanvasWidgetStates] = useState<
-    IdMap<CanvasWidgetState>
+    Record<string, CanvasWidgetState>
   >({});
-  const appearance = useThemeAppearanceListener();
+  const appearance = useAppearanceListener();
 
   useShowToastListener();
   useRenderWidgetListener(canvasWidgetStates, setCanvasWidgetStates);
   useRemoveWidgetsListener(canvasWidgetStates, setCanvasWidgetStates);
 
   /**
-   * Update the setting of a particular widget.
+   * Update the settings of a particular widget.
    *
-   * This function not only updates the setting in the canvas widget states, but also
-   * notifies the manager to update the widget-specific setting as well.
+   * This function not only updates the settings in the canvas widget states, but also
+   * notifies the manager to update the widget-specific settings as well.
    */
-  async function setSettingForWidget(widgetId: string, setting: WidgetSetting) {
+  async function setSettingsForWidget(widgetId: string, settings: WidgetSettings) {
     // This step must be done first, otherwise there will be a visible delay between
     // the transform change and the absolute position change, causing an undesirable
     // visual effect
     setCanvasWidgetStates((prev) => ({
       ...prev,
-      [widgetId]: { ...prev[widgetId], setting },
+      [widgetId]: { ...prev[widgetId], settings },
     }));
-    await emitUpdateSettingToManager({ widgetId, setting });
+    await emitUpdateSettingsToManager({ widgetId, settings });
   }
 
   return (
@@ -60,12 +60,12 @@ export default function App() {
         }}
       />
       {Object.entries(canvasWidgetStates).map(
-        ([widgetId, { display, width, height, setting }]) => (
+        ([widgetId, { display, width, height, settings }]) => (
           <WidgetContainer
             key={widgetId}
             id={widgetId}
-            setting={setting}
-            setSetting={(setting) => setSettingForWidget(widgetId, setting)}
+            settings={settings}
+            setSettings={(settings) => setSettingsForWidget(widgetId, settings)}
             width={width}
             height={height}
           >

@@ -1,13 +1,4 @@
-import {
-  Avatar,
-  Badge,
-  DataList,
-  Flex,
-  Heading,
-  Link,
-  Separator,
-  Text,
-} from "@radix-ui/themes";
+import { Avatar, DataList, Flex, Heading, Text } from "@radix-ui/themes";
 import ExternalCopyLink from "../components/ExternalCopyLink";
 import Logo from "/deskulpt.svg";
 
@@ -34,7 +25,7 @@ export default function AboutTab() {
           }}
         />
       </Flex>
-      <Flex direction="column" gap="3" css={{ flex: 3 }}>
+      <Flex direction="column" gap="3" css={{ flex: 2 }}>
         <Flex direction="column">
           <Heading size="6">Deskulpt</Heading>
           <Text>A cross-platform desktop customization tool</Text>
@@ -42,46 +33,11 @@ export default function AboutTab() {
         <DataList.Root size="2" css={{ gap: "var(--space-1)" }}>
           <DataList.Item>
             <DataList.Label>Version</DataList.Label>
-            <DataList.Value>
-              <Flex gap="3" align="center">
-                <Text>0.0.1</Text>
-                <Badge color="red">alpha</Badge>
-              </Flex>
-            </DataList.Value>
+            <DataList.Value>0.0.1</DataList.Value>
           </DataList.Item>
           <DataList.Item>
             <DataList.Label>Authors</DataList.Label>
-            <DataList.Value>
-              <Flex gap="2" align="center">
-                <Link
-                  href="https://github.com/Xinyu-Li-123"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Xinyu Li
-                </Link>
-                <Separator orientation="vertical" />
-                <Link
-                  href="https://github.com/Charlie-XIAO"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Yao Xiao
-                </Link>
-                <Separator orientation="vertical" />
-                <Link
-                  href="https://github.com/ROMEEZHOU"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Yuchen Zhou
-                </Link>
-                <Separator orientation="vertical" />
-                <Link href="https://github.com/rz2606" target="_blank" rel="noreferrer">
-                  Runkai Zhu
-                </Link>
-              </Flex>
-            </DataList.Value>
+            <DataList.Value>The Deskulpt Development Team</DataList.Value>
           </DataList.Item>
           <DataList.Item>
             <DataList.Label>Repository</DataList.Label>

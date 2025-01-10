@@ -1,1 +1,0 @@
-import{jsx as _jsx}from"@deskulpt-test/emotion/jsx-runtime";const render=()=>_jsx("div",{children:"Hello, world!"});const __default={render,width:"100px",height:"100px"};export{__default as default};

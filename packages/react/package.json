@@ -1,6 +1,6 @@
 {
   "name": "@deskulpt-test/react",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Deskulpt partial re-export of React.",
   "type": "module",
   "main": "./dist/index.js",
@@ -10,6 +10,7 @@
   ],
   "scripts": {
     "preinstall": "npx only-allow pnpm",
+    "prepublishOnly": "pnpm build",
     "build": "rollup -c --configPlugin typescript",
     "lint": "eslint --max-warnings=0 --fix .",
     "lint:check": "eslint --max-warnings=0 ."

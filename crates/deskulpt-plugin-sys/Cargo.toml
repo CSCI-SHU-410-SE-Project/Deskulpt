@@ -1,0 +1,18 @@
+[package]
+name        = "deskulpt-plugin-sys"
+description = "Deskulpt system information plugin."
+version     = { workspace = true }
+authors     = { workspace = true }
+edition     = { workspace = true }
+homepage    = { workspace = true }
+license     = { workspace = true }
+repository  = { workspace = true }
+
+[dependencies]
+anyhow          = { workspace = true }
+deskulpt-plugin = { workspace = true }
+serde           = { workspace = true, features = ["derive"] }
+sysinfo         = { workspace = true }
+
+[package.metadata.docs.rs]
+rustdoc-args = ["--document-private-items", "--extend-css", "../rustdoc.css"]

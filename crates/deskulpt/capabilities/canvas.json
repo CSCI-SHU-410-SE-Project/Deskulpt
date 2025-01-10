@@ -1,0 +1,8 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "canvas-capabilities",
+  "description": "Capabilities of the canvas window.",
+  "local": true,
+  "windows": ["canvas"],
+  "permissions": ["core:event:default"]
+}

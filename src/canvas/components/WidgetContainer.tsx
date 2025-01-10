@@ -3,7 +3,7 @@ import Draggable, { DraggableData, DraggableEvent } from "react-draggable";
 import { ErrorBoundary } from "react-error-boundary";
 import ErrorDisplay from "./ErrorDisplay";
 import { grabErrorInfo } from "../utils";
-import { WidgetSetting } from "../../types/backend";
+import { WidgetSettings } from "../../types/backend";
 import { LuGripVertical } from "react-icons/lu";
 import { Box } from "@radix-ui/themes";
 import { Widget } from "../../types/frontend";
@@ -11,10 +11,10 @@ import { Widget } from "../../types/frontend";
 export interface WidgetContainerProps {
   /** ID of the widget. */
   id: string;
-  /** The setting of the widget. */
-  setting: WidgetSetting;
-  /** Callback function to update the setting of the specific widget. */
-  setSetting: (setting: WidgetSetting) => void;
+  /** The settings of the widget. */
+  settings: WidgetSettings;
+  /** Callback function to update the settings of the specific widget. */
+  setSettings: (settings: WidgetSettings) => void;
   /** Width of the widget container. */
   width: Widget["width"];
   /** Height of the widget container. */
@@ -33,8 +33,8 @@ export interface WidgetContainerProps {
  */
 export default function WidgetContainer({
   id,
-  setting,
-  setSetting,
+  settings,
+  setSettings,
   width,
   height,
   children,
@@ -43,7 +43,7 @@ export default function WidgetContainer({
   let retried = false;
 
   function updateContainerPos(_: DraggableEvent, data: DraggableData) {
-    setSetting({ ...setting, x: setting.x + data.x, y: setting.y + data.y });
+    setSettings({ ...settings, x: settings.x + data.x, y: settings.y + data.y });
   }
 
   return (
@@ -60,8 +60,8 @@ export default function WidgetContainer({
         ref={containerRef}
         overflow="hidden"
         position="absolute"
-        left={`${setting.x}px`}
-        top={`${setting.y}px`}
+        left={`${settings.x}px`}
+        top={`${settings.y}px`}
         width={width}
         height={height}
         css={{
@@ -69,7 +69,7 @@ export default function WidgetContainer({
           backgroundColor: "var(--gray-surface)",
           borderRadius: "var(--radius-2)",
           boxShadow: "0 0 2px var(--gray-8)",
-          opacity: `${setting.opacity}%`,
+          opacity: `${settings.opacity}%`,
         }}
       >
         <LuGripVertical
