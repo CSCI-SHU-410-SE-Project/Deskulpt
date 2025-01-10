@@ -1,7 +1,6 @@
 {
-  "name": "deskulpt-frontend",
+  "name": "frontend",
   "private": true,
-  "version": "0.0.1",
   "type": "module",
   "scripts": {
     "preinstall": "npx only-allow pnpm",

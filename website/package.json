@@ -1,6 +1,5 @@
 {
-  "name": "deskulpt-website",
-  "version": "0.0.1",
+  "name": "website",
   "private": true,
   "scripts": {
     "preinstall": "npx only-allow pnpm",
