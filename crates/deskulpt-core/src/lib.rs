@@ -4,7 +4,6 @@
     html_favicon_url = "https://github.com/CSCI-SHU-410-SE-Project/Deskulpt/raw/main/src/public/deskulpt.svg"
 )]
 
-// pub mod apis;
 mod bundler;
 pub mod commands;
 mod config;

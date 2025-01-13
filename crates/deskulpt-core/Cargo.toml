@@ -11,12 +11,17 @@ repository  = { workspace = true }
 [dependencies]
 anyhow                       = { workspace = true }
 bincode                      = { workspace = true }
+dunce                        = { workspace = true }
 once_cell                    = { workspace = true }
 open                         = { workspace = true }
+oxc                          = { workspace = true }
 path-clean                   = { workspace = true }
+rolldown                     = { workspace = true }
+rolldown_common              = { workspace = true }
+rolldown_plugin_alias        = { workspace = true }
+rolldown_utils               = { workspace = true }
 serde                        = { workspace = true, features = ["derive"] }
 serde_json                   = { workspace = true }
-swc_core                     = { workspace = true, features = ["__common", "bundler", "ecma_ast", "ecma_codegen", "ecma_loader", "ecma_parser", "ecma_transforms_react", "ecma_transforms_typescript", "ecma_visit"] }
 tauri                        = { workspace = true, features = ["tray-icon"] }
 tauri-plugin-global-shortcut = { workspace = true }
 tempfile                     = { workspace = true }

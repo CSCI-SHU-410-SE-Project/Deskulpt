@@ -85,8 +85,8 @@ impl WidgetConfig {
     }
 
     /// Get the entry file of the widget.
-    pub fn entry(&self) -> &str {
-        &self.entry
+    pub fn entry(&self) -> String {
+        self.entry.to_string()
     }
 
     /// Get the set of external dependencies of the widget.
