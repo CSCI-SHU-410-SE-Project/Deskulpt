@@ -1,6 +1,5 @@
 //! Bundler for Deskulpt widgets.
 
-use std::collections::HashSet;
 use std::path::PathBuf;
 use std::sync::Arc;
 
@@ -21,25 +20,16 @@ pub struct WidgetBundlerBuilder {
     base_url: String,
     /// URL to the widget APIs blob.
     apis_blob_url: String,
-    /// External dependencies.
-    external_deps: HashSet<String>,
 }
 
 impl WidgetBundlerBuilder {
     /// Create a new widget bundler builder instance.
-    pub fn new(
-        root: PathBuf,
-        entry: String,
-        base_url: String,
-        apis_blob_url: String,
-        external_deps: HashSet<String>,
-    ) -> Self {
+    pub fn new(root: PathBuf, entry: String, base_url: String, apis_blob_url: String) -> Self {
         Self {
             root,
             entry,
             base_url,
             apis_blob_url,
-            external_deps,
         }
     }
 
@@ -56,6 +46,11 @@ impl WidgetBundlerBuilder {
             format: Some(OutputFormat::Esm),
             platform: Some(Platform::Browser),
             minify: Some(true),
+            jsx: Some(Jsx::Enable(JsxOptions {
+                runtime: JsxRuntime::Automatic,
+                import_source: Some("@deskulpt-test/emotion".to_string()),
+                ..Default::default()
+            })),
             external: Some(
                 vec![
                     jsx_runtime_url.clone(),
@@ -66,11 +61,6 @@ impl WidgetBundlerBuilder {
                 ]
                 .into(),
             ),
-            jsx: Some(Jsx::Enable(JsxOptions {
-                runtime: JsxRuntime::Automatic,
-                import_source: Some("@deskulpt-test/emotion".to_string()),
-                ..Default::default()
-            })),
             ..Default::default()
         };
 

@@ -34,7 +34,6 @@ pub async fn bundle_widget<R: Runtime>(
                     config.entry(),
                     base_url,
                     apis_blob_url,
-                    config.external_deps(),
                 );
                 builder.build()
             })
