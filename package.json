@@ -12,8 +12,8 @@
     "format:js:check": "prettier --check .",
     "format:rs": "cargo +nightly fmt",
     "format:rs:check": "cargo +nightly fmt -- --check",
-    "format:toml": "taplo fmt",
-    "format:toml:check": "taplo fmt --check",
+    "format:toml": "taplo format",
+    "format:toml:check": "taplo format --check --diff",
     "lint": "pnpm lint:js && pnpm lint:rs",
     "lint:check": "pnpm lint:js:check && pnpm lint:rs:check",
     "lint:js": "pnpm run -r lint",
@@ -35,6 +35,6 @@
   "lint-staged": {
     "*.{js,jsx,ts,tsx,json,md,mdx,html,css,scss,yml,yaml}": "prettier --write",
     "*.rs": "rustfmt +nightly --",
-    "*.toml": "taplo fmt"
+    "*.toml": "taplo format"
   }
 }
