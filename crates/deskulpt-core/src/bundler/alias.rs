@@ -37,7 +37,7 @@ impl Plugin for AliasPlugin {
 
         Ok(ctx
             .resolve(
-                &update_id,
+                update_id,
                 None,
                 Some(PluginContextResolveOptions {
                     import_kind: args.kind,
