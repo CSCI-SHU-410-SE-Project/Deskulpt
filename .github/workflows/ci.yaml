@@ -16,7 +16,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  format-and-lint:
+  ci-repo-check:
     strategy:
       fail-fast: false
       matrix:
@@ -40,7 +40,7 @@ jobs:
       - name: Check linting
         run: pnpm lint:check
 
-  test:
+  ci-test:
     strategy:
       fail-fast: false
       matrix:
@@ -58,7 +58,7 @@ jobs:
       - name: Run test suite
         run: pnpm test
 
-  build:
+  ci-build:
     strategy:
       fail-fast: false
       matrix:
