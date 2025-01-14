@@ -1,7 +1,4 @@
 //! Deskulpt alias plugin for rolldown.
-//!
-//! This is a simplified version of the rolldown built-in alias plugin since we
-//! only need a subset of its functionalities.
 
 use std::borrow::Cow;
 use std::collections::HashMap;
@@ -13,9 +10,16 @@ use rolldown::plugin::{
 };
 
 /// Deskulpt alias plugin.
+///
+/// This is a simplified version of the rolldown built-in alias plugin since we
+/// only need a subset of its functionalities.
+///
+/// Based on the given alias mapping, this plugin will replace the original
+/// imports with the aliased imports. Note that the aliased imports need to be
+/// either resolvable or externalized to avoid bundling errors.
 #[derive(Debug)]
 pub struct AliasPlugin(
-    /// Alias mapping from original imports to aliased imports.
+    /// The alias mapping from original imports to aliased imports.
     pub HashMap<String, String>,
 );
 

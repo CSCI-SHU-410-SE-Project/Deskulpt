@@ -6,7 +6,7 @@ use std::path::PathBuf;
 use std::sync::Arc;
 
 use alias::AliasPlugin;
-use anyhow::{anyhow, Result};
+use anyhow::{anyhow, bail, Result};
 use oxc::transformer::{JsxOptions, JsxRuntime};
 use rolldown::{Bundler, BundlerOptions, Jsx, OutputFormat, Platform};
 use rolldown_common::Output;
@@ -34,7 +34,7 @@ impl WidgetBundlerBuilder {
         }
     }
 
-    /// Build a Deskulpt widget bundler.
+    /// Build the Deskulpt widget bundler.
     pub fn build(self) -> WidgetBundler {
         let jsx_runtime_url = self.base_url.clone() + "/.scripts/jsx-runtime.js";
         let raw_apis_url = self.base_url.clone() + "/.scripts/raw-apis.js";
@@ -47,11 +47,14 @@ impl WidgetBundlerBuilder {
             format: Some(OutputFormat::Esm),
             platform: Some(Platform::Browser),
             minify: Some(true),
+            // Use automatic runtime for JSX transforms, which will refer to
+            // `@deskulpt-test/emotion/jsx-runtime`
             jsx: Some(Jsx::Enable(JsxOptions {
                 runtime: JsxRuntime::Automatic,
                 import_source: Some("@deskulpt-test/emotion".to_string()),
                 ..Default::default()
             })),
+            // Externalize default dependencies available at runtime
             external: Some(
                 vec![
                     jsx_runtime_url.clone(),
@@ -65,6 +68,7 @@ impl WidgetBundlerBuilder {
             ..Default::default()
         };
 
+        // Alias the default dependencies to URLs resolvable at runtime
         let alias_plugin = AliasPlugin(
             [
                 (
@@ -101,11 +105,18 @@ impl WidgetBundler {
                 .collect::<Vec<String>>()
                 .join("\n"))
         })?;
-        assert!(
-            result.assets.len() == 1,
-            "Expected 1 bundled output, found {}",
-            result.assets.len()
-        );
+
+        // We have supplied a single entry file, so we expect a single output
+        // bundle; this can be broken if widget code contains e.g. dynamic
+        // imports, which we do not allow
+        if result.assets.len() != 1 {
+            bail!(
+                "Expected 1 bundled output, found {}; ensure that widget code does not contain \
+                 e.g. dynamic imports that may result in extra chunks",
+                result.assets.len()
+            );
+        }
+
         let output = &result.assets[0];
         let code = match output {
             Output::Asset(asset) => asset.source.clone().try_into_string()?,
