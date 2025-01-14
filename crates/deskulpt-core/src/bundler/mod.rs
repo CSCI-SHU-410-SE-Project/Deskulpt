@@ -1,140 +1,127 @@
 //! Bundler for Deskulpt widgets.
 
-use std::collections::{HashMap, HashSet};
+mod alias;
+
 use std::path::PathBuf;
+use std::sync::Arc;
 
-use anyhow::{bail, Result};
-use common::{ModuleExt, NoopHook, PathLoader, PathResolver};
-use swc_core::atoms::Atom;
-use swc_core::bundler::Bundler;
-use swc_core::common::sync::Lrc;
-use swc_core::common::{FileName, FilePathMapping, Globals, SourceMap, GLOBALS};
-use swc_core::ecma::ast::{Module, Program};
-use swc_core::ecma::visit::visit_mut_pass;
+use alias::AliasPlugin;
+use anyhow::{anyhow, bail, Result};
+use oxc::transformer::{JsxOptions, JsxRuntime};
+use rolldown::{Bundler, BundlerOptions, Jsx, OutputFormat, Platform};
+use rolldown_common::Output;
 
-mod common;
-mod transforms;
-
-/// The Deskulpt widget bundler.
-pub struct WidgetBundler {
+/// Builder for the Deskulpt widget bundler.
+pub struct WidgetBundlerBuilder {
     /// Absolute path to the widget directory.
     root: PathBuf,
-    /// Absolute path to the entry file of the widget.
-    ///
-    /// This file must be within the `root` directory and share the exact same
-    /// path prefix.
-    entry: PathBuf,
+    /// Entry file relative to the widget directory.
+    entry: String,
     /// The base URL to resolve local path imports.
     base_url: String,
     /// URL to the widget APIs blob.
     apis_blob_url: String,
-    /// External dependencies.
-    external_deps: HashSet<String>,
 }
 
-impl WidgetBundler {
-    /// Create a new bundler instance.
-    ///
-    /// Note that `root` and `entry` must be absolute paths, and `entry` must
-    /// be within the `root` directory and share the exact same path prefix.
-    pub fn new(
-        root: PathBuf,
-        entry: PathBuf,
-        base_url: String,
-        apis_blob_url: String,
-        external_deps: HashSet<String>,
-    ) -> Self {
+impl WidgetBundlerBuilder {
+    /// Create a new widget bundler builder instance.
+    pub fn new(root: PathBuf, entry: String, base_url: String, apis_blob_url: String) -> Self {
         Self {
             root,
             entry,
             base_url,
             apis_blob_url,
-            external_deps,
         }
     }
 
-    /// Bundle the widget into a raw module.
-    ///
-    /// This does not apply any AST transforms and also leaves imports of
-    /// default and external dependencies as is.
-    fn bundle_into_raw_module(&self, globals: &Globals, cm: Lrc<SourceMap>) -> Result<Module> {
-        if !self.entry.exists() {
-            bail!("Entry point does not exist: '{}'", self.entry.display());
-        }
+    /// Build the Deskulpt widget bundler.
+    pub fn build(self) -> WidgetBundler {
+        let jsx_runtime_url = self.base_url.clone() + "/.scripts/jsx-runtime.js";
+        let raw_apis_url = self.base_url.clone() + "/.scripts/raw-apis.js";
+        let react_url = self.base_url.clone() + "/.scripts/react.js";
+        let ui_url = self.base_url.clone() + "/.scripts/ui.js";
 
-        // Get the list of external modules not to resolve; this should include default
-        // dependencies and (if any) external dependencies obtained from the dependency
-        // map
-        let external_modules = {
-            let mut dependencies = HashSet::from([
-                Atom::from("@deskulpt-test/apis"),
-                Atom::from("@deskulpt-test/emotion/jsx-runtime"),
-                Atom::from("@deskulpt-test/react"),
-                Atom::from("@deskulpt-test/ui"),
-            ]);
-            dependencies.extend(self.external_deps.iter().map(|k| Atom::from(k.clone())));
-            Vec::from_iter(dependencies)
+        let bundler_options = BundlerOptions {
+            input: Some(vec![self.entry.into()]),
+            cwd: Some(self.root),
+            format: Some(OutputFormat::Esm),
+            platform: Some(Platform::Browser),
+            minify: Some(true),
+            // Use automatic runtime for JSX transforms, which will refer to
+            // `@deskulpt-test/emotion/jsx-runtime`
+            jsx: Some(Jsx::Enable(JsxOptions {
+                runtime: JsxRuntime::Automatic,
+                import_source: Some("@deskulpt-test/emotion".to_string()),
+                ..Default::default()
+            })),
+            // Externalize default dependencies available at runtime
+            external: Some(
+                vec![
+                    jsx_runtime_url.clone(),
+                    raw_apis_url.clone(),
+                    react_url.clone(),
+                    ui_url.clone(),
+                    self.apis_blob_url.clone(),
+                ]
+                .into(),
+            ),
+            ..Default::default()
         };
 
-        // The root of the path resolver will be used to determine whether a resolved
-        // import goes beyond the root; the comparison is done via path prefixes so
-        // we must be consistent with how SWC resolves paths, see:
-        // https://github.com/swc-project/swc/blob/f584ef76d75e86da15d0725ac94be35a88a1c946/crates/swc_bundler/src/bundler/mod.rs#L159-L166
-        #[cfg(target_os = "windows")]
-        let path_resolver_root = self.root.canonicalize()?;
-        #[cfg(not(target_os = "windows"))]
-        let path_resolver_root = self.root.to_path_buf();
-
-        let mut bundler = Bundler::new(
-            globals,
-            cm.clone(),
-            PathLoader(cm.clone()),
-            PathResolver(path_resolver_root),
-            // Do not resolve the external modules
-            swc_core::bundler::Config {
-                external_modules,
-                ..Default::default()
-            },
-            Box::new(NoopHook),
+        // Alias the default dependencies to URLs resolvable at runtime
+        let alias_plugin = AliasPlugin(
+            [
+                (
+                    "@deskulpt-test/emotion/jsx-runtime".to_string(),
+                    jsx_runtime_url,
+                ),
+                ("@deskulpt-test/raw-apis".to_string(), raw_apis_url),
+                ("@deskulpt-test/react".to_string(), react_url),
+                ("@deskulpt-test/ui".to_string(), ui_url),
+                ("@deskulpt-test/apis".to_string(), self.apis_blob_url),
+            ]
+            .into(),
         );
 
-        // SWC bundler requires a map of entries to bundle; we provide a single entry
-        // point and expect there to be only one generated bundle; we use the target
-        // path as the key for convenience
-        let mut entries = HashMap::new();
-        entries.insert(
-            self.entry.to_string_lossy().to_string(),
-            FileName::Real(self.entry.to_path_buf()),
-        );
-
-        let mut bundles = bundler.bundle(entries)?;
-        if bundles.len() != 1 {
-            bail!("Expected a single bundle, got {}", bundles.len());
+        WidgetBundler {
+            bundler: Bundler::with_plugins(bundler_options, vec![Arc::new(alias_plugin)]),
         }
-        Ok(bundles.pop().unwrap().module)
     }
+}
 
+/// The Deskulpt widget bundler.
+pub struct WidgetBundler {
+    bundler: Bundler,
+}
+
+impl WidgetBundler {
     /// Bundle the widget into a single ESM code string.
-    pub fn bundle(&self) -> Result<String> {
-        let globals = Globals::default();
-        let cm = Lrc::new(SourceMap::new(FilePathMapping::empty()));
+    pub async fn bundle(&mut self) -> Result<String> {
+        let result = self.bundler.generate().await.map_err(|e| {
+            anyhow!(e
+                .into_vec()
+                .iter()
+                .map(|diagnostic| diagnostic.to_diagnostic().to_string())
+                .collect::<Vec<String>>()
+                .join("\n"))
+        })?;
 
-        let module = self.bundle_into_raw_module(&globals, cm.clone())?;
-        let code = GLOBALS.set(&globals, || {
-            // Redirect `@deskulpt-test/*` imports
-            let import_renamer = visit_mut_pass(transforms::ImportRenamer {
-                base_url: self.base_url.clone(),
-                apis_blob_url: self.apis_blob_url.clone(),
-            });
-            let program = Program::Module(module);
-            let module = program.apply(import_renamer).expect_module();
+        // We have supplied a single entry file, so we expect a single output
+        // bundle; this can be broken if widget code contains e.g. dynamic
+        // imports, which we do not allow
+        if result.assets.len() != 1 {
+            bail!(
+                "Expected 1 bundled output, found {}; ensure that widget code does not contain \
+                 e.g. dynamic imports that may result in extra chunks",
+                result.assets.len()
+            );
+        }
 
-            // Emit the bundled module as string into a buffer
-            let mut buf = vec![];
-            module.emit_to_buf(cm.clone(), &mut buf);
-            String::from_utf8_lossy(&buf).to_string()
-        });
-
+        let output = &result.assets[0];
+        let code = match output {
+            Output::Asset(asset) => asset.source.clone().try_into_string()?,
+            Output::Chunk(chunk) => chunk.code.clone(),
+        };
         Ok(code)
     }
 }

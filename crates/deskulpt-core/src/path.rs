@@ -23,6 +23,7 @@ pub trait PathExt<R: Runtime>: Manager<R> {
     fn init_widgets_dir(&self) -> Result<()> {
         let widgets_dir = WIDGETS_DIR.get_or_init(|| {
             let resource_dir = self.path().resource_dir().unwrap();
+            let resource_dir = dunce::simplified(&resource_dir);
             Arc::new(resource_dir.join("widgets"))
         });
 
