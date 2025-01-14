@@ -969,8 +969,6 @@ dependencies = [
  "path-clean",
  "rolldown",
  "rolldown_common",
- "rolldown_plugin_alias",
- "rolldown_utils",
  "serde",
  "serde_json",
  "sysinfo",
@@ -4258,15 +4256,6 @@ dependencies = [
  "tokio",
  "tracing",
  "typedmap",
-]
-
-[[package]]
-name = "rolldown_plugin_alias"
-version = "0.1.0"
-source = "git+https://github.com/rolldown/rolldown.git?tag=v1.0.0-beta.1#713b181e666610284c820ae53b359299e149c1b0"
-dependencies = [
- "rolldown_plugin",
- "rolldown_utils",
 ]
 
 [[package]]

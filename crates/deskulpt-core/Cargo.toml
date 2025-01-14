@@ -18,8 +18,6 @@ oxc                          = { workspace = true }
 path-clean                   = { workspace = true }
 rolldown                     = { workspace = true }
 rolldown_common              = { workspace = true }
-rolldown_plugin_alias        = { workspace = true }
-rolldown_utils               = { workspace = true }
 serde                        = { workspace = true, features = ["derive"] }
 serde_json                   = { workspace = true }
 tauri                        = { workspace = true, features = ["tray-icon"] }

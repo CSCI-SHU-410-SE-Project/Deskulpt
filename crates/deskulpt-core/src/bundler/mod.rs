@@ -1,14 +1,15 @@
 //! Bundler for Deskulpt widgets.
 
+mod alias;
+
 use std::path::PathBuf;
 use std::sync::Arc;
 
+use alias::AliasPlugin;
 use anyhow::{anyhow, Result};
 use oxc::transformer::{JsxOptions, JsxRuntime};
 use rolldown::{Bundler, BundlerOptions, Jsx, OutputFormat, Platform};
 use rolldown_common::Output;
-use rolldown_plugin_alias::{Alias, AliasPlugin};
-use rolldown_utils::pattern_filter::StringOrRegex;
 
 /// Builder for the Deskulpt widget bundler.
 pub struct WidgetBundlerBuilder {
@@ -64,30 +65,19 @@ impl WidgetBundlerBuilder {
             ..Default::default()
         };
 
-        let alias_plugin = AliasPlugin {
-            entries: vec![
-                Alias {
-                    find: StringOrRegex::String("@deskulpt-test/emotion/jsx-runtime".to_string()),
-                    replacement: jsx_runtime_url,
-                },
-                Alias {
-                    find: StringOrRegex::String("@deskulpt-test/raw-apis".to_string()),
-                    replacement: raw_apis_url,
-                },
-                Alias {
-                    find: StringOrRegex::String("@deskulpt-test/react".to_string()),
-                    replacement: react_url,
-                },
-                Alias {
-                    find: StringOrRegex::String("@deskulpt-test/ui".to_string()),
-                    replacement: ui_url,
-                },
-                Alias {
-                    find: StringOrRegex::String("@deskulpt-test/apis".to_string()),
-                    replacement: self.apis_blob_url,
-                },
-            ],
-        };
+        let alias_plugin = AliasPlugin(
+            [
+                (
+                    "@deskulpt-test/emotion/jsx-runtime".to_string(),
+                    jsx_runtime_url,
+                ),
+                ("@deskulpt-test/raw-apis".to_string(), raw_apis_url),
+                ("@deskulpt-test/react".to_string(), react_url),
+                ("@deskulpt-test/ui".to_string(), ui_url),
+                ("@deskulpt-test/apis".to_string(), self.apis_blob_url),
+            ]
+            .into(),
+        );
 
         WidgetBundler {
             bundler: Bundler::with_plugins(bundler_options, vec![Arc::new(alias_plugin)]),

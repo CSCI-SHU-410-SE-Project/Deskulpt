@@ -21,8 +21,6 @@ oxc                            = "0.43.0"
 path-clean                     = "1.0.1"
 rolldown                       = { git = "https://github.com/rolldown/rolldown.git", tag = "v1.0.0-beta.1" }
 rolldown_common                = { git = "https://github.com/rolldown/rolldown.git", tag = "v1.0.0-beta.1" }
-rolldown_plugin_alias          = { git = "https://github.com/rolldown/rolldown.git", tag = "v1.0.0-beta.1" }
-rolldown_utils                 = { git = "https://github.com/rolldown/rolldown.git", tag = "v1.0.0-beta.1" }
 serde                          = "1.0.210"
 serde_json                     = "1.0.128"
 tauri                          = "2.2.0"
