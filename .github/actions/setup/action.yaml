@@ -41,6 +41,7 @@ runs:
       uses: dtolnay/rust-toolchain@stable
       with:
         components: ${{ inputs.lint == 'true' && 'clippy' || '' }}
+        targets: ${{ inputs.targets }}
 
     - name: Install formatting tools
       if: inputs.format == 'true'
