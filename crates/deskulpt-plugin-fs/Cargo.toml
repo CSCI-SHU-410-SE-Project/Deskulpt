@@ -1,12 +1,13 @@
 [package]
-name        = "deskulpt-plugin-fs"
 description = "Deskulpt file system plugin."
-version     = { workspace = true }
-authors     = { workspace = true }
-edition     = { workspace = true }
-homepage    = { workspace = true }
-license     = { workspace = true }
-repository  = { workspace = true }
+name        = "deskulpt-plugin-fs"
+
+authors    = { workspace = true }
+edition    = { workspace = true }
+homepage   = { workspace = true }
+license    = { workspace = true }
+repository = { workspace = true }
+version    = { workspace = true }
 
 [dependencies]
 anyhow          = { workspace = true }

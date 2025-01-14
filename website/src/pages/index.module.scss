@@ -6,7 +6,12 @@
     linear-gradient(#6d6d6d25 1px, transparent 0),
     linear-gradient(-90deg, #6d6d6d25 1px, transparent 0),
     linear-gradient(#6d6d6d25 1px, transparent 0),
-    linear-gradient(transparent 6px, transparent 0, transparent 156px, transparent 0),
+    linear-gradient(
+      transparent 6px,
+      transparent 0,
+      transparent 156px,
+      transparent 0
+    ),
     linear-gradient(-90deg, #6d6d6d25 1px, transparent 0),
     linear-gradient(
       -90deg,
@@ -34,7 +39,10 @@
     background: linear-gradient(transparent, var(--ifm-background-color));
 
     [data-theme="light"] & {
-      background: linear-gradient(transparent, var(--ifm-background-surface-color));
+      background: linear-gradient(
+        transparent,
+        var(--ifm-background-surface-color)
+      );
     }
   }
 }

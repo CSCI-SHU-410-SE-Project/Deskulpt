@@ -35,7 +35,11 @@ export default function AppearanceToggler({
         content={`Switch to ${appearance === "light" ? "dark" : "light"} mode`}
       >
         <IconButton variant="soft" size="1" onClick={toggleAppearance}>
-          {appearance === "light" ? <MdOutlineLightMode /> : <MdOutlineDarkMode />}
+          {appearance === "light" ? (
+            <MdOutlineLightMode />
+          ) : (
+            <MdOutlineDarkMode />
+          )}
         </IconButton>
       </Tooltip>
     </Box>

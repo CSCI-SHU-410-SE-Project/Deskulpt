@@ -23,10 +23,14 @@ export default function useToggleShortcut(
   const [toggleShortcut, setToggleShortcut] = useState(initialToggleShortcut);
 
   useEffect(() => {
-    invokeUpdateToggleShortcut({ newShortcut: toggleShortcut }).catch(console.error);
+    invokeUpdateToggleShortcut({ newShortcut: toggleShortcut }).catch(
+      console.error,
+    );
 
     return () => {
-      invokeUpdateToggleShortcut({ oldShortcut: toggleShortcut }).catch(console.error);
+      invokeUpdateToggleShortcut({ oldShortcut: toggleShortcut }).catch(
+        console.error,
+      );
     };
   }, [toggleShortcut]);
 

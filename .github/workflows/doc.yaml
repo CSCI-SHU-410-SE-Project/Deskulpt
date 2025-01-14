@@ -1,4 +1,4 @@
-name: Doc build and deploy
+name: Documentation
 
 on:
   push:
@@ -9,7 +9,7 @@ on:
       - main
 
 jobs:
-  build:
+  doc-build:
     runs-on: ubuntu-latest
 
     steps:
@@ -28,9 +28,8 @@ jobs:
         with:
           path: website/build
 
-  deploy:
-    needs: build
-    # Do not deploy on PRs
+  doc-deploy:
+    needs: doc-build
     if: github.event_name == 'push'
     permissions:
       pages: write

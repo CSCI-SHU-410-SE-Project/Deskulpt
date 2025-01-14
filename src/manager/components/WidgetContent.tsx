@@ -1,4 +1,12 @@
-import { Badge, Box, Flex, ScrollArea, Separator, Tabs, Text } from "@radix-ui/themes";
+import {
+  Badge,
+  Box,
+  Flex,
+  ScrollArea,
+  Separator,
+  Tabs,
+  Text,
+} from "@radix-ui/themes";
 import { LuFolderOpen, LuRepeat } from "react-icons/lu";
 import { invokeOpenInWidgetsDir } from "../../commands";
 import { Result, WidgetConfig, WidgetSettings } from "../../types/backend";
@@ -20,7 +28,9 @@ export interface WidgetContentProps {
   /** The widget-specific settings. */
   settings: WidgetSettings;
   /** Setter for the manager widget states. */
-  setManagerWidgetStates: Dispatch<SetStateAction<Record<string, ManagerWidgetState>>>;
+  setManagerWidgetStates: Dispatch<
+    SetStateAction<Record<string, ManagerWidgetState>>
+  >;
 }
 
 /**
@@ -43,7 +53,8 @@ export default function WidgetContent({
         <WidgetContentHeading
           heading={
             <Flex align="center" gap="2">
-              Configuration {"Err" in config && <Badge color="red">Error</Badge>}
+              Configuration{" "}
+              {"Err" in config && <Badge color="red">Error</Badge>}
             </Flex>
           }
           actionIcon={<LuFolderOpen />}
@@ -57,7 +68,10 @@ export default function WidgetContent({
             ) : (
               <Text
                 size="1"
-                css={{ whiteSpace: "pre-wrap", fontFamily: "var(--code-font-family)" }}
+                css={{
+                  whiteSpace: "pre-wrap",
+                  fontFamily: "var(--code-font-family)",
+                }}
               >
                 {config.Err}
               </Text>
@@ -70,8 +84,8 @@ export default function WidgetContent({
           actionIcon={<LuRepeat />}
           actionText="Re-render"
           action={() =>
-            emitRenderWidgetToCanvas({ widgetId, settings, bundle: true }).then(() =>
-              toast.success(`Re-rendered widget "${widgetId}".`),
+            emitRenderWidgetToCanvas({ widgetId, settings, bundle: true }).then(
+              () => toast.success(`Re-rendered widget "${widgetId}".`),
             )
           }
         />

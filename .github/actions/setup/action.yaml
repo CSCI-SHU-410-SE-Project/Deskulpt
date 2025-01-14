@@ -37,10 +37,13 @@ runs:
       with:
         components: ${{ inputs.lint == 'true' && 'clippy' || '' }}
 
-    - name: Install nightly rustfmt
+    - name: Install formatting tools
       if: inputs.format == 'true'
       shell: bash
-      run: rustup toolchain install nightly --component rustfmt --profile minimal --no-self-update
+      run: |
+        rustup toolchain install nightly --component rustfmt --profile minimal --no-self-update
+        curl -fsSL https://github.com/tamasfe/taplo/releases/latest/download/taplo-full-linux-x86_64.gz | \
+          gzip -d - | install -m 755 /dev/stdin /usr/local/bin/taplo
 
     - name: Rust cache
       uses: swatinem/rust-cache@v2

@@ -1,12 +1,13 @@
 [package]
-name        = "deskulpt-plugin-macros"
 description = "Macros for Deskulpt plugins."
-version     = { workspace = true }
-authors     = { workspace = true }
-edition     = { workspace = true }
-homepage    = { workspace = true }
-license     = { workspace = true }
-repository  = { workspace = true }
+name        = "deskulpt-plugin-macros"
+
+authors    = { workspace = true }
+edition    = { workspace = true }
+homepage   = { workspace = true }
+license    = { workspace = true }
+repository = { workspace = true }
+version    = { workspace = true }
 
 [lib]
 proc-macro = true

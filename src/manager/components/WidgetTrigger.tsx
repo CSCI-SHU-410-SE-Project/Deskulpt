@@ -39,7 +39,8 @@ export default function WidgetTrigger({ index, config }: WidgetTriggerProps) {
           height="6px"
           css={{
             borderRadius: "var(--radius-thumb)",
-            backgroundColor: "Ok" in config ? "var(--green-10)" : "var(--red-10)",
+            backgroundColor:
+              "Ok" in config ? "var(--green-10)" : "var(--red-10)",
             opacity: 1, // TODO: decrease opacity when widget unloaded
           }}
         />

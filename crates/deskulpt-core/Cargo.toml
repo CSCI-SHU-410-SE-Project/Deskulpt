@@ -1,12 +1,13 @@
 [package]
-name        = "deskulpt-core"
 description = "Deskulpt backend core."
-version     = { workspace = true }
-authors     = { workspace = true }
-edition     = { workspace = true }
-homepage    = { workspace = true }
-license     = { workspace = true }
-repository  = { workspace = true }
+name        = "deskulpt-core"
+
+authors    = { workspace = true }
+edition    = { workspace = true }
+homepage   = { workspace = true }
+license    = { workspace = true }
+repository = { workspace = true }
+version    = { workspace = true }
 
 [dependencies]
 anyhow                       = { workspace = true }

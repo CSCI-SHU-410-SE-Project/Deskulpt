@@ -12,7 +12,9 @@ export interface WidgetContentSettingListProps {
   /** The widget-specific setting. */
   settings: WidgetSettings;
   /** Setter for the manager widget states. */
-  setManagerWidgetStates: Dispatch<SetStateAction<Record<string, ManagerWidgetState>>>;
+  setManagerWidgetStates: Dispatch<
+    SetStateAction<Record<string, ManagerWidgetState>>
+  >;
 }
 
 /**

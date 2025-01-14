@@ -41,7 +41,9 @@ export default function WidgetContentConfigList({
                 variant="ghost"
                 size="1"
                 onClick={() =>
-                  invokeOpenInWidgetsDir({ components: [widgetId, config.entry] })
+                  invokeOpenInWidgetsDir({
+                    components: [widgetId, config.entry],
+                  })
                 }
               >
                 <MdOpenInNew />

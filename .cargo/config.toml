@@ -1,2 +1,6 @@
 [build]
-rustdocflags = ["--document-private-items", "--extend-css", "crates/rustdoc.css"]
+rustdocflags = [
+  "--document-private-items",
+  "--extend-css",
+  "crates/rustdoc.css",
+]

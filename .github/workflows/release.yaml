@@ -1,13 +1,12 @@
-name: Release Deskulpt
+name: Release
 
 on:
   push:
-    branches:
-      - release
-  workflow_dispatch:
+    tags:
+      - "v[0-9]+*"
 
 jobs:
-  publish-deskulpt:
+  release:
     permissions:
       contents: write
     strategy:

@@ -69,7 +69,10 @@ export default function SettingToggleShortcut({
   }, [popoverOpen]);
 
   return (
-    <Popover.Root open={popoverOpen} onOpenChange={(isOpen) => setPopoverOpen(isOpen)}>
+    <Popover.Root
+      open={popoverOpen}
+      onOpenChange={(isOpen) => setPopoverOpen(isOpen)}
+    >
       <Popover.Trigger>
         <Button
           size="1"
@@ -93,10 +96,10 @@ export default function SettingToggleShortcut({
         <Flex direction="column" gap="3">
           {/* Introduction */}
           <Blockquote size="1" color="gray">
-            The toggle shortcut is used for toggling the floating/sinking state of the
-            canvas, equivalent to the "Float/Sink" option in the tray menu. Widgets are
-            not interactable when the canvas is floated, and the desktop is not
-            interactable when the canvas is sunk.
+            The toggle shortcut is used for toggling the floating/sinking state
+            of the canvas, equivalent to the "Float/Sink" option in the tray
+            menu. Widgets are not interactable when the canvas is floated, and
+            the desktop is not interactable when the canvas is sunk.
           </Blockquote>
           {/* Decision whether to disable the shortcut */}
           <Text size="1">
@@ -105,7 +108,9 @@ export default function SettingToggleShortcut({
                 size="1"
                 checked={disableShortcut}
                 onCheckedChange={(checked) => {
-                  setDisableShortcut(checked === "indeterminate" ? true : checked);
+                  setDisableShortcut(
+                    checked === "indeterminate" ? true : checked,
+                  );
                 }}
               />
               <Text>
@@ -116,8 +121,8 @@ export default function SettingToggleShortcut({
           </Text>
           {/* Usage guidance */}
           <Text size="1">
-            Start by clicking the <Strong>Start Listening</Strong> button and pressing
-            the desired shortcut.
+            Start by clicking the <Strong>Start Listening</Strong> button and
+            pressing the desired shortcut.
           </Text>
           {/* Shortcut setting panel */}
           {!disableShortcut && (
@@ -174,8 +179,8 @@ export default function SettingToggleShortcut({
             <Flex direction="column" gap="1">
               {!hasModifier && (
                 <Text size="1">
-                  <Badge color="red">Invalid</Badge> Shortcut must contain at least one
-                  modifier.
+                  <Badge color="red">Invalid</Badge> Shortcut must contain at
+                  least one modifier.
                 </Text>
               )}
               {!hasKey && (

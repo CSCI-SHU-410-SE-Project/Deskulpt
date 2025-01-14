@@ -13,7 +13,9 @@ export interface WidgetsTabProps {
   /** The manager widget states. */
   managerWidgetStates: Record<string, ManagerWidgetState>;
   /** Setter for the manager widget states. */
-  setManagerWidgetStates: Dispatch<SetStateAction<Record<string, ManagerWidgetState>>>;
+  setManagerWidgetStates: Dispatch<
+    SetStateAction<Record<string, ManagerWidgetState>>
+  >;
   /** The function for refreshing the widget collection. */
   rescanAndRender: () => Promise<number>;
 }
@@ -67,23 +69,31 @@ export default function WidgetsTab({
             >
               <ScrollArea scrollbars="vertical" asChild>
                 <Flex direction="column">
-                  {managerWidgetStatesArray.map(([widgetId, { config }], index) => (
-                    <WidgetTrigger key={widgetId} index={index} config={config} />
-                  ))}
+                  {managerWidgetStatesArray.map(
+                    ([widgetId, { config }], index) => (
+                      <WidgetTrigger
+                        key={widgetId}
+                        index={index}
+                        config={config}
+                      />
+                    ),
+                  )}
                 </Flex>
               </ScrollArea>
             </Tabs.List>
           )}
-          {managerWidgetStatesArray.map(([widgetId, { config, settings }], index) => (
-            <WidgetContent
-              key={widgetId}
-              index={index}
-              widgetId={widgetId}
-              config={config}
-              settings={settings}
-              setManagerWidgetStates={setManagerWidgetStates}
-            />
-          ))}
+          {managerWidgetStatesArray.map(
+            ([widgetId, { config, settings }], index) => (
+              <WidgetContent
+                key={widgetId}
+                index={index}
+                widgetId={widgetId}
+                config={config}
+                settings={settings}
+                setManagerWidgetStates={setManagerWidgetStates}
+              />
+            ),
+          )}
         </Flex>
       </Tabs.Root>
       <FloatButton

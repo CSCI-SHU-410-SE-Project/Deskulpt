@@ -38,7 +38,10 @@ export default function App({ initialSettings }: ManagerAppProps) {
       css={{ height: "100vh" }}
     >
       <ManagerToaster appearance={appearance} />
-      <AppearanceToggler appearance={appearance} setAppearance={setAppearance} />
+      <AppearanceToggler
+        appearance={appearance}
+        setAppearance={setAppearance}
+      />
       <Tabs.Root defaultValue="widgets" asChild>
         <Box height="100%" p="2">
           <Tabs.List>

@@ -39,9 +39,9 @@ export default function ExternalCopyLink({
           size="1"
           variant="ghost"
           onClick={() =>
-            writeText("https://csci-shu-410-se-project.github.io/Deskulpt/").then(() =>
-              toast.success("Copied to clipboard."),
-            )
+            writeText(
+              "https://csci-shu-410-se-project.github.io/Deskulpt/",
+            ).then(() => toast.success("Copied to clipboard."))
           }
         >
           <RxCopy />
