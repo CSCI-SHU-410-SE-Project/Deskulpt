@@ -43,7 +43,11 @@ export default function WidgetContainer({
   let retried = false;
 
   function updateContainerPos(_: DraggableEvent, data: DraggableData) {
-    setSettings({ ...settings, x: settings.x + data.x, y: settings.y + data.y });
+    setSettings({
+      ...settings,
+      x: settings.x + data.x,
+      y: settings.y + data.y,
+    });
   }
 
   return (

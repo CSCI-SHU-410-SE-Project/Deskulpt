@@ -12,7 +12,9 @@ import { ManagerWidgetState } from "../../types/frontend";
  * @param setManagerWidgetStates Setter for the manager widget states.
  */
 export default function useUpdateSettingListener(
-  setManagerWidgetStates: Dispatch<SetStateAction<Record<string, ManagerWidgetState>>>,
+  setManagerWidgetStates: Dispatch<
+    SetStateAction<Record<string, ManagerWidgetState>>
+  >,
 ) {
   useEffect(() => {
     const unlisten = listenToUpdateSettings((event) => {

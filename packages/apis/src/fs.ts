@@ -1,6 +1,9 @@
 import { invoke } from "@tauri-apps/api/core";
 
-function appendFile(widgetId: string, payload: { path: string; content: string }) {
+function appendFile(
+  widgetId: string,
+  payload: { path: string; content: string },
+) {
   return invoke<void>("call_plugin", {
     plugin: "fs",
     command: "append_file",
@@ -72,7 +75,10 @@ function removeFile(widgetId: string, payload: { path: string }) {
   });
 }
 
-function writeFile(widgetId: string, payload: { path: string; content: string }) {
+function writeFile(
+  widgetId: string,
+  payload: { path: string; content: string },
+) {
   return invoke<void>("call_plugin", {
     plugin: "fs",
     command: "write_file",

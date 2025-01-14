@@ -52,7 +52,10 @@ export default function InstallationGrid() {
           <span>MSI installer (64-bit)</span>
         </DownloadOption>
       </TabItem>
-      <TabItem value="macos" label={<IconTabLabel icon={<FaApple />} title="MacOS" />}>
+      <TabItem
+        value="macos"
+        label={<IconTabLabel icon={<FaApple />} title="MacOS" />}
+      >
         <DownloadOption version="0.0.1" artifact="Deskulpt_0.0.1_aarch64.dmg">
           <span>Disk Image (64-bit, Apple Silicon)</span>
         </DownloadOption>
@@ -66,8 +69,14 @@ export default function InstallationGrid() {
           <span>App bundle (64-bit, Intel)</span>
         </DownloadOption>
       </TabItem>
-      <TabItem value="linux" label={<IconTabLabel icon={<FaLinux />} title="Linux" />}>
-        <DownloadOption version="0.0.1" artifact="deskulpt_0.0.1_amd64.AppImage">
+      <TabItem
+        value="linux"
+        label={<IconTabLabel icon={<FaLinux />} title="Linux" />}
+      >
+        <DownloadOption
+          version="0.0.1"
+          artifact="deskulpt_0.0.1_amd64.AppImage"
+        >
           <span>AppImage (64-bit, amd64)</span>
         </DownloadOption>
         <DownloadOption version="0.0.1" artifact="deskulpt-0.0.1-1.x86_64.rpm">

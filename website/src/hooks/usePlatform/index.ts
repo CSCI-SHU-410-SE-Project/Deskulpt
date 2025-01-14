@@ -9,7 +9,10 @@ export default function usePlatform(defaultPlatform: string) {
       setPlatform("windows");
     } else if (userAgent.indexOf("mac") != -1) {
       setPlatform("macos");
-    } else if (userAgent.indexOf("linux") != -1 || userAgent.indexOf("x11") != -1) {
+    } else if (
+      userAgent.indexOf("linux") != -1 ||
+      userAgent.indexOf("x11") != -1
+    ) {
       setPlatform("linux");
     }
   }, []);

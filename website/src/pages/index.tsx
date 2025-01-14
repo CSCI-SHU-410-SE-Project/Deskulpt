@@ -32,8 +32,9 @@ const features: FeatureItem[] = [
     Svg: MdOutlineDashboardCustomize,
     description: (
       <>
-        Deskulpt allows writing <a href="https://react.dev/">React</a> code to design
-        your desktop widgets, unlocking infinite possibilities for customization.
+        Deskulpt allows writing <a href="https://react.dev/">React</a> code to
+        design your desktop widgets, unlocking infinite possibilities for
+        customization.
       </>
     ),
   },
@@ -43,8 +44,10 @@ const features: FeatureItem[] = [
     description: (
       <>
         Deskulpt is completely free and{" "}
-        <a href="https://github.com/CSCI-SHU-410-SE-Project/Deskulpt">open source</a>,
-        with an active community of developers and welcoming anyone to join or{" "}
+        <a href="https://github.com/CSCI-SHU-410-SE-Project/Deskulpt">
+          open source
+        </a>
+        , with an active community of developers and welcoming anyone to join or{" "}
         <Link to="/development/developer-guide">contribute</Link>.
       </>
     ),
@@ -79,7 +82,10 @@ function HomepageHeader() {
     <header className={clsx("hero", styles.homepageHeader)}>
       <div className="container">
         <Heading as="h1" className="hero__title">
-          <DeskulptLogo className="invert-on-dark" style={{ height: "120px" }} />
+          <DeskulptLogo
+            className="invert-on-dark"
+            style={{ height: "120px" }}
+          />
         </Heading>
         <p className="hero__subtitle">{siteConfig.tagline}</p>
         <div>

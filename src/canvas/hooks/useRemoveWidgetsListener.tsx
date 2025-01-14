@@ -10,7 +10,9 @@ import { CanvasWidgetState } from "../../types/frontend";
  */
 export default function useRemoveWidgetsListener(
   canvasWidgetStates: Record<string, CanvasWidgetState>,
-  setCanvasWidgetStates: Dispatch<SetStateAction<Record<string, CanvasWidgetState>>>,
+  setCanvasWidgetStates: Dispatch<
+    SetStateAction<Record<string, CanvasWidgetState>>
+  >,
 ) {
   useEffect(() => {
     const unlisten = listenToRemoveWidgets((event) => {
@@ -34,7 +36,9 @@ export default function useRemoveWidgetsListener(
       // Remove the specified widgets from the canvas states
       setCanvasWidgetStates((prev) =>
         Object.fromEntries(
-          Object.entries(prev).filter(([widgetId]) => !removedIds.includes(widgetId)),
+          Object.entries(prev).filter(
+            ([widgetId]) => !removedIds.includes(widgetId),
+          ),
         ),
       );
     });

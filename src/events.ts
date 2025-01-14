@@ -60,7 +60,9 @@ export async function listenToRemoveWidgets(
  *
  * @param payload The payload of the event.
  */
-export async function emitUpdateSettingsToManager(payload: UpdateSettingsPayload) {
+export async function emitUpdateSettingsToManager(
+  payload: UpdateSettingsPayload,
+) {
   await emitTo("manager", "update-settings", payload);
 }
 
@@ -91,7 +93,9 @@ export async function emitSwitchAppearanceToCanvas(payload: Appearance) {
  * @param handler The callback function to handle the event.
  * @returns A promise that resolves to a function to unlisten to the event.
  */
-export async function listenToSwitchAppearance(handler: EventCallback<Appearance>) {
+export async function listenToSwitchAppearance(
+  handler: EventCallback<Appearance>,
+) {
   return listen("switch-theme-appearance", handler);
 }
 
@@ -111,6 +115,8 @@ export async function listenToExitApp(handler: EventCallback<null>) {
  * @param handler The callback function to handle the event.
  * @returns A promise that resolves to a function to unlisten to the event.
  */
-export async function listenToShowToast(handler: EventCallback<ShowToastPayload>) {
+export async function listenToShowToast(
+  handler: EventCallback<ShowToastPayload>,
+) {
   return listen("show-toast", handler);
 }

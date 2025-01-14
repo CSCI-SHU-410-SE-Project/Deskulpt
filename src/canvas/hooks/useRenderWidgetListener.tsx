@@ -22,7 +22,9 @@ const baseUrl = new URL(import.meta.url).origin;
  */
 export default function useRenderWidgetListener(
   canvasWidgetStates: Record<string, CanvasWidgetState>,
-  setCanvasWidgetStates: Dispatch<SetStateAction<Record<string, CanvasWidgetState>>>,
+  setCanvasWidgetStates: Dispatch<
+    SetStateAction<Record<string, CanvasWidgetState>>
+  >,
 ) {
   useEffect(() => {
     const unlisten = listenToRenderWidget((event) => {
@@ -100,12 +102,16 @@ export default function useRenderWidgetListener(
     }
 
     // Create the module blob URL
-    const moduleBlob = new Blob([moduleCode], { type: "application/javascript" });
+    const moduleBlob = new Blob([moduleCode], {
+      type: "application/javascript",
+    });
     const moduleBlobUrl = URL.createObjectURL(moduleBlob);
 
     // Dynamically import the module and render the widget
     try {
-      const module = (await import(/* @vite-ignore */ moduleBlobUrl)) as WidgetModule;
+      const module = (await import(
+        /* @vite-ignore */ moduleBlobUrl
+      )) as WidgetModule;
       const moduleError = getWidgetModuleError(module);
 
       if (moduleError !== null) {
@@ -178,7 +184,10 @@ async function getWidgetApisCode(widgetId: string) {
   const template = await response.text();
   return template
     .replace("__DESKULPT_WIDGET_ID__", widgetId)
-    .replace("__RAW_APIS_URL__", new URL("/.scripts/raw-apis.js", baseUrl).href);
+    .replace(
+      "__RAW_APIS_URL__",
+      new URL("/.scripts/raw-apis.js", baseUrl).href,
+    );
 }
 
 /**

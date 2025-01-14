@@ -29,7 +29,9 @@ export async function invokeExitApp(payload: { settings: Settings }) {
 /**
  * Invoke the `open_in_widgets_dir` command.
  */
-export async function invokeOpenInWidgetsDir(payload: { components: string[] }) {
+export async function invokeOpenInWidgetsDir(payload: {
+  components: string[];
+}) {
   return invoke<void>("open_in_widgets_dir", payload);
 }
 

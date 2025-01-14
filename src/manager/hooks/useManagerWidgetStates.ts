@@ -2,13 +2,18 @@ import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { ManagerWidgetState } from "../../types/frontend";
 import { WidgetSettings } from "../../types/backend";
 import { invokeRescanWidgets } from "../../commands";
-import { emitRemoveWidgetsToCanvas, emitRenderWidgetToCanvas } from "../../events";
+import {
+  emitRemoveWidgetsToCanvas,
+  emitRenderWidgetToCanvas,
+} from "../../events";
 
 export interface UseManagerWidgetStatesOutput {
   /** The manager widget states. */
   managerWidgetStates: Record<string, ManagerWidgetState>;
   /** Setter for the manager widget states. */
-  setManagerWidgetStates: Dispatch<SetStateAction<Record<string, ManagerWidgetState>>>;
+  setManagerWidgetStates: Dispatch<
+    SetStateAction<Record<string, ManagerWidgetState>>
+  >;
   /** Function that scans the widget base directory and renders newly added widgets. */
   rescanAndRender: () => Promise<number>;
 }

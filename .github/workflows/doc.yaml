@@ -1,4 +1,4 @@
-name: Doc build and deploy
+name: Documentation
 
 on:
   push:
@@ -30,7 +30,6 @@ jobs:
 
   deploy:
     needs: build
-    # Do not deploy on PRs
     if: github.event_name == 'push'
     permissions:
       pages: write

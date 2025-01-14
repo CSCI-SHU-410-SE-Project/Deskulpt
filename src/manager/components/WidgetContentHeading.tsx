@@ -27,7 +27,13 @@ export default function WidgetContentHeading({
   return (
     <Flex justify="between" align="center">
       <Heading size="2">{heading}</Heading>
-      <Button size="1" variant="surface" color="gray" highContrast onClick={action}>
+      <Button
+        size="1"
+        variant="surface"
+        color="gray"
+        highContrast
+        onClick={action}
+      >
         {actionIcon}
         {actionText}
       </Button>

@@ -29,7 +29,10 @@ export default function App() {
    * This function not only updates the settings in the canvas widget states, but also
    * notifies the manager to update the widget-specific settings as well.
    */
-  async function setSettingsForWidget(widgetId: string, settings: WidgetSettings) {
+  async function setSettingsForWidget(
+    widgetId: string,
+    settings: WidgetSettings,
+  ) {
     // This step must be done first, otherwise there will be a visible delay between
     // the transform change and the absolute position change, causing an undesirable
     // visual effect

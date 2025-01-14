@@ -22,7 +22,9 @@ export interface WidgetDependenciesProps {
  * names and corresponding version strings. The package names are linked to their URL
  * on [npmjs.com](https://www.npmjs.com/).
  */
-export default function WidgetDependencies({ dependencies }: WidgetDependenciesProps) {
+export default function WidgetDependencies({
+  dependencies,
+}: WidgetDependenciesProps) {
   const dependenciesArray = Object.entries(dependencies);
 
   return (
