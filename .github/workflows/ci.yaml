@@ -16,7 +16,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  ci:
+  format-and-lint:
     strategy:
       fail-fast: false
       matrix:
@@ -35,13 +35,43 @@ jobs:
 
       - name: Check formatting
         if: ${{ matrix.platform == 'ubuntu-latest' }}
-        run: pnpm format:check
+        run: pnpm format:check && taplo format --check --diff
 
       - name: Check linting
         run: pnpm lint:check
 
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [macos-latest, ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.platform }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - uses: ./.github/actions/setup
+        with:
+          platform: ${{ matrix.platform }}
+
       - name: Run test suite
         run: pnpm test
+
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [macos-latest, ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.platform }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - uses: ./.github/actions/setup
+        with:
+          platform: ${{ matrix.platform }}
 
       - name: Build Deskulpt
         id: build-deskulpt
