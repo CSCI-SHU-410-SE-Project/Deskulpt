@@ -11,6 +11,11 @@ inputs:
       - ubuntu-latest
       - macos-latest
       - windows-latest
+  targets:
+    description: Rust setup targets.
+    type: string
+    required: true
+    default: ""
   lint:
     description: Whether to do additional setup for linting.
     type: boolean
