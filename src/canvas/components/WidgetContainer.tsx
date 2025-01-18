@@ -1,12 +1,12 @@
 import { PropsWithChildren, RefObject, useRef } from "react";
 import Draggable, { DraggableData, DraggableEvent } from "react-draggable";
 import { ErrorBoundary } from "react-error-boundary";
-import ErrorDisplay from "./ErrorDisplay";
-import { grabErrorInfo } from "../utils";
-import { WidgetSettings } from "../../types/backend";
+import ErrorDisplay from "@/canvas/components/ErrorDisplay";
+import { grabErrorInfo } from "@/canvas/utils";
+import { WidgetSettings } from "@/types/backend";
 import { LuGripVertical } from "react-icons/lu";
 import { Box } from "@radix-ui/themes";
-import { Widget } from "../../types/frontend";
+import { Widget } from "@/types/frontend";
 
 export interface WidgetContainerProps {
   /** ID of the widget. */

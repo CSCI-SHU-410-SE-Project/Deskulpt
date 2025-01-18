@@ -1,8 +1,8 @@
 import { useEffect } from "react";
-import { listenToExitApp } from "../../events";
-import { invokeExitApp } from "../../commands";
-import { ManagerWidgetState } from "../../types/frontend";
-import { Appearance } from "../../types/backend";
+import { listenToExitApp } from "@/events";
+import { invokeExitApp } from "@/commands";
+import { ManagerWidgetState } from "@/types/frontend";
+import { Appearance } from "@/types/backend";
 
 /**
  * Listen and react to the "exit-app" event.

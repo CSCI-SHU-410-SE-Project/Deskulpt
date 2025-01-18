@@ -1,8 +1,5 @@
 // @ts-check
 
-// eslint: https://eslint.org/docs/latest/
-// typescript-eslint: https://typescript-eslint.io/getting-started/
-
 import eslint from "@eslint/js";
 import globals from "globals";
 import tseslint from "typescript-eslint";

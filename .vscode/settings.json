@@ -1,0 +1,4 @@
+{
+  // Auto imports will use the paths as defined in tsconfig.json
+  "typescript.preferences.importModuleSpecifier": "non-relative"
+}

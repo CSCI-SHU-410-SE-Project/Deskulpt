@@ -1,14 +1,14 @@
 import { useState } from "react";
-import { CanvasWidgetState } from "../types/frontend";
-import { WidgetSettings } from "../types/backend";
-import { emitUpdateSettingsToManager } from "../events";
-import WidgetContainer from "./components/WidgetContainer";
-import useRenderWidgetListener from "./hooks/useRenderWidgetListener";
-import useRemoveWidgetsListener from "./hooks/useRemoveWidgetsListener";
-import useShowToastListener from "./hooks/useShowToastListener";
+import { CanvasWidgetState } from "@/types/frontend";
+import { WidgetSettings } from "@/types/backend";
+import { emitUpdateSettingsToManager } from "@/events";
+import WidgetContainer from "@/canvas/components/WidgetContainer";
+import useRenderWidgetListener from "@/canvas/hooks/useRenderWidgetListener";
+import useRemoveWidgetsListener from "@/canvas/hooks/useRemoveWidgetsListener";
+import useShowToastListener from "@/canvas/hooks/useShowToastListener";
 import { Toaster } from "sonner";
 import { Theme } from "@radix-ui/themes";
-import useAppearanceListener from "./hooks/useAppearanceListener";
+import useAppearanceListener from "@/canvas/hooks/useAppearanceListener";
 
 /**
  * The main component of the canvas window.

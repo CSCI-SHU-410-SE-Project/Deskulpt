@@ -40,7 +40,7 @@ jobs:
           tagName: v__VERSION__
           releaseName: "Deskulpt v__VERSION__"
           releaseDraft: true
-          prerelease: true
+          prerelease: false
           releaseBody: |
             ## Download Deskulpt v__VERSION__
 
