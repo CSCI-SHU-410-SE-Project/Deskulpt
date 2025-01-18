@@ -10,8 +10,8 @@ import {
   RemoveWidgetsPayload,
   RenderWidgetPayload,
   UpdateSettingsPayload,
-} from "./types/frontend";
-import { Appearance, ShowToastPayload } from "./types/backend";
+} from "@/types/frontend";
+import { Appearance, ShowToastPayload } from "@/types/backend";
 
 /**
  * Emit the "render-widget" event to the canvas window.

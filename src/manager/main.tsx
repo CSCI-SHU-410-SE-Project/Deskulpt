@@ -1,10 +1,10 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { invokeLoadSettings } from "../commands";
-import { emitSwitchAppearanceToCanvas } from "../events";
-import App from "./App";
+import { invokeLoadSettings } from "@/commands";
+import { emitSwitchAppearanceToCanvas } from "@/events";
+import App from "@/manager/App";
 import "@radix-ui/themes/styles.css";
-import "../custom.css";
+import "@/custom.css";
 
 invokeLoadSettings()
   .then((settings) => {

@@ -1,8 +1,8 @@
 import { Box, IconButton, Tooltip } from "@radix-ui/themes";
-import { Appearance } from "../../types/backend";
+import { Appearance } from "@/types/backend";
 import { MdOutlineDarkMode, MdOutlineLightMode } from "react-icons/md";
 import { Dispatch, SetStateAction } from "react";
-import { emitSwitchAppearanceToCanvas } from "../../events";
+import { emitSwitchAppearanceToCanvas } from "@/events";
 
 export interface AppearanceTogglerProps {
   /** Theme appearance. */

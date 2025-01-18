@@ -1,5 +1,5 @@
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { invokeUpdateToggleShortcut } from "../../commands";
+import { invokeUpdateToggleShortcut } from "@/commands";
 
 export interface UseToggleShortcutOutput {
   /** The current toggle shortcut. */

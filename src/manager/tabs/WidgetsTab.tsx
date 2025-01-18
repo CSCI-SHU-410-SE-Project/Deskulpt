@@ -1,13 +1,13 @@
 import { Dispatch, SetStateAction } from "react";
 import { LuFileScan, LuFolderOpen, LuRepeat } from "react-icons/lu";
-import { invokeOpenInWidgetsDir } from "../../commands";
+import { invokeOpenInWidgetsDir } from "@/commands";
 import { Flex, ScrollArea, Tabs } from "@radix-ui/themes";
 import { toast } from "sonner";
-import { ManagerWidgetState } from "../../types/frontend";
-import WidgetTrigger from "../components/WidgetTrigger";
-import WidgetContent from "../components/WidgetContent";
-import FloatButton from "../components/FloatButton";
-import { emitRenderWidgetToCanvas } from "../../events";
+import { ManagerWidgetState } from "@/types/frontend";
+import WidgetTrigger from "@/manager/components/WidgetTrigger";
+import WidgetContent from "@/manager/components/WidgetContent";
+import FloatButton from "@/manager/components/FloatButton";
+import { emitRenderWidgetToCanvas } from "@/events";
 
 export interface WidgetsTabProps {
   /** The manager widget states. */

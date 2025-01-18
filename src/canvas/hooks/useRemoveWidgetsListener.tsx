@@ -1,6 +1,6 @@
 import { Dispatch, SetStateAction, useEffect } from "react";
-import { listenToRemoveWidgets } from "../../events";
-import { CanvasWidgetState } from "../../types/frontend";
+import { listenToRemoveWidgets } from "@/events";
+import { CanvasWidgetState } from "@/types/frontend";
 
 /**
  * Listen and react to the "remove-widgets" event.

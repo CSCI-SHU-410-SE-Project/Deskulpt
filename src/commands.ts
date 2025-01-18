@@ -6,7 +6,7 @@
  */
 
 import { invoke } from "@tauri-apps/api/core";
-import { Settings, WidgetCollection } from "./types/backend";
+import { Settings, WidgetCollection } from "@/types/backend";
 
 /**
  * Invoke the `bundle_widget` command.

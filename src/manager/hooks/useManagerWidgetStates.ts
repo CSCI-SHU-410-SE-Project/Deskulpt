@@ -1,11 +1,8 @@
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { ManagerWidgetState } from "../../types/frontend";
-import { WidgetSettings } from "../../types/backend";
-import { invokeRescanWidgets } from "../../commands";
-import {
-  emitRemoveWidgetsToCanvas,
-  emitRenderWidgetToCanvas,
-} from "../../events";
+import { ManagerWidgetState } from "@/types/frontend";
+import { WidgetSettings } from "@/types/backend";
+import { invokeRescanWidgets } from "@/commands";
+import { emitRemoveWidgetsToCanvas, emitRenderWidgetToCanvas } from "@/events";
 
 export interface UseManagerWidgetStatesOutput {
   /** The manager widget states. */

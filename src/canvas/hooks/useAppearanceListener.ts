@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { Appearance } from "../../types/backend";
-import { listenToSwitchAppearance } from "../../events";
+import { Appearance } from "@/types/backend";
+import { listenToSwitchAppearance } from "@/events";
 
 /**
  * Handle the theme appearance of the canvas.
