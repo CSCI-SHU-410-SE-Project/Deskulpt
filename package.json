@@ -14,8 +14,8 @@
     "format:rs:check": "cargo +nightly fmt -- --check",
     "lint": "pnpm lint:js && pnpm lint:rs",
     "lint:check": "pnpm lint:js:check && pnpm lint:rs:check",
-    "lint:js": "pnpm run -r lint",
-    "lint:js:check": "pnpm run -r lint:check",
+    "lint:js": "oxlint --max-warnings=0 --fix .",
+    "lint:js:check": "oxlint --max-warnings=0 .",
     "lint:rs": "cargo clippy --fix --allow-dirty --allow-staged -- -D warnings",
     "lint:rs:check": "cargo clippy -- -D warnings",
     "test": "pnpm test:js && pnpm test:rs",
@@ -27,11 +27,13 @@
     "@tauri-apps/cli": "^2.2.2",
     "husky": "^9.1.6",
     "lint-staged": "^15.3.0",
+    "oxlint": "^0.15.6",
     "prettier": "^3.4.2"
   },
+  "prettier": {},
   "lint-staged": {
     "*.{js,jsx,ts,tsx,json,md,mdx,html,css,scss,yml,yaml}": "prettier --write",
-    "*.rs": "rustfmt +nightly --",
-    "*.toml": "taplo format"
+    "*.{js,jsx,ts,tsx}": "oxlint --fix",
+    "*.rs": "rustfmt +nightly --"
   }
 }

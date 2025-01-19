@@ -29,8 +29,7 @@ export default function WidgetDependencies({
 
   return (
     <Flex gap="2" align="center">
-      {dependenciesArray.length || "None"}
-      {dependenciesArray.length !== 0 && (
+      {dependenciesArray.length > 0 ? (
         <Popover.Root>
           <Tooltip content="View details" side="right">
             <Popover.Trigger>
@@ -59,6 +58,8 @@ export default function WidgetDependencies({
             </ScrollArea>
           </Popover.Content>
         </Popover.Root>
+      ) : (
+        "None"
       )}
     </Flex>
   );

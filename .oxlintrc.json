@@ -1,0 +1,20 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "ignorePatterns": ["**/dist/**", "src/.scripts/**", "website/**"],
+  "plugins": ["react/jsx-runtime", "unicorn", "typescript", "oxc"],
+  "categories": {
+    "correctness": "error",
+    "suspicious": "error",
+    "perf": "warn",
+    "pedantic": "warn"
+  },
+  "overrides": [
+    {
+      "files": ["packages/apis/**"],
+      "rules": {
+        "ban-types": "off",
+        "no-unsafe-function-type": "off"
+      }
+    }
+  ]
+}
