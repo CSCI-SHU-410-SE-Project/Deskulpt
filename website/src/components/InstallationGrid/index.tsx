@@ -5,7 +5,7 @@ import Tabs from "@theme/Tabs";
 import TabItem from "@theme/TabItem";
 import usePlatform from "@site/src/hooks/usePlatform";
 import IconTabLabel from "@site/src/components/IconTabLabel";
-import { FaWindows, FaApple, FaLinux } from "react-icons/fa";
+import { FaApple, FaLinux, FaWindows } from "react-icons/fa";
 
 function DownloadOption(props: {
   version: string;

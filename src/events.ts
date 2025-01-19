@@ -10,8 +10,8 @@ import {
   RemoveWidgetsPayload,
   RenderWidgetPayload,
   UpdateSettingsPayload,
-} from "@/types/frontend";
-import { Appearance, ShowToastPayload } from "@/types/backend";
+} from "./types/frontend";
+import { Appearance, ShowToastPayload } from "./types/backend";
 
 /**
  * Emit the "render-widget" event to the canvas window.
@@ -28,7 +28,7 @@ export async function emitRenderWidgetToCanvas(payload: RenderWidgetPayload) {
  * @param handler The callback function to handle the event.
  * @returns A promise that resolves to a function to unlisten to the event.
  */
-export async function listenToRenderWidget(
+export function listenToRenderWidget(
   handler: EventCallback<RenderWidgetPayload>,
 ) {
   return listen("render-widget", handler);
@@ -49,7 +49,7 @@ export async function emitRemoveWidgetsToCanvas(payload: RemoveWidgetsPayload) {
  * @param handler The callback function to handle the event.
  * @returns A promise that resolves to a function to unlisten to the event.
  */
-export async function listenToRemoveWidgets(
+export function listenToRemoveWidgets(
   handler: EventCallback<RemoveWidgetsPayload>,
 ) {
   return listen("remove-widgets", handler);
@@ -72,7 +72,7 @@ export async function emitUpdateSettingsToManager(
  * @param handler The callback function to handle the event.
  * @returns A promise that resolves to a function to unlisten to the event.
  */
-export async function listenToUpdateSettings(
+export function listenToUpdateSettings(
   handler: EventCallback<UpdateSettingsPayload>,
 ) {
   return listen("update-settings", handler);
@@ -93,9 +93,7 @@ export async function emitSwitchAppearanceToCanvas(payload: Appearance) {
  * @param handler The callback function to handle the event.
  * @returns A promise that resolves to a function to unlisten to the event.
  */
-export async function listenToSwitchAppearance(
-  handler: EventCallback<Appearance>,
-) {
+export function listenToSwitchAppearance(handler: EventCallback<Appearance>) {
   return listen("switch-theme-appearance", handler);
 }
 
@@ -105,7 +103,7 @@ export async function listenToSwitchAppearance(
  * @param handler The callback function to handle the event.
  * @returns A promise that resolves to a function to unlisten to the event.
  */
-export async function listenToExitApp(handler: EventCallback<null>) {
+export function listenToExitApp(handler: EventCallback<null>) {
   return listen("exit-app", handler);
 }
 
@@ -115,8 +113,6 @@ export async function listenToExitApp(handler: EventCallback<null>) {
  * @param handler The callback function to handle the event.
  * @returns A promise that resolves to a function to unlisten to the event.
  */
-export async function listenToShowToast(
-  handler: EventCallback<ShowToastPayload>,
-) {
+export function listenToShowToast(handler: EventCallback<ShowToastPayload>) {
   return listen("show-toast", handler);
 }

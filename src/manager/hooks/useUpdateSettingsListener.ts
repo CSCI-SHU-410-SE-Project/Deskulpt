@@ -1,6 +1,6 @@
 import { Dispatch, SetStateAction, useEffect } from "react";
-import { listenToUpdateSettings } from "@/events";
-import { ManagerWidgetState } from "@/types/frontend";
+import { listenToUpdateSettings } from "../../events";
+import { ManagerWidgetState } from "../../types/frontend";
 
 /**
  * Listen and react to the "update-setting" event.

@@ -10,9 +10,9 @@ import {
   Text,
 } from "@radix-ui/themes";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import Shortcut from "@/manager/components/Shortcut";
+import Shortcut from "./Shortcut";
 import { FaEdit } from "react-icons/fa";
-import useKeyboardListener from "@/manager/hooks/useKeyboardListener";
+import useKeyboardListener from "../hooks/useKeyboardListener";
 
 export interface SettingToggleShortcutProps {
   /** Setter for the toggle shortcut state. */

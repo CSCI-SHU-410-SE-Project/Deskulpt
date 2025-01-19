@@ -5,13 +5,13 @@ export default function usePlatform(defaultPlatform: string) {
 
   useEffect(() => {
     const userAgent = window.navigator.userAgent.toLowerCase();
-    if (userAgent.indexOf("win") != -1) {
+    if (userAgent.indexOf("win") !== -1) {
       setPlatform("windows");
-    } else if (userAgent.indexOf("mac") != -1) {
+    } else if (userAgent.indexOf("mac") !== -1) {
       setPlatform("macos");
     } else if (
-      userAgent.indexOf("linux") != -1 ||
-      userAgent.indexOf("x11") != -1
+      userAgent.indexOf("linux") !== -1 ||
+      userAgent.indexOf("x11") !== -1
     ) {
       setPlatform("linux");
     }

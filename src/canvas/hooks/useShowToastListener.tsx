@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { listenToShowToast } from "@/events";
+import { listenToShowToast } from "../../events";
 import { toast } from "sonner";
 
 /**

@@ -8,15 +8,15 @@ import {
   Text,
 } from "@radix-ui/themes";
 import { LuFolderOpen, LuRepeat } from "react-icons/lu";
-import { invokeOpenInWidgetsDir } from "@/commands";
-import { Result, WidgetConfig, WidgetSettings } from "@/types/backend";
-import { emitRenderWidgetToCanvas } from "@/events";
+import { invokeOpenInWidgetsDir } from "../../commands";
+import { Result, WidgetConfig, WidgetSettings } from "../../types/backend";
+import { emitRenderWidgetToCanvas } from "../../events";
 import { Dispatch, SetStateAction } from "react";
-import { ManagerWidgetState } from "@/types/frontend";
-import WidgetContentHeading from "@/manager/components/WidgetContentHeading";
+import { ManagerWidgetState } from "../../types/frontend";
+import WidgetContentHeading from "../components/WidgetContentHeading";
 import { toast } from "sonner";
-import WidgetContentConfigList from "@/manager/components/WidgetContentConfigList";
-import WidgetContentSettingsList from "@/manager/components/WidgetContentSettingsList";
+import WidgetContentConfigList from "../components/WidgetContentConfigList";
+import WidgetContentSettingsList from "../components/WidgetContentSettingsList";
 
 export interface WidgetContentProps {
   /** The index of the widget in the collection. */

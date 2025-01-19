@@ -1,5 +1,5 @@
 import { Toaster } from "sonner";
-import { Appearance } from "@/types/backend";
+import { Appearance } from "../../types/backend";
 
 export interface ManagerToasterProps {
   /** The theme appearance. */

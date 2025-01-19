@@ -6,12 +6,12 @@
  */
 
 import { invoke } from "@tauri-apps/api/core";
-import { Settings, WidgetCollection } from "@/types/backend";
+import { Settings, WidgetCollection } from "./types/backend";
 
 /**
  * Invoke the `bundle_widget` command.
  */
-export async function invokeBundleWidget(payload: {
+export function invokeBundleWidget(payload: {
   widgetId: string;
   baseUrl: string;
   apisBlobUrl: string;
@@ -22,37 +22,35 @@ export async function invokeBundleWidget(payload: {
 /**
  * Invoke the `exit_app` command.
  */
-export async function invokeExitApp(payload: { settings: Settings }) {
+export function invokeExitApp(payload: { settings: Settings }) {
   return invoke<void>("exit_app", payload);
 }
 
 /**
  * Invoke the `open_in_widgets_dir` command.
  */
-export async function invokeOpenInWidgetsDir(payload: {
-  components: string[];
-}) {
+export function invokeOpenInWidgetsDir(payload: { components: string[] }) {
   return invoke<void>("open_in_widgets_dir", payload);
 }
 
 /**
  * Invoke the `load_settings` command.
  */
-export async function invokeLoadSettings() {
+export function invokeLoadSettings() {
   return invoke<Settings>("load_settings");
 }
 
 /**
  * Invoke the `rescan_widgets` command.
  */
-export async function invokeRescanWidgets() {
+export function invokeRescanWidgets() {
   return invoke<WidgetCollection>("rescan_widgets");
 }
 
 /**
  * Invoke the `update_toggle_shortcut` command.
  */
-export async function invokeUpdateToggleShortcut(payload: {
+export function invokeUpdateToggleShortcut(payload: {
   oldShortcut?: string;
   newShortcut?: string;
 }) {

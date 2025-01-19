@@ -1,10 +1,10 @@
 import { Dispatch, SetStateAction, useEffect } from "react";
-import { listenToRenderWidget } from "@/events";
-import { CanvasWidgetState, WidgetModule } from "@/types/frontend";
-import { WidgetSettings } from "@/types/backend";
-import { invokeBundleWidget } from "@/commands";
-import ErrorDisplay from "@/canvas/components/ErrorDisplay";
-import { grabErrorInfo } from "@/canvas/utils";
+import { listenToRenderWidget } from "../../events";
+import { CanvasWidgetState, WidgetModule } from "../../types/frontend";
+import { WidgetSettings } from "../../types/backend";
+import { invokeBundleWidget } from "../../commands";
+import ErrorDisplay from "../../canvas/components/ErrorDisplay";
+import { grabErrorInfo } from "../../canvas/utils";
 
 // The default width and height of a widget container, used when the widget module
 // fails to be loaded correctly

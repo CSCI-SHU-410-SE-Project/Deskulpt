@@ -1,9 +1,9 @@
 import { Dispatch, SetStateAction } from "react";
-import { WidgetSettings } from "@/types/backend";
-import { ManagerWidgetState } from "@/types/frontend";
-import { emitRenderWidgetToCanvas } from "@/events";
+import { WidgetSettings } from "../../types/backend";
+import { ManagerWidgetState } from "../../types/frontend";
+import { emitRenderWidgetToCanvas } from "../../events";
 import { DataList, Flex } from "@radix-ui/themes";
-import NumberInput from "@/manager/components/NumberInput";
+import NumberInput from "../components/NumberInput";
 import { FaTimes } from "react-icons/fa";
 
 export interface WidgetContentSettingListProps {

@@ -54,7 +54,7 @@ export default function useKeyboardListener(): KeyboardListenerOutput {
     }
 
     // Only include non-modifier keys as the final main key of the shortcut
-    if (!modifierKeys.includes(event.key)) {
+    if (!modifierKeys.has(event.key)) {
       if (event.code in codeMapping) {
         keys.push(codeMapping[event.code as keyof typeof codeMapping]);
         localHasKey = true;
@@ -150,4 +150,4 @@ const codeMapping = {
   KeyZ: "Z",
 };
 
-const modifierKeys = ["Alt", "Control", "Meta", "Shift"];
+const modifierKeys = new Set(["Alt", "Control", "Meta", "Shift"]);

@@ -3,11 +3,6 @@ import { resolve } from "path";
 import react from "@vitejs/plugin-react";
 
 export default defineConfig({
-  resolve: {
-    alias: {
-      "@": __dirname,
-    },
-  },
   plugins: [
     react({
       jsxImportSource: "@emotion/react",

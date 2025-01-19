@@ -1,5 +1,5 @@
 import { Badge, Box, Flex, Tabs, Text } from "@radix-ui/themes";
-import { Result, WidgetConfig } from "@/types/backend";
+import { Result, WidgetConfig } from "../../types/backend";
 
 export interface WidgetTriggerProps {
   /** The index of the widget in the collection. */

@@ -1,5 +1,5 @@
 import { Avatar, DataList, Flex, Heading, Text } from "@radix-ui/themes";
-import ExternalCopyLink from "@/manager/components/ExternalCopyLink";
+import ExternalCopyLink from "../components/ExternalCopyLink";
 import Logo from "/deskulpt.svg";
 
 /**

@@ -4,7 +4,7 @@
  */
 
 import { ReactNode } from "react";
-import { Result, WidgetConfig, WidgetSettings } from "@/types/backend";
+import { Result, WidgetConfig, WidgetSettings } from "./backend";
 
 /**
  * The user-defined widget interface.

@@ -1,6 +1,6 @@
 import { Dispatch, SetStateAction, useEffect } from "react";
-import { listenToRemoveWidgets } from "@/events";
-import { CanvasWidgetState } from "@/types/frontend";
+import { listenToRemoveWidgets } from "../../events";
+import { CanvasWidgetState } from "../../types/frontend";
 
 /**
  * Listen and react to the "remove-widgets" event.
@@ -20,7 +20,7 @@ export default function useRemoveWidgetsListener(
 
       removedIds.forEach((widgetId) => {
         const state = canvasWidgetStates[widgetId];
-        if (state == null) {
+        if (state === null) {
           return; // This should not happen but let us be safe
         }
 

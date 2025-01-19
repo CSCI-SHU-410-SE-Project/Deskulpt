@@ -42,7 +42,7 @@ export default function NumberInput({
       return;
     }
 
-    const value = parseInt(event.target.value);
+    const value = parseInt(event.target.value, 10);
     if (min !== undefined && value < min) {
       onChange(min);
       return;
