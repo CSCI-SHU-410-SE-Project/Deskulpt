@@ -1,15 +1,15 @@
 import { Dispatch, SetStateAction } from "react";
 import { LuFileScan, LuFolderOpen, LuRepeat } from "react-icons/lu";
-import { invokeOpenInWidgetsDir } from "../../commands";
+import { invokeOpenInWidgetsDir } from "../../core/commands";
 import { Flex, ScrollArea, Tabs } from "@radix-ui/themes";
 import { toast } from "sonner";
 import { ManagerWidgetState } from "../../types/frontend";
 import WidgetTrigger from "../components/WidgetTrigger";
 import WidgetContent from "../components/WidgetContent";
 import FloatButton from "../components/FloatButton";
-import { emitRenderWidgetToCanvas } from "../../events";
+import { emitRenderToCanvas } from "../../core/events";
 
-export interface WidgetsTabProps {
+interface Props {
   /** The manager widget states. */
   managerWidgetStates: Record<string, ManagerWidgetState>;
   /** Setter for the manager widget states. */
@@ -27,17 +27,17 @@ export interface WidgetsTabProps {
  * bottom right corner. It contains the triggers {@link WidgetTrigger} and the contents
  * {@link WidgetContent} for each widget in the collection.
  */
-export default function WidgetsTab({
+export default ({
   managerWidgetStates,
   setManagerWidgetStates,
   rescanAndRender,
-}: WidgetsTabProps) {
+}: Props) => {
   const managerWidgetStatesArray = Object.entries(managerWidgetStates);
 
   const rerenderAction = async () => {
     await Promise.all(
-      managerWidgetStatesArray.map(([widgetId, { settings }]) =>
-        emitRenderWidgetToCanvas({ widgetId, settings, bundle: true }),
+      managerWidgetStatesArray.map(([id, { settings }]) =>
+        emitRenderToCanvas({ id, settings }),
       ),
     );
     toast.success(`Re-rendered ${managerWidgetStatesArray.length} widgets.`);
@@ -82,18 +82,16 @@ export default function WidgetsTab({
               </ScrollArea>
             </Tabs.List>
           )}
-          {managerWidgetStatesArray.map(
-            ([widgetId, { config, settings }], index) => (
-              <WidgetContent
-                key={widgetId}
-                index={index}
-                widgetId={widgetId}
-                config={config}
-                settings={settings}
-                setManagerWidgetStates={setManagerWidgetStates}
-              />
-            ),
-          )}
+          {managerWidgetStatesArray.map(([id, { config, settings }], index) => (
+            <WidgetContent
+              key={id}
+              index={index}
+              id={id}
+              config={config}
+              settings={settings}
+              setManagerWidgetStates={setManagerWidgetStates}
+            />
+          ))}
         </Flex>
       </Tabs.Root>
       <FloatButton
@@ -117,4 +115,4 @@ export default function WidgetsTab({
       />
     </>
   );
-}
+};

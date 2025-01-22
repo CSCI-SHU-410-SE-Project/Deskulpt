@@ -1,3 +1,5 @@
-fixtures/
-src/.scripts/
 pnpm-lock.yaml
+
+# Auto-generated minimized files
+crates/deskulpt-core/.scripts
+src/.scripts/

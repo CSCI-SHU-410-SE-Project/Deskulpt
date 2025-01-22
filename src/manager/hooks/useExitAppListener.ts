@@ -1,6 +1,6 @@
 import { useEffect } from "react";
-import { listenToExitApp } from "../../events";
-import { invokeExitApp } from "../../commands";
+import { listenToExitApp } from "../../core/events";
+import { invokeExitApp } from "../../core/commands";
 import { ManagerWidgetState } from "../../types/frontend";
 import { Appearance } from "../../types/backend";
 

@@ -3,7 +3,7 @@
  * without corresponding backend implementations.
  */
 
-import { ReactNode } from "react";
+import { FC } from "react";
 import { Result, WidgetConfig, WidgetSettings } from "./backend";
 
 /**
@@ -13,12 +13,11 @@ import { Result, WidgetConfig, WidgetSettings } from "./backend";
  * interface as default.
  */
 export interface Widget {
-  /** Function that returns the React component to render. */
-  render: () => ReactNode;
+  Component: FC<{ id: string }>;
   /** Widget widget as accepted in CSS. */
-  width: string;
+  width?: string;
   /** Widget height as accepted in CSS. */
-  height: string;
+  height?: string;
 }
 
 /**
@@ -28,44 +27,6 @@ export interface ManagerWidgetState {
   /** Configuration or configuration error of the widget. */
   config: Result<WidgetConfig, string>;
   /** Settings of the widget. */
-  settings: WidgetSettings;
-}
-
-/**
- * The state of a widget on the canvas.
- */
-export interface CanvasWidgetState {
-  /** The rendered widget component or the error component to display. */
-  display: ReactNode;
-  /** The width of the widget container, as exported from the widget module. */
-  width: Widget["width"];
-  /** The height of the widget container, as exported from the widget module. */
-  height: Widget["height"];
-  /** Settings of the widget. */
-  settings: WidgetSettings;
-  /** The URL of the blob of widget APIs. */
-  apisBlobUrl: string;
-  /** The URL of the blob of the widget module. */
-  moduleBlobUrl?: string;
-}
-
-/**
- * The module obtained by dynamically importing the bundle of widget source code.
- */
-export interface WidgetModule {
-  /** The default export of the entry file of a user-defined widget. */
-  default: Widget;
-}
-
-/**
- * The payload of the "render-widget" event.
- */
-export interface RenderWidgetPayload {
-  /** The widget ID. */
-  widgetId: string;
-  /** Whether to call the backend to bundle the widget. */
-  bundle: boolean;
-  /** The widget-specific settings. */
   settings: WidgetSettings;
 }
 

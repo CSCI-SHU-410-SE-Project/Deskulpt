@@ -11,7 +11,7 @@ import { Box, Tabs, Theme } from "@radix-ui/themes";
 import ManagerToaster from "./components/ManagerToaster";
 import AppearanceToggler from "./components/AppearanceToggler";
 
-export interface ManagerAppProps {
+interface Props {
   /** The initial settings read from the previously saved setting file. */
   initialSettings: Settings;
 }
@@ -19,7 +19,7 @@ export interface ManagerAppProps {
 /**
  * The main component of the manager window.
  */
-export default function App({ initialSettings }: ManagerAppProps) {
+export default ({ initialSettings }: Props) => {
   const [appearance, setAppearance] = useState(initialSettings.appearance);
   const { toggleShortcut, setToggleShortcut } = useToggleShortcut(
     initialSettings.toggleShortcut,
@@ -78,4 +78,4 @@ export default function App({ initialSettings }: ManagerAppProps) {
       </Tabs.Root>
     </Theme>
   );
-}
+};

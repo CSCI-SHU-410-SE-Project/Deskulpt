@@ -60,7 +60,7 @@ function cleanDir(path: string) {
   let dir: Dir;
   try {
     dir = opendirSync(path);
-  } catch (err: unknown) {
+  } catch (err) {
     if (err instanceof Error && "code" in err) {
       switch (err.code) {
         case "ENOENT":

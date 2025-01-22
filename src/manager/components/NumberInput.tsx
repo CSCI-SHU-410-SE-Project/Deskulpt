@@ -1,6 +1,6 @@
 import { ChangeEvent, useEffect } from "react";
 
-export interface NumberInputProps {
+interface Props {
   /** The controlled number input value. */
   value: number;
   /** The callback on value change. */
@@ -25,13 +25,7 @@ export interface NumberInputProps {
  * such that it has the increment/decrement buttons, accepts keyboard input, reacts to
  * up/down keys and the scroll wheel, etc.
  */
-export default function NumberInput({
-  value,
-  onChange,
-  min,
-  max,
-  width,
-}: NumberInputProps) {
+export default ({ value, onChange, min, max, width }: Props) => {
   useEffect(() => {
     onChange(value);
   }, [value]);
@@ -70,4 +64,4 @@ export default function NumberInput({
       }}
     />
   );
-}
+};

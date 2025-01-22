@@ -1,20 +1,11 @@
 import { Badge, Box, Flex, Heading, ScrollArea, Text } from "@radix-ui/themes";
 
-export interface ErrorDisplayProps {
-  /** Title of the error display. */
-  title: string;
-  /** The full error message. */
+interface Props {
+  id: string;
   error: string;
 }
 
-/**
- * The error display component for user widget errors.
- *
- * It will display an error badge and the error title as a heading, followed by the full
- * error message displayed as pre-wrap monospace text. The component is wrapped in a
- * scroll area is scrollable in both directions.
- */
-export default function ErrorDisplay({ title, error }: ErrorDisplayProps) {
+export default ({ id, error }: Props) => {
   return (
     <ScrollArea scrollbars="both" asChild>
       <Box p="2">
@@ -22,7 +13,7 @@ export default function ErrorDisplay({ title, error }: ErrorDisplayProps) {
           <Flex align="center" gap="2">
             <Badge color="red">Error</Badge>
             <Heading size="2" trim="both" css={{ whiteSpace: "pre" }}>
-              {title}
+              {id}
             </Heading>
           </Flex>
           <Text
@@ -35,4 +26,4 @@ export default function ErrorDisplay({ title, error }: ErrorDisplayProps) {
       </Box>
     </ScrollArea>
   );
-}
+};

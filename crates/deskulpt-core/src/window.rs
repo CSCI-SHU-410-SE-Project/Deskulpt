@@ -5,6 +5,14 @@ use tauri::{
     App, AppHandle, Manager, Runtime, WebviewUrl, WebviewWindowBuilder, Window, WindowEvent,
 };
 
+/// Initialization script for the canvas window.
+const CANVAS_INIT_SCRIPT: &str = concat!(
+    "Object.defineProperty(window, \"__DESKULPT_INTERNALS__\", { value: { ",
+    "apisTemplate: `",
+    include_str!("../.scripts/apis.template.js"),
+    "` } });",
+);
+
 /// Extention trait for window-related operations.
 pub trait WindowExt {
     /// Create the manager window.
@@ -46,6 +54,7 @@ macro_rules! shared_impl {
                     .visible(false)
                     // Unsupported on macOS; see below for activation policy
                     .skip_taskbar(true)
+                    .initialization_script(CANVAS_INIT_SCRIPT)
                     .build()?;
 
                 #[cfg(target_os = "macos")]

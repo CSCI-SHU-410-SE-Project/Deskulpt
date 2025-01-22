@@ -1,12 +1,12 @@
 import { Dispatch, SetStateAction } from "react";
 import { WidgetSettings } from "../../types/backend";
 import { ManagerWidgetState } from "../../types/frontend";
-import { emitRenderWidgetToCanvas } from "../../events";
+import { emitUpdateSettingsToCanvas } from "../../core/events";
 import { DataList, Flex } from "@radix-ui/themes";
 import NumberInput from "../components/NumberInput";
 import { FaTimes } from "react-icons/fa";
 
-export interface WidgetContentSettingListProps {
+interface Props {
   /** The widget ID. */
   widgetId: string;
   /** The widget-specific setting. */
@@ -24,21 +24,16 @@ export interface WidgetContentSettingListProps {
  * manager will be updated via the setter, and the updated settings will also be sent
  * to the canvas via emitting corresponding events.
  */
-export default function WidgetContentSettingList({
-  widgetId,
-  settings,
-  setManagerWidgetStates,
-}: WidgetContentSettingListProps) {
+export default ({ widgetId, settings, setManagerWidgetStates }: Props) => {
   function updateSetting(partialSettings: Partial<WidgetSettings>) {
     const newSettings = { ...settings, ...partialSettings };
     setManagerWidgetStates((prev) => ({
       ...prev,
       [widgetId]: { ...prev[widgetId], settings: newSettings },
     }));
-    emitRenderWidgetToCanvas({
-      widgetId,
+    emitUpdateSettingsToCanvas({
+      id: widgetId,
       settings: newSettings,
-      bundle: false,
     }).catch(console.error);
   }
 
@@ -78,4 +73,4 @@ export default function WidgetContentSettingList({
       </DataList.Item>
     </DataList.Root>
   );
-}
+};

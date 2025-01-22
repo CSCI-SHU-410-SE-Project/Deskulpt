@@ -3,7 +3,7 @@ import { DataList, Flex } from "@radix-ui/themes";
 import SettingToggleShortcut from "../components/SettingToggleShortcut";
 import Shortcut from "../components/Shortcut";
 
-export interface SettingsTabProps {
+interface Props {
   /** The current toggle shortcut. */
   toggleShortcut?: string;
   /** Setter for the toggle shortcut state. */
@@ -16,10 +16,7 @@ export interface SettingsTabProps {
  * This tab is rendered as a data list with some margin. It contains the settings and
  * setters for the global settings, which include the toggle shortcut.
  */
-export default function SettingsTab({
-  toggleShortcut,
-  setToggleShortcut,
-}: SettingsTabProps) {
+export default ({ toggleShortcut, setToggleShortcut }: Props) => {
   const shortcutKeys = toggleShortcut?.split("+") ?? [];
 
   return (
@@ -35,4 +32,4 @@ export default function SettingsTab({
       </DataList.Item>
     </DataList.Root>
   );
-}
+};

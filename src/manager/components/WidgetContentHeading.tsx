@@ -1,7 +1,7 @@
 import { Button, Flex, Heading } from "@radix-ui/themes";
 import { ReactNode } from "react";
 
-export interface WidgetContentHeadingProps {
+interface Props {
   /** The component to put in the heading. */
   heading: ReactNode;
   /** The icon for the action button. */
@@ -18,12 +18,7 @@ export interface WidgetContentHeadingProps {
  * This displays the heading aligned left and the action button aligned right. The
  * action button will be composed of the icon then the text.
  */
-export default function WidgetContentHeading({
-  heading,
-  actionIcon,
-  actionText,
-  action,
-}: WidgetContentHeadingProps) {
+export default ({ heading, actionIcon, actionText, action }: Props) => {
   return (
     <Flex justify="between" align="center">
       <Heading size="2">{heading}</Heading>
@@ -39,4 +34,4 @@ export default function WidgetContentHeading({
       </Button>
     </Flex>
   );
-}
+};

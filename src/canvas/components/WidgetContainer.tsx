@@ -1,54 +1,26 @@
-import { PropsWithChildren, RefObject, useRef } from "react";
+import { memo, RefObject, useRef } from "react";
 import Draggable, { DraggableData, DraggableEvent } from "react-draggable";
 import { ErrorBoundary } from "react-error-boundary";
-import ErrorDisplay from "../components/ErrorDisplay";
-import { grabErrorInfo } from "../utils";
-import { WidgetSettings } from "../../types/backend";
 import { LuGripVertical } from "react-icons/lu";
 import { Box } from "@radix-ui/themes";
-import { Widget } from "../../types/frontend";
+import { WidgetState } from "../hooks";
+import { UpdateSettingsCallback } from "../hooks";
+import ErrorDisplay from "./ErrorDisplay";
+import { stringifyError } from "../utils";
 
-export interface WidgetContainerProps {
-  /** ID of the widget. */
+interface Props {
   id: string;
-  /** The settings of the widget. */
-  settings: WidgetSettings;
-  /** Callback function to update the settings of the specific widget. */
-  setSettings: (settings: WidgetSettings) => void;
-  /** Width of the widget container. */
-  width: Widget["width"];
-  /** Height of the widget container. */
-  height: Widget["height"];
+  widget: WidgetState;
+  updateSettings: UpdateSettingsCallback;
 }
 
-/**
- * The widget container component that wraps around each user widget.
- *
- * It wraps the widget in a draggable container with a grip handle on the top right
- * corner on hover. It adds no padding within the container to allow users to have full
- * control over the appearance.
- *
- * If the child (i.e., the widget) throws a rendering error, it will be caught by the
- * error boundary and displayed with the {@link ErrorDisplay} component.
- */
-export default function WidgetContainer({
-  id,
-  settings,
-  setSettings,
-  width,
-  height,
-  children,
-}: PropsWithChildren<WidgetContainerProps>) {
+export default memo(({ id, widget, updateSettings }: Props) => {
+  const { Component, width, height, x, y, opacity } = widget;
   const containerRef = useRef<HTMLDivElement>(null);
-  let retried = false;
 
-  function updateContainerPos(_: DraggableEvent, data: DraggableData) {
-    setSettings({
-      ...settings,
-      x: settings.x + data.x,
-      y: settings.y + data.y,
-    });
-  }
+  const updateContainerPos = (_: DraggableEvent, data: DraggableData) => {
+    updateSettings(id, { x: x + data.x, y: y + data.y });
+  };
 
   return (
     <Draggable
@@ -64,16 +36,16 @@ export default function WidgetContainer({
         ref={containerRef}
         overflow="hidden"
         position="absolute"
-        left={`${settings.x}px`}
-        top={`${settings.y}px`}
-        width={width}
-        height={height}
+        left={`${x}px`}
+        top={`${y}px`}
+        width={width ?? "300px"}
+        height={height ?? "150px"}
         css={{
           color: "var(--gray-12)",
           backgroundColor: "var(--gray-surface)",
           borderRadius: "var(--radius-2)",
           boxShadow: "0 0 2px var(--gray-8)",
-          opacity: `${settings.opacity}%`,
+          opacity: `${opacity}%`,
         }}
       >
         <LuGripVertical
@@ -93,27 +65,14 @@ export default function WidgetContainer({
           }}
         />
         <ErrorBoundary
-          fallbackRender={({ error, resetErrorBoundary }) => {
-            if (!retried) {
-              // Reset the error boundary and retry the render once per re-render of the
-              // widget, since otherwise even if the error in the children is fixed, the
-              // error boundary will not refresh itself; note that the `retried` flag is
-              // reset to false on each re-render and it is here to prevent infinite
-              // loops of resetting error boundary and falling back
-              resetErrorBoundary();
-              retried = true;
-            }
-            return (
-              <ErrorDisplay
-                title={`Error in '${id}': potential issues with the \`render\` function)`}
-                error={grabErrorInfo(error)}
-              />
-            );
-          }}
+          resetKeys={[id, widget]}
+          fallbackRender={({ error }) => (
+            <ErrorDisplay id={id} error={stringifyError(error)} />
+          )}
         >
-          {children}
+          <Component id={id} />
         </ErrorBoundary>
       </Box>
     </Draggable>
   );
-}
+});

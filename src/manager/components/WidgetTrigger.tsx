@@ -1,7 +1,7 @@
 import { Badge, Box, Flex, Tabs, Text } from "@radix-ui/themes";
 import { Result, WidgetConfig } from "../../types/backend";
 
-export interface WidgetTriggerProps {
+interface Props {
   /** The index of the widget in the collection. */
   index: number;
   /** The widget configuration or error. */
@@ -15,7 +15,7 @@ export interface WidgetTriggerProps {
  * will display the widget name with a green indicator. Otherwise, it will display an
  * error badge with a red indicator.
  */
-export default function WidgetTrigger({ index, config }: WidgetTriggerProps) {
+export default ({ index, config }: Props) => {
   return (
     <Tabs.Trigger
       value={`tab${index}`}
@@ -50,4 +50,4 @@ export default function WidgetTrigger({ index, config }: WidgetTriggerProps) {
       </Flex>
     </Tabs.Trigger>
   );
-}
+};

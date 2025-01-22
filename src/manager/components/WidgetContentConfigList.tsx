@@ -2,9 +2,9 @@ import { Code, DataList, Flex, IconButton, Tooltip } from "@radix-ui/themes";
 import { WidgetConfig } from "../../types/backend";
 import WidgetDependencies from "../components/WidgetDependencies";
 import { MdOpenInNew } from "react-icons/md";
-import { invokeOpenInWidgetsDir } from "../../commands";
+import { invokeOpenInWidgetsDir } from "../../core/commands";
 
-export interface WidgetContentConfigListProps {
+interface Props {
   /** The widget ID. */
   widgetId: string;
   /** The widget configuration. */
@@ -17,10 +17,7 @@ export interface WidgetContentConfigListProps {
  * This is rendered as a data list, displaying the widget ID, name, entry, and
  * external dependencies.
  */
-export default function WidgetContentConfigList({
-  widgetId,
-  config,
-}: WidgetContentConfigListProps) {
+export default ({ widgetId, config }: Props) => {
   return (
     <DataList.Root size="2" css={{ gap: "var(--space-2)" }}>
       <DataList.Item>
@@ -60,4 +57,4 @@ export default function WidgetContentConfigList({
       </DataList.Item>
     </DataList.Root>
   );
-}
+};

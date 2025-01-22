@@ -29,7 +29,7 @@ export default defineConfig([
     input: "src/index.ts",
     output: {
       format: "esm",
-      file: "../../src/public/.wrap-apis.js.txt",
+      file: "../../crates/deskulpt-core/.scripts/apis.template.js",
     },
     external: ["@tauri-apps/api/core", "__RAW_APIS_URL__"],
     plugins: [
@@ -70,7 +70,7 @@ function cleanDir(path: string) {
   let dir: Dir;
   try {
     dir = opendirSync(path);
-  } catch (err: unknown) {
+  } catch (err) {
     if (err instanceof Error && "code" in err) {
       switch (err.code) {
         case "ENOENT":

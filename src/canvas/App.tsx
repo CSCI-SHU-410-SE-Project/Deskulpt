@@ -1,47 +1,31 @@
-import { useState } from "react";
-import { CanvasWidgetState } from "../types/frontend";
-import { WidgetSettings } from "../types/backend";
-import { emitUpdateSettingsToManager } from "../events";
-import WidgetContainer from "./components/WidgetContainer";
-import useRenderWidgetListener from "./hooks/useRenderWidgetListener";
-import useRemoveWidgetsListener from "./hooks/useRemoveWidgetsListener";
-import useShowToastListener from "./hooks/useShowToastListener";
 import { Toaster } from "sonner";
 import { Theme } from "@radix-ui/themes";
-import useAppearanceListener from "./hooks/useAppearanceListener";
+import {
+  useAppearance,
+  useBatchRemoveListener,
+  useRenderCallback,
+  useRenderListener,
+  useShowToastListener,
+  useUpdateSettingsCallback,
+  useUpdateSettingsListener,
+  useWidgets,
+} from "./hooks";
+import { WidgetContainer } from "./components";
 
-/**
- * The main component of the canvas window.
- */
-export default function App() {
-  const [canvasWidgetStates, setCanvasWidgetStates] = useState<
-    Record<string, CanvasWidgetState>
-  >({});
-  const appearance = useAppearanceListener();
+export default () => {
+  // States
+  const appearance = useAppearance();
+  const [widgets, widgetsDispatch] = useWidgets();
 
+  // Callbacks
+  const render = useRenderCallback(widgets, widgetsDispatch);
+  const updateSettings = useUpdateSettingsCallback(widgetsDispatch);
+
+  // Listeners
+  useBatchRemoveListener(widgets, widgetsDispatch);
+  useRenderListener(render);
   useShowToastListener();
-  useRenderWidgetListener(canvasWidgetStates, setCanvasWidgetStates);
-  useRemoveWidgetsListener(canvasWidgetStates, setCanvasWidgetStates);
-
-  /**
-   * Update the settings of a particular widget.
-   *
-   * This function not only updates the settings in the canvas widget states, but also
-   * notifies the manager to update the widget-specific settings as well.
-   */
-  async function setSettingsForWidget(
-    widgetId: string,
-    settings: WidgetSettings,
-  ) {
-    // This step must be done first, otherwise there will be a visible delay between
-    // the transform change and the absolute position change, causing an undesirable
-    // visual effect
-    setCanvasWidgetStates((prev) => ({
-      ...prev,
-      [widgetId]: { ...prev[widgetId], settings },
-    }));
-    await emitUpdateSettingsToManager({ widgetId, settings });
-  }
+  useUpdateSettingsListener(widgetsDispatch);
 
   return (
     <Theme
@@ -62,20 +46,14 @@ export default function App() {
           },
         }}
       />
-      {Object.entries(canvasWidgetStates).map(
-        ([widgetId, { display, width, height, settings }]) => (
-          <WidgetContainer
-            key={widgetId}
-            id={widgetId}
-            settings={settings}
-            setSettings={(settings) => setSettingsForWidget(widgetId, settings)}
-            width={width}
-            height={height}
-          >
-            {display}
-          </WidgetContainer>
-        ),
-      )}
+      {Object.entries(widgets).map(([id, widget]) => (
+        <WidgetContainer
+          key={id}
+          id={id}
+          widget={widget}
+          updateSettings={updateSettings}
+        />
+      ))}
     </Theme>
   );
-}
+};

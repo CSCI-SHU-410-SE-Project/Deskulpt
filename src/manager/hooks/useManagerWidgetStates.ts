@@ -1,11 +1,8 @@
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { ManagerWidgetState } from "../../types/frontend";
 import { WidgetSettings } from "../../types/backend";
-import { invokeRescanWidgets } from "../../commands";
-import {
-  emitRemoveWidgetsToCanvas,
-  emitRenderWidgetToCanvas,
-} from "../../events";
+import { invokeRescanWidgets } from "../../core/commands";
+import { emitBatchRemoveToCanvas, emitRenderToCanvas } from "../../core/events";
 
 export interface UseManagerWidgetStatesOutput {
   /** The manager widget states. */
@@ -47,12 +44,12 @@ export default function useManagerWidgetStates(
 
     // If a widget exists in the previous states but does not exist in the new detected
     // configurations, we consider it as removed from the collection
-    const removedIds = Object.keys(managerWidgetStates).filter(
+    const ids = Object.keys(managerWidgetStates).filter(
       (id) => !(id in detectedConfigs),
     );
-    if (removedIds.length > 0) {
+    if (ids.length > 0) {
       // Notify the cacnvas to clean up resources allocated for removed widgets
-      await emitRemoveWidgetsToCanvas({ removedIds });
+      await emitBatchRemoveToCanvas({ ids });
     }
 
     // Return the new states, wrapped from the detected configurations; note that we are
@@ -85,12 +82,12 @@ export default function useManagerWidgetStates(
   async function rescanAndRender() {
     const newManagerWidgetStates = await getNewManagerWidgetStates();
     const addedStates = Object.entries(newManagerWidgetStates).filter(
-      ([widgetId]) => !(widgetId in managerWidgetStates),
+      ([id]) => !(id in managerWidgetStates),
     );
     setManagerWidgetStates(newManagerWidgetStates); // Direct replacement
     await Promise.all(
-      addedStates.map(([widgetId, { settings }]) =>
-        emitRenderWidgetToCanvas({ widgetId, settings, bundle: true }),
+      addedStates.map(([id, { settings }]) =>
+        emitRenderToCanvas({ id, settings }),
       ),
     );
     return addedStates.length;
