@@ -39,8 +39,8 @@ export default ({ dependencies }: Props) => {
           <Popover.Content size="1">
             <ScrollArea scrollbars="vertical">
               <Flex direction="column" maxHeight="100px" pr="4" gap="1">
-                {dependenciesArray.map(([name, version], index) => (
-                  <Flex key={index} gap="4" align="center">
+                {dependenciesArray.map(([name, version]) => (
+                  <Flex key={name} gap="4" align="center">
                     <Link
                       size="1"
                       href={`https://www.npmjs.com/package/${name}`}

@@ -60,7 +60,7 @@ impl PluginCommand for GetSystemInfo {
     #[dispatch]
     fn run(
         &self,
-        _widget_id: String,
+        _id: String,
         plugin: &Self::Plugin,
         _engine: &EngineInterface,
         input: (),

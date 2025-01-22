@@ -55,19 +55,19 @@ export default function useManagerWidgetStates(
     // Return the new states, wrapped from the detected configurations; note that we are
     // only caring about the detected configurations
     return Object.fromEntries(
-      Object.entries(detectedConfigs).map(([widgetId, config]) => {
+      Object.entries(detectedConfigs).map(([id, config]) => {
         let settings: WidgetSettings;
-        if (widgetId in managerWidgetStates) {
+        if (id in managerWidgetStates) {
           // The widget state already exists, from which we can get its settings
-          settings = managerWidgetStates[widgetId].settings;
-        } else if (widgetId in initialWidgetSettings) {
+          settings = managerWidgetStates[id].settings;
+        } else if (id in initialWidgetSettings) {
           // There is an initial setting for the widget
-          settings = initialWidgetSettings[widgetId];
+          settings = initialWidgetSettings[id];
         } else {
           // Fall back to the default setting
           settings = { x: 0, y: 0, opacity: 100 };
         }
-        return [widgetId, { config, settings }];
+        return [id, { config, settings }];
       }),
     );
   }

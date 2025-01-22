@@ -43,7 +43,7 @@ export interface RemoveWidgetsPayload {
  */
 export interface UpdateSettingsPayload {
   /** The widget ID. */
-  widgetId: string;
+  id: string;
   /** The widget-specific settings to update. */
   settings: WidgetSettings;
 }

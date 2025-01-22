@@ -8,7 +8,7 @@ import { FaTimes } from "react-icons/fa";
 
 interface Props {
   /** The widget ID. */
-  widgetId: string;
+  id: string;
   /** The widget-specific setting. */
   settings: WidgetSettings;
   /** Setter for the manager widget states. */
@@ -24,15 +24,15 @@ interface Props {
  * manager will be updated via the setter, and the updated settings will also be sent
  * to the canvas via emitting corresponding events.
  */
-export default ({ widgetId, settings, setManagerWidgetStates }: Props) => {
+export default ({ id, settings, setManagerWidgetStates }: Props) => {
   function updateSetting(partialSettings: Partial<WidgetSettings>) {
     const newSettings = { ...settings, ...partialSettings };
     setManagerWidgetStates((prev) => ({
       ...prev,
-      [widgetId]: { ...prev[widgetId], settings: newSettings },
+      [id]: { ...prev[id], settings: newSettings },
     }));
     emitUpdateSettingsToCanvas({
-      id: widgetId,
+      id: id,
       settings: newSettings,
     }).catch(console.error);
   }

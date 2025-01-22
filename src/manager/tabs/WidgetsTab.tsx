@@ -69,15 +69,9 @@ export default ({
             >
               <ScrollArea scrollbars="vertical" asChild>
                 <Flex direction="column">
-                  {managerWidgetStatesArray.map(
-                    ([widgetId, { config }], index) => (
-                      <WidgetTrigger
-                        key={widgetId}
-                        index={index}
-                        config={config}
-                      />
-                    ),
-                  )}
+                  {managerWidgetStatesArray.map(([id, { config }], index) => (
+                    <WidgetTrigger key={id} index={index} config={config} />
+                  ))}
                 </Flex>
               </ScrollArea>
             </Tabs.List>

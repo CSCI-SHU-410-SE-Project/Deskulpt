@@ -23,12 +23,12 @@ impl PluginCommand for RemoveFile {
     #[dispatch]
     fn run(
         &self,
-        widget_id: String,
+        id: String,
         _plugin: &Self::Plugin,
         engine: &EngineInterface,
         input: RemoveFileInputPayload,
     ) -> Result<()> {
-        let path = engine.widget_dir(widget_id.as_str()).join(input.path);
+        let path = engine.widget_dir(id.as_str()).join(input.path);
         std::fs::remove_file(&path)?;
         Ok(())
     }

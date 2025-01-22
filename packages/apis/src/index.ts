@@ -1,9 +1,6 @@
 import rawApis from "./raw";
 
-type AssignWidgetId<T> = T extends (
-  widgetId: string,
-  ...args: infer P
-) => infer R
+type AssignWidgetId<T> = T extends (id: string, ...args: infer P) => infer R
   ? (...args: P) => R
   : never;
 
@@ -12,7 +9,7 @@ type WrappedApis<T> = {
 };
 
 function wrapApis<T>(
-  widgetId: string,
+  id: string,
   apis: T,
 ): { [K in keyof T]: WrappedApis<T[K]> } {
   const wrappedApis: any = {};
@@ -22,8 +19,7 @@ function wrapApis<T>(
     for (const funcName in module) {
       const func = module[funcName];
       if (typeof func === "function") {
-        wrappedApis[modName][funcName] = (...args: any[]) =>
-          func(widgetId, ...args);
+        wrappedApis[modName][funcName] = (...args: any[]) => func(id, ...args);
       }
     }
   }

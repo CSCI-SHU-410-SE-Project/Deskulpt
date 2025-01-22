@@ -64,7 +64,7 @@ export default ({
         <ScrollArea scrollbars="vertical" asChild>
           <Box px="2" css={{ flex: 3 }}>
             {"Ok" in config ? (
-              <WidgetContentConfigList widgetId={id} config={config.Ok} />
+              <WidgetContentConfigList id={id} config={config.Ok} />
             ) : (
               <Text
                 size="1"
@@ -91,7 +91,7 @@ export default ({
         />
         <Box px="2" css={{ flex: 4 }}>
           <WidgetContentSettingsList
-            widgetId={id}
+            id={id}
             settings={settings}
             setManagerWidgetStates={setManagerWidgetStates}
           />

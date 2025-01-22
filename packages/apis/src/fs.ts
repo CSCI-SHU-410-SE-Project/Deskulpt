@@ -1,88 +1,82 @@
 import { invoke } from "@tauri-apps/api/core";
 
-function appendFile(
-  widgetId: string,
-  payload: { path: string; content: string },
-) {
+function appendFile(id: string, payload: { path: string; content: string }) {
   return invoke<void>("call_plugin", {
     plugin: "fs",
     command: "append_file",
-    widgetId,
+    id,
     payload,
   });
 }
 
-function createDir(widgetId: string, payload: { path: string }) {
+function createDir(id: string, payload: { path: string }) {
   return invoke<void>("call_plugin", {
     plugin: "fs",
     command: "create_dir",
-    widgetId,
+    id,
     payload,
   });
 }
 
-function exists(widgetId: string, payload: { path: string }) {
+function exists(id: string, payload: { path: string }) {
   return invoke<boolean>("call_plugin", {
     plugin: "fs",
     command: "exists",
-    widgetId,
+    id,
     payload,
   });
 }
 
-function isDir(widgetId: string, payload: { path: string }) {
+function isDir(id: string, payload: { path: string }) {
   return invoke<boolean>("call_plugin", {
     plugin: "fs",
     command: "is_dir",
-    widgetId,
+    id,
     payload,
   });
 }
 
-function isFile(widgetId: string, payload: { path: string }) {
+function isFile(id: string, payload: { path: string }) {
   return invoke<boolean>("call_plugin", {
     plugin: "fs",
     command: "is_file",
-    widgetId,
+    id,
     payload,
   });
 }
 
-function readFile(widgetId: string, payload: { path: string }) {
+function readFile(id: string, payload: { path: string }) {
   return invoke<string>("call_plugin", {
     plugin: "fs",
     command: "read_file",
-    widgetId,
+    id,
     payload,
   });
 }
 
-function removeDir(widgetId: string, payload: { path: string }) {
+function removeDir(id: string, payload: { path: string }) {
   return invoke<void>("call_plugin", {
     plugin: "fs",
     command: "remove_dir",
-    widgetId,
+    id,
     payload,
   });
 }
 
-function removeFile(widgetId: string, payload: { path: string }) {
+function removeFile(id: string, payload: { path: string }) {
   return invoke<void>("call_plugin", {
     plugin: "fs",
     command: "remove_file",
-    widgetId,
+    id,
     payload,
   });
 }
 
-function writeFile(
-  widgetId: string,
-  payload: { path: string; content: string },
-) {
+function writeFile(id: string, payload: { path: string; content: string }) {
   return invoke<void>("call_plugin", {
     plugin: "fs",
     command: "write_file",
-    widgetId,
+    id,
     payload,
   });
 }

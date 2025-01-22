@@ -6,7 +6,7 @@ import { invokeOpenInWidgetsDir } from "../../core/commands";
 
 interface Props {
   /** The widget ID. */
-  widgetId: string;
+  id: string;
   /** The widget configuration. */
   config: WidgetConfig;
 }
@@ -17,12 +17,12 @@ interface Props {
  * This is rendered as a data list, displaying the widget ID, name, entry, and
  * external dependencies.
  */
-export default ({ widgetId, config }: Props) => {
+export default ({ id, config }: Props) => {
   return (
     <DataList.Root size="2" css={{ gap: "var(--space-2)" }}>
       <DataList.Item>
         <DataList.Label>ID</DataList.Label>
-        <DataList.Value>{widgetId}</DataList.Value>
+        <DataList.Value>{id}</DataList.Value>
       </DataList.Item>
       <DataList.Item>
         <DataList.Label>Name</DataList.Label>
@@ -39,7 +39,7 @@ export default ({ widgetId, config }: Props) => {
                 size="1"
                 onClick={() =>
                   invokeOpenInWidgetsDir({
-                    components: [widgetId, config.entry],
+                    components: [id, config.entry],
                   })
                 }
               >
