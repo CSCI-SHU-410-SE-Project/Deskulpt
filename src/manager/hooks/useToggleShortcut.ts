@@ -17,7 +17,7 @@ export interface UseToggleShortcutOutput {
  *
  * @param initialToggleShortcut The initial toggle shortcut to use.
  */
-export default function useToggleShortcut(
+export function useToggleShortcut(
   initialToggleShortcut?: string,
 ): UseToggleShortcutOutput {
   const [toggleShortcut, setToggleShortcut] = useState(initialToggleShortcut);

@@ -1,7 +1,6 @@
 import { Dispatch, SetStateAction } from "react";
 import { DataList, Flex } from "@radix-ui/themes";
-import SettingToggleShortcut from "../components/SettingToggleShortcut";
-import Shortcut from "../components/Shortcut";
+import { SettingToggleShortcut, Shortcut } from "../components";
 
 interface Props {
   /** The current toggle shortcut. */

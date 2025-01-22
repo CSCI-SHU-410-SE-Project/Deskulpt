@@ -14,7 +14,7 @@ import { Appearance } from "../../types/backend";
  * @param managerWidgetStates The current manager widget states.
  * @param toggleShortcut The current toggle shortcut.
  */
-export default function useExitAppListener(
+export function useExitAppListener(
   toggleShortcut: string | undefined,
   appearance: Appearance,
   managerWidgetStates: Record<string, ManagerWidgetState>,

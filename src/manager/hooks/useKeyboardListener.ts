@@ -19,7 +19,7 @@ export interface KeyboardListenerOutput {
 /**
  * Hook for listening to keyboard inputs.
  */
-export default function useKeyboardListener(): KeyboardListenerOutput {
+export function useKeyboardListener(): KeyboardListenerOutput {
   const [listeningToShortcut, setListeningToShortcut] = useState(false);
   const [listenedShortcut, setListenedShortcut] = useState<string[]>([]);
   const [hasModifier, setHasModifier] = useState(false);

@@ -4,9 +4,7 @@ import { invokeOpenInWidgetsDir } from "../../core/commands";
 import { Flex, ScrollArea, Tabs } from "@radix-ui/themes";
 import { toast } from "sonner";
 import { ManagerWidgetState } from "../../types/frontend";
-import WidgetTrigger from "../components/WidgetTrigger";
-import WidgetContent from "../components/WidgetContent";
-import FloatButton from "../components/FloatButton";
+import { WidgetTrigger, WidgetContent, FloatButton } from "../components";
 import { emitRenderToCanvas } from "../../core/events";
 
 interface Props {

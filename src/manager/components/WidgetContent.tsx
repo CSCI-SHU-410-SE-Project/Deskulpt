@@ -13,10 +13,10 @@ import { Result, WidgetConfig, WidgetSettings } from "../../types/backend";
 import { emitRenderToCanvas } from "../../core/events";
 import { Dispatch, SetStateAction } from "react";
 import { ManagerWidgetState } from "../../types/frontend";
-import WidgetContentHeading from "../components/WidgetContentHeading";
 import { toast } from "sonner";
-import WidgetContentConfigList from "../components/WidgetContentConfigList";
-import WidgetContentSettingsList from "../components/WidgetContentSettingsList";
+import WidgetContentHeading from "./WidgetContentHeading";
+import WidgetContentConfigList from "./WidgetContentConfigList";
+import WidgetContentSettingsList from "./WidgetContentSettingsList";
 
 interface Props {
   /** The index of the widget in the collection. */

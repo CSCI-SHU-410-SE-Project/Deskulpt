@@ -11,7 +11,7 @@ import { ManagerWidgetState } from "../../types/frontend";
  *
  * @param setManagerWidgetStates Setter for the manager widget states.
  */
-export default function useUpdateSettingListener(
+export function useUpdateSettingsListener(
   setManagerWidgetStates: Dispatch<
     SetStateAction<Record<string, ManagerWidgetState>>
   >,

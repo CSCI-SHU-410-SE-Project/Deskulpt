@@ -25,7 +25,7 @@ export interface UseManagerWidgetStatesOutput {
  *
  * @param initialWidgetSettings The initial collection of per-widget settings.
  */
-export default function useManagerWidgetStates(
+export function useManagerWidgetStates(
   initialWidgetSettings: Record<string, WidgetSettings>,
 ): UseManagerWidgetStatesOutput {
   const [managerWidgetStates, setManagerWidgetStates] = useState<

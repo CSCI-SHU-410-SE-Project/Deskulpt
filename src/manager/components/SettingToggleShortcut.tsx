@@ -12,7 +12,7 @@ import {
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import Shortcut from "./Shortcut";
 import { FaEdit } from "react-icons/fa";
-import useKeyboardListener from "../hooks/useKeyboardListener";
+import { useKeyboardListener } from "../hooks";
 
 interface Props {
   /** Setter for the toggle shortcut state. */

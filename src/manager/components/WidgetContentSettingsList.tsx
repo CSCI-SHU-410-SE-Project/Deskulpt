@@ -3,7 +3,7 @@ import { WidgetSettings } from "../../types/backend";
 import { ManagerWidgetState } from "../../types/frontend";
 import { emitUpdateSettingsToCanvas } from "../../core/events";
 import { DataList, Flex } from "@radix-ui/themes";
-import NumberInput from "../components/NumberInput";
+import { NumberInput } from "../components";
 import { FaTimes } from "react-icons/fa";
 
 interface Props {

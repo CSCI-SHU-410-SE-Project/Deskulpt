@@ -2,14 +2,15 @@ import { useState } from "react";
 import WidgetsTab from "./tabs/WidgetsTab";
 import SettingsTab from "./tabs/SettingsTab";
 import AboutTab from "./tabs/AboutTab";
-import useExitAppListener from "./hooks/useExitAppListener";
-import useToggleShortcut from "./hooks/useToggleShortcut";
-import useManagerWidgetStates from "./hooks/useManagerWidgetStates";
-import useUpdateSettingsListener from "./hooks/useUpdateSettingsListener";
+import {
+  useExitAppListener,
+  useToggleShortcut,
+  useManagerWidgetStates,
+  useUpdateSettingsListener,
+} from "./hooks";
 import { Settings } from "../types/backend";
 import { Box, Tabs, Theme } from "@radix-ui/themes";
-import ManagerToaster from "./components/ManagerToaster";
-import AppearanceToggler from "./components/AppearanceToggler";
+import { AppearanceToggler, ManagerToaster } from "./components";
 
 interface Props {
   /** The initial settings read from the previously saved setting file. */
