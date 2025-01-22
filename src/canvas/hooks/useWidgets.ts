@@ -1,8 +1,13 @@
-import { ActionDispatch, createElement, useReducer } from "react";
+import { ActionDispatch, createElement, FC, useReducer } from "react";
 import { WidgetSettings } from "../../types/backend";
-import { Widget } from "../../types/frontend";
 import { ErrorDisplay } from "../components";
 import { stringifyError } from "../utils";
+
+export interface Widget {
+  Component: FC<{ id: string }>;
+  width?: string;
+  height?: string;
+}
 
 export interface WidgetState extends Widget, WidgetSettings {
   apisBlobUrl: string;

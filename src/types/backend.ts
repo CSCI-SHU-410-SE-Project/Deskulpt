@@ -4,8 +4,6 @@
 
 export type Result<T, E> = { Ok: T } | { Err: E };
 
-export type ShowToastPayload = { success: string } | { error: string };
-
 export type WidgetCollection = Record<string, Result<WidgetConfig, string>>;
 
 export interface WidgetConfig {
@@ -16,10 +14,10 @@ export interface WidgetConfig {
   directory: string;
 }
 
-export type Appearance = "light" | "dark";
+export type Theme = "light" | "dark";
 
 export interface Settings {
-  appearance: Appearance;
+  theme: Theme;
   toggleShortcut?: string;
   widgetSettingsMap: Record<string, WidgetSettings>;
 }

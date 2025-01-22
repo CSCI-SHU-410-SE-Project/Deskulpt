@@ -1,9 +1,8 @@
 import { Toaster } from "sonner";
-import { Appearance } from "../../types/backend";
+import { Theme } from "../../types/backend";
 
 interface Props {
-  /** The theme appearance. */
-  appearance: Appearance;
+  theme: Theme;
 }
 
 /**
@@ -12,11 +11,11 @@ interface Props {
  * This is styled on top of [`Toaster`](https://sonner.emilkowal.ski/toaster), rendered
  * in the bottom center of the manager window.
  */
-export default ({ appearance }: Props) => {
+export default ({ theme }: Props) => {
   return (
     <Toaster
       position="bottom-center"
-      theme={appearance}
+      theme={theme}
       gap={6}
       toastOptions={{
         style: {

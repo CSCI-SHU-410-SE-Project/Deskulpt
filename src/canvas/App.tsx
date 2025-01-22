@@ -1,7 +1,7 @@
 import { Toaster } from "sonner";
 import { Theme } from "@radix-ui/themes";
 import {
-  useAppearance,
+  useTheme,
   useBatchRemoveListener,
   useRenderCallback,
   useRenderListener,
@@ -14,7 +14,7 @@ import { WidgetContainer } from "./components";
 
 export default () => {
   // States
-  const appearance = useAppearance();
+  const theme = useTheme();
   const [widgets, widgetsDispatch] = useWidgets();
 
   // Callbacks
@@ -29,7 +29,7 @@ export default () => {
 
   return (
     <Theme
-      appearance={appearance}
+      appearance={theme}
       accentColor="indigo"
       grayColor="slate"
       hasBackground={false}

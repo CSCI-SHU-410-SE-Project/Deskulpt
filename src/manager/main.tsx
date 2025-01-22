@@ -1,21 +1,20 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { invokeLoadSettings } from "../core/commands";
-import { emitSwitchAppearanceToCanvas } from "../core/events";
+import { emitSwitchThemeToCanvas } from "../core/events";
 import App from "./App";
 import "@radix-ui/themes/styles.css";
 import "../custom.css";
 
-invokeLoadSettings()
-  .then((settings) => {
-    emitSwitchAppearanceToCanvas({
-      appearance: settings.appearance,
-    }).catch(console.error);
-    createRoot(document.querySelector("#root")!).render(
-      <StrictMode>
-        <App initialSettings={settings} />
-      </StrictMode>,
-    );
-  })
-  // This command never fails by design so we do not need to handle the error case
-  .catch(console.error);
+async function main() {
+  const settings = await invokeLoadSettings();
+  await emitSwitchThemeToCanvas({ theme: settings.theme });
+
+  createRoot(document.querySelector("#root")!).render(
+    <StrictMode>
+      <App settings={settings} />
+    </StrictMode>,
+  );
+}
+
+main().catch(console.error);

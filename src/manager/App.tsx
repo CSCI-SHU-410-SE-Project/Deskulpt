@@ -10,39 +10,32 @@ import {
 } from "./hooks";
 import { Settings } from "../types/backend";
 import { Box, Tabs, Theme } from "@radix-ui/themes";
-import { AppearanceToggler, ManagerToaster } from "./components";
+import { ThemeToggler, ManagerToaster } from "./components";
 
 interface Props {
-  /** The initial settings read from the previously saved setting file. */
-  initialSettings: Settings;
+  settings: Settings;
 }
 
-/**
- * The main component of the manager window.
- */
-export default ({ initialSettings }: Props) => {
-  const [appearance, setAppearance] = useState(initialSettings.appearance);
+export default ({ settings }: Props) => {
+  const [theme, setTheme] = useState(settings.theme);
   const { toggleShortcut, setToggleShortcut } = useToggleShortcut(
-    initialSettings.toggleShortcut,
+    settings.toggleShortcut,
   );
   const { managerWidgetStates, setManagerWidgetStates, rescanAndRender } =
-    useManagerWidgetStates(initialSettings.widgetSettingsMap);
+    useManagerWidgetStates(settings.widgetSettingsMap);
 
-  useExitAppListener(toggleShortcut, appearance, managerWidgetStates);
+  useExitAppListener(toggleShortcut, theme, managerWidgetStates);
   useUpdateSettingsListener(setManagerWidgetStates);
 
   return (
     <Theme
-      appearance={appearance}
+      appearance={theme}
       accentColor="indigo"
       grayColor="slate"
       css={{ height: "100vh" }}
     >
-      <ManagerToaster appearance={appearance} />
-      <AppearanceToggler
-        appearance={appearance}
-        setAppearance={setAppearance}
-      />
+      <ManagerToaster theme={theme} />
+      <ThemeToggler theme={theme} setTheme={setTheme} />
       <Tabs.Root defaultValue="widgets" asChild>
         <Box height="100%" p="2">
           <Tabs.List>

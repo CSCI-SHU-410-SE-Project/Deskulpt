@@ -25,10 +25,10 @@ struct WidgetSettings {
     opacity: i32,
 }
 
-/// The light/dark theme appearance of the application.
+/// Light/dark theme of the application.
 #[derive(Default, Deserialize, Serialize)]
 #[serde(rename_all = "lowercase")]
-enum Appearance {
+enum Theme {
     #[default]
     Light,
     Dark,
@@ -38,8 +38,8 @@ enum Appearance {
 #[derive(Default, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Settings {
-    /// The theme appearance.
-    appearance: Appearance,
+    /// The application theme.
+    theme: Theme,
     /// The keyboard shortcut for toggling canvas click-through.
     toggle_shortcut: Option<String>,
     /// The mapping from widget IDs to their respective settings.

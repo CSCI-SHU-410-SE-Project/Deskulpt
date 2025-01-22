@@ -2,8 +2,12 @@ import { useCallback } from "react";
 import { BASE_URL } from "../consts";
 import { WidgetSettings } from "../../types/backend";
 import { invokeBundleWidget } from "../../core/commands";
-import { Widget } from "../../types/frontend";
-import { WidgetsActionType, WidgetsDispatch, WidgetsState } from "./useWidgets";
+import {
+  Widget,
+  WidgetsActionType,
+  WidgetsDispatch,
+  WidgetsState,
+} from "./useWidgets";
 
 export type RenderCallback = (
   id: string,

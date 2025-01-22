@@ -1,5 +1,5 @@
 // States
-export * from "./useAppearance";
+export * from "./useTheme";
 export * from "./useWidgets";
 
 // Listeners
