@@ -1,6 +1,5 @@
-import { useCallback } from "react";
+import { useEffect, useRef } from "react";
 import { BASE_URL } from "../consts";
-import { WidgetSettings } from "../../types/backend";
 import { invokeBundleWidget } from "../../core/commands";
 import {
   Widget,
@@ -8,36 +7,19 @@ import {
   WidgetsDispatch,
   WidgetsState,
 } from "./useWidgets";
+import { listenToRender } from "../../core/events";
+import { ListenerKeys, ReadyCallback } from "./useListenersReady";
 
-export type RenderCallback = (
-  id: string,
-  settings?: WidgetSettings,
-  code?: string,
-) => void;
-
-/**
- * Return a callback function for rendering a widget.
- *
- * @param widgets The widgets state.
- * @param widgetsDispatch The widgets dispatch function.
- * @returns The callback function `render`.
- *
- * ### `render`
- *
- * This function will add a new widget if the ID is not in the widgets state, or
- * update the properties of an existing widget otherwise.
- *
- * @param id The widget ID.
- * @param settings The widget settings. Required and used only when the widget
- *  is not in the the widgets state.
- * @param code The widget code. If provided, the bundling step will be skipped.
- */
-export function useRenderCallback(
+export function useRenderListener(
   widgets: WidgetsState,
   widgetsDispatch: WidgetsDispatch,
+  ready: ReadyCallback,
 ) {
-  const render = useCallback<RenderCallback>(
-    async (id: string, settings?: WidgetSettings, code?: string) => {
+  const isReady = useRef(false);
+
+  useEffect(() => {
+    const unlisten = listenToRender(async (event) => {
+      const { id, settings, code } = event.payload;
       let apisBlobUrl;
 
       if (id in widgets) {
@@ -50,11 +32,11 @@ export function useRenderCallback(
         }
       } else {
         // Create new APIs blob URL from the template
-        const apisCode = window.__DESKULPT_INTERNALS__.apisTemplate
+        const apisCode = window.__DESKULPT__.apisWrapper
           .replace("__DESKULPT_WIDGET_ID__", id)
           .replace(
             "__RAW_APIS_URL__",
-            new URL("/.scripts/raw-apis.js", BASE_URL).href,
+            new URL("/generated/raw-apis.js", BASE_URL).href,
           );
         const apisBlob = new Blob([apisCode], {
           type: "application/javascript",
@@ -93,11 +75,17 @@ export function useRenderCallback(
           });
         }
       }
-    },
-    [widgets],
-  );
+    });
 
-  return render;
+    if (!isReady.current) {
+      ready(ListenerKeys.RENDER);
+      isReady.current = true;
+    }
+
+    return () => {
+      unlisten.then((f) => f()).catch(console.error);
+    };
+  }, [widgets]);
 }
 
 async function renderHelper(id: string, apisBlobUrl: string, code?: string) {

@@ -14,49 +14,42 @@ use crate::states::StatesExtCanvasClickThrough;
 use crate::window::WindowExt;
 
 /// Extention trait for system tray-related operations.
-pub trait TrayExt {
+pub trait TrayExt<R: Runtime>: StatesExtCanvasClickThrough<R> {
     /// Create the system tray.
-    fn create_tray(&self, icon: Image) -> Result<()>;
+    fn create_tray(&self, icon: Image) -> Result<()>
+    where
+        Self: Sized,
+    {
+        // Store the menu item for toggling canvas click-through
+        let menu_item_toggle = MenuItemBuilder::with_id("tray-toggle", "Float").build(self)?;
+        self.set_canvas_click_through_menu_item(&menu_item_toggle);
+
+        // Build the system tray menu
+        let tray_menu = MenuBuilder::new(self)
+            .items(&[
+                &menu_item_toggle,
+                &MenuItemBuilder::with_id("tray-manage", "Manage").build(self)?,
+                &MenuItemBuilder::with_id("tray-exit", "Exit").build(self)?,
+            ])
+            .build()?;
+
+        // Build the system tray icon
+        TrayIconBuilder::with_id("tray")
+            .icon(icon)
+            .icon_as_template(true)
+            .show_menu_on_left_click(false)
+            .tooltip("Deskulpt")
+            .menu(&tray_menu)
+            .on_menu_event(on_menu_event)
+            .on_tray_icon_event(on_tray_icon_event)
+            .build(self)?;
+
+        Ok(())
+    }
 }
 
-/// Shared implementation of [`TrayExt`].
-macro_rules! shared_impl {
-    ($app: ty) => {
-        impl<R: Runtime> TrayExt for $app {
-            fn create_tray(&self, icon: Image) -> Result<()> {
-                // Store the menu item for toggling canvas click-through
-                let menu_item_toggle =
-                    MenuItemBuilder::with_id("tray-toggle", "Float").build(self)?;
-                self.set_canvas_click_through_menu_item(&menu_item_toggle);
-
-                // Build the system tray menu
-                let tray_menu = MenuBuilder::new(self)
-                    .items(&[
-                        &menu_item_toggle,
-                        &MenuItemBuilder::with_id("tray-manage", "Manage").build(self)?,
-                        &MenuItemBuilder::with_id("tray-exit", "Exit").build(self)?,
-                    ])
-                    .build()?;
-
-                // Build the system tray icon
-                TrayIconBuilder::with_id("tray")
-                    .icon(icon)
-                    .icon_as_template(true)
-                    .show_menu_on_left_click(false)
-                    .tooltip("Deskulpt")
-                    .menu(&tray_menu)
-                    .on_menu_event(on_menu_event)
-                    .on_tray_icon_event(on_tray_icon_event)
-                    .build(self)?;
-
-                Ok(())
-            }
-        }
-    };
-}
-
-shared_impl!(App<R>);
-shared_impl!(AppHandle<R>);
+impl<R: Runtime> TrayExt<R> for App<R> {}
+impl<R: Runtime> TrayExt<R> for AppHandle<R> {}
 
 /// Handler for system tray menu events.
 ///

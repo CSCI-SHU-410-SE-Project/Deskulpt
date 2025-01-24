@@ -18,13 +18,17 @@ pub enum ShowToastPayload {
 pub trait EventsExt<R: Runtime>: Emitter<R> {
     /// Emit the `show-toast` event to the canvas.
     fn emit_show_toast_to_canvas(&self, payload: ShowToastPayload) -> Result<()> {
-        self.emit_to("canvas", "show-toast", payload)
-            .map_err(Into::into)
+        Ok(self.emit_to("canvas", "show-toast", payload)?)
     }
 
     /// Emit the `exit-app` event to the manager.
     fn emit_exit_app_to_manager(&self) -> Result<()> {
-        self.emit_to("manager", "exit-app", ()).map_err(Into::into)
+        Ok(self.emit_to("manager", "exit-app", ())?)
+    }
+
+    /// Emit the `window-ready` event to all windows.
+    fn emit_window_ready(&self) -> Result<()> {
+        Ok(self.emit_to("manager", "window-ready", ())?)
     }
 }
 

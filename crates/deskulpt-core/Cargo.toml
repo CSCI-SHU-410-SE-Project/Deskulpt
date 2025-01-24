@@ -21,6 +21,7 @@ rolldown                     = { workspace = true }
 rolldown_common              = { workspace = true }
 serde                        = { workspace = true, features = ["derive"] }
 serde_json                   = { workspace = true }
+serialize-to-javascript      = { workspace = true }
 tauri                        = { workspace = true, features = ["tray-icon"] }
 tauri-plugin-global-shortcut = { workspace = true }
 tempfile                     = { workspace = true }

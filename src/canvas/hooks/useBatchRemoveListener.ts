@@ -1,11 +1,15 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { listenToBatchRemove } from "../../core/events";
 import { WidgetsActionType, WidgetsDispatch, WidgetsState } from "./useWidgets";
+import { ListenerKeys, ReadyCallback } from "./useListenersReady";
 
 export function useBatchRemoveListener(
   widgets: WidgetsState,
   widgetsDispatch: WidgetsDispatch,
+  ready: ReadyCallback,
 ) {
+  const isReady = useRef(false);
+
   useEffect(() => {
     const unlisten = listenToBatchRemove((event) => {
       const { ids } = event.payload;
@@ -26,6 +30,11 @@ export function useBatchRemoveListener(
         payload: { ids },
       });
     });
+
+    if (!isReady.current) {
+      ready(ListenerKeys.BATCH_REMOVE);
+      isReady.current = true;
+    }
 
     return () => {
       unlisten.then((f) => f()).catch(console.error);

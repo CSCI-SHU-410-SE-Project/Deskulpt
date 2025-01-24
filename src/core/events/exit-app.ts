@@ -1,5 +1,5 @@
-import { EventCallback, listen } from "@tauri-apps/api/event";
+import { EventCallback, once } from "@tauri-apps/api/event";
 
-export function listenToExitApp(handler: EventCallback<never>) {
-  return listen("exit-app", handler);
+export function listenToExitAppOnce(handler: EventCallback<never>) {
+  return once("exit-app", handler);
 }

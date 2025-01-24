@@ -1,12 +1,21 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "ignorePatterns": ["**/dist/**", "src/.scripts/**", "**/website/**"],
-  "plugins": ["react/jsx-runtime", "unicorn", "typescript", "oxc"],
+  "ignorePatterns": [
+    "**/dist/**",
+    "crates/deskulpt-core/generated/",
+    "src/generated/**",
+    "**/website/**"
+  ],
+  "plugins": ["oxc", "react", "react-hooks", "typescript", "unicorn"],
   "categories": {
     "correctness": "error",
     "suspicious": "error",
     "perf": "warn",
     "pedantic": "warn"
+  },
+  "rules": {
+    "react-in-jsx-scope": "off",
+    "sort-imports": ["error", { "ignoreDeclarationSort": true }]
   },
   "overrides": [
     {

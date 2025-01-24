@@ -9,28 +9,20 @@ import {
 } from "@radix-ui/themes";
 import { LuFolderOpen, LuRepeat } from "react-icons/lu";
 import { invokeOpenInWidgetsDir } from "../../core/commands";
-import { Result, WidgetConfig, WidgetSettings } from "../../types/backend";
+import { WidgetConfig, WidgetConfigType, WidgetSettings } from "../../types";
 import { emitRenderToCanvas } from "../../core/events";
-import { Dispatch, SetStateAction } from "react";
-import { ManagerWidgetState } from "../../types/frontend";
 import { toast } from "sonner";
 import WidgetContentHeading from "./WidgetContentHeading";
 import WidgetContentConfigList from "./WidgetContentConfigList";
 import WidgetContentSettingsList from "./WidgetContentSettingsList";
+import { WidgetsDispatch } from "../hooks";
 
 interface Props {
-  /** The index of the widget in the collection. */
   index: number;
-  /** The widget ID. */
   id: string;
-  /** The widget configuration or error. */
-  config: Result<WidgetConfig, string>;
-  /** The widget-specific settings. */
+  config: WidgetConfig;
   settings: WidgetSettings;
-  /** Setter for the manager widget states. */
-  setManagerWidgetStates: Dispatch<
-    SetStateAction<Record<string, ManagerWidgetState>>
-  >;
+  widgetsDispatch: WidgetsDispatch;
 }
 
 /**
@@ -40,13 +32,7 @@ interface Props {
  * {@link WidgetContentConfigList} and a setting section
  * {@link WidgetContentSettingsList}.
  */
-export default ({
-  index,
-  id,
-  config,
-  settings,
-  setManagerWidgetStates,
-}: Props) => {
+export default ({ index, id, config, settings, widgetsDispatch }: Props) => {
   return (
     <Tabs.Content value={`tab${index}`} asChild>
       <Flex height="100%" gap="3" direction="column" css={{ flex: 3 }}>
@@ -63,8 +49,8 @@ export default ({
         />
         <ScrollArea scrollbars="vertical" asChild>
           <Box px="2" css={{ flex: 3 }}>
-            {"Ok" in config ? (
-              <WidgetContentConfigList id={id} config={config.Ok} />
+            {config.type === WidgetConfigType.VALID ? (
+              <WidgetContentConfigList id={id} config={config.content} />
             ) : (
               <Text
                 size="1"
@@ -73,7 +59,7 @@ export default ({
                   fontFamily: "var(--code-font-family)",
                 }}
               >
-                {config.Err}
+                {config.content}
               </Text>
             )}
           </Box>
@@ -93,7 +79,7 @@ export default ({
           <WidgetContentSettingsList
             id={id}
             settings={settings}
-            setManagerWidgetStates={setManagerWidgetStates}
+            widgetsDispatch={widgetsDispatch}
           />
         </Box>
       </Flex>

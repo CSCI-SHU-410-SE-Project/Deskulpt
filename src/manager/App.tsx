@@ -1,41 +1,52 @@
-import { useState } from "react";
 import WidgetsTab from "./tabs/WidgetsTab";
 import SettingsTab from "./tabs/SettingsTab";
 import AboutTab from "./tabs/AboutTab";
 import {
   useExitAppListener,
+  useListenersReady,
+  useRescanCallback,
+  useTheme,
   useToggleShortcut,
-  useManagerWidgetStates,
   useUpdateSettingsListener,
+  useWidgets,
+  useWindowReadyListener,
 } from "./hooks";
-import { Settings } from "../types/backend";
-import { Box, Tabs, Theme } from "@radix-ui/themes";
-import { ThemeToggler, ManagerToaster } from "./components";
+import { Box, Theme as RadixTheme, Tabs } from "@radix-ui/themes";
+import { ThemeToggler } from "./components";
+import { Toaster } from "sonner";
 
-interface Props {
-  settings: Settings;
-}
+export default () => {
+  const ready = useListenersReady();
 
-export default ({ settings }: Props) => {
-  const [theme, setTheme] = useState(settings.theme);
-  const { toggleShortcut, setToggleShortcut } = useToggleShortcut(
-    settings.toggleShortcut,
-  );
-  const { managerWidgetStates, setManagerWidgetStates, rescanAndRender } =
-    useManagerWidgetStates(settings.widgetSettingsMap);
+  const [theme, toggleTheme] = useTheme();
+  const [toggleShortcut, setToggleShortcut] = useToggleShortcut();
+  const [widgets, widgetsDispatch] = useWidgets();
+  const rescan = useRescanCallback(widgets, widgetsDispatch);
 
-  useExitAppListener(toggleShortcut, theme, managerWidgetStates);
-  useUpdateSettingsListener(setManagerWidgetStates);
+  useExitAppListener(toggleShortcut, theme, widgets, ready);
+  useUpdateSettingsListener(widgetsDispatch, ready);
+  useWindowReadyListener(rescan, ready);
 
   return (
-    <Theme
+    <RadixTheme
       appearance={theme}
       accentColor="indigo"
       grayColor="slate"
       css={{ height: "100vh" }}
     >
-      <ManagerToaster theme={theme} />
-      <ThemeToggler theme={theme} setTheme={setTheme} />
+      <Toaster
+        position="bottom-center"
+        gap={6}
+        toastOptions={{
+          style: {
+            color: "var(--gray-12)",
+            borderColor: "var(--gray-6)",
+            backgroundColor: "var(--gray-2)",
+            padding: "var(--space-2) var(--space-4)",
+          },
+        }}
+      />
+      <ThemeToggler theme={theme} toggleTheme={toggleTheme} />
       <Tabs.Root defaultValue="widgets" asChild>
         <Box height="100%" p="2">
           <Tabs.List>
@@ -48,9 +59,9 @@ export default ({ settings }: Props) => {
             <Tabs.Content value="widgets" asChild>
               <Box height="100%">
                 <WidgetsTab
-                  managerWidgetStates={managerWidgetStates}
-                  setManagerWidgetStates={setManagerWidgetStates}
-                  rescanAndRender={rescanAndRender}
+                  widgets={widgets}
+                  widgetsDispatch={widgetsDispatch}
+                  rescan={rescan}
                 />
               </Box>
             </Tabs.Content>
@@ -70,6 +81,6 @@ export default ({ settings }: Props) => {
           </Box>
         </Box>
       </Tabs.Root>
-    </Theme>
+    </RadixTheme>
   );
 };

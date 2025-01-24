@@ -1,14 +1,12 @@
 import { Code, DataList, Flex, IconButton, Tooltip } from "@radix-ui/themes";
-import { WidgetConfig } from "../../types/backend";
+import { WidgetConfig, WidgetConfigType } from "../../types";
 import { WidgetDependencies } from "../components";
 import { MdOpenInNew } from "react-icons/md";
 import { invokeOpenInWidgetsDir } from "../../core/commands";
 
 interface Props {
-  /** The widget ID. */
   id: string;
-  /** The widget configuration. */
-  config: WidgetConfig;
+  config: Extract<WidgetConfig, { type: WidgetConfigType.VALID }>["content"];
 }
 
 /**

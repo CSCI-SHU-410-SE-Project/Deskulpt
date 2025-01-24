@@ -1,31 +1,23 @@
 import { Box, IconButton, Tooltip } from "@radix-ui/themes";
-import { Theme } from "../../types/backend";
+import { Theme } from "../../types";
 import { MdOutlineDarkMode, MdOutlineLightMode } from "react-icons/md";
-import { Dispatch, SetStateAction } from "react";
-import { emitSwitchThemeToCanvas } from "../../core/events";
+import { ToggleThemeCallback } from "../hooks";
 
 interface Props {
   theme: Theme;
-  setTheme: Dispatch<SetStateAction<Theme>>;
+  toggleTheme: ToggleThemeCallback;
 }
 
-export default ({ theme, setTheme }: Props) => {
-  const toggleTheme = () => {
-    const newTheme = theme === "light" ? "dark" : "light";
-    setTheme(newTheme);
-    emitSwitchThemeToCanvas({
-      theme: newTheme,
-    }).catch(console.error);
-  };
-
+export default ({ theme, toggleTheme }: Props) => {
   return (
     <Box position="absolute" right="3" top="4">
-      <Tooltip
-        side="left"
-        content={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
-      >
+      <Tooltip side="left" content={`Switch to ${theme} mode`}>
         <IconButton variant="soft" size="1" onClick={toggleTheme}>
-          {theme === "light" ? <MdOutlineLightMode /> : <MdOutlineDarkMode />}
+          {theme === Theme.LIGHT ? (
+            <MdOutlineLightMode />
+          ) : (
+            <MdOutlineDarkMode />
+          )}
         </IconButton>
       </Tooltip>
     </Box>

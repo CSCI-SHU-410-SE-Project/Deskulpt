@@ -1,28 +1,34 @@
-import { useEffect } from "react";
-import { listenToExitApp } from "../../core/events";
+import { useEffect, useRef } from "react";
+import { listenToExitAppOnce } from "../../core/events";
 import { invokeExitApp } from "../../core/commands";
-import { ManagerWidgetState } from "../../types/frontend";
-import { Theme } from "../../types/backend";
+import { Theme } from "../../types";
+import { WidgetsState } from "./useWidgets";
+import { ListenerKeys, ReadyCallback } from "./useListenersReady";
 
 export function useExitAppListener(
   toggleShortcut: string | undefined,
   theme: Theme,
-  managerWidgetStates: Record<string, ManagerWidgetState>,
+  widgets: WidgetsState,
+  ready: ReadyCallback,
 ) {
+  const isReady = useRef(false);
+
   useEffect(() => {
-    const unlisten = listenToExitApp(() => {
+    const unlisten = listenToExitAppOnce(() => {
       const widgetSettingsMap = Object.fromEntries(
-        Object.entries(managerWidgetStates).map(([id, { settings }]) => [
-          id,
-          settings,
-        ]),
+        Object.entries(widgets).map(([id, { settings }]) => [id, settings]),
       );
       const settings = { toggleShortcut, theme, widgetSettingsMap };
       invokeExitApp({ settings }).catch(console.error);
     });
 
+    if (!isReady.current) {
+      ready(ListenerKeys.EXIT_APP);
+      isReady.current = true;
+    }
+
     return () => {
       unlisten.then((f) => f()).catch(console.error);
     };
-  }, [toggleShortcut, theme, managerWidgetStates]);
+  }, [toggleShortcut, theme, widgets]);
 }

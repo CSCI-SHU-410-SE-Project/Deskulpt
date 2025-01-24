@@ -1,5 +1,5 @@
-import { emitTo, EventCallback, listen } from "@tauri-apps/api/event";
-import { WidgetSettings } from "../../types/backend";
+import { EventCallback, emitTo, listen } from "@tauri-apps/api/event";
+import { WidgetSettings } from "../../types";
 
 interface UpdateSettingsPayload {
   id: string;

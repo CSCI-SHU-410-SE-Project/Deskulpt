@@ -95,9 +95,10 @@ export default ({ setToggleShortcut }: Props) => {
           {/* Introduction */}
           <Blockquote size="1" color="gray">
             The toggle shortcut is used for toggling the floating/sinking state
-            of the canvas, equivalent to the "Float/Sink" option in the tray
-            menu. Widgets are not interactable when the canvas is floated, and
-            the desktop is not interactable when the canvas is sunk.
+            of the canvas, equivalent to the &quot;Float/Sink&quot; option in
+            the tray menu. Widgets are not interactable when the canvas is
+            floated, and the desktop is not interactable when the canvas is
+            sunk.
           </Blockquote>
           {/* Decision whether to disable the shortcut */}
           <Text size="1">

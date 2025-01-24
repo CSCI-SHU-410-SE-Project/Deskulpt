@@ -1,5 +1,5 @@
 pnpm-lock.yaml
 
 # Auto-generated minimized files
-crates/deskulpt-core/.scripts
-src/.scripts/
+crates/deskulpt-core/generated/
+src/generated/

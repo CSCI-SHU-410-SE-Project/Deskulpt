@@ -15,7 +15,7 @@ export default defineConfig([
     input: "src/index.ts",
     output: {
       format: "esm",
-      file: "../../src/.scripts/react.js",
+      file: "../../src/generated/react.js",
     },
     external: ["react"],
     plugins: [typescript(), terser()],

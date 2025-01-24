@@ -1,11 +1,11 @@
 import { Toaster } from "sonner";
 import { Theme } from "@radix-ui/themes";
 import {
-  useTheme,
   useBatchRemoveListener,
-  useRenderCallback,
+  useListenersReady,
   useRenderListener,
   useShowToastListener,
+  useTheme,
   useUpdateSettingsCallback,
   useUpdateSettingsListener,
   useWidgets,
@@ -13,19 +13,16 @@ import {
 import { WidgetContainer } from "./components";
 
 export default () => {
-  // States
-  const theme = useTheme();
-  const [widgets, widgetsDispatch] = useWidgets();
+  const ready = useListenersReady();
 
-  // Callbacks
-  const render = useRenderCallback(widgets, widgetsDispatch);
+  const theme = useTheme(ready);
+  const [widgets, widgetsDispatch] = useWidgets();
   const updateSettings = useUpdateSettingsCallback(widgetsDispatch);
 
-  // Listeners
-  useBatchRemoveListener(widgets, widgetsDispatch);
-  useRenderListener(render);
-  useShowToastListener();
-  useUpdateSettingsListener(widgetsDispatch);
+  useRenderListener(widgets, widgetsDispatch, ready);
+  useBatchRemoveListener(widgets, widgetsDispatch, ready);
+  useShowToastListener(ready);
+  useUpdateSettingsListener(widgetsDispatch, ready);
 
   return (
     <Theme

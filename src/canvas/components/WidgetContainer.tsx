@@ -1,4 +1,4 @@
-import { memo, RefObject, useRef } from "react";
+import { RefObject, memo, useRef } from "react";
 import Draggable, { DraggableData, DraggableEvent } from "react-draggable";
 import { ErrorBoundary } from "react-error-boundary";
 import { LuGripVertical } from "react-icons/lu";
@@ -14,7 +14,7 @@ interface Props {
   updateSettings: UpdateSettingsCallback;
 }
 
-export default memo(({ id, widget, updateSettings }: Props) => {
+const x = memo(({ id, widget, updateSettings }: Props) => {
   const { Component, width, height, x, y, opacity } = widget;
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -76,3 +76,5 @@ export default memo(({ id, widget, updateSettings }: Props) => {
     </Draggable>
   );
 });
+
+export default x;

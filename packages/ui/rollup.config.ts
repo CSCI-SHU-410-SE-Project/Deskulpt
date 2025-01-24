@@ -15,7 +15,7 @@ export default defineConfig([
     input: "src/jsx-runtime.js",
     output: {
       format: "esm",
-      file: "../../src/.scripts/jsx-runtime.js",
+      file: "../../src/generated/jsx-runtime.js",
     },
     external: ["@emotion/react/jsx-runtime"],
     plugins: [terser()],
@@ -26,7 +26,7 @@ export default defineConfig([
     input: "src/index.ts",
     output: {
       format: "esm",
-      file: "../../src/.scripts/ui.js",
+      file: "../../src/generated/ui.js",
     },
     external: ["@emotion/react", "@radix-ui/themes"],
     plugins: [typescript(), terser()],

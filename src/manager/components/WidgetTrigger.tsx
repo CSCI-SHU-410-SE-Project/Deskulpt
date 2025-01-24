@@ -1,11 +1,9 @@
 import { Badge, Box, Flex, Tabs, Text } from "@radix-ui/themes";
-import { Result, WidgetConfig } from "../../types/backend";
+import { WidgetConfig, WidgetConfigType } from "../../types";
 
 interface Props {
-  /** The index of the widget in the collection. */
   index: number;
-  /** The widget configuration or error. */
-  config: Result<WidgetConfig, string>;
+  config: WidgetConfig;
 }
 
 /**
@@ -40,12 +38,18 @@ export default ({ index, config }: Props) => {
           css={{
             borderRadius: "var(--radius-thumb)",
             backgroundColor:
-              "Ok" in config ? "var(--green-10)" : "var(--red-10)",
+              config.type === WidgetConfigType.VALID
+                ? "var(--green-10)"
+                : "var(--red-10)",
             opacity: 1, // TODO: decrease opacity when widget unloaded
           }}
         />
         <Text>
-          {"Ok" in config ? config.Ok.name : <Badge color="red">Error</Badge>}
+          {config.type === WidgetConfigType.VALID ? (
+            config.content.name
+          ) : (
+            <Badge color="red">Error</Badge>
+          )}
         </Text>
       </Flex>
     </Tabs.Trigger>

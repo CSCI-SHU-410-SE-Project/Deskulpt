@@ -1,4 +1,4 @@
-import { emitTo, EventCallback, listen } from "@tauri-apps/api/event";
+import { EventCallback, emitTo, listen } from "@tauri-apps/api/event";
 
 interface BatchRemovePayload {
   ids: string[];

@@ -1,26 +1,38 @@
 use std::collections::HashMap;
 use std::fs::read_dir;
 
+use serde::Serialize;
 use tauri::{command, AppHandle, Runtime};
 
 use super::error::{cmdbail, CmdResult};
-use crate::config::{WidgetCollection, WidgetConfig};
+use crate::config::WidgetConfig;
 use crate::path::PathExt;
-use crate::states::StatesExtWidgetCollection;
+use crate::states::StatesExtWidgetConfigMap;
+
+/// Output type of the [`rescan_widgets`] command.
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct RescanWidgetsOutput {
+    /// All widgets discovered in the widgets directory.
+    config_map: HashMap<String, WidgetConfig>,
+    /// IDs of widgets that were newly discovered.
+    added_ids: Vec<String>,
+    /// IDs of widgets that were removed.
+    removed_ids: Vec<String>,
+}
 
 /// Rescan the widgets directory and update the widget collection.
-///
-/// This will update the widget collection state and return the updated
-/// collection as well.
 ///
 /// ### Errors
 ///
 /// - Error traversing the widgets directory.
 /// - Error inferring widget ID from the directory entry.
 #[command]
-pub async fn rescan_widgets<R: Runtime>(app_handle: AppHandle<R>) -> CmdResult<WidgetCollection> {
+pub async fn rescan_widgets<R: Runtime>(
+    app_handle: AppHandle<R>,
+) -> CmdResult<RescanWidgetsOutput> {
     let widgets_dir = app_handle.widgets_dir();
-    let mut new_widget_collection = HashMap::new();
+    let mut new_config_map = HashMap::new();
 
     let entries = read_dir(widgets_dir)?;
     for entry in entries {
@@ -31,28 +43,37 @@ pub async fn rescan_widgets<R: Runtime>(app_handle: AppHandle<R>) -> CmdResult<W
             continue; // Non-directory entries are not widgets, skip
         }
 
+        // Get widget ID based on the directory name
         let id = match path.file_name() {
             Some(file_name) => file_name.to_string_lossy().to_string(),
             None => cmdbail!("Invalid widget directory: '{}'", path.display()),
         };
 
-        // Load the widget configuration
-        match WidgetConfig::load(&path) {
-            Ok(Some(widget_config)) => {
-                new_widget_collection.insert(id, Ok(widget_config));
-            },
-            Ok(None) => {},
-            Err(e) => {
-                // Configuration errors are recorded as error messages and do
-                // not fail the command
-                new_widget_collection.insert(id, Err(e.to_string()));
-            },
-        };
+        if let Some(widget_config) = WidgetConfig::load(&path) {
+            new_config_map.insert(id, widget_config);
+        }
     }
 
-    // Update the widget collection state
-    app_handle.with_widget_collection_mut(|collection| {
-        collection.clone_from(&new_widget_collection);
+    let (added_ids, removed_ids) = app_handle.with_widget_config_map_mut(|config_map| {
+        let added_ids = new_config_map
+            .keys()
+            .filter(|&id| !config_map.contains_key(id))
+            .cloned()
+            .collect::<Vec<_>>();
+        let removed_ids = config_map
+            .keys()
+            .filter(|&id| !new_config_map.contains_key(id))
+            .cloned()
+            .collect::<Vec<_>>();
+
+        // Update the widget configuration map state
+        config_map.clone_from(&new_config_map);
+        (added_ids, removed_ids)
     });
-    Ok(new_widget_collection)
+
+    Ok(RescanWidgetsOutput {
+        config_map: new_config_map,
+        added_ids,
+        removed_ids,
+    })
 }

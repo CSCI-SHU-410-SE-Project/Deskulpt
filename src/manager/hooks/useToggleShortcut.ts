@@ -1,26 +1,10 @@
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { invokeUpdateToggleShortcut } from "../../core/commands";
 
-export interface UseToggleShortcutOutput {
-  /** The current toggle shortcut. */
-  toggleShortcut?: string;
-  /** Setter for the toggle shortcut state. */
-  setToggleShortcut: Dispatch<SetStateAction<string | undefined>>;
-}
-
-/**
- * The hook for managing the toggle shortcut.
- *
- * This hook is responsible for registering and unregistering the toggle shortcut on
- * shortcut change. Just use the setter it returns to change the toggle shortcut and
- * it will handle the rest.
- *
- * @param initialToggleShortcut The initial toggle shortcut to use.
- */
-export function useToggleShortcut(
-  initialToggleShortcut?: string,
-): UseToggleShortcutOutput {
-  const [toggleShortcut, setToggleShortcut] = useState(initialToggleShortcut);
+export function useToggleShortcut() {
+  const [toggleShortcut, setToggleShortcut] = useState(
+    window.__DESKULPT__.initialSettings.toggleShortcut,
+  );
 
   useEffect(() => {
     invokeUpdateToggleShortcut({ newShortcut: toggleShortcut }).catch(
@@ -34,5 +18,5 @@ export function useToggleShortcut(
     };
   }, [toggleShortcut]);
 
-  return { toggleShortcut, setToggleShortcut };
+  return [toggleShortcut, setToggleShortcut] as const;
 }

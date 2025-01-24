@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { WidgetSettings } from "../../types/backend";
+import { WidgetSettings } from "../../types";
 import { emitUpdateSettingsToManager } from "../../core/events";
 import { WidgetsActionType, WidgetsDispatch } from "./useWidgets";
 
@@ -9,16 +9,11 @@ export type UpdateSettingsCallback = (
 ) => void;
 
 export function useUpdateSettingsCallback(widgetsDispatch: WidgetsDispatch) {
-  const updateSettings = useCallback<UpdateSettingsCallback>(
-    async (id: string, settings: Partial<WidgetSettings>) => {
-      widgetsDispatch({
-        type: WidgetsActionType.SET_SETTINGS,
-        payload: { id, settings },
-      });
-      await emitUpdateSettingsToManager({ id, settings });
-    },
-    [],
-  );
-
-  return updateSettings;
+  return useCallback(async (id: string, settings: Partial<WidgetSettings>) => {
+    widgetsDispatch({
+      type: WidgetsActionType.SET_SETTINGS,
+      payload: { id, settings },
+    });
+    await emitUpdateSettingsToManager({ id, settings });
+  }, []);
 }

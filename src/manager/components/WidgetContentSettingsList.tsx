@@ -1,10 +1,9 @@
-import { Dispatch, SetStateAction } from "react";
-import { WidgetSettings } from "../../types/backend";
-import { ManagerWidgetState } from "../../types/frontend";
+import { WidgetSettings } from "../../types";
 import { emitUpdateSettingsToCanvas } from "../../core/events";
 import { DataList, Flex } from "@radix-ui/themes";
 import { NumberInput } from "../components";
 import { FaTimes } from "react-icons/fa";
+import { WidgetsActionType, WidgetsDispatch } from "../hooks";
 
 interface Props {
   /** The widget ID. */
@@ -12,9 +11,7 @@ interface Props {
   /** The widget-specific setting. */
   settings: WidgetSettings;
   /** Setter for the manager widget states. */
-  setManagerWidgetStates: Dispatch<
-    SetStateAction<Record<string, ManagerWidgetState>>
-  >;
+  widgetsDispatch: WidgetsDispatch;
 }
 
 /**
@@ -24,17 +21,15 @@ interface Props {
  * manager will be updated via the setter, and the updated settings will also be sent
  * to the canvas via emitting corresponding events.
  */
-export default ({ id, settings, setManagerWidgetStates }: Props) => {
+export default ({ id, settings, widgetsDispatch }: Props) => {
   function updateSetting(partialSettings: Partial<WidgetSettings>) {
-    const newSettings = { ...settings, ...partialSettings };
-    setManagerWidgetStates((prev) => ({
-      ...prev,
-      [id]: { ...prev[id], settings: newSettings },
-    }));
-    emitUpdateSettingsToCanvas({
-      id: id,
-      settings: newSettings,
-    }).catch(console.error);
+    widgetsDispatch({
+      type: WidgetsActionType.SET_SETTINGS,
+      payload: { id, settings: partialSettings },
+    });
+    emitUpdateSettingsToCanvas({ id, settings: partialSettings }).catch(
+      console.error,
+    );
   }
 
   return (

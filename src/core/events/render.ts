@@ -1,5 +1,5 @@
-import { emitTo, EventCallback, listen } from "@tauri-apps/api/event";
-import { WidgetSettings } from "../../types/backend";
+import { EventCallback, emitTo, listen } from "@tauri-apps/api/event";
+import { WidgetSettings } from "../../types";
 
 interface RenderWidgetPayload {
   id: string;
@@ -11,8 +11,6 @@ export async function emitRenderToCanvas(payload: RenderWidgetPayload) {
   await emitTo("canvas", "render", payload);
 }
 
-export function listenToRenderWidget(
-  handler: EventCallback<RenderWidgetPayload>,
-) {
+export function listenToRender(handler: EventCallback<RenderWidgetPayload>) {
   return listen("render", handler);
 }
