@@ -48,5 +48,8 @@ swc_core = { version = "0.104.2", features = [
 [target."cfg(target_os = \"macos\")".dependencies]
 objc = "0.2.7"
 
+[target."cfg(target_os = \"windows\")".dependencies]
+windows = "0.58.0"
+
 [features]
 custom-protocol = ["tauri/custom-protocol"]

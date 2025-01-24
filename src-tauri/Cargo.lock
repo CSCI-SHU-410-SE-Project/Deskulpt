@@ -931,6 +931,7 @@ dependencies = [
  "tauri-plugin-global-shortcut",
  "tauri-plugin-shell",
  "tempfile",
+ "windows 0.58.0",
 ]
 
 [[package]]
