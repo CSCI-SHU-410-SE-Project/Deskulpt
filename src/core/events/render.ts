@@ -1,11 +1,11 @@
 import { EventCallback, emitTo, listen } from "@tauri-apps/api/event";
 import { WidgetSettings } from "../../types";
 
-interface RenderWidgetPayload {
+type RenderWidgetPayload = {
   id: string;
   settings?: WidgetSettings;
   code?: string;
-}
+}[];
 
 export async function emitRenderToCanvas(payload: RenderWidgetPayload) {
   await emitTo("canvas", "render", payload);

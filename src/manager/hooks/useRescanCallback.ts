@@ -21,7 +21,7 @@ export function useRescanCallback(
       await emitBatchRemoveToCanvas({ ids: removedIds });
     }
 
-    const newWidgets = Object.entries(configMap).map(([id, config]) => {
+    const newWidgetsArray = Object.entries(configMap).map(([id, config]) => {
       const settings =
         widgets[id]?.settings ??
         window.__DESKULPT__.initialSettings.widgetSettingsMap[id] ??
@@ -29,21 +29,19 @@ export function useRescanCallback(
       return [id, { config, settings }] as const;
     });
 
-    await Promise.all(
-      newWidgets.map(([id, { settings }]) =>
-        emitRenderToCanvas({ id, settings }),
-      ),
+    await emitRenderToCanvas(
+      newWidgetsArray.map(([id, { settings }]) => ({ id, settings })),
     );
 
     widgetsDispatch({
       type: WidgetsActionType.BATCH_UPDATE,
-      payload: { widgets: Object.fromEntries(newWidgets) },
+      payload: { widgets: Object.fromEntries(newWidgetsArray) },
     });
 
     return {
       numAdded: addedIds.length,
       numRemoved: removedIds.length,
-      numUpdated: newWidgets.length - addedIds.length,
+      numUpdated: newWidgetsArray.length - addedIds.length,
     };
   }, []);
 }

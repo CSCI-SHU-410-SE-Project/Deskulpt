@@ -70,7 +70,7 @@ export default ({ index, id, config, settings, widgetsDispatch }: Props) => {
           actionIcon={<LuRepeat />}
           actionText="Re-render"
           action={() =>
-            emitRenderToCanvas({ id, settings }).then(() =>
+            emitRenderToCanvas([{ id, settings }]).then(() =>
               toast.success(`Re-rendered widget "${id}".`),
             )
           }

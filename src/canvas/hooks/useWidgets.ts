@@ -1,4 +1,4 @@
-import { ActionDispatch, FC, createElement, memo, useReducer } from "react";
+import { ActionDispatch, FC, createElement, useReducer } from "react";
 import { WidgetSettings } from "../../types";
 import { ErrorDisplay } from "../components";
 import { stringifyError } from "../utils";
@@ -83,12 +83,11 @@ export function useWidgets() {
           ...state,
           [action.payload.id]: {
             ...action.payload.settings,
-            Component: memo(() =>
+            Component: () =>
               createElement(ErrorDisplay, {
                 id: action.payload.id,
                 error: stringifyError(action.payload.error),
               }),
-            ),
             apisBlobUrl: action.payload.apisBlobUrl,
           },
         };
@@ -100,7 +99,7 @@ export function useWidgets() {
             ...state[action.payload.id],
             // Not using spread syntax because we want undefined properties in
             // the widget to override previous properties as well
-            Component: memo(action.payload.widget.Component),
+            Component: action.payload.widget.Component,
             width: action.payload.widget.width,
             height: action.payload.widget.height,
             moduleBlobUrl: action.payload.moduleBlobUrl,
@@ -112,12 +111,11 @@ export function useWidgets() {
           ...state,
           [action.payload.id]: {
             ...state[action.payload.id],
-            Component: memo(() =>
+            Component: () =>
               createElement(ErrorDisplay, {
                 id: action.payload.id,
                 error: stringifyError(action.payload.error),
               }),
-            ),
             width: undefined,
             height: undefined,
             moduleBlobUrl: undefined,

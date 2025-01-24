@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { FloatButton, WidgetContent, WidgetTrigger } from "../components";
 import { emitRenderToCanvas } from "../../core/events";
 import { RescanCallback, WidgetsDispatch, WidgetsState } from "../hooks";
+import { useCallback, useMemo } from "react";
 
 interface Props {
   widgets: WidgetsState;
@@ -12,31 +13,32 @@ interface Props {
   rescan: RescanCallback;
 }
 
-/**
- * The widgets tab in the manager.
- *
- * This tab is rendered as a vertical tab list along with {@link FloatButton}s in the
- * bottom right corner. It contains the triggers {@link WidgetTrigger} and the contents
- * {@link WidgetContent} for each widget in the collection.
- */
 export default ({ widgets, widgetsDispatch, rescan }: Props) => {
-  const widgetsArray = Object.entries(widgets);
+  const widgetsArray = useMemo(() => Object.entries(widgets), [widgets]);
 
-  const rerenderAction = async () => {
-    await Promise.all(
-      widgetsArray.map(([id, { settings }]) =>
-        emitRenderToCanvas({ id, settings }),
-      ),
-    );
-    toast.success(`Re-rendered ${widgetsArray.length} widgets.`);
-  };
+  const rerenderAction = useCallback(() => {
+    emitRenderToCanvas(
+      widgetsArray.map(([id, { settings }]) => ({ id, settings })),
+    )
+      .then(() => {
+        toast.success(`Re-rendered ${widgetsArray.length} widgets.`);
+      })
+      .catch(console.error);
+  }, [widgetsArray]);
 
-  const rescanAction = async () => {
-    const { numAdded, numRemoved, numUpdated } = await rescan();
-    toast.success(
-      `${numAdded} added, ${numRemoved} removed, ${numUpdated} updated.`,
-    );
-  };
+  const rescanAction = useCallback(() => {
+    rescan()
+      .then(({ numAdded, numRemoved, numUpdated }) => {
+        toast.success(
+          `${numAdded} added, ${numRemoved} removed, ${numUpdated} refreshed.`,
+        );
+      })
+      .catch(console.error);
+  }, [rescan]);
+
+  const openAction = useCallback(() => {
+    invokeOpenInWidgetsDir({ components: [] }).catch(console.error);
+  }, []);
 
   return (
     <>
@@ -75,21 +77,21 @@ export default ({ widgets, widgetsDispatch, rescan }: Props) => {
       <FloatButton
         order={3}
         icon={<LuRepeat />}
-        tooltip="Re-render all widgets"
+        tooltip="Re-render current widgets"
         onClick={rerenderAction}
         disabled={widgetsArray.length === 0}
       />
       <FloatButton
         order={2}
         icon={<LuFileScan />}
-        tooltip="Rescan widgets"
+        tooltip="Rescan widgets directory"
         onClick={rescanAction}
       />
       <FloatButton
         order={1}
         icon={<LuFolderOpen />}
-        tooltip="Open base directory"
-        onClick={() => invokeOpenInWidgetsDir({ components: [] })}
+        tooltip="Open widgets directory"
+        onClick={openAction}
       />
     </>
   );
