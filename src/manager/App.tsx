@@ -2,12 +2,12 @@ import WidgetsTab from "./tabs/WidgetsTab";
 import SettingsTab from "./tabs/SettingsTab";
 import AboutTab from "./tabs/AboutTab";
 import {
+  useAppSettings,
   useExitAppListener,
   useListenersReady,
   useRescanCallback,
-  useTheme,
-  useToggleShortcut,
   useUpdateSettingsListener,
+  useUpdateShortcutsCallback,
   useWidgets,
   useWindowReadyListener,
 } from "./hooks";
@@ -18,18 +18,18 @@ import { Toaster } from "sonner";
 export default () => {
   const ready = useListenersReady();
 
-  const [theme, toggleTheme] = useTheme();
-  const [toggleShortcut, setToggleShortcut] = useToggleShortcut();
   const [widgets, widgetsDispatch] = useWidgets();
+  const [appSettings, appSettingsDispatch] = useAppSettings();
   const rescan = useRescanCallback(widgets, widgetsDispatch);
+  const updateShortcuts = useUpdateShortcutsCallback(appSettingsDispatch);
 
-  useExitAppListener(toggleShortcut, theme, widgets, ready);
+  useExitAppListener(appSettings, widgets, ready);
   useUpdateSettingsListener(widgetsDispatch, ready);
   useWindowReadyListener(rescan, ready);
 
   return (
     <RadixTheme
-      appearance={theme}
+      appearance={appSettings.theme}
       accentColor="indigo"
       grayColor="slate"
       css={{ height: "100vh" }}
@@ -46,7 +46,10 @@ export default () => {
           },
         }}
       />
-      <ThemeToggler theme={theme} toggleTheme={toggleTheme} />
+      <ThemeToggler
+        theme={appSettings.theme}
+        appSettingsDispatch={appSettingsDispatch}
+      />
       <Tabs.Root defaultValue="widgets" asChild>
         <Box height="100%" p="2">
           <Tabs.List>
@@ -68,8 +71,8 @@ export default () => {
             <Tabs.Content value="settings" asChild>
               <Box height="100%">
                 <SettingsTab
-                  toggleShortcut={toggleShortcut}
-                  setToggleShortcut={setToggleShortcut}
+                  appSettings={appSettings}
+                  updateShortcuts={updateShortcuts}
                 />
               </Box>
             </Tabs.Content>

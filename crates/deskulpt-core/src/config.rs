@@ -9,6 +9,9 @@ use anyhow::{Context, Result};
 use serde::{Deserialize, Serialize};
 
 /// Macro for implementing [`DeskulptConf::load`] and [`PackageJson::load`].
+///
+/// The first argument is the type to implement the method on, and the second
+/// argument is the path to the target file within the widget directory.
 macro_rules! impl_load {
     ($type:ty, $path:expr) => {
         impl $type {

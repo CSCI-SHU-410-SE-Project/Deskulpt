@@ -4,8 +4,9 @@ use tauri::{command, AppHandle, Runtime};
 use super::error::CmdResult;
 use crate::StatesExtWindowReady;
 
+/// Window enum for the [`window_ready`] command.
 #[derive(Deserialize)]
-#[serde(rename_all = "lowercase")]
+#[serde(rename_all = "camelCase")]
 pub enum WindowEnum {
     Canvas,
     Manager,

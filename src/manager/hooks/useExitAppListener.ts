@@ -1,13 +1,12 @@
 import { useEffect, useRef } from "react";
 import { listenToExitAppOnce } from "../../core/events";
 import { invokeExitApp } from "../../core/commands";
-import { Theme } from "../../types";
+import { AppSettings } from "../../types";
 import { WidgetsState } from "./useWidgets";
 import { ListenerKeys, ReadyCallback } from "./useListenersReady";
 
 export function useExitAppListener(
-  toggleShortcut: string | undefined,
-  theme: Theme,
+  appSettings: AppSettings,
   widgets: WidgetsState,
   ready: ReadyCallback,
 ) {
@@ -18,7 +17,7 @@ export function useExitAppListener(
       const widgetSettingsMap = Object.fromEntries(
         Object.entries(widgets).map(([id, { settings }]) => [id, settings]),
       );
-      const settings = { toggleShortcut, theme, widgetSettingsMap };
+      const settings = { app: appSettings, widgets: widgetSettingsMap };
       invokeExitApp({ settings }).catch(console.error);
     });
 
@@ -30,5 +29,5 @@ export function useExitAppListener(
     return () => {
       unlisten.then((f) => f()).catch(console.error);
     };
-  }, [toggleShortcut, theme, widgets]);
+  }, [appSettings, widgets]);
 }

@@ -8,22 +8,18 @@ use tauri::{
     App, AppHandle, Manager, Runtime, WebviewUrl, WebviewWindowBuilder, Window, WindowEvent,
 };
 
-use crate::path::PathExt;
 use crate::settings::Settings;
 
 /// Extention trait for window-related operations.
-pub trait WindowExt<R: Runtime>: Manager<R> + PathExt<R> {
-    /// Create the manager and canvas windows.
-    fn create_manager_and_canvas(&mut self) -> Result<()>
+pub trait WindowExt<R: Runtime>: Manager<R> {
+    /// Create the manager window.
+    fn create_manager(&mut self, initial_settings: &Settings) -> Result<()>
     where
         Self: Sized,
     {
-        let initial_settings = Settings::load(self.persist_dir())?;
+        let url = WebviewUrl::App("views/manager.html".into());
         let init_js = WindowInitJS::generate(initial_settings)?;
-
-        // Create the manager window
-        let manager_url = WebviewUrl::App("views/manager.html".into());
-        WebviewWindowBuilder::new(self, "manager", manager_url)
+        WebviewWindowBuilder::new(self, "manager", url)
             .title("Deskulpt Manager")
             .inner_size(750.0, 500.0)
             .center()
@@ -34,9 +30,17 @@ pub trait WindowExt<R: Runtime>: Manager<R> + PathExt<R> {
             .initialization_script(&init_js)
             .build()?;
 
-        // Create the canvas window
-        let canvas_url = WebviewUrl::App("views/canvas.html".into());
-        let canvas = WebviewWindowBuilder::new(self, "canvas", canvas_url)
+        Ok(())
+    }
+
+    /// Create the canvas window.
+    fn create_canvas(&mut self, initial_settings: &Settings) -> Result<()>
+    where
+        Self: Sized,
+    {
+        let url = WebviewUrl::App("views/canvas.html".into());
+        let init_js = WindowInitJS::generate(initial_settings)?;
+        let canvas = WebviewWindowBuilder::new(self, "canvas", url)
             .maximized(true)
             .transparent(true)
             .decorations(false)

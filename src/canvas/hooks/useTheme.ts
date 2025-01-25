@@ -1,15 +1,20 @@
 import { useEffect, useRef, useState } from "react";
 import { listenToSwitchTheme } from "../../core/events";
 import { ListenerKeys, ReadyCallback } from "./useListenersReady";
+import { Theme } from "../../types";
 
 export function useTheme(ready: ReadyCallback) {
   const isReady = useRef(false);
-  const [theme, setTheme] = useState(window.__DESKULPT__.initialSettings.theme);
+
+  const [theme, setTheme] = useState(
+    window.__DESKULPT__.initialSettings.app.theme,
+  );
 
   useEffect(() => {
-    const unlisten = listenToSwitchTheme((event) => {
-      const { theme } = event.payload;
-      setTheme(theme);
+    const unlisten = listenToSwitchTheme(() => {
+      setTheme((prevTheme) =>
+        prevTheme === Theme.LIGHT ? Theme.DARK : Theme.LIGHT,
+      );
     });
 
     if (!isReady.current) {

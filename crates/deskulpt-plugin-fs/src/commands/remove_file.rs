@@ -9,6 +9,7 @@ use crate::FsPlugin;
 pub struct RemoveFile;
 
 #[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct RemoveFileInputPayload {
     path: PathBuf,
 }

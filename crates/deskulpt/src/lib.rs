@@ -5,8 +5,8 @@
 )]
 
 use deskulpt_core::{
-    PathExt, StatesExtCanvasClickThrough, StatesExtWidgetConfigMap, StatesExtWindowReady, TrayExt,
-    WindowExt,
+    commands, PathExt, Settings, ShortcutsExt, StatesExtCanvasClickThrough,
+    StatesExtWidgetConfigMap, StatesExtWindowReady, TrayExt, WindowExt,
 };
 use tauri::image::Image;
 use tauri::{generate_context, generate_handler, include_image, Builder};
@@ -20,31 +20,37 @@ pub fn run() {
         .setup(|app| {
             app.init_widgets_dir()?;
             app.init_persist_dir()?;
+            let mut settings = Settings::load(app.persist_dir())?;
 
+            // Initialize application state management
             app.manage_window_ready();
             app.manage_widget_config_map();
             app.manage_canvas_click_through();
 
-            #[cfg(target_os = "macos")]
             // Hide the application from the dock on macOS because skipping
             // taskbar is not applicable for macOS
+            #[cfg(target_os = "macos")]
             app.set_activation_policy(tauri::ActivationPolicy::Accessory);
 
-            app.create_manager_and_canvas()?;
+            // Register initial shortcuts
+            app.init_shortcuts(&mut settings);
 
+            // Create windows and system tray
+            app.create_manager(&settings)?;
+            app.create_canvas(&settings)?;
             app.create_tray(DESKULPT_ICON)?;
 
             Ok(())
         })
         .on_window_event(deskulpt_core::on_window_event)
         .invoke_handler(generate_handler![
-            deskulpt_core::commands::call_plugin,
-            deskulpt_core::commands::bundle_widget,
-            deskulpt_core::commands::exit_app,
-            deskulpt_core::commands::open_in_widgets_dir,
-            deskulpt_core::commands::rescan_widgets,
-            deskulpt_core::commands::update_toggle_shortcut,
-            deskulpt_core::commands::window_ready,
+            commands::call_plugin,
+            commands::bundle_widget,
+            commands::exit_app,
+            commands::open_in_widgets_dir,
+            commands::rescan_widgets,
+            commands::update_shortcuts,
+            commands::window_ready,
         ])
         .plugin(tauri_plugin_clipboard_manager::init())
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())

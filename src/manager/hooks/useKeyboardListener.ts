@@ -1,25 +1,7 @@
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
-export interface KeyboardListenerOutput {
-  /** Whether the listener is listening. */
-  listeningToShortcut: boolean;
-  /** Setter for the state of whether the listener is listening. */
-  setListeningToShortcut: Dispatch<SetStateAction<boolean>>;
-  /** The listened keys. */
-  listenedShortcut: string[];
-  /** Whether the listened keys contain a valid modifier. */
-  hasModifier: boolean;
-  /** Whether the listened keys contain a valid main key. */
-  hasKey: boolean;
-  /** Cleanup function to stop listening and reset states. */
-  cleanup: () => void;
-}
-
-/**
- * Hook for listening to keyboard inputs.
- */
-export function useKeyboardListener(): KeyboardListenerOutput {
+export function useKeyboardListener() {
   const [listeningToShortcut, setListeningToShortcut] = useState(false);
   const [listenedShortcut, setListenedShortcut] = useState<string[]>([]);
   const [hasModifier, setHasModifier] = useState(false);

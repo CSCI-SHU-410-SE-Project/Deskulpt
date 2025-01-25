@@ -1,16 +1,9 @@
 import { EventCallback, emitTo, listen } from "@tauri-apps/api/event";
-import { Theme } from "../../types";
 
-interface SwitchThemePayload {
-  theme: Theme;
+export async function emitSwitchThemeToCanvas() {
+  await emitTo("canvas", "switch-theme");
 }
 
-export async function emitSwitchThemeToCanvas(payload: SwitchThemePayload) {
-  await emitTo("canvas", "switch-theme", payload);
-}
-
-export function listenToSwitchTheme(
-  handler: EventCallback<SwitchThemePayload>,
-) {
+export function listenToSwitchTheme(handler: EventCallback<void>) {
   return listen("switch-theme", handler);
 }

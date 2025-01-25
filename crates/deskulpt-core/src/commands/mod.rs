@@ -11,7 +11,7 @@ mod open_in_widgets_dir;
 #[doc(hidden)]
 mod rescan_widgets;
 #[doc(hidden)]
-mod update_toggle_shortcut;
+mod update_shortcuts;
 #[doc(hidden)]
 mod window_ready;
 
@@ -22,5 +22,5 @@ pub use call_plugin::*;
 pub use exit_app::*;
 pub use open_in_widgets_dir::*;
 pub use rescan_widgets::*;
-pub use update_toggle_shortcut::*;
+pub use update_shortcuts::*;
 pub use window_ready::*;

@@ -11,11 +11,39 @@ use serde::{Deserialize, Serialize};
 /// The settings file name in the persistence directory.
 static SETTINGS_FILE: &str = "settings.bin";
 
+/// Light/dark theme of the application.
+#[derive(Default, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+enum Theme {
+    #[default]
+    Light,
+    Dark,
+}
+
+/// Keyboard shortcuts registered in the application.
+#[derive(Default, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Shortcuts {
+    /// For toggling canvas click-through.
+    pub canvas_toggle: Option<String>,
+}
+
+/// Application-wide settings.
+#[derive(Default, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+struct AppSettings {
+    /// The application theme.
+    theme: Theme,
+    /// The keyboard shortcuts.
+    shortcuts: Shortcuts,
+}
+
 /// Per-widget settings.
 ///
 /// Different from widget configurations, these are independent of the widget
 /// configuration files and are managed internally by the application.
 #[derive(Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
 struct WidgetSettings {
     /// The leftmost x-coordinate in pixels.
     x: i32,
@@ -25,25 +53,14 @@ struct WidgetSettings {
     opacity: i32,
 }
 
-/// Light/dark theme of the application.
-#[derive(Default, Deserialize, Serialize)]
-#[serde(rename_all = "lowercase")]
-enum Theme {
-    #[default]
-    Light,
-    Dark,
-}
-
 /// Full settings of the application.
 #[derive(Default, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Settings {
-    /// The application theme.
-    theme: Theme,
-    /// The keyboard shortcut for toggling canvas click-through.
-    toggle_shortcut: Option<String>,
+    /// Application-wide settings.
+    app: AppSettings,
     /// The mapping from widget IDs to their respective settings.
-    widget_settings_map: HashMap<String, WidgetSettings>,
+    widgets: HashMap<String, WidgetSettings>,
 }
 
 impl Settings {
@@ -74,5 +91,10 @@ impl Settings {
         let writer = BufWriter::new(file);
         bincode::serialize_into(writer, self)?;
         Ok(())
+    }
+
+    /// Get the mutable reference to the keyboard shortcuts.
+    pub fn shortcuts_mut(&mut self) -> &mut Shortcuts {
+        &mut self.app.shortcuts
     }
 }

@@ -1,12 +1,11 @@
-import { Dispatch, SetStateAction } from "react";
 import { DataList, Flex } from "@radix-ui/themes";
 import { SettingToggleShortcut, Shortcut } from "../components";
+import { AppSettings } from "../../types";
+import { UpdateShortcutsCallback } from "../hooks";
 
 interface Props {
-  /** The current toggle shortcut. */
-  toggleShortcut?: string;
-  /** Setter for the toggle shortcut state. */
-  setToggleShortcut: Dispatch<SetStateAction<string | undefined>>;
+  appSettings: AppSettings;
+  updateShortcuts: UpdateShortcutsCallback;
 }
 
 /**
@@ -15,8 +14,8 @@ interface Props {
  * This tab is rendered as a data list with some margin. It contains the settings and
  * setters for the global settings, which include the toggle shortcut.
  */
-export default ({ toggleShortcut, setToggleShortcut }: Props) => {
-  const shortcutKeys = toggleShortcut?.split("+") ?? [];
+export default ({ appSettings, updateShortcuts }: Props) => {
+  const shortcutKeys = appSettings.shortcuts.canvasToggle?.split("+") ?? [];
 
   return (
     <DataList.Root size="2" mx="3" my="2" css={{ gap: "var(--space-2)" }}>
@@ -25,7 +24,10 @@ export default ({ toggleShortcut, setToggleShortcut }: Props) => {
         <DataList.Value>
           <Flex align="center" justify="between" width="100%">
             <Shortcut keys={shortcutKeys} gap="1" />
-            <SettingToggleShortcut setToggleShortcut={setToggleShortcut} />
+            <SettingToggleShortcut
+              shortcuts={appSettings.shortcuts}
+              updateShortcuts={updateShortcuts}
+            />
           </Flex>
         </DataList.Value>
       </DataList.Item>

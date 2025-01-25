@@ -8,16 +8,16 @@ use crate::settings::Settings;
 /// Template for window initialization scripts.
 #[derive(Template)]
 #[default_template("init.js")]
-pub struct WindowInitJS {
+pub struct WindowInitJS<'a> {
     /// `window.__DESKULPT__.apisWrapper`
     apis_wrapper: &'static str,
     /// `window.__DESKULPT__.initialSettings`
-    initial_settings: Settings,
+    initial_settings: &'a Settings,
 }
 
-impl WindowInitJS {
+impl<'a> WindowInitJS<'a> {
     /// Generate JavaScript code for initializing the window.
-    pub fn generate(initial_settings: Settings) -> Result<String> {
+    pub fn generate(initial_settings: &'a Settings) -> Result<String> {
         let template = Self {
             apis_wrapper: include_str!("../../generated/apis.wrapper.js"),
             initial_settings,

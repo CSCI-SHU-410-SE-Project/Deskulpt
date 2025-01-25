@@ -54,13 +54,13 @@ const x = memo(({ id, widget, updateSettings }: Props) => {
           css={{
             position: "absolute",
             top: "var(--space-1)",
-            right: "var(--space-1)",
+            right: 0,
             cursor: "grab",
-            opacity: "0",
+            opacity: 0,
             zIndex: 9999,
             transition: "opacity 200ms ease-in-out",
             "&:hover": {
-              opacity: "1",
+              opacity: 1,
             },
           }}
         />

@@ -6,7 +6,7 @@ use tauri::{App, AppHandle, Emitter, Runtime};
 
 /// Payload of the `show-toast` event.
 #[derive(Serialize, Clone)]
-#[serde(rename_all = "lowercase")]
+#[serde(rename_all = "camelCase")]
 pub enum ShowToastPayload {
     /// Show a [success](https://sonner.emilkowal.ski/toast#success) toast.
     Success(String),

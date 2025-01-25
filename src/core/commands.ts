@@ -1,5 +1,5 @@
 import { invoke } from "@tauri-apps/api/core";
-import { Settings, WidgetConfig } from "../types";
+import { Settings, Shortcuts, WidgetConfig } from "../types";
 
 export function invokeBundleWidget(payload: {
   id: string;
@@ -25,11 +25,11 @@ export function invokeRescanWidgets() {
   }>("rescan_widgets");
 }
 
-export function invokeUpdateToggleShortcut(payload: {
-  oldShortcut?: string;
-  newShortcut?: string;
+export function invokeUpdateShortcuts(payload: {
+  oldShortcuts: Shortcuts;
+  newShortcuts: Shortcuts;
 }) {
-  return invoke<void>("update_toggle_shortcut", payload);
+  return invoke<void>("update_shortcuts", payload);
 }
 
 export function invokeWindowReady(payload: { window: "manager" | "canvas" }) {
