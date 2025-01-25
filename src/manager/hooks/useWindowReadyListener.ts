@@ -20,5 +20,5 @@ export function useWindowReadyListener(
     return () => {
       unlisten.then((f) => f()).catch(console.error);
     };
-  }, [rescan]);
+  }, [rescan, ready]);
 }

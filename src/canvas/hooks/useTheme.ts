@@ -25,7 +25,7 @@ export function useTheme(ready: ReadyCallback) {
     return () => {
       unlisten.then((f) => f()).catch(console.error);
     };
-  }, []);
+  }, [ready]);
 
   return theme;
 }

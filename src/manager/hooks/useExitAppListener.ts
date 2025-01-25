@@ -29,5 +29,5 @@ export function useExitAppListener(
     return () => {
       unlisten.then((f) => f()).catch(console.error);
     };
-  }, [appSettings, widgets]);
+  }, [appSettings, widgets, ready]);
 }

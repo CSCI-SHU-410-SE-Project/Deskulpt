@@ -43,5 +43,5 @@ export function useRescanCallback(
       numRemoved: removedIds.length,
       numUpdated: newWidgetsArray.length - addedIds.length,
     };
-  }, []);
+  }, [widgets, widgetsDispatch]);
 }

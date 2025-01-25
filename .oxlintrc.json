@@ -6,7 +6,7 @@
     "src/generated/**",
     "**/website/**"
   ],
-  "plugins": ["oxc", "react", "react-hooks", "typescript", "unicorn"],
+  "plugins": ["import", "oxc", "react", "typescript", "unicorn"],
   "categories": {
     "correctness": "error",
     "suspicious": "error",
@@ -14,8 +14,10 @@
     "pedantic": "warn"
   },
   "rules": {
-    "react-in-jsx-scope": "off",
-    "sort-imports": ["error", { "ignoreDeclarationSort": true }]
+    "sort-imports": ["error", { "ignoreDeclarationSort": true }],
+    "import/max-dependencies": "off",
+    "react/react-in-jsx-scope": "off",
+    "react/exhaustive-deps": "warn"
   },
   "overrides": [
     {

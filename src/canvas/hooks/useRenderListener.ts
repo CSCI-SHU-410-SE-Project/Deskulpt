@@ -88,7 +88,7 @@ export function useRenderListener(
     return () => {
       unlisten.then((f) => f()).catch(console.error);
     };
-  }, [widgets]);
+  }, [widgets, widgetsDispatch, ready]);
 }
 
 async function renderHelper(id: string, apisBlobUrl: string, code?: string) {

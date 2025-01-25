@@ -9,11 +9,14 @@ export type UpdateSettingsCallback = (
 ) => void;
 
 export function useUpdateSettingsCallback(widgetsDispatch: WidgetsDispatch) {
-  return useCallback(async (id: string, settings: Partial<WidgetSettings>) => {
-    widgetsDispatch({
-      type: WidgetsActionType.SET_SETTINGS,
-      payload: { id, settings },
-    });
-    await emitUpdateSettingsToManager({ id, settings });
-  }, []);
+  return useCallback(
+    async (id: string, settings: Partial<WidgetSettings>) => {
+      widgetsDispatch({
+        type: WidgetsActionType.SET_SETTINGS,
+        payload: { id, settings },
+      });
+      await emitUpdateSettingsToManager({ id, settings });
+    },
+    [widgetsDispatch],
+  );
 }

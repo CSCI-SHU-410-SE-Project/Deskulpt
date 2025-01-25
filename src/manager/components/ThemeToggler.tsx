@@ -14,7 +14,7 @@ export default ({ theme, appSettingsDispatch }: Props) => {
   const toggleTheme = useCallback(() => {
     appSettingsDispatch({ type: AppSettingsActionType.TOGGLE_THEME });
     emitSwitchThemeToCanvas();
-  }, []);
+  }, [appSettingsDispatch]);
 
   return (
     <Box position="absolute" right="3" top="4">

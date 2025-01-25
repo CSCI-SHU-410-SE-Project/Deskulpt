@@ -28,7 +28,7 @@ interface Props {
 export default ({ value, onChange, min, max, width }: Props) => {
   useEffect(() => {
     onChange(value);
-  }, [value]);
+  }, [value, onChange]);
 
   function handleChange(event: ChangeEvent<HTMLInputElement>) {
     if (event.target.value === "") {

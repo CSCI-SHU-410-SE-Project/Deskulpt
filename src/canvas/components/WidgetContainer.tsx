@@ -3,8 +3,7 @@ import Draggable, { DraggableData, DraggableEvent } from "react-draggable";
 import { ErrorBoundary } from "react-error-boundary";
 import { LuGripVertical } from "react-icons/lu";
 import { Box } from "@radix-ui/themes";
-import { WidgetState } from "../hooks";
-import { UpdateSettingsCallback } from "../hooks";
+import { UpdateSettingsCallback, WidgetState } from "../hooks";
 import ErrorDisplay from "./ErrorDisplay";
 import { stringifyError } from "../utils";
 

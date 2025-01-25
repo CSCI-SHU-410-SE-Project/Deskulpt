@@ -25,6 +25,6 @@ export function useUpdateShortcutsCallback(
           console.error(error);
           toast.error("Failed to update shortcuts");
         }),
-    [],
+    [appSettingsDispatch],
   );
 }

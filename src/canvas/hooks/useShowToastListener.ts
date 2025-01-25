@@ -23,5 +23,5 @@ export function useShowToastListener(ready: ReadyCallback) {
     return () => {
       unlisten.then((f) => f()).catch(console.error);
     };
-  }, []);
+  }, [ready]);
 }

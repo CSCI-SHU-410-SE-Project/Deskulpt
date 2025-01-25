@@ -38,13 +38,13 @@ export default ({ shortcuts, updateShortcuts }: Props) => {
     if (disableShortcut) {
       cleanup();
     }
-  }, [disableShortcut]);
+  }, [disableShortcut, cleanup]);
 
   // Cleanup and reset states when popover is opened/closed
   useEffect(() => {
     setDisableShortcut(false);
     cleanup();
-  }, [popoverOpen]);
+  }, [popoverOpen, cleanup]);
 
   return (
     <Popover.Root

@@ -39,5 +39,5 @@ export function useBatchRemoveListener(
     return () => {
       unlisten.then((f) => f()).catch(console.error);
     };
-  }, [widgets]);
+  }, [widgets, widgetsDispatch, ready]);
 }

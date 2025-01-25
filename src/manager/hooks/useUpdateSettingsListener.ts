@@ -26,5 +26,5 @@ export function useUpdateSettingsListener(
     return () => {
       unlisten.then((f) => f()).catch(console.error);
     };
-  }, []);
+  }, [widgetsDispatch, ready]);
 }
