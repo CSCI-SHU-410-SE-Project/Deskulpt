@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 
 export function useKeyboardListener() {
@@ -63,12 +63,12 @@ export function useKeyboardListener() {
    * This stops listening (and thus triggers the event listener cleanup), empties up the
    * listened shortcut keys, and resets the relevant states.
    */
-  function cleanup() {
+  const cleanup = useCallback(() => {
     setListeningToShortcut(false);
     setListenedShortcut([]);
     setHasKey(false);
     setHasModifier(false);
-  }
+  }, []);
 
   // Listen to the shortcut when listening toggle is on
   useEffect(() => {

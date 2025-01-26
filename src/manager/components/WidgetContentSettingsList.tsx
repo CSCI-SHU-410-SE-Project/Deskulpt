@@ -4,6 +4,7 @@ import { DataList, Flex } from "@radix-ui/themes";
 import { NumberInput } from "../components";
 import { FaTimes } from "react-icons/fa";
 import { WidgetsActionType, WidgetsDispatch } from "../hooks";
+import { useCallback } from "react";
 
 interface Props {
   /** The widget ID. */
@@ -14,6 +15,18 @@ interface Props {
   widgetsDispatch: WidgetsDispatch;
 }
 
+const updateSetting =
+  (id: string, widgetsDispatch: WidgetsDispatch) =>
+  (partialSettings: Partial<WidgetSettings>) => {
+    widgetsDispatch({
+      type: WidgetsActionType.SET_SETTINGS,
+      payload: { id, settings: partialSettings },
+    });
+    emitUpdateSettingsToCanvas({ id, settings: partialSettings }).catch(
+      console.error,
+    );
+  };
+
 /**
  * Component for displaying the widget-specific settings.
  *
@@ -22,15 +35,26 @@ interface Props {
  * to the canvas via emitting corresponding events.
  */
 export default ({ id, settings, widgetsDispatch }: Props) => {
-  function updateSetting(partialSettings: Partial<WidgetSettings>) {
-    widgetsDispatch({
-      type: WidgetsActionType.SET_SETTINGS,
-      payload: { id, settings: partialSettings },
-    });
-    emitUpdateSettingsToCanvas({ id, settings: partialSettings }).catch(
-      console.error,
-    );
-  }
+  const updateX = useCallback(
+    (x: number) => {
+      updateSetting(id, widgetsDispatch)({ x });
+    },
+    [id, widgetsDispatch],
+  );
+
+  const updateY = useCallback(
+    (y: number) => {
+      updateSetting(id, widgetsDispatch)({ y });
+    },
+    [id, widgetsDispatch],
+  );
+
+  const updateOpacity = useCallback(
+    (opacity: number) => {
+      updateSetting(id, widgetsDispatch)({ opacity });
+    },
+    [id, widgetsDispatch],
+  );
 
   return (
     <DataList.Root size="2" css={{ gap: "var(--space-2)" }}>
@@ -42,14 +66,14 @@ export default ({ id, settings, widgetsDispatch }: Props) => {
               value={settings.x}
               min={0}
               width="50px"
-              onChange={(value) => updateSetting({ x: value })}
+              onChange={updateX}
             />
             <FaTimes size={10} />
             <NumberInput
               value={settings.y}
               min={0}
               width="50px"
-              onChange={(value) => updateSetting({ y: value })}
+              onChange={updateY}
             />
           </Flex>
         </DataList.Value>
@@ -62,7 +86,7 @@ export default ({ id, settings, widgetsDispatch }: Props) => {
             min={1}
             max={100}
             width="50px"
-            onChange={(value) => updateSetting({ opacity: value })}
+            onChange={updateOpacity}
           />
         </DataList.Value>
       </DataList.Item>
