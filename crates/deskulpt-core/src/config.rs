@@ -7,6 +7,7 @@ use std::path::{Path, PathBuf};
 
 use anyhow::{Context, Result};
 use serde::{Deserialize, Serialize};
+use uuid::Uuid;
 
 /// Macro for implementing [`DeskulptConf::load`] and [`PackageJson::load`].
 ///
@@ -125,10 +126,20 @@ impl WidgetConfig {
         })
     }
 
+    /// Get the directory of the widget inside the widgets directory.
     pub fn dir(&self) -> &Path {
         match self {
             WidgetConfig::Valid { dir, .. } => dir,
             WidgetConfig::Invalid { dir, .. } => dir,
         }
+    }
+
+    /// Get the widget ID.
+    ///
+    /// This ID is derived from the widget directory name using UUID v5. It is
+    /// deterministic for the same directory name.
+    pub fn id(&self) -> String {
+        let dir_encoded = self.dir().as_os_str().as_encoded_bytes();
+        Uuid::new_v5(&Uuid::NAMESPACE_URL, dir_encoded).to_string()
     }
 }

@@ -3,7 +3,6 @@ use std::fs::read_dir;
 
 use serde::Serialize;
 use tauri::{command, AppHandle, Runtime};
-use uuid::Uuid;
 
 use super::error::CmdResult;
 use crate::config::WidgetConfig;
@@ -45,10 +44,7 @@ pub async fn rescan_widgets<R: Runtime>(
         }
 
         if let Some(widget_config) = WidgetConfig::load(&path) {
-            // Generate a unique ID for the widget based on its directory; we
-            // use UUID v5 because it is deterministic
-            let dir_encoded = widget_config.dir().as_os_str().as_encoded_bytes();
-            let id = Uuid::new_v5(&Uuid::NAMESPACE_URL, dir_encoded).to_string();
+            let id = widget_config.id();
             new_config_map.insert(id, widget_config);
         }
     }
