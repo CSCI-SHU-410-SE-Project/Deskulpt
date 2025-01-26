@@ -22,7 +22,6 @@ pub async fn bundle_widget<R: Runtime>(
     apis_blob_url: String,
 ) -> CmdResult<String> {
     let widgets_dir = app_handle.widgets_dir();
-    let widget_dir = widgets_dir.join(&id);
 
     let mut bundler = app_handle.with_widget_config_map(|collection| {
         let config = collection
@@ -30,16 +29,16 @@ pub async fn bundle_widget<R: Runtime>(
             .ok_or_else(|| cmderr!("Widget (id={}) does not exist in the collection", id))?;
 
         match config {
-            WidgetConfig::Valid { entry, .. } => {
+            WidgetConfig::Valid { dir, entry, .. } => {
                 let builder = WidgetBundlerBuilder::new(
-                    widget_dir.to_path_buf(),
+                    widgets_dir.join(dir),
                     entry.clone(),
                     base_url,
                     apis_blob_url,
                 );
                 Ok(builder.build())
             },
-            WidgetConfig::Invalid(msg) => Err(cmderr!(msg.clone())),
+            WidgetConfig::Invalid { error, .. } => Err(cmderr!(error.clone())),
         }
     })?;
 

@@ -2,24 +2,28 @@
 
 use std::path::PathBuf;
 
-use tauri::{AppHandle, Manager};
+use anyhow::Result;
 
 /// The interface for interacting with the Deskulpt engine (🚧 TODO 🚧).
 ///
 /// ### 🚧 TODO 🚧
 ///
-/// This is a temporary implementation that directly uses the app handle of the
-/// Deskulpt core because the plugin currently runs in the same process. The
-/// final implementation should use IPC for communication, and this struct may
-/// need to hold the IPC channel, etc.
+/// This is a temporary implementation that directly takes the necessary
+/// functions for the engine interface from the Deskulpt core, because the
+/// plugins currently run in the same process as the core. The final
+/// implementation should not require this and should use IPC for communication.
+/// This struct may need to hold the IPC channel, etc. instead.
 pub struct EngineInterface {
-    app_handle: AppHandle,
+    #[allow(clippy::type_complexity)]
+    widgets_dir_fn: Box<dyn Fn(&str) -> Result<PathBuf>>,
 }
 
 impl EngineInterface {
     /// Create a new engine interface instance.
-    pub(crate) fn new(app_handle: AppHandle) -> Self {
-        Self { app_handle }
+    pub(crate) fn new(widgets_dir_fn: impl Fn(&str) -> Result<PathBuf> + 'static) -> Self {
+        Self {
+            widgets_dir_fn: Box::new(widgets_dir_fn),
+        }
     }
 
     /// Get the directory of a widget (🚧 TODO 🚧).
@@ -29,12 +33,7 @@ impl EngineInterface {
     /// This method is a temporary implementation. The final implementation
     /// should use IPC to communicate with the Deskulpt core to get the widget
     /// directory.
-    pub fn widget_dir<S: AsRef<str>>(&self, id: S) -> PathBuf {
-        self.app_handle
-            .path()
-            .resource_dir()
-            .unwrap()
-            .join("widgets")
-            .join(id.as_ref())
+    pub fn widget_dir<S: AsRef<str>>(&self, id: S) -> Result<PathBuf> {
+        (self.widgets_dir_fn)(id.as_ref())
     }
 }

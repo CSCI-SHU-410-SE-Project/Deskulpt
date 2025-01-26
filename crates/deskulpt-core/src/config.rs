@@ -3,7 +3,7 @@
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::BufReader;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 use anyhow::{Context, Result};
 use serde::{Deserialize, Serialize};
@@ -62,6 +62,8 @@ impl_load!(PackageJson, "package.json");
 pub enum WidgetConfig {
     /// Valid widget configuration.
     Valid {
+        /// The directory of the widget inside the widgets directory.
+        dir: PathBuf,
         /// Display name of the widget.
         name: String,
         /// Entry file of the widget source code.
@@ -69,8 +71,13 @@ pub enum WidgetConfig {
         /// External dependencies of the widget as in `package.json`.
         dependencies: HashMap<String, String>,
     },
-    /// Invalid configuration with error message.
-    Invalid(String),
+    /// Invalid widget configuration.
+    Invalid {
+        /// The directory of the widget inside the widgets directory.
+        dir: PathBuf,
+        /// Error message.
+        error: String,
+    },
 }
 
 impl WidgetConfig {
@@ -86,7 +93,12 @@ impl WidgetConfig {
             match DeskulptConf::load(dir).context("Failed to load deskulpt.conf.json") {
                 Ok(Some(deskulpt_conf)) => deskulpt_conf,
                 Ok(None) => return None,
-                Err(e) => return Some(WidgetConfig::Invalid(e.to_string())),
+                Err(e) => {
+                    return Some(WidgetConfig::Invalid {
+                        dir: dir.to_path_buf(),
+                        error: e.to_string(),
+                    })
+                },
             };
 
         // Ignore widgets that are explcitly marked as such
@@ -97,13 +109,26 @@ impl WidgetConfig {
         let dependencies = match PackageJson::load(dir).context("Failed to load package.json") {
             Ok(Some(package_json)) => package_json.dependencies,
             Ok(None) => Default::default(),
-            Err(e) => return Some(WidgetConfig::Invalid(e.to_string())),
+            Err(e) => {
+                return Some(WidgetConfig::Invalid {
+                    dir: dir.to_path_buf(),
+                    error: e.to_string(),
+                })
+            },
         };
 
         Some(WidgetConfig::Valid {
+            dir: dir.to_path_buf(),
             name: deskulpt_conf.name,
             entry: deskulpt_conf.entry,
             dependencies,
         })
+    }
+
+    pub fn dir(&self) -> &Path {
+        match self {
+            WidgetConfig::Valid { dir, .. } => dir,
+            WidgetConfig::Invalid { dir, .. } => dir,
+        }
     }
 }

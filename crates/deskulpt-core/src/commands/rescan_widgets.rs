@@ -3,8 +3,9 @@ use std::fs::read_dir;
 
 use serde::Serialize;
 use tauri::{command, AppHandle, Runtime};
+use uuid::Uuid;
 
-use super::error::{cmdbail, CmdResult};
+use super::error::CmdResult;
 use crate::config::WidgetConfig;
 use crate::path::PathExt;
 use crate::states::StatesExtWidgetConfigMap;
@@ -43,13 +44,11 @@ pub async fn rescan_widgets<R: Runtime>(
             continue; // Non-directory entries are not widgets, skip
         }
 
-        // Get widget ID based on the directory name
-        let id = match path.file_name() {
-            Some(file_name) => file_name.to_string_lossy().to_string(),
-            None => cmdbail!("Invalid widget directory: '{}'", path.display()),
-        };
-
         if let Some(widget_config) = WidgetConfig::load(&path) {
+            // Generate a unique ID for the widget based on its directory; we
+            // use UUID v5 because it is deterministic
+            let dir_encoded = widget_config.dir().as_os_str().as_encoded_bytes();
+            let id = Uuid::new_v5(&Uuid::NAMESPACE_URL, dir_encoded).to_string();
             new_config_map.insert(id, widget_config);
         }
     }
