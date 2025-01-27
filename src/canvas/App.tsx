@@ -1,36 +1,35 @@
 import { Toaster } from "sonner";
-import { Theme } from "@radix-ui/themes";
+import { Box, Theme as RadixTheme } from "@radix-ui/themes";
 import {
   useBatchRemoveListener,
-  useListenersReady,
-  useRenderListener,
+  useRender,
   useShowToastListener,
   useTheme,
   useUpdateSettingsCallback,
   useUpdateSettingsListener,
   useWidgets,
 } from "./hooks";
-import { WidgetContainer } from "./components";
+import { RenderingScreen, WidgetContainer } from "./components";
 
 export default () => {
-  const ready = useListenersReady();
-
-  const theme = useTheme(ready);
+  const theme = useTheme();
   const [widgets, widgetsDispatch] = useWidgets();
+  const isRendering = useRender(widgets, widgetsDispatch);
   const updateSettings = useUpdateSettingsCallback(widgetsDispatch);
 
-  useRenderListener(widgets, widgetsDispatch, ready);
-  useBatchRemoveListener(widgets, widgetsDispatch, ready);
-  useShowToastListener(ready);
-  useUpdateSettingsListener(widgetsDispatch, ready);
+  useBatchRemoveListener(widgets, widgetsDispatch);
+  useShowToastListener();
+  useUpdateSettingsListener(widgetsDispatch);
 
   return (
-    <Theme
+    <RadixTheme
       appearance={theme}
       accentColor="indigo"
       grayColor="slate"
       hasBackground={false}
+      css={{ height: "100vh" }}
     >
+      {isRendering && <RenderingScreen />}
       <Toaster
         position="bottom-right"
         gap={6}
@@ -43,14 +42,16 @@ export default () => {
           },
         }}
       />
-      {Object.entries(widgets).map(([id, widget]) => (
-        <WidgetContainer
-          key={id}
-          id={id}
-          widget={widget}
-          updateSettings={updateSettings}
-        />
-      ))}
-    </Theme>
+      <Box>
+        {Object.entries(widgets).map(([id, widget]) => (
+          <WidgetContainer
+            key={id}
+            id={id}
+            widget={widget}
+            updateSettings={updateSettings}
+          />
+        ))}
+      </Box>
+    </RadixTheme>
   );
 };

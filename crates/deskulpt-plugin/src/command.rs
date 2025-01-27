@@ -1,7 +1,6 @@
 //! Plugin command APIs.
 
 use anyhow::Result;
-use serde_json::Value as JsonValue;
 
 use crate::interface::EngineInterface;
 use crate::Plugin;
@@ -39,6 +38,6 @@ pub trait PluginCommand {
         id: String,
         plugin: &Self::Plugin,
         engine: &EngineInterface,
-        input: JsonValue,
-    ) -> Result<JsonValue>;
+        input: serde_json::Value,
+    ) -> Result<serde_json::Value>;
 }

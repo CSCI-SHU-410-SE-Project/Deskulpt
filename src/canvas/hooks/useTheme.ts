@@ -1,11 +1,8 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { listenToSwitchTheme } from "../../core/events";
-import { ListenerKeys, ReadyCallback } from "./useListenersReady";
 import { Theme } from "../../types";
 
-export function useTheme(ready: ReadyCallback) {
-  const isReady = useRef(false);
-
+export function useTheme() {
   const [theme, setTheme] = useState(
     window.__DESKULPT__.initialSettings.app.theme,
   );
@@ -17,15 +14,10 @@ export function useTheme(ready: ReadyCallback) {
       );
     });
 
-    if (!isReady.current) {
-      ready(ListenerKeys.SWITCH_THEME);
-      isReady.current = true;
-    }
-
     return () => {
       unlisten.then((f) => f()).catch(console.error);
     };
-  }, [ready]);
+  }, []);
 
   return theme;
 }

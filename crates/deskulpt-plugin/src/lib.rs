@@ -12,7 +12,6 @@ use std::path::PathBuf;
 use anyhow::{bail, Result};
 pub use command::PluginCommand;
 pub use interface::EngineInterface;
-use serde_json::Value as JsonValue;
 pub use {anyhow, serde_json};
 
 /// The API for a Deskulpt plugin.
@@ -42,17 +41,22 @@ pub trait Plugin {
 /// [nushell](https://docs.rs/nu-plugin/0.101.0/nu_plugin/fn.serve_plugin.html)
 /// for reference.
 pub fn call_plugin<P: Plugin>(
-    widgets_dir_fn: impl Fn(&str) -> Result<PathBuf> + 'static,
+    widget_dir_fn: impl Fn(&str) -> Result<PathBuf> + 'static,
     plugin: &P,
     command: &str,
     id: String,
-    payload: Option<JsonValue>,
-) -> Result<JsonValue> {
-    let engine = EngineInterface::new(widgets_dir_fn);
+    payload: Option<serde_json::Value>,
+) -> Result<serde_json::Value> {
+    let engine = EngineInterface::new(widget_dir_fn);
 
     for plugin_command in plugin.commands() {
         if plugin_command.name() == command {
-            return plugin_command.run(id, plugin, &engine, payload.unwrap_or(JsonValue::Null));
+            return plugin_command.run(
+                id,
+                plugin,
+                &engine,
+                payload.unwrap_or(serde_json::Value::Null),
+            );
         }
     }
     bail!("Unknown command: {}", command)

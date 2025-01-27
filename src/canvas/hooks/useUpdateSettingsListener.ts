@@ -1,14 +1,8 @@
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { listenToUpdateSettings } from "../../core/events";
 import { WidgetsActionType, WidgetsDispatch } from "./useWidgets";
-import { ListenerKeys, ReadyCallback } from "./useListenersReady";
 
-export function useUpdateSettingsListener(
-  widgetsDispatch: WidgetsDispatch,
-  ready: ReadyCallback,
-) {
-  const isReady = useRef(false);
-
+export function useUpdateSettingsListener(widgetsDispatch: WidgetsDispatch) {
   useEffect(() => {
     const unlisten = listenToUpdateSettings((event) => {
       const { id, settings } = event.payload;
@@ -18,13 +12,8 @@ export function useUpdateSettingsListener(
       });
     });
 
-    if (!isReady.current) {
-      ready(ListenerKeys.UPDATE_SETTINGS);
-      isReady.current = true;
-    }
-
     return () => {
       unlisten.then((f) => f()).catch(console.error);
     };
-  }, [widgetsDispatch, ready]);
+  }, [widgetsDispatch]);
 }

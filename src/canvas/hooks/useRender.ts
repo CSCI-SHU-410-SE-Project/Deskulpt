@@ -1,6 +1,6 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { BASE_URL } from "../consts";
-import { invokeBundleWidget } from "../../core/commands";
+import { invokeBundleWidget, invokeSetRenderReady } from "../../core/commands";
 import {
   Widget,
   WidgetsActionType,
@@ -8,17 +8,19 @@ import {
   WidgetsState,
 } from "./useWidgets";
 import { listenToRender } from "../../core/events";
-import { ListenerKeys, ReadyCallback } from "./useListenersReady";
 
-export function useRenderListener(
+export function useRender(
   widgets: WidgetsState,
   widgetsDispatch: WidgetsDispatch,
-  ready: ReadyCallback,
 ) {
-  const isReady = useRef(false);
+  const [isRendering, setIsRendering] = useState(true);
+  const hasInited = useRef(false);
 
   useEffect(() => {
     const unlisten = listenToRender(async (event) => {
+      // If rendering is done within 1s, we do not set loading state at all
+      const timer = setTimeout(() => setIsRendering(true), 1000);
+
       const promises = event.payload.map(async ({ id, settings, code }) => {
         let apisBlobUrl;
 
@@ -51,44 +53,37 @@ export function useRenderListener(
             code,
           );
 
-          if (id in widgets) {
-            widgetsDispatch({
-              type: WidgetsActionType.SET_RENDER,
-              payload: { id, widget, moduleBlobUrl },
-            });
-          } else if (settings !== undefined) {
-            widgetsDispatch({
-              type: WidgetsActionType.ADD,
-              payload: { id, widget, settings, apisBlobUrl, moduleBlobUrl },
-            });
-          }
+          widgetsDispatch({
+            type: WidgetsActionType.SET_RENDER,
+            payload: { id, widget, settings, apisBlobUrl, moduleBlobUrl },
+          });
         } catch (error) {
-          if (id in widgets) {
-            widgetsDispatch({
-              type: WidgetsActionType.SET_RENDER_ERROR,
-              payload: { id, error },
-            });
-          } else if (settings !== undefined) {
-            widgetsDispatch({
-              type: WidgetsActionType.ADD_ERROR,
-              payload: { id, error, settings, apisBlobUrl },
-            });
-          }
+          widgetsDispatch({
+            type: WidgetsActionType.SET_RENDER_ERROR,
+            payload: { id, error, settings, apisBlobUrl },
+          });
         }
       });
 
       await Promise.all(promises);
+      clearTimeout(timer);
+      setIsRendering(false);
     });
 
-    if (!isReady.current) {
-      ready(ListenerKeys.RENDER);
-      isReady.current = true;
+    if (!hasInited.current) {
+      invokeSetRenderReady()
+        .then(() => {
+          hasInited.current = true;
+        })
+        .catch(console.error);
     }
 
     return () => {
       unlisten.then((f) => f()).catch(console.error);
     };
-  }, [widgets, widgetsDispatch, ready]);
+  }, [widgets, widgetsDispatch, setIsRendering]);
+
+  return isRendering;
 }
 
 async function renderHelper(id: string, apisBlobUrl: string, code?: string) {

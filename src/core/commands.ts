@@ -1,5 +1,6 @@
 import { invoke } from "@tauri-apps/api/core";
 import { Settings, Shortcuts, WidgetConfig } from "../types";
+import { RenderPayload } from "./events";
 
 export function invokeBundleWidget(payload: {
   id: string;
@@ -32,6 +33,10 @@ export function invokeUpdateShortcuts(payload: {
   return invoke<void>("update_shortcuts", payload);
 }
 
-export function invokeWindowReady(payload: { window: "manager" | "canvas" }) {
-  return invoke<void>("window_ready", payload);
+export function invokeEmitOnRenderReady(payload: { payload: RenderPayload }) {
+  return invoke<void>("emit_on_render_ready", payload);
+}
+
+export function invokeSetRenderReady() {
+  return invoke<void>("set_render_ready");
 }

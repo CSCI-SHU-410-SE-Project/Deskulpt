@@ -1,6 +1,5 @@
 export * from "./useBatchRemoveListener";
-export * from "./useListenersReady";
-export * from "./useRenderListener";
+export * from "./useRender";
 export * from "./useShowToastListener";
 export * from "./useTheme";
 export * from "./useUpdateSettingsCallback";

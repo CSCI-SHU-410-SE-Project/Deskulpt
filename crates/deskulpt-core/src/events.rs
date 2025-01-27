@@ -26,6 +26,11 @@ pub trait EventsExt<R: Runtime>: Emitter<R> {
         Ok(self.emit_to("manager", "exit-app", ())?)
     }
 
+    /// Emit the `render` event to the canvas.
+    fn emit_render_to_canvas(&self, payload: serde_json::Value) -> Result<()> {
+        Ok(self.emit_to("canvas", "render", payload)?)
+    }
+
     /// Emit the `window-ready` event to all windows.
     fn emit_window_ready(&self) -> Result<()> {
         Ok(self.emit_to("manager", "window-ready", ())?)

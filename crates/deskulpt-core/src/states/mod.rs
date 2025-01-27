@@ -1,12 +1,12 @@
 //! Deskulpt runtime state management.
 
 mod canvas_click_through;
+mod render_ready;
 mod widget_config_map;
-mod window_ready;
 
 #[doc(hidden)]
 pub use canvas_click_through::StatesExtCanvasClickThrough;
 #[doc(hidden)]
-pub use widget_config_map::StatesExtWidgetConfigMap;
+pub use render_ready::StatesExtRenderReady;
 #[doc(hidden)]
-pub use window_ready::StatesExtWindowReady;
+pub use widget_config_map::StatesExtWidgetConfigMap;

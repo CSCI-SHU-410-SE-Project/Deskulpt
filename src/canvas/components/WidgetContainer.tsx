@@ -13,7 +13,7 @@ interface Props {
   updateSettings: UpdateSettingsCallback;
 }
 
-const x = memo(({ id, widget, updateSettings }: Props) => {
+export default memo(({ id, widget, updateSettings }: Props) => {
   const { Component, width, height, x, y, opacity } = widget;
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -75,5 +75,3 @@ const x = memo(({ id, widget, updateSettings }: Props) => {
     </Draggable>
   );
 });
-
-export default x;

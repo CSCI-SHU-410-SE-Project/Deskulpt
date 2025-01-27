@@ -4,28 +4,25 @@ import AboutTab from "./tabs/AboutTab";
 import {
   useAppSettings,
   useExitAppListener,
-  useListenersReady,
   useRescanCallback,
+  useRescanInitially,
   useUpdateSettingsListener,
   useUpdateShortcutsCallback,
   useWidgets,
-  useWindowReadyListener,
 } from "./hooks";
 import { Box, Theme as RadixTheme, Tabs } from "@radix-ui/themes";
 import { ThemeToggler } from "./components";
 import { Toaster } from "sonner";
 
 export default () => {
-  const ready = useListenersReady();
-
   const [widgets, widgetsDispatch] = useWidgets();
   const [appSettings, appSettingsDispatch] = useAppSettings();
   const rescan = useRescanCallback(widgets, widgetsDispatch);
   const updateShortcuts = useUpdateShortcutsCallback(appSettingsDispatch);
 
-  useExitAppListener(appSettings, widgets, ready);
-  useUpdateSettingsListener(widgetsDispatch, ready);
-  useWindowReadyListener(rescan, ready);
+  useRescanInitially(widgetsDispatch);
+  useExitAppListener(appSettings, widgets);
+  useUpdateSettingsListener(widgetsDispatch);
 
   return (
     <RadixTheme

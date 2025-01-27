@@ -1,6 +1,5 @@
 use anyhow::anyhow;
 use once_cell::sync::Lazy;
-use serde_json::Value as JsonValue;
 use tauri::{command, AppHandle};
 use tokio::sync::Mutex;
 
@@ -33,21 +32,23 @@ pub async fn call_plugin(
     plugin: String,
     command: String,
     id: String,
-    payload: Option<JsonValue>,
-) -> CmdResult<JsonValue> {
+    payload: Option<serde_json::Value>,
+) -> CmdResult<serde_json::Value> {
+    let widget_dir_fn = move |x: &str| {
+        let widgets_dir = app_handle.widgets_dir();
+        app_handle.with_widget_config_map(|config_map| {
+            config_map
+                .get(x)
+                .ok_or_else(|| anyhow!("WidgetConfig not found"))
+                .map(|config| widgets_dir.join(config.dir()))
+        })
+    };
+
     match plugin.as_str() {
         "fs" => {
             let plugin = FS_PLUGIN.lock().await;
             let result = deskulpt_plugin::call_plugin(
-                move |x: &str| {
-                    let widgets_dir = app_handle.widgets_dir();
-                    app_handle.with_widget_config_map(|config_map| {
-                        config_map
-                            .get(x)
-                            .ok_or_else(|| anyhow!("WidgetConfig not found"))
-                            .map(|config| widgets_dir.join(config.dir()))
-                    })
-                },
+                widget_dir_fn,
                 &*plugin,
                 command.as_str(),
                 id,
@@ -58,15 +59,7 @@ pub async fn call_plugin(
         "sys" => {
             let plugin = SYS_PLUGIN.lock().await;
             let result = deskulpt_plugin::call_plugin(
-                move |x: &str| {
-                    let widgets_dir = app_handle.widgets_dir();
-                    app_handle.with_widget_config_map(|config_map| {
-                        config_map
-                            .get(x)
-                            .ok_or_else(|| anyhow!("WidgetConfig not found"))
-                            .map(|config| widgets_dir.join(config.dir()))
-                    })
-                },
+                widget_dir_fn,
                 &*plugin,
                 command.as_str(),
                 id,

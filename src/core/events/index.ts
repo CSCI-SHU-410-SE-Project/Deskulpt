@@ -4,4 +4,3 @@ export * from "./render";
 export * from "./show-toast";
 export * from "./switch-theme";
 export * from "./update-settings";
-export * from "./window-ready";

@@ -1,11 +1,8 @@
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { listenToShowToast } from "../../core/events";
 import { toast } from "sonner";
-import { ListenerKeys, ReadyCallback } from "./useListenersReady";
 
-export function useShowToastListener(ready: ReadyCallback) {
-  const isReady = useRef(false);
-
+export function useShowToastListener() {
   useEffect(() => {
     const unlisten = listenToShowToast((event) => {
       if ("success" in event.payload) {
@@ -15,13 +12,8 @@ export function useShowToastListener(ready: ReadyCallback) {
       }
     });
 
-    if (!isReady.current) {
-      isReady.current = true;
-      ready(ListenerKeys.SHOW_TOAST);
-    }
-
     return () => {
       unlisten.then((f) => f()).catch(console.error);
     };
-  }, [ready]);
+  }, []);
 }

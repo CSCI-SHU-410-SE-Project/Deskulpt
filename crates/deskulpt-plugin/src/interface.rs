@@ -15,14 +15,14 @@ use anyhow::Result;
 /// This struct may need to hold the IPC channel, etc. instead.
 pub struct EngineInterface {
     #[allow(clippy::type_complexity)]
-    widgets_dir_fn: Box<dyn Fn(&str) -> Result<PathBuf>>,
+    widget_dir_fn: Box<dyn Fn(&str) -> Result<PathBuf>>,
 }
 
 impl EngineInterface {
     /// Create a new engine interface instance.
-    pub(crate) fn new(widgets_dir_fn: impl Fn(&str) -> Result<PathBuf> + 'static) -> Self {
+    pub(crate) fn new(widget_dir_fn: impl Fn(&str) -> Result<PathBuf> + 'static) -> Self {
         Self {
-            widgets_dir_fn: Box::new(widgets_dir_fn),
+            widget_dir_fn: Box::new(widget_dir_fn),
         }
     }
 
@@ -34,6 +34,6 @@ impl EngineInterface {
     /// should use IPC to communicate with the Deskulpt core to get the widget
     /// directory.
     pub fn widget_dir<S: AsRef<str>>(&self, id: S) -> Result<PathBuf> {
-        (self.widgets_dir_fn)(id.as_ref())
+        (self.widget_dir_fn)(id.as_ref())
     }
 }

@@ -1,4 +1,4 @@
-import { ChangeEvent, useEffect } from "react";
+import { ChangeEvent } from "react";
 
 interface Props {
   /** The controlled number input value. */
@@ -26,10 +26,6 @@ interface Props {
  * up/down keys and the scroll wheel, etc.
  */
 export default ({ value, onChange, min, max, width }: Props) => {
-  useEffect(() => {
-    onChange(value);
-  }, [value, onChange]);
-
   function handleChange(event: ChangeEvent<HTMLInputElement>) {
     if (event.target.value === "") {
       onChange(min ?? 0);
