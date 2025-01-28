@@ -1,7 +1,7 @@
 import { DataList, Flex } from "@radix-ui/themes";
-import { SettingToggleShortcut, Shortcut } from "../components";
-import { AppSettings } from "../../types";
-import { UpdateShortcutsCallback } from "../hooks";
+import { SettingToggleShortcut, Shortcut } from "../../components";
+import { AppSettings } from "../../../types";
+import { UpdateShortcutsCallback } from "../../hooks";
 
 interface Props {
   appSettings: AppSettings;

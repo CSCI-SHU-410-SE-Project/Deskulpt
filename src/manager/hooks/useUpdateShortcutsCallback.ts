@@ -23,7 +23,7 @@ export function useUpdateShortcutsCallback(
         })
         .catch((error) => {
           console.error(error);
-          toast.error("Failed to update shortcuts");
+          toast.error("Failed to update shortcuts.");
         }),
     [appSettingsDispatch],
   );

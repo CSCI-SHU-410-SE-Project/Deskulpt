@@ -2,19 +2,10 @@ import { Flex, Kbd, KbdProps, Text } from "@radix-ui/themes";
 import { ComponentPropsWithoutRef, Fragment } from "react";
 
 interface Props {
-  /** The array of shortcut keys. */
   keys: string[];
-  /** The size of the shortcut display. */
   size?: KbdProps["size"];
 }
 
-/**
- * The shortcut display component.
- *
- * Each key will be displayed as a keyboard element, joint by a plus sign. They will be
- * wrapped in a flex box with default gap size 1. All flex box props can be passed to
- * this component to further customize the display layout.
- */
 export default ({
   keys,
   size = "2",

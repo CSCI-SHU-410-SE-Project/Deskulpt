@@ -3,7 +3,7 @@
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::BufReader;
-use std::path::{Path, PathBuf};
+use std::path::Path;
 
 use anyhow::{Context, Result};
 use serde::{Deserialize, Serialize};
@@ -62,9 +62,10 @@ impl_load!(PackageJson, "package.json");
 #[serde(tag = "type", content = "content", rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum WidgetConfig {
     /// Valid widget configuration.
+    #[serde(rename_all = "camelCase")]
     Valid {
-        /// The directory of the widget inside the widgets directory.
-        dir: PathBuf,
+        /// The directory name of the widget.
+        dir: String,
         /// Display name of the widget.
         name: String,
         /// Entry file of the widget source code.
@@ -73,9 +74,10 @@ pub enum WidgetConfig {
         dependencies: HashMap<String, String>,
     },
     /// Invalid widget configuration.
+    #[serde(rename_all = "camelCase")]
     Invalid {
-        /// The directory of the widget inside the widgets directory.
-        dir: PathBuf,
+        /// The directory name of the widget.
+        dir: String,
         /// Error message.
         error: String,
     },
@@ -88,7 +90,7 @@ impl WidgetConfig {
     /// directory, or if the widget is explicitly marked as ignored.
     pub fn load<P: AsRef<Path>>(dir: P) -> Option<Self> {
         let dir = dir.as_ref();
-        debug_assert!(dir.is_absolute() && dir.is_dir());
+        let dir_name = dir.file_name()?.to_string_lossy();
 
         let deskulpt_conf =
             match DeskulptConf::load(dir).context("Failed to load deskulpt.conf.json") {
@@ -96,7 +98,7 @@ impl WidgetConfig {
                 Ok(None) => return None,
                 Err(e) => {
                     return Some(WidgetConfig::Invalid {
-                        dir: dir.to_path_buf(),
+                        dir: dir_name.to_string(),
                         error: e.to_string(),
                     })
                 },
@@ -112,14 +114,14 @@ impl WidgetConfig {
             Ok(None) => Default::default(),
             Err(e) => {
                 return Some(WidgetConfig::Invalid {
-                    dir: dir.to_path_buf(),
+                    dir: dir_name.to_string(),
                     error: e.to_string(),
                 })
             },
         };
 
         Some(WidgetConfig::Valid {
-            dir: dir.to_path_buf(),
+            dir: dir_name.to_string(),
             name: deskulpt_conf.name,
             entry: deskulpt_conf.entry,
             dependencies,
@@ -127,7 +129,7 @@ impl WidgetConfig {
     }
 
     /// Get the directory of the widget inside the widgets directory.
-    pub fn dir(&self) -> &Path {
+    pub fn dir(&self) -> &str {
         match self {
             WidgetConfig::Valid { dir, .. } => dir,
             WidgetConfig::Invalid { dir, .. } => dir,
@@ -139,7 +141,7 @@ impl WidgetConfig {
     /// This ID is derived from the widget directory name using UUID v5. It is
     /// deterministic for the same directory name.
     pub fn id(&self) -> String {
-        let dir_encoded = self.dir().as_os_str().as_encoded_bytes();
+        let dir_encoded = self.dir().as_bytes();
         Uuid::new_v5(&Uuid::NAMESPACE_URL, dir_encoded).to_string()
     }
 }

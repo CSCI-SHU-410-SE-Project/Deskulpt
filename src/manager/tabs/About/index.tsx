@@ -1,14 +1,7 @@
 import { Avatar, DataList, Flex, Heading, Text } from "@radix-ui/themes";
-import { ExternalCopyLink } from "../components";
+import { ExternalCopyLink } from "../../components";
 import Logo from "/deskulpt.svg";
 
-/**
- * The about tab in the manager.
- *
- * This tab is rendered as a flex container with 100% height. It displays static
- * information of the Deskulpt application, including the version, authors, repository,
- * and documentation.
- */
 export default () => {
   return (
     <Flex height="100%" pb="9" px="3" justify="center" align="center" gap="3">
@@ -33,7 +26,7 @@ export default () => {
         <DataList.Root size="2" css={{ gap: "var(--space-1)" }}>
           <DataList.Item>
             <DataList.Label>Version</DataList.Label>
-            <DataList.Value>0.0.1</DataList.Value>
+            <DataList.Value>{__VERSION__}</DataList.Value>
           </DataList.Item>
           <DataList.Item>
             <DataList.Label>Authors</DataList.Label>

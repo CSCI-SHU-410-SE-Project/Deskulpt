@@ -1,6 +1,3 @@
-import WidgetsTab from "./tabs/WidgetsTab";
-import SettingsTab from "./tabs/SettingsTab";
-import AboutTab from "./tabs/AboutTab";
 import {
   useAppSettings,
   useExitAppListener,
@@ -13,6 +10,7 @@ import {
 import { Box, Theme as RadixTheme, Tabs } from "@radix-ui/themes";
 import { ThemeToggler } from "./components";
 import { Toaster } from "sonner";
+import { AboutTab, SettingsTab, WidgetsTab } from "./tabs";
 
 export default () => {
   const [widgets, widgetsDispatch] = useWidgets();

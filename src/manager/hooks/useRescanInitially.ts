@@ -11,20 +11,20 @@ export function useRescanInitially(widgetsDispatch: WidgetsDispatch) {
     const helper = async () => {
       const { configMap } = await invokeRescanWidgets();
 
-      const widgetsArray = Object.entries(configMap).map(([id, config]) => {
+      const widgets = Object.entries(configMap).map(([id, config]) => {
         const settings =
           window.__DESKULPT__.initialSettings.widgets[id] ??
           DEFAULT_WIDGET_SETTINGS;
-        return [id, { config, settings }] as const;
+        return { id, config, settings };
       });
 
       await invokeEmitOnRenderReady({
-        payload: widgetsArray.map(([id, { settings }]) => ({ id, settings })),
+        payload: widgets.map(({ id, settings }) => ({ id, settings })),
       });
 
       widgetsDispatch({
         type: WidgetsActionType.BATCH_UPDATE,
-        payload: { widgets: Object.fromEntries(widgetsArray) },
+        payload: { widgets },
       });
     };
 

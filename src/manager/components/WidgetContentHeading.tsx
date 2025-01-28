@@ -1,14 +1,9 @@
 import { Button, Flex, Heading } from "@radix-ui/themes";
-import { ReactNode } from "react";
 
 interface Props {
-  /** The component to put in the heading. */
-  heading: ReactNode;
-  /** The icon for the action button. */
+  heading: string;
   actionIcon: React.ReactNode;
-  /** The text for the action button. */
   actionText: string;
-  /** The action on button click. */
   action: () => void;
 }
 

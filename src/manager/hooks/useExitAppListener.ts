@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { listenToExitAppOnce } from "../../core/events";
 import { invokeExitApp } from "../../core/commands";
-import { AppSettings } from "../../types";
+import { AppSettings, WidgetSettings } from "../../types";
 import { WidgetsState } from "./useWidgets";
 
 export function useExitAppListener(
@@ -10,9 +10,14 @@ export function useExitAppListener(
 ) {
   useEffect(() => {
     const unlisten = listenToExitAppOnce(() => {
-      const widgetSettingsMap = Object.fromEntries(
-        Object.entries(widgets).map(([id, { settings }]) => [id, settings]),
+      const widgetSettingsMap = widgets.reduce(
+        (acc, { id, settings }) => {
+          acc[id] = settings;
+          return acc;
+        },
+        {} as Record<string, WidgetSettings>,
       );
+
       const settings = { app: appSettings, widgets: widgetSettingsMap };
       invokeExitApp({ settings }).catch(console.error);
     });
