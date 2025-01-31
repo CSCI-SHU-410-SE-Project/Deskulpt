@@ -26,11 +26,12 @@ export function invokeRescanWidgets() {
   }>("rescan_widgets");
 }
 
-export function invokeUpdateShortcuts(payload: {
-  oldShortcuts: Shortcuts;
-  newShortcuts: Shortcuts;
+export function invokeUpdateShortcut(payload: {
+  key: keyof Shortcuts;
+  from: string | null;
+  to: string | null;
 }) {
-  return invoke<void>("update_shortcuts", payload);
+  return invoke<void>("update_shortcut", payload);
 }
 
 export function invokeEmitOnRenderReady(payload: { payload: RenderPayload }) {

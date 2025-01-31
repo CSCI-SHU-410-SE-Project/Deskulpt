@@ -34,7 +34,7 @@ export function useRescanCallback(
     );
 
     widgetsDispatch({
-      type: WidgetsActionType.BATCH_UPDATE,
+      type: WidgetsActionType.RESET_ALL,
       payload: { widgets: newWidgets },
     });
 

@@ -35,7 +35,7 @@ pub async fn call_plugin(
     payload: Option<serde_json::Value>,
 ) -> CmdResult<serde_json::Value> {
     let widget_dir_fn = move |x: &str| {
-        let widgets_dir = app_handle.widgets_dir();
+        let widgets_dir = app_handle.widgets_dir()?;
         app_handle.with_widget_config_map(|config_map| {
             config_map
                 .get(x)

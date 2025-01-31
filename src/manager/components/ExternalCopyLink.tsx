@@ -1,4 +1,4 @@
-import { Flex, FlexProps, IconButton, Link, Tooltip } from "@radix-ui/themes";
+import { Flex, FlexProps, IconButton, Link } from "@radix-ui/themes";
 import { RxCopy } from "react-icons/rx";
 import { writeText } from "@tauri-apps/plugin-clipboard-manager";
 import { toast } from "sonner";
@@ -19,11 +19,9 @@ export default ({ href, gap = "3", children }: PropsWithChildren<Props>) => {
       <Link href={href} target="_blank" rel="noreferrer">
         {children}
       </Link>
-      <Tooltip content="Copy link" side="right">
-        <IconButton size="1" variant="ghost" onClick={handleCopy}>
-          <RxCopy />
-        </IconButton>
-      </Tooltip>
+      <IconButton size="1" variant="ghost" onClick={handleCopy}>
+        <RxCopy />
+      </IconButton>
     </Flex>
   );
 };

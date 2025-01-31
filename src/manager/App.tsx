@@ -4,19 +4,24 @@ import {
   useRescanCallback,
   useRescanInitially,
   useUpdateSettingsListener,
-  useUpdateShortcutsCallback,
+  useUpdateShortcutCallback,
   useWidgets,
 } from "./hooks";
 import { Box, Theme as RadixTheme, Tabs } from "@radix-ui/themes";
 import { ThemeToggler } from "./components";
 import { Toaster } from "sonner";
 import { AboutTab, SettingsTab, WidgetsTab } from "./tabs";
+import { css } from "@emotion/react";
+
+const styles = {
+  root: css({ height: "100vh" }),
+};
 
 export default () => {
   const [widgets, widgetsDispatch] = useWidgets();
   const [appSettings, appSettingsDispatch] = useAppSettings();
   const rescan = useRescanCallback(widgets, widgetsDispatch);
-  const updateShortcuts = useUpdateShortcutsCallback(appSettingsDispatch);
+  const updateShortcut = useUpdateShortcutCallback(appSettingsDispatch);
 
   useRescanInitially(widgetsDispatch);
   useExitAppListener(appSettings, widgets);
@@ -27,7 +32,7 @@ export default () => {
       appearance={appSettings.theme}
       accentColor="indigo"
       grayColor="slate"
-      css={{ height: "100vh" }}
+      css={styles.root}
     >
       <Toaster
         position="bottom-center"
@@ -53,7 +58,7 @@ export default () => {
             <Tabs.Trigger value="about">About</Tabs.Trigger>
           </Tabs.List>
           {/* Tab triggers have ~40px height */}
-          <Box px="1" py="3" css={{ height: "calc(100% - 40px)" }}>
+          <Box px="1" py="3" height="calc(100% - 40px)">
             <Tabs.Content value="widgets" asChild>
               <Box height="100%">
                 <WidgetsTab
@@ -67,7 +72,7 @@ export default () => {
               <Box height="100%">
                 <SettingsTab
                   appSettings={appSettings}
-                  updateShortcuts={updateShortcuts}
+                  updateShortcut={updateShortcut}
                 />
               </Box>
             </Tabs.Content>

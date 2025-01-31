@@ -10,6 +10,11 @@ import {
   useWidgets,
 } from "./hooks";
 import { RenderingScreen, WidgetContainer } from "./components";
+import { css } from "@emotion/react";
+
+const styles = {
+  root: css({ height: "100vh" }),
+};
 
 export default () => {
   const theme = useTheme();
@@ -27,7 +32,7 @@ export default () => {
       accentColor="indigo"
       grayColor="slate"
       hasBackground={false}
-      css={{ height: "100vh" }}
+      css={styles.root}
     >
       {isRendering && <RenderingScreen />}
       <Toaster

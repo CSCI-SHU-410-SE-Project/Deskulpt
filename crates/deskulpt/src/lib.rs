@@ -20,7 +20,15 @@ pub fn run() {
         .setup(|app| {
             app.init_widgets_dir()?;
             app.init_persist_dir()?;
-            let mut settings = Settings::load(app.persist_dir())?;
+
+            // Load settings or use default settings if failed to load
+            let mut settings = match Settings::load(app.persist_dir()?) {
+                Ok(settings) => settings,
+                Err(e) => {
+                    eprintln!("Failed to load settings: {e}");
+                    Settings::default()
+                },
+            };
 
             // Initialize application state management
             app.manage_render_ready();
@@ -51,7 +59,7 @@ pub fn run() {
             commands::open_in_widgets_dir,
             commands::rescan_widgets,
             commands::set_render_ready,
-            commands::update_shortcuts,
+            commands::update_shortcut,
         ])
         .plugin(tauri_plugin_clipboard_manager::init())
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())

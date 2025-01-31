@@ -6,6 +6,28 @@ import { Box } from "@radix-ui/themes";
 import { UpdateSettingsCallback, WidgetState } from "../hooks";
 import ErrorDisplay from "./ErrorDisplay";
 import { stringifyError } from "../utils";
+import { css } from "@emotion/react";
+
+const styles = {
+  container: css({
+    color: "var(--gray-12)",
+    backgroundColor: "var(--gray-surface)",
+    borderRadius: "var(--radius-2)",
+    boxShadow: "0 0 2px var(--gray-8)",
+  }),
+  dragger: css({
+    position: "absolute",
+    top: "var(--space-1)",
+    right: 0,
+    cursor: "grab",
+    opacity: 0,
+    zIndex: 9999,
+    transition: "opacity 200ms ease-in-out",
+    "&:hover": {
+      opacity: 1,
+    },
+  }),
+};
 
 interface Props {
   id: string;
@@ -39,29 +61,13 @@ export default memo(({ id, widget, updateSettings }: Props) => {
         top={`${y}px`}
         width={width ?? "300px"}
         height={height ?? "150px"}
-        css={{
-          color: "var(--gray-12)",
-          backgroundColor: "var(--gray-surface)",
-          borderRadius: "var(--radius-2)",
-          boxShadow: "0 0 2px var(--gray-8)",
-          opacity: `${opacity}%`,
-        }}
+        css={styles.container}
+        style={{ opacity: `${opacity}%` }}
       >
         <LuGripVertical
           className="draggable-handle"
           size={20}
-          css={{
-            position: "absolute",
-            top: "var(--space-1)",
-            right: 0,
-            cursor: "grab",
-            opacity: 0,
-            zIndex: 9999,
-            transition: "opacity 200ms ease-in-out",
-            "&:hover": {
-              opacity: 1,
-            },
-          }}
+          css={styles.dragger}
         />
         <ErrorBoundary
           resetKeys={[id, widget]}

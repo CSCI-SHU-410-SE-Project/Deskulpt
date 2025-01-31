@@ -6,6 +6,7 @@ use tauri_plugin_global_shortcut::{GlobalShortcutExt, ShortcutState};
 
 use crate::settings::Settings;
 use crate::states::StatesExtCanvasClickThrough;
+use crate::WindowExt;
 
 /// Implement a shortcut update function in [`ShortcutsExt`].
 ///
@@ -56,21 +57,38 @@ pub trait ShortcutsExt<R: Runtime>: Manager<R> + GlobalShortcutExt<R> {
         let initial_shortcuts = initial_settings.shortcuts_mut();
 
         if let Err(e) =
-            self.update_canvas_toggle_shortcut(None, initial_shortcuts.canvas_toggle.as_deref())
+            self.update_toggle_canvas_shortcut(None, initial_shortcuts.toggle_canvas.as_deref())
         {
             eprintln!("{e}");
-            initial_shortcuts.canvas_toggle = None;
+            initial_shortcuts.toggle_canvas = None;
+        }
+
+        if let Err(e) =
+            self.update_show_manager_shortcut(None, initial_shortcuts.show_manager.as_deref())
+        {
+            eprintln!("{e}");
+            initial_shortcuts.show_manager = None;
         }
     }
 
     impl_update_shortcut!(
-        update_canvas_toggle_shortcut,
+        update_toggle_canvas_shortcut,
         "Update the keyboard shortcut for toggling canvas click-through.",
         |app_handle, _, event| {
             if event.state == ShortcutState::Pressed {
                 if let Err(e) = app_handle.toggle_canvas_click_through() {
                     eprintln!("Failed to toggle canvas click-through: {e}");
                 }
+            }
+        }
+    );
+
+    impl_update_shortcut!(
+        update_show_manager_shortcut,
+        "Update the keyboard shortcut for showing the manager window.",
+        |app_handle, _, _| {
+            if let Err(e) = app_handle.show_manager() {
+                eprintln!("Failed to show the manager window: {e}");
             }
         }
     );

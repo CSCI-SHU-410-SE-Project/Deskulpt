@@ -1,4 +1,16 @@
+import { css } from "@emotion/react";
 import { ChangeEvent, useCallback } from "react";
+
+const styles = {
+  input: css({
+    all: "unset",
+    backgroundColor: "var(--gray-5)",
+    paddingLeft: "var(--space-2)",
+    fontSize: "var(--font-size-2)",
+    borderRadius: "var(--radius-2)",
+    lineHeight: 1.6,
+  }),
+};
 
 interface Props {
   value: number;
@@ -35,15 +47,8 @@ export default ({ value, onChange, min, max, width }: Props) => {
       type="number"
       value={value.toFixed(0)}
       onChange={handleChange}
-      css={{
-        all: "unset",
-        backgroundColor: "var(--gray-5)",
-        paddingLeft: "var(--space-2)",
-        fontSize: "var(--font-size-2)",
-        borderRadius: "var(--radius-2)",
-        lineHeight: 1.6,
-        width,
-      }}
+      css={styles.input}
+      style={{ width }}
     />
   );
 };

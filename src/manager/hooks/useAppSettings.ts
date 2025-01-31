@@ -3,7 +3,7 @@ import { AppSettings, Shortcuts, Theme } from "../../types";
 
 export enum AppSettingsActionType {
   TOGGLE_THEME = "TOGGLE_THEME",
-  SET_SHORTCUTS = "SET_SHORTCUTS",
+  SET_SHORTCUT = "SET_SHORTCUT",
 }
 
 type AppSettingsAction =
@@ -11,8 +11,8 @@ type AppSettingsAction =
       type: AppSettingsActionType.TOGGLE_THEME;
     }
   | {
-      type: AppSettingsActionType.SET_SHORTCUTS;
-      payload: { shortcuts: Shortcuts };
+      type: AppSettingsActionType.SET_SHORTCUT;
+      payload: { key: keyof Shortcuts; shortcut: string | null };
     };
 
 export type AppSettingsDispatch = ActionDispatch<[action: AppSettingsAction]>;
@@ -25,8 +25,14 @@ export function useAppSettings() {
           ...state,
           theme: state.theme === Theme.LIGHT ? Theme.DARK : Theme.LIGHT,
         };
-      case AppSettingsActionType.SET_SHORTCUTS:
-        return { ...state, shortcuts: action.payload.shortcuts };
+      case AppSettingsActionType.SET_SHORTCUT:
+        return {
+          ...state,
+          shortcuts: {
+            ...state.shortcuts,
+            [action.payload.key]: action.payload.shortcut,
+          },
+        };
       default:
         throw new Error("Invalid action type");
     }

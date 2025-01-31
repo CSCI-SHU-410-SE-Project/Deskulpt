@@ -10,14 +10,14 @@ export interface WidgetState {
 export type WidgetsState = WidgetState[];
 
 export enum WidgetsActionType {
-  BATCH_UPDATE = "BATCH_UPDATE",
+  RESET_ALL = "RESET_ALL",
   SET_SETTINGS = "SET_SETTINGS",
   BATCH_REMOVE = "BATCH_REMOVE",
 }
 
 type WidgetsAction =
   | {
-      type: WidgetsActionType.BATCH_UPDATE;
+      type: WidgetsActionType.RESET_ALL;
       payload: { widgets: WidgetsState };
     }
   | {
@@ -34,21 +34,10 @@ export type WidgetsDispatch = ActionDispatch<[action: WidgetsAction]>;
 export function useWidgets() {
   return useReducer((state: WidgetsState, action: WidgetsAction) => {
     switch (action.type) {
-      case WidgetsActionType.BATCH_UPDATE: {
-        // Use an object to deduplicate widgets by ID and resort the whole array
-        // by widget directory name; array size will not be too large to cause
-        // performance issues
-        const map = {} as Record<string, WidgetState>;
-        state.forEach((widget) => {
-          map[widget.id] = widget;
-        });
-        action.payload.widgets.forEach((widget) => {
-          map[widget.id] = widget;
-        });
-        return Object.values(map).sort((a, b) =>
+      case WidgetsActionType.RESET_ALL:
+        return action.payload.widgets.sort((a, b) =>
           a.config.content.dir.localeCompare(b.config.content.dir),
         );
-      }
       case WidgetsActionType.SET_SETTINGS: {
         const index = state.findIndex(({ id }) => id === action.payload.id);
         if (index === -1) return state;

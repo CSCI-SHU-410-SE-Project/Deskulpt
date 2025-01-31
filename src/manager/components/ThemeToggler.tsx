@@ -1,4 +1,4 @@
-import { Box, IconButton, Tooltip } from "@radix-ui/themes";
+import { Box, IconButton } from "@radix-ui/themes";
 import { Theme } from "../../types";
 import { MdOutlineDarkMode, MdOutlineLightMode } from "react-icons/md";
 import { AppSettingsActionType, AppSettingsDispatch } from "../hooks";
@@ -18,15 +18,14 @@ export default ({ theme, appSettingsDispatch }: Props) => {
 
   return (
     <Box position="absolute" right="3" top="4">
-      <Tooltip side="left" content={`Switch to ${theme} mode`}>
-        <IconButton variant="soft" size="1" onClick={toggleTheme}>
-          {theme === Theme.LIGHT ? (
-            <MdOutlineLightMode />
-          ) : (
-            <MdOutlineDarkMode />
-          )}
-        </IconButton>
-      </Tooltip>
+      <IconButton
+        title={`Switch to ${theme} mode`}
+        variant="soft"
+        size="1"
+        onClick={toggleTheme}
+      >
+        {theme === Theme.LIGHT ? <MdOutlineLightMode /> : <MdOutlineDarkMode />}
+      </IconButton>
     </Box>
   );
 };

@@ -17,11 +17,11 @@ pub trait WindowExt<R: Runtime>: Manager<R> {
     where
         Self: Sized,
     {
-        let url = WebviewUrl::App("views/manager.html".into());
+        let url = WebviewUrl::App("manager/index.html".into());
         let init_js = WindowInitJS::generate(initial_settings)?;
         WebviewWindowBuilder::new(self, "manager", url)
             .title("Deskulpt Manager")
-            .inner_size(750.0, 500.0)
+            .inner_size(800.0, 500.0)
             .center()
             .resizable(false)
             .maximizable(false)
@@ -38,7 +38,7 @@ pub trait WindowExt<R: Runtime>: Manager<R> {
     where
         Self: Sized,
     {
-        let url = WebviewUrl::App("views/canvas.html".into());
+        let url = WebviewUrl::App("canvas/index.html".into());
         let init_js = WindowInitJS::generate(initial_settings)?;
         let canvas = WebviewWindowBuilder::new(self, "canvas", url)
             .maximized(true)

@@ -1,4 +1,9 @@
-import { Badge, Box, Flex, Heading, ScrollArea, Text } from "@radix-ui/themes";
+import { css } from "@emotion/react";
+import { Badge, Box, Code, Flex, ScrollArea } from "@radix-ui/themes";
+
+const styles = {
+  error: css({ whiteSpace: "pre" }),
+};
 
 interface Props {
   id: string;
@@ -7,21 +12,15 @@ interface Props {
 
 export default ({ id, error }: Props) => {
   return (
-    <ScrollArea scrollbars="both" asChild>
+    <ScrollArea asChild>
       <Box p="2">
-        <Flex direction="column" gap="2">
-          <Flex align="center" gap="2">
-            <Badge color="red">Error</Badge>
-            <Heading size="2" trim="both" css={{ whiteSpace: "pre" }}>
-              {id}
-            </Heading>
-          </Flex>
-          <Text
-            size="1"
-            css={{ whiteSpace: "pre", fontFamily: "var(--code-font-family)" }}
-          >
+        <Flex direction="column" gap="1">
+          <Badge size="2" color="red">
+            Error: {id}
+          </Badge>
+          <Code size="2" variant="ghost" css={styles.error}>
             {error}
-          </Text>
+          </Code>
         </Flex>
       </Box>
     </ScrollArea>

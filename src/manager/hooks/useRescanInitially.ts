@@ -23,7 +23,7 @@ export function useRescanInitially(widgetsDispatch: WidgetsDispatch) {
       });
 
       widgetsDispatch({
-        type: WidgetsActionType.BATCH_UPDATE,
+        type: WidgetsActionType.RESET_ALL,
         payload: { widgets },
       });
     };

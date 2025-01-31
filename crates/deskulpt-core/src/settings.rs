@@ -21,11 +21,16 @@ enum Theme {
 }
 
 /// Keyboard shortcuts registered in the application.
+///
+/// A keyboard shortcut being `None` means that it is disabled, otherwise it is
+/// a string parsable into [`Shortcut`](tauri_plugin_global_shortcut::Shortcut).
 #[derive(Default, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Shortcuts {
     /// For toggling canvas click-through.
-    pub canvas_toggle: Option<String>,
+    pub toggle_canvas: Option<String>,
+    /// For showing the manager window.
+    pub show_manager: Option<String>,
 }
 
 /// Application-wide settings.
