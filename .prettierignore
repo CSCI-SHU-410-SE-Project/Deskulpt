@@ -1,3 +1,5 @@
-fixtures/
-src/.scripts/
 pnpm-lock.yaml
+
+# Auto-generated files
+src/public/generated/
+src/generated/

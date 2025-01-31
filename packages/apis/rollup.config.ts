@@ -16,7 +16,7 @@ export default defineConfig([
     input: "src/raw.ts",
     output: {
       format: "esm",
-      file: "../../src/.scripts/raw-apis.js",
+      file: "../../src/generated/raw-apis.js",
     },
     external: ["@tauri-apps/api/core"],
     plugins: [typescript(), terser()],
@@ -29,7 +29,7 @@ export default defineConfig([
     input: "src/index.ts",
     output: {
       format: "esm",
-      file: "../../src/public/.wrap-apis.js.txt",
+      file: "../../src/public/generated/apis.wrapper.js",
     },
     external: ["@tauri-apps/api/core", "__RAW_APIS_URL__"],
     plugins: [
