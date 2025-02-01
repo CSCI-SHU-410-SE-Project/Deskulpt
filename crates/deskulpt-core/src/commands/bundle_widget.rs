@@ -11,6 +11,7 @@ use crate::states::StatesExtWidgetConfigMap;
 ///
 /// ### Errors
 ///
+/// - Failed to access the widgets directory.
 /// - Widget ID does not exist in the configuration map.
 /// - Widget has a configuration error.
 /// - Error bundling the widget.

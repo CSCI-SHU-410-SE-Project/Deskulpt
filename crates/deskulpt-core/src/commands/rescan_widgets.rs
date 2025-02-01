@@ -25,6 +25,7 @@ pub struct RescanWidgetsOutput {
 ///
 /// ### Errors
 ///
+/// - Failed to access the widgets directory.
 /// - Error traversing the widgets directory.
 /// - Error inferring widget ID from the directory entry.
 #[command]

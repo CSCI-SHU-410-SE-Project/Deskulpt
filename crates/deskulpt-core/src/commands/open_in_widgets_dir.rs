@@ -12,6 +12,7 @@ use crate::path::PathExt;
 ///
 /// ### Errors
 ///
+/// - Failed to access the widgets directory.
 /// - Error opening the specified path.
 #[command]
 pub async fn open_in_widgets_dir<R: Runtime>(

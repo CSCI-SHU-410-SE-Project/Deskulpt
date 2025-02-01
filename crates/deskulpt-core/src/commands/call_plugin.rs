@@ -34,12 +34,12 @@ pub async fn call_plugin(
     id: String,
     payload: Option<serde_json::Value>,
 ) -> CmdResult<serde_json::Value> {
-    let widget_dir_fn = move |x: &str| {
+    let widget_dir_fn = move |id: &str| {
         let widgets_dir = app_handle.widgets_dir()?;
         app_handle.with_widget_config_map(|config_map| {
             config_map
-                .get(x)
-                .ok_or_else(|| anyhow!("WidgetConfig not found"))
+                .get(id)
+                .ok_or_else(|| anyhow!("Widget {} not found in the collection", id))
                 .map(|config| widgets_dir.join(config.dir()))
         })
     };
