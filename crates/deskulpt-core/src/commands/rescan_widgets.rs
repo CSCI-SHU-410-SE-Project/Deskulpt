@@ -3,7 +3,7 @@ use std::fs::read_dir;
 
 use tauri::{command, AppHandle, Runtime};
 
-use super::error::{cmdbail, CmdResult};
+use super::error::CmdResult;
 use crate::config::WidgetConfig;
 use crate::path::PathExt;
 use crate::states::StatesExtWidgetConfigMap;
@@ -34,12 +34,8 @@ pub async fn rescan_widgets<R: Runtime>(
             continue; // Non-directory entries are not widgets, skip
         }
 
-        let id = match path.file_name() {
-            Some(file_name) => file_name.to_string_lossy().to_string(),
-            None => cmdbail!("Invalid widget directory: '{}'", path.display()),
-        };
-
         if let Some(widget_config) = WidgetConfig::load(&path) {
+            let id = widget_config.id();
             new_config_map.insert(id, widget_config);
         }
     }

@@ -28,7 +28,7 @@ impl PluginCommand for IsDir {
         engine: &EngineInterface,
         input: IsDirInputPayload,
     ) -> Result<bool> {
-        let path = engine.widget_dir(id.as_str()).join(input.path);
+        let path = engine.widget_dir(id.as_str())?.join(input.path);
         Ok(path.is_dir())
     }
 }

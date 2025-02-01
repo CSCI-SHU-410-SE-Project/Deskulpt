@@ -28,7 +28,7 @@ impl PluginCommand for Exists {
         engine: &EngineInterface,
         input: ExistsInputPayload,
     ) -> Result<bool> {
-        let path = engine.widget_dir(id).join(input.path);
+        let path = engine.widget_dir(id)?.join(input.path);
         Ok(path.exists())
     }
 }

@@ -28,7 +28,7 @@ impl PluginCommand for RemoveDir {
         engine: &EngineInterface,
         input: RemoveDirInputPayload,
     ) -> Result<()> {
-        let path = engine.widget_dir(id.as_str()).join(input.path);
+        let path = engine.widget_dir(id.as_str())?.join(input.path);
         std::fs::remove_dir_all(&path)?;
         Ok(())
     }
