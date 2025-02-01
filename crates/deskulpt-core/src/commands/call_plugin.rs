@@ -29,30 +29,20 @@ pub async fn call_plugin(
     app_handle: AppHandle,
     plugin: String,
     command: String,
-    widget_id: String,
+    id: String,
     payload: Option<serde_json::Value>,
 ) -> CmdResult<serde_json::Value> {
     match plugin.as_str() {
         "fs" => {
             let plugin = FS_PLUGIN.lock().await;
-            let result = deskulpt_plugin::call_plugin(
-                app_handle,
-                &*plugin,
-                command.as_str(),
-                widget_id,
-                payload,
-            )?;
+            let result =
+                deskulpt_plugin::call_plugin(app_handle, &*plugin, command.as_str(), id, payload)?;
             Ok(result)
         },
         "sys" => {
             let plugin = SYS_PLUGIN.lock().await;
-            let result = deskulpt_plugin::call_plugin(
-                app_handle,
-                &*plugin,
-                command.as_str(),
-                widget_id,
-                payload,
-            )?;
+            let result =
+                deskulpt_plugin::call_plugin(app_handle, &*plugin, command.as_str(), id, payload)?;
             Ok(result)
         },
         _ => cmdbail!("Unknown plugin: {}", plugin),

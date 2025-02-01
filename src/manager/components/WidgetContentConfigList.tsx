@@ -6,7 +6,7 @@ import { invokeOpenInWidgetsDir } from "../../commands";
 
 export interface WidgetContentConfigListProps {
   /** The widget ID. */
-  widgetId: string;
+  id: string;
   /** The widget configuration. */
   config: WidgetConfig;
 }
@@ -18,14 +18,14 @@ export interface WidgetContentConfigListProps {
  * external dependencies.
  */
 export default function WidgetContentConfigList({
-  widgetId,
+  id,
   config,
 }: WidgetContentConfigListProps) {
   return (
     <DataList.Root size="2" css={{ gap: "var(--space-2)" }}>
       <DataList.Item>
         <DataList.Label>ID</DataList.Label>
-        <DataList.Value>{widgetId}</DataList.Value>
+        <DataList.Value>{id}</DataList.Value>
       </DataList.Item>
       <DataList.Item>
         <DataList.Label>Name</DataList.Label>
@@ -42,7 +42,7 @@ export default function WidgetContentConfigList({
                 size="1"
                 onClick={() =>
                   invokeOpenInWidgetsDir({
-                    components: [widgetId, config.entry],
+                    components: [id, config.entry],
                   })
                 }
               >

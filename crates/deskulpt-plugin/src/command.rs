@@ -27,7 +27,7 @@ pub trait PluginCommand {
     ///
     /// Other available information include:
     ///
-    /// - `widget_id` is the ID of the widget that triggered the command.
+    /// - `id` is the ID of the widget that triggered the command.
     /// - `plugin` provides a reference back to the plugin that the command is
     ///   running on. This is useful when the plugin carries some state that the
     ///   command needs to access.
@@ -35,7 +35,7 @@ pub trait PluginCommand {
     ///   engine. See [`EngineInterface`] for available methods.
     fn run(
         &self,
-        widget_id: String,
+        id: String,
         plugin: &Self::Plugin,
         engine: &EngineInterface,
         input: serde_json::Value,

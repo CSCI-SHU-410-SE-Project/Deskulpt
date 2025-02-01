@@ -27,14 +27,14 @@ export default function useRenderWidgetListener(
   >,
 ) {
   const bundleWidget = useCallback(
-    async (widgetId: string, settings: WidgetSettings, isTracked: boolean) => {
+    async (id: string, settings: WidgetSettings, isTracked: boolean) => {
       // Get the widget APIs blob URL, reusing if applicable
       let apisBlobUrl: string;
       if (isTracked) {
-        apisBlobUrl = canvasWidgetStates[widgetId].apisBlobUrl;
+        apisBlobUrl = canvasWidgetStates[id].apisBlobUrl;
       } else {
         const apisCode = window.__DESKULPT_CANVAS_INTERNALS__.apisWrapper
-          .replace("__DESKULPT_WIDGET_ID__", widgetId)
+          .replace("__DESKULPT_WIDGET_ID__", id)
           .replace(
             "__RAW_APIS_URL__",
             new URL("/generated/raw-apis.js", baseUrl).href,
@@ -49,17 +49,17 @@ export default function useRenderWidgetListener(
       let moduleCode: string;
       try {
         moduleCode = await invokeBundleWidget({
-          widgetId,
+          id,
           baseUrl,
           apisBlobUrl,
         });
       } catch (err) {
         setCanvasWidgetStates((prev) => ({
           ...prev,
-          [widgetId]: {
+          [id]: {
             display: (
               <ErrorDisplay
-                title={`Error in '${widgetId}': failed to bundle widget`}
+                title={`Error in '${id}': failed to bundle widget`}
                 error={grabErrorInfo(err)}
               />
             ),
@@ -89,10 +89,10 @@ export default function useRenderWidgetListener(
           // There are known errors with the widget module
           setCanvasWidgetStates((prev) => ({
             ...prev,
-            [widgetId]: {
+            [id]: {
               display: (
                 <ErrorDisplay
-                  title={`Error in '${widgetId}': invalid widget module`}
+                  title={`Error in '${id}': invalid widget module`}
                   error={moduleError}
                 />
               ),
@@ -113,7 +113,7 @@ export default function useRenderWidgetListener(
         const widgetDisplay = module.default.render();
         setCanvasWidgetStates((prev) => ({
           ...prev,
-          [widgetId]: {
+          [id]: {
             display: widgetDisplay,
             width: module.default.width,
             height: module.default.height,
@@ -125,10 +125,10 @@ export default function useRenderWidgetListener(
       } catch (err) {
         setCanvasWidgetStates((prev) => ({
           ...prev,
-          [widgetId]: {
+          [id]: {
             display: (
               <ErrorDisplay
-                title={`Error in '${widgetId}': failed to import widget module`}
+                title={`Error in '${id}': failed to import widget module`}
                 error={grabErrorInfo(err)}
               />
             ),
@@ -146,8 +146,8 @@ export default function useRenderWidgetListener(
 
   useEffect(() => {
     const unlisten = listenToRenderWidget((event) => {
-      const { widgetId, bundle, settings } = event.payload;
-      const isTracked = widgetId in canvasWidgetStates;
+      const { id, bundle, settings } = event.payload;
+      const isTracked = id in canvasWidgetStates;
 
       // We do not wish to bundle the widget
       if (!bundle) {
@@ -159,14 +159,14 @@ export default function useRenderWidgetListener(
         if (isTracked) {
           setCanvasWidgetStates((prev) => ({
             ...prev,
-            [widgetId]: { ...prev[widgetId], settings },
+            [id]: { ...prev[id], settings },
           }));
         }
         return;
       }
 
       // We do wish to bundle the widget
-      bundleWidget(widgetId, settings, isTracked).catch(console.error);
+      bundleWidget(id, settings, isTracked).catch(console.error);
     });
 
     return () => {

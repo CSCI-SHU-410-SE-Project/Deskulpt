@@ -35,11 +35,11 @@ interface GetSystemInfoOutputPayload {
   usedMemory: number;
 }
 
-function getSystemInfo(widgetId: string) {
+function getSystemInfo(id: string) {
   return invoke<GetSystemInfoOutputPayload>("call_plugin", {
     plugin: "sys",
     command: "get_system_info",
-    widgetId,
+    id,
   });
 }
 

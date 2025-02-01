@@ -58,35 +58,35 @@ export default function useManagerWidgetStates(): UseManagerWidgetStatesOutput {
     }
 
     const newManagerWidgetStates = Object.fromEntries(
-      Object.entries(detectedConfigs).map(([widgetId, config]) => {
+      Object.entries(detectedConfigs).map(([id, config]) => {
         let settings: WidgetSettings;
-        if (widgetId in managerWidgetStates) {
+        if (id in managerWidgetStates) {
           // The widget state already exists, from which we can get its settings
-          settings = managerWidgetStates[widgetId].settings;
+          settings = managerWidgetStates[id].settings;
         } else if (
-          widgetId in
+          id in
           window.__DESKULPT_MANAGER_INTERNALS__.initialSettings
             .widgetSettingsMap
         ) {
           // There is an initial setting for the widget
           settings =
             window.__DESKULPT_MANAGER_INTERNALS__.initialSettings
-              .widgetSettingsMap[widgetId];
+              .widgetSettingsMap[id];
         } else {
           // Fall back to the default setting
           settings = { x: 0, y: 0, opacity: 100 };
         }
-        return [widgetId, { config, settings }];
+        return [id, { config, settings }];
       }),
     );
 
     const addedStates = Object.entries(newManagerWidgetStates).filter(
-      ([widgetId]) => !(widgetId in managerWidgetStates),
+      ([id]) => !(id in managerWidgetStates),
     );
     setManagerWidgetStates(newManagerWidgetStates); // Direct replacement
     await Promise.all(
-      addedStates.map(([widgetId, { settings }]) =>
-        emitRenderWidgetToCanvas({ widgetId, settings, bundle: true }),
+      addedStates.map(([id, { settings }]) =>
+        emitRenderWidgetToCanvas({ id, settings, bundle: true }),
       ),
     );
     return addedStates.length;

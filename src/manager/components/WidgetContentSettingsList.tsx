@@ -8,7 +8,7 @@ import { FaTimes } from "react-icons/fa";
 
 export interface WidgetContentSettingListProps {
   /** The widget ID. */
-  widgetId: string;
+  id: string;
   /** The widget-specific setting. */
   settings: WidgetSettings;
   /** Setter for the manager widget states. */
@@ -25,7 +25,7 @@ export interface WidgetContentSettingListProps {
  * to the canvas via emitting corresponding events.
  */
 export default function WidgetContentSettingList({
-  widgetId,
+  id,
   settings,
   setManagerWidgetStates,
 }: WidgetContentSettingListProps) {
@@ -33,10 +33,10 @@ export default function WidgetContentSettingList({
     const newSettings = { ...settings, ...partialSettings };
     setManagerWidgetStates((prev) => ({
       ...prev,
-      [widgetId]: { ...prev[widgetId], settings: newSettings },
+      [id]: { ...prev[id], settings: newSettings },
     }));
     emitRenderWidgetToCanvas({
-      widgetId,
+      id,
       settings: newSettings,
       bundle: false,
     }).catch(console.error);

@@ -12,7 +12,7 @@ import { Settings, WidgetCollection } from "./types/backend";
  * Invoke the `bundle_widget` command.
  */
 export function invokeBundleWidget(payload: {
-  widgetId: string;
+  id: string;
   baseUrl: string;
   apisBlobUrl: string;
 }) {

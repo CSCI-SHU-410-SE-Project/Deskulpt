@@ -22,7 +22,7 @@ export interface WidgetContentProps {
   /** The index of the widget in the collection. */
   index: number;
   /** The widget ID. */
-  widgetId: string;
+  id: string;
   /** The widget configuration or error. */
   config: Result<WidgetConfig, string>;
   /** The widget-specific settings. */
@@ -42,7 +42,7 @@ export interface WidgetContentProps {
  */
 export default function WidgetContent({
   index,
-  widgetId,
+  id,
   config,
   settings,
   setManagerWidgetStates,
@@ -59,12 +59,12 @@ export default function WidgetContent({
           }
           actionIcon={<LuFolderOpen />}
           actionText="Edit"
-          action={() => invokeOpenInWidgetsDir({ components: [widgetId] })}
+          action={() => invokeOpenInWidgetsDir({ components: [id] })}
         />
         <ScrollArea scrollbars="vertical" asChild>
           <Box px="2" css={{ flex: 3 }}>
             {"Ok" in config ? (
-              <WidgetContentConfigList widgetId={widgetId} config={config.Ok} />
+              <WidgetContentConfigList id={id} config={config.Ok} />
             ) : (
               <Text
                 size="1"
@@ -84,14 +84,14 @@ export default function WidgetContent({
           actionIcon={<LuRepeat />}
           actionText="Re-render"
           action={() =>
-            emitRenderWidgetToCanvas({ widgetId, settings, bundle: true }).then(
-              () => toast.success(`Re-rendered widget "${widgetId}".`),
+            emitRenderWidgetToCanvas({ id, settings, bundle: true }).then(() =>
+              toast.success(`Re-rendered widget "${id}".`),
             )
           }
         />
         <Box px="2" css={{ flex: 4 }}>
           <WidgetContentSettingsList
-            widgetId={widgetId}
+            id={id}
             settings={settings}
             setManagerWidgetStates={setManagerWidgetStates}
           />

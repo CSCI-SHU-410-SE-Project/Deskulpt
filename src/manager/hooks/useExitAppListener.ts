@@ -22,8 +22,8 @@ export default function useExitAppListener(
   useEffect(() => {
     const unlisten = listenToExitApp(() => {
       const widgetSettingsMap = Object.fromEntries(
-        Object.entries(managerWidgetStates).map(([widgetId, { settings }]) => [
-          widgetId,
+        Object.entries(managerWidgetStates).map(([id, { settings }]) => [
+          id,
           settings,
         ]),
       );

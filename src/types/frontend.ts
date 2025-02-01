@@ -66,7 +66,7 @@ export interface WidgetModule {
  */
 export interface RenderWidgetPayload {
   /** The widget ID. */
-  widgetId: string;
+  id: string;
   /** Whether to call the backend to bundle the widget. */
   bundle: boolean;
   /** The widget-specific settings. */
@@ -86,7 +86,7 @@ export interface RemoveWidgetsPayload {
  */
 export interface UpdateSettingsPayload {
   /** The widget ID. */
-  widgetId: string;
+  id: string;
   /** The widget-specific settings to update. */
   settings: WidgetSettings;
 }

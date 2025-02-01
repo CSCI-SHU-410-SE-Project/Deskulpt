@@ -29,18 +29,15 @@ export default function App() {
    * This function not only updates the settings in the canvas widget states, but also
    * notifies the manager to update the widget-specific settings as well.
    */
-  async function setSettingsForWidget(
-    widgetId: string,
-    settings: WidgetSettings,
-  ) {
+  async function setSettingsForWidget(id: string, settings: WidgetSettings) {
     // This step must be done first, otherwise there will be a visible delay between
     // the transform change and the absolute position change, causing an undesirable
     // visual effect
     setCanvasWidgetStates((prev) => ({
       ...prev,
-      [widgetId]: { ...prev[widgetId], settings },
+      [id]: { ...prev[id], settings },
     }));
-    await emitUpdateSettingsToManager({ widgetId, settings });
+    await emitUpdateSettingsToManager({ id, settings });
   }
 
   return (
@@ -63,12 +60,12 @@ export default function App() {
         }}
       />
       {Object.entries(canvasWidgetStates).map(
-        ([widgetId, { display, width, height, settings }]) => (
+        ([id, { display, width, height, settings }]) => (
           <WidgetContainer
-            key={widgetId}
-            id={widgetId}
+            key={id}
+            id={id}
             settings={settings}
-            setSettings={(settings) => setSettingsForWidget(widgetId, settings)}
+            setSettings={(settings) => setSettingsForWidget(id, settings)}
             width={width}
             height={height}
           >
