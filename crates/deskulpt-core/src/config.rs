@@ -9,6 +9,22 @@ use anyhow::{Context, Result};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
+/// Deserialized `deskulpt.conf.json`.
+#[derive(Clone, Deserialize, Serialize)]
+struct DeskulptConf {
+    name: String,
+    entry: String,
+    #[serde(default)]
+    ignore: bool,
+}
+
+/// Deserialized `package.json`.
+#[derive(Deserialize)]
+struct PackageJson {
+    #[serde(default)]
+    dependencies: HashMap<String, String>,
+}
+
 /// Macro for implementing [`DeskulptConf::load`] and [`PackageJson::load`].
 ///
 /// The first argument is the type to implement the method on, and the second
@@ -16,10 +32,9 @@ use uuid::Uuid;
 macro_rules! impl_load {
     ($type:ty, $path:expr) => {
         impl $type {
-            /// Load from a directory.
-            ///
-            /// Target file within the directory:
+            /// Load `
             #[doc = $path]
+            /// ` from a directory.
             ///
             /// This method returns `Ok(None)` if the target file does not exist
             /// and `Err` if there is failure to read or parse the file.
@@ -36,22 +51,6 @@ macro_rules! impl_load {
             }
         }
     };
-}
-
-/// Deserialized `deskulpt.conf.json`.
-#[derive(Clone, Deserialize, Serialize)]
-struct DeskulptConf {
-    name: String,
-    entry: String,
-    #[serde(default)]
-    ignore: bool,
-}
-
-/// Deserialized `package.json`.
-#[derive(Deserialize)]
-struct PackageJson {
-    #[serde(default)]
-    dependencies: HashMap<String, String>,
 }
 
 impl_load!(DeskulptConf, "deskulpt.conf.json");
@@ -99,7 +98,7 @@ impl WidgetConfig {
                 Err(e) => {
                     return Some(WidgetConfig::Invalid {
                         dir: dir_name.to_string(),
-                        error: e.to_string(),
+                        error: format!("{e:?}"),
                     })
                 },
             };
@@ -115,7 +114,7 @@ impl WidgetConfig {
             Err(e) => {
                 return Some(WidgetConfig::Invalid {
                     dir: dir_name.to_string(),
-                    error: e.to_string(),
+                    error: format!("{e:?}"),
                 })
             },
         };

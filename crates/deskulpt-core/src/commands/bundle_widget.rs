@@ -11,7 +11,7 @@ use crate::states::StatesExtWidgetConfigMap;
 ///
 /// ### Errors
 ///
-/// - Widget ID does not exist in the collection.
+/// - Widget ID does not exist in the configuration map.
 /// - Widget has a configuration error.
 /// - Error bundling the widget.
 #[command]
@@ -23,12 +23,11 @@ pub async fn bundle_widget<R: Runtime>(
 ) -> CmdResult<String> {
     let widgets_dir = app_handle.widgets_dir()?;
 
-    let mut bundler = app_handle.with_widget_config_map(|collection| {
-        let config = collection
+    let mut bundler = app_handle.with_widget_config_map(|config_map| {
+        match config_map
             .get(&id)
-            .ok_or_else(|| cmderr!("Widget (id={}) does not exist in the collection", id))?;
-
-        match config {
+            .ok_or_else(|| cmderr!("Widget (id={}) does not exist", id))?
+        {
             WidgetConfig::Valid { dir, entry, .. } => {
                 let builder = WidgetBundlerBuilder::new(
                     widgets_dir.join(dir),

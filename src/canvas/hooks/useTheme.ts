@@ -4,7 +4,7 @@ import { Theme } from "../../types";
 
 export function useTheme() {
   const [theme, setTheme] = useState(
-    window.__DESKULPT__.initialSettings.app.theme,
+    window.__DESKULPT_CANVAS_INTERNALS__.initialSettings.app.theme,
   );
 
   useEffect(() => {

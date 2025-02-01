@@ -2,7 +2,7 @@
   "$schema": "./node_modules/oxlint/configuration_schema.json",
   "ignorePatterns": [
     "**/dist/**",
-    "crates/deskulpt-core/generated/",
+    "crates/deskulpt-core/generated/**",
     "src/generated/**",
     "**/website/**"
   ],
@@ -17,7 +17,7 @@
     "sort-imports": ["error", { "ignoreDeclarationSort": true }],
     "import/max-dependencies": "off",
     "react/react-in-jsx-scope": "off",
-    "react/exhaustive-deps": "warn"
+    "react/exhaustive-deps": "error"
   },
   "overrides": [
     {

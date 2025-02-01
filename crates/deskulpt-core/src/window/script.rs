@@ -5,18 +5,35 @@ use serialize_to_javascript::{default_template, DefaultTemplate, Template};
 
 use crate::settings::Settings;
 
-/// Template for window initialization scripts.
+/// Template for the manager window initialization script.
 #[derive(Template)]
-#[default_template("init.js")]
-pub struct WindowInitJS<'a> {
-    /// `window.__DESKULPT__.apisWrapper`
-    apis_wrapper: &'static str,
-    /// `window.__DESKULPT__.initialSettings`
+#[default_template("manager.js")]
+pub struct ManagerInitJS<'a> {
+    /// `window.__DESKULPT_MANAGER_INTERNALS__.initialSettings`
     initial_settings: &'a Settings,
 }
 
-impl<'a> WindowInitJS<'a> {
-    /// Generate JavaScript code for initializing the window.
+/// Template for the canvas window initialization script.
+#[derive(Template)]
+#[default_template("canvas.js")]
+pub struct CanvasInitJS<'a> {
+    /// `window.__DESKULPT_CANVAS_INTERNALS__.apisWrapper`
+    apis_wrapper: &'static str,
+    /// `window.__DESKULPT_CANVAS_INTERNALS__.initialSettings`
+    initial_settings: &'a Settings,
+}
+
+impl<'a> ManagerInitJS<'a> {
+    /// Generate JavaScript code for initializing the manager window.
+    pub fn generate(initial_settings: &'a Settings) -> Result<String> {
+        let template = Self { initial_settings };
+        let serialized = template.render_default(&Default::default())?;
+        Ok(serialized.into_string())
+    }
+}
+
+impl<'a> CanvasInitJS<'a> {
+    /// Generate JavaScript code for initializing the canvas window.
     pub fn generate(initial_settings: &'a Settings) -> Result<String> {
         let template = Self {
             apis_wrapper: include_str!("../../generated/apis.wrapper.js"),

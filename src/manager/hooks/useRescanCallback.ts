@@ -24,7 +24,7 @@ export function useRescanCallback(
     const newWidgets = Object.entries(configMap).map(([id, config]) => {
       const settings =
         widgets.find((widget) => widget.id === id)?.settings ??
-        window.__DESKULPT__.initialSettings.widgets[id] ??
+        window.__DESKULPT_MANAGER_INTERNALS__.initialSettings.widgets[id] ??
         DEFAULT_WIDGET_SETTINGS;
       return { id, config, settings };
     });

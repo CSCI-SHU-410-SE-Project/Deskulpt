@@ -36,5 +36,5 @@ export function useAppSettings() {
       default:
         throw new Error("Invalid action type");
     }
-  }, window.__DESKULPT__.initialSettings.app);
+  }, window.__DESKULPT_MANAGER_INTERNALS__.initialSettings.app);
 }

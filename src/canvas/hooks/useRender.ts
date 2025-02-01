@@ -34,7 +34,7 @@ export function useRender(
           }
         } else {
           // Create new APIs blob URL from the template
-          const apisCode = window.__DESKULPT__.apisWrapper
+          const apisCode = window.__DESKULPT_CANVAS_INTERNALS__.apisWrapper
             .replace("__DESKULPT_WIDGET_ID__", id)
             .replace(
               "__RAW_APIS_URL__",

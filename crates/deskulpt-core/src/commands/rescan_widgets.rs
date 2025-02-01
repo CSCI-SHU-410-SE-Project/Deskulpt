@@ -21,7 +21,7 @@ pub struct RescanWidgetsOutput {
     removed_ids: Vec<String>,
 }
 
-/// Rescan the widgets directory and update the widget collection.
+/// Rescan the widgets directory and update the widget configuration map.
 ///
 /// ### Errors
 ///
@@ -61,7 +61,6 @@ pub async fn rescan_widgets<R: Runtime>(
             .cloned()
             .collect::<Vec<_>>();
 
-        // Update the widget configuration map state
         config_map.clone_from(&new_config_map);
         (added_ids, removed_ids)
     });

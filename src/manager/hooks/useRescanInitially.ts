@@ -13,7 +13,7 @@ export function useRescanInitially(widgetsDispatch: WidgetsDispatch) {
 
       const widgets = Object.entries(configMap).map(([id, config]) => {
         const settings =
-          window.__DESKULPT__.initialSettings.widgets[id] ??
+          window.__DESKULPT_MANAGER_INTERNALS__.initialSettings.widgets[id] ??
           DEFAULT_WIDGET_SETTINGS;
         return { id, config, settings };
       });
