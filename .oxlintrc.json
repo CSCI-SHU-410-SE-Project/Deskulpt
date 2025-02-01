@@ -6,12 +6,18 @@
     "src/generated/**",
     "**/website/**"
   ],
-  "plugins": ["react/jsx-runtime", "unicorn", "typescript", "oxc"],
+  "plugins": ["import", "oxc", "react", "typescript", "unicorn"],
   "categories": {
     "correctness": "error",
     "suspicious": "error",
     "perf": "warn",
     "pedantic": "warn"
+  },
+  "rules": {
+    "sort-imports": ["error", { "ignoreDeclarationSort": true }],
+    "import/max-dependencies": "off",
+    "react/react-in-jsx-scope": "off",
+    "react/exhaustive-deps": "warn"
   },
   "overrides": [
     {

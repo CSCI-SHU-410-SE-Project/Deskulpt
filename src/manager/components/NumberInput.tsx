@@ -1,4 +1,4 @@
-import { ChangeEvent, useEffect } from "react";
+import { ChangeEvent } from "react";
 
 export interface NumberInputProps {
   /** The controlled number input value. */
@@ -32,10 +32,6 @@ export default function NumberInput({
   max,
   width,
 }: NumberInputProps) {
-  useEffect(() => {
-    onChange(value);
-  }, [value]);
-
   function handleChange(event: ChangeEvent<HTMLInputElement>) {
     if (event.target.value === "") {
       onChange(min ?? 0);

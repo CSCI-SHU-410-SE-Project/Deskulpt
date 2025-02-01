@@ -30,7 +30,7 @@ export default function Shortcut({
       {keys.map(
         (key, index) =>
           index !== 0 && (
-            <Fragment key={index}>
+            <Fragment key={key}>
               <Text size={size}>+</Text>
               <Kbd size={size}>{key}</Kbd>
             </Fragment>

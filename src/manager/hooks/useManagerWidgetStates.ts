@@ -1,4 +1,10 @@
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import {
+  Dispatch,
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
 import { ManagerWidgetState } from "../../types/frontend";
 import { WidgetSettings } from "../../types/backend";
 import { invokeRescanWidgets } from "../../commands";
@@ -25,27 +31,23 @@ export interface UseManagerWidgetStatesOutput {
  * prepares the setter and the {@link UseManagerWidgetStatesOutput.rescanAndRender}
  * function that is the core function for refreshing the widget collection. This will
  * also perform an initial scanning and render on mount with a small timeout.
- *
- * @param initialWidgetSettings The initial collection of per-widget settings.
  */
-export default function useManagerWidgetStates(
-  initialWidgetSettings: Record<string, WidgetSettings>,
-): UseManagerWidgetStatesOutput {
+export default function useManagerWidgetStates(): UseManagerWidgetStatesOutput {
   const [managerWidgetStates, setManagerWidgetStates] = useState<
     Record<string, ManagerWidgetState>
   >({});
 
   /**
-   * Get the new widget states in the manager.
+   * Rescan the widget base directory and render newly added widgets.
    *
-   * This function fetches the widget collection by scanning the widget base directory.
-   * If notifies the canvas about removed widget, and returns the updated widget states
-   * as detected configurations, wrapped with either existing or initial settings.
+   * Newly added widgets are those that exist in the new states but does not exist in
+   * the previous states. They will be rendered and the number of newly added widgets
+   * will be returned.
    */
-  async function getNewManagerWidgetStates() {
+  const rescanAndRender = useCallback(async () => {
     const detectedConfigs = await invokeRescanWidgets();
 
-    // If a widget exists in the previous states but does not exist in the new detected
+    // If a widget exists in the previous states but does not exist in the newdetected
     // configurations, we consider it as removed from the collection
     const removedIds = Object.keys(managerWidgetStates).filter(
       (id) => !(id in detectedConfigs),
@@ -55,17 +57,21 @@ export default function useManagerWidgetStates(
       await emitRemoveWidgetsToCanvas({ removedIds });
     }
 
-    // Return the new states, wrapped from the detected configurations; note that we are
-    // only caring about the detected configurations
-    return Object.fromEntries(
+    const newManagerWidgetStates = Object.fromEntries(
       Object.entries(detectedConfigs).map(([widgetId, config]) => {
         let settings: WidgetSettings;
         if (widgetId in managerWidgetStates) {
           // The widget state already exists, from which we can get its settings
           settings = managerWidgetStates[widgetId].settings;
-        } else if (widgetId in initialWidgetSettings) {
+        } else if (
+          widgetId in
+          window.__DESKULPT_MANAGER_INTERNALS__.initialSettings
+            .widgetSettingsMap
+        ) {
           // There is an initial setting for the widget
-          settings = initialWidgetSettings[widgetId];
+          settings =
+            window.__DESKULPT_MANAGER_INTERNALS__.initialSettings
+              .widgetSettingsMap[widgetId];
         } else {
           // Fall back to the default setting
           settings = { x: 0, y: 0, opacity: 100 };
@@ -73,17 +79,7 @@ export default function useManagerWidgetStates(
         return [widgetId, { config, settings }];
       }),
     );
-  }
 
-  /**
-   * Rescan the widget base directory and render newly added widgets.
-   *
-   * Newly added widgets are those that exist in the new states but does not exist in
-   * the previous states. They will be rendered and the number of newly added widgets
-   * will be returned.
-   */
-  async function rescanAndRender() {
-    const newManagerWidgetStates = await getNewManagerWidgetStates();
     const addedStates = Object.entries(newManagerWidgetStates).filter(
       ([widgetId]) => !(widgetId in managerWidgetStates),
     );
@@ -94,7 +90,7 @@ export default function useManagerWidgetStates(
       ),
     );
     return addedStates.length;
-  }
+  }, [managerWidgetStates, setManagerWidgetStates]);
 
   useEffect(() => {
     // The rescan is guaranteed to succeed because it triggers a command in the backend;

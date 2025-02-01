@@ -31,5 +31,5 @@ export default function useUpdateSettingListener(
     return () => {
       unlisten.then((f) => f()).catch(console.error);
     };
-  }, []);
+  }, [setManagerWidgetStates]);
 }
