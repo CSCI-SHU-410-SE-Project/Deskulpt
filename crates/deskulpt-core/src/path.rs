@@ -33,6 +33,8 @@ pub trait PathExt<R: Runtime>: Manager<R> {
         Ok(())
     }
 
+    /// Get a reference to the widgets directory.
+    ///
     /// This will create the widgets directory if it does not exist, which can
     /// happen if one removes that directory during the application. This will
     /// error if the [`init_widgets_dir`](PathExt::init_widgets_dir) method has
@@ -66,6 +68,8 @@ pub trait PathExt<R: Runtime>: Manager<R> {
         Ok(())
     }
 
+    /// Get a reference to the persistence directory.
+    ///
     /// This will create the persistence directory if it does not exist, which
     /// can happen if one removes that directory during the application. This
     /// will error if the [`init_persist_dir`](PathExt::init_persist_dir) method
