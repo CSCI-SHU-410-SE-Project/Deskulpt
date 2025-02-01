@@ -7,8 +7,8 @@ import useRenderWidgetListener from "./hooks/useRenderWidgetListener";
 import useRemoveWidgetsListener from "./hooks/useRemoveWidgetsListener";
 import useShowToastListener from "./hooks/useShowToastListener";
 import { Toaster } from "sonner";
-import { Theme } from "@radix-ui/themes";
-import useAppearanceListener from "./hooks/useAppearanceListener";
+import { Theme as RadixTheme } from "@radix-ui/themes";
+import useThemeListener from "./hooks/useThemeListener";
 
 /**
  * The main component of the canvas window.
@@ -17,7 +17,7 @@ export default function App() {
   const [canvasWidgetStates, setCanvasWidgetStates] = useState<
     Record<string, CanvasWidgetState>
   >({});
-  const appearance = useAppearanceListener();
+  const theme = useThemeListener();
 
   useShowToastListener();
   useRenderWidgetListener(canvasWidgetStates, setCanvasWidgetStates);
@@ -41,8 +41,8 @@ export default function App() {
   }
 
   return (
-    <Theme
-      appearance={appearance}
+    <RadixTheme
+      appearance={theme}
       accentColor="indigo"
       grayColor="slate"
       hasBackground={false}
@@ -73,6 +73,6 @@ export default function App() {
           </WidgetContainer>
         ),
       )}
-    </Theme>
+    </RadixTheme>
   );
 }

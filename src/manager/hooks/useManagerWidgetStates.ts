@@ -64,14 +64,11 @@ export default function useManagerWidgetStates(): UseManagerWidgetStatesOutput {
           // The widget state already exists, from which we can get its settings
           settings = managerWidgetStates[id].settings;
         } else if (
-          id in
-          window.__DESKULPT_MANAGER_INTERNALS__.initialSettings
-            .widgetSettingsMap
+          id in window.__DESKULPT_MANAGER_INTERNALS__.initialSettings.widgets
         ) {
           // There is an initial setting for the widget
           settings =
-            window.__DESKULPT_MANAGER_INTERNALS__.initialSettings
-              .widgetSettingsMap[id];
+            window.__DESKULPT_MANAGER_INTERNALS__.initialSettings.widgets[id];
         } else {
           // Fall back to the default setting
           settings = { x: 0, y: 0, opacity: 100 };

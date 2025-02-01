@@ -1,4 +1,10 @@
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import {
+  Dispatch,
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
 import { toast } from "sonner";
 
 export interface KeyboardListenerOutput {
@@ -25,7 +31,7 @@ export default function useKeyboardListener(): KeyboardListenerOutput {
   const [hasModifier, setHasModifier] = useState(false);
   const [hasKey, setHasKey] = useState(false);
 
-  function shortcutListener(event: KeyboardEvent) {
+  const shortcutListener = useCallback((event: KeyboardEvent) => {
     event.preventDefault();
     if (event.repeat) {
       return;
@@ -73,7 +79,7 @@ export default function useKeyboardListener(): KeyboardListenerOutput {
     setListenedShortcut(keys);
     setHasKey(localHasKey);
     setHasModifier(localHasModifier);
-  }
+  }, []);
 
   /**
    * Cleanup the shortcut listener.
@@ -81,12 +87,12 @@ export default function useKeyboardListener(): KeyboardListenerOutput {
    * This stops listening (and thus triggers the event listener cleanup), empties up the
    * listened shortcut keys, and resets the relevant states.
    */
-  function cleanup() {
+  const cleanup = useCallback(() => {
     setListeningToShortcut(false);
     setListenedShortcut([]);
     setHasKey(false);
     setHasModifier(false);
-  }
+  }, []);
 
   // Listen to the shortcut when listening toggle is on
   useEffect(() => {

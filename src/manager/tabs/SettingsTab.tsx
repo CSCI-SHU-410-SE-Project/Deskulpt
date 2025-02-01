@@ -5,9 +5,9 @@ import Shortcut from "../components/Shortcut";
 
 export interface SettingsTabProps {
   /** The current toggle shortcut. */
-  toggleShortcut?: string;
+  toggleShortcut: string | null;
   /** Setter for the toggle shortcut state. */
-  setToggleShortcut: Dispatch<SetStateAction<string | undefined>>;
+  setToggleShortcut: Dispatch<SetStateAction<string | null>>;
 }
 
 /**
