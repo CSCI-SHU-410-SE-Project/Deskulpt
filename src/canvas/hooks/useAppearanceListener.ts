@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { Appearance } from "../../types/backend";
 import { listenToSwitchAppearance } from "../../events";
 
 /**
@@ -11,7 +10,9 @@ import { listenToSwitchAppearance } from "../../events";
  * @returns The current theme appearance.
  */
 export default function useAppearanceListener() {
-  const [appearance, setAppearance] = useState<Appearance>("dark");
+  const [appearance, setAppearance] = useState(
+    window.__DESKULPT_CANVAS_INTERNALS__.initialSettings.appearance,
+  );
 
   useEffect(() => {
     const unlisten = listenToSwitchAppearance((event) => {

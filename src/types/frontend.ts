@@ -6,6 +6,10 @@
 import { ReactNode } from "react";
 import { Result, WidgetConfig, WidgetSettings } from "./backend";
 
+export type DeepReadonly<T> = {
+  readonly [P in keyof T]: T[P] extends object ? DeepReadonly<T[P]> : T[P];
+};
+
 /**
  * The user-defined widget interface.
  *
