@@ -9,6 +9,7 @@ use crate::FsPlugin;
 pub struct WriteFile;
 
 #[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct WriteFileInputPayload {
     path: PathBuf,
     content: String,

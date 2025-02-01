@@ -9,6 +9,7 @@ use crate::FsPlugin;
 pub struct CreateDir;
 
 #[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct CreateDirInputPayload {
     path: PathBuf,
 }

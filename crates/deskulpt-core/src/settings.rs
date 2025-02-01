@@ -13,7 +13,7 @@ static SETTINGS_FILE: &str = "settings.bin";
 
 /// Light/dark theme of the application.
 #[derive(Default, Deserialize, Serialize)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "lowercase")]
 enum Theme {
     #[default]
     Light,
@@ -46,6 +46,7 @@ struct AppSettings {
 /// Different from widget configurations, these are independent of the widget
 /// configuration files and are managed internally by the application.
 #[derive(Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
 struct WidgetSettings {
     /// The leftmost x-coordinate in pixels.
     x: i32,

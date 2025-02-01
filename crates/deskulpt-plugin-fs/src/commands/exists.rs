@@ -9,6 +9,7 @@ use crate::FsPlugin;
 pub struct Exists;
 
 #[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ExistsInputPayload {
     path: PathBuf,
 }
