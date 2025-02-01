@@ -23,12 +23,12 @@ impl PluginCommand for Exists {
     #[dispatch]
     fn run(
         &self,
-        widget_id: String,
+        id: String,
         _plugin: &Self::Plugin,
         engine: &EngineInterface,
         input: ExistsInputPayload,
     ) -> Result<bool> {
-        let path = engine.widget_dir(widget_id).join(input.path);
+        let path = engine.widget_dir(id).join(input.path);
         Ok(path.exists())
     }
 }

@@ -36,8 +36,8 @@ export default function WidgetsTab({
 
   const rerenderAction = async () => {
     await Promise.all(
-      managerWidgetStatesArray.map(([widgetId, { settings }]) =>
-        emitRenderWidgetToCanvas({ widgetId, settings, bundle: true }),
+      managerWidgetStatesArray.map(([id, { settings }]) =>
+        emitRenderWidgetToCanvas({ id, settings, bundle: true }),
       ),
     );
     toast.success(`Re-rendered ${managerWidgetStatesArray.length} widgets.`);
@@ -69,31 +69,23 @@ export default function WidgetsTab({
             >
               <ScrollArea scrollbars="vertical" asChild>
                 <Flex direction="column">
-                  {managerWidgetStatesArray.map(
-                    ([widgetId, { config }], index) => (
-                      <WidgetTrigger
-                        key={widgetId}
-                        index={index}
-                        config={config}
-                      />
-                    ),
-                  )}
+                  {managerWidgetStatesArray.map(([id, { config }], index) => (
+                    <WidgetTrigger key={id} index={index} config={config} />
+                  ))}
                 </Flex>
               </ScrollArea>
             </Tabs.List>
           )}
-          {managerWidgetStatesArray.map(
-            ([widgetId, { config, settings }], index) => (
-              <WidgetContent
-                key={widgetId}
-                index={index}
-                widgetId={widgetId}
-                config={config}
-                settings={settings}
-                setManagerWidgetStates={setManagerWidgetStates}
-              />
-            ),
-          )}
+          {managerWidgetStatesArray.map(([id, { config, settings }], index) => (
+            <WidgetContent
+              key={id}
+              index={index}
+              id={id}
+              config={config}
+              settings={settings}
+              setManagerWidgetStates={setManagerWidgetStates}
+            />
+          ))}
         </Flex>
       </Tabs.Root>
       <FloatButton

@@ -31,7 +31,7 @@ pub async fn rescan_widgets<R: Runtime>(app_handle: AppHandle<R>) -> CmdResult<W
             continue; // Non-directory entries are not widgets, skip
         }
 
-        let widget_id = match path.file_name() {
+        let id = match path.file_name() {
             Some(file_name) => file_name.to_string_lossy().to_string(),
             None => cmdbail!("Invalid widget directory: '{}'", path.display()),
         };
@@ -39,13 +39,13 @@ pub async fn rescan_widgets<R: Runtime>(app_handle: AppHandle<R>) -> CmdResult<W
         // Load the widget configuration
         match WidgetConfig::load(&path) {
             Ok(Some(widget_config)) => {
-                new_widget_collection.insert(widget_id, Ok(widget_config));
+                new_widget_collection.insert(id, Ok(widget_config));
             },
             Ok(None) => {},
             Err(e) => {
                 // Configuration errors are recorded as error messages and do
                 // not fail the command
-                new_widget_collection.insert(widget_id, Err(e.to_string()));
+                new_widget_collection.insert(id, Err(e.to_string()));
             },
         };
     }

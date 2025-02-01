@@ -43,7 +43,7 @@ pub fn call_plugin<P: Plugin>(
     app_handle: AppHandle,
     plugin: &P,
     command: &str,
-    widget_id: String,
+    id: String,
     payload: Option<serde_json::Value>,
 ) -> Result<serde_json::Value> {
     let engine = EngineInterface::new(app_handle);
@@ -51,7 +51,7 @@ pub fn call_plugin<P: Plugin>(
     for plugin_command in plugin.commands() {
         if plugin_command.name() == command {
             return plugin_command.run(
-                widget_id,
+                id,
                 plugin,
                 &engine,
                 payload.unwrap_or(serde_json::Value::Null),
@@ -142,7 +142,7 @@ macro_rules! register_commands {
 ///     #[dispatch]
 ///     fn run(
 ///         &self,
-///         _widget_id: String,
+///         _id: String,
 ///         _plugin: &Self::Plugin,
 ///         _engine: &EngineInterface,
 ///         input: InputPayload,     // Custom deserializable input type

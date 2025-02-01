@@ -18,11 +18,11 @@ export default function useUpdateSettingListener(
 ) {
   useEffect(() => {
     const unlisten = listenToUpdateSettings((event) => {
-      const { widgetId, settings } = event.payload;
+      const { id, settings } = event.payload;
 
       setManagerWidgetStates((prev) => {
-        if (widgetId in prev) {
-          return { ...prev, [widgetId]: { ...prev[widgetId], settings } };
+        if (id in prev) {
+          return { ...prev, [id]: { ...prev[id], settings } };
         }
         return prev;
       });

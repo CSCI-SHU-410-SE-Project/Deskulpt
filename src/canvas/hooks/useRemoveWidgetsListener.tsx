@@ -18,8 +18,8 @@ export default function useRemoveWidgetsListener(
     const unlisten = listenToRemoveWidgets((event) => {
       const { removedIds } = event.payload;
 
-      removedIds.forEach((widgetId) => {
-        const state = canvasWidgetStates[widgetId];
+      removedIds.forEach((id) => {
+        const state = canvasWidgetStates[id];
         if (state === null) {
           return; // This should not happen but let us be safe
         }
@@ -36,9 +36,7 @@ export default function useRemoveWidgetsListener(
       // Remove the specified widgets from the canvas states
       setCanvasWidgetStates((prev) =>
         Object.fromEntries(
-          Object.entries(prev).filter(
-            ([widgetId]) => !removedIds.includes(widgetId),
-          ),
+          Object.entries(prev).filter(([id]) => !removedIds.includes(id)),
         ),
       );
     });
