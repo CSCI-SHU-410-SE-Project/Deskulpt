@@ -21,9 +21,7 @@ export default function App() {
     window.__DESKULPT_MANAGER_INTERNALS__.initialSettings.toggleShortcut,
   );
   const { managerWidgetStates, setManagerWidgetStates, rescanAndRender } =
-    useManagerWidgetStates(
-      window.__DESKULPT_MANAGER_INTERNALS__.initialSettings.widgetSettingsMap,
-    );
+    useManagerWidgetStates();
 
   useExitAppListener(toggleShortcut, appearance, managerWidgetStates);
   useUpdateSettingsListener(setManagerWidgetStates);

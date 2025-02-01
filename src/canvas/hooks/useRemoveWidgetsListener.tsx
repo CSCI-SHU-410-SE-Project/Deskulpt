@@ -46,5 +46,5 @@ export default function useRemoveWidgetsListener(
     return () => {
       unlisten.then((f) => f()).catch(console.error);
     };
-  }, [canvasWidgetStates]);
+  }, [canvasWidgetStates, setCanvasWidgetStates]);
 }

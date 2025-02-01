@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useEffect } from "react";
+import { Dispatch, SetStateAction, useCallback, useEffect } from "react";
 import { listenToRenderWidget } from "../../events";
 import { CanvasWidgetState, WidgetModule } from "../../types/frontend";
 import { WidgetSettings } from "../../types/backend";
@@ -26,6 +26,124 @@ export default function useRenderWidgetListener(
     SetStateAction<Record<string, CanvasWidgetState>>
   >,
 ) {
+  const bundleWidget = useCallback(
+    async (widgetId: string, settings: WidgetSettings, isTracked: boolean) => {
+      // Get the widget APIs blob URL, reusing if applicable
+      let apisBlobUrl: string;
+      if (isTracked) {
+        apisBlobUrl = canvasWidgetStates[widgetId].apisBlobUrl;
+      } else {
+        const apisCode = window.__DESKULPT_CANVAS_INTERNALS__.apisWrapper
+          .replace("__DESKULPT_WIDGET_ID__", widgetId)
+          .replace(
+            "__RAW_APIS_URL__",
+            new URL("/generated/raw-apis.js", baseUrl).href,
+          );
+        const apisBlob = new Blob([apisCode], {
+          type: "application/javascript",
+        });
+        apisBlobUrl = URL.createObjectURL(apisBlob);
+      }
+
+      // Bundle the widget and get the output code
+      let moduleCode: string;
+      try {
+        moduleCode = await invokeBundleWidget({
+          widgetId,
+          baseUrl,
+          apisBlobUrl,
+        });
+      } catch (err) {
+        setCanvasWidgetStates((prev) => ({
+          ...prev,
+          [widgetId]: {
+            display: (
+              <ErrorDisplay
+                title={`Error in '${widgetId}': failed to bundle widget`}
+                error={grabErrorInfo(err)}
+              />
+            ),
+            width: defaultContainerWidth,
+            height: defaultContainerHeight,
+            settings,
+            apisBlobUrl,
+          },
+        }));
+        return;
+      }
+
+      // Create the module blob URL
+      const moduleBlob = new Blob([moduleCode], {
+        type: "application/javascript",
+      });
+      const moduleBlobUrl = URL.createObjectURL(moduleBlob);
+
+      // Dynamically import the module and render the widget
+      try {
+        const module = (await import(
+          /* @vite-ignore */ moduleBlobUrl
+        )) as WidgetModule;
+        const moduleError = getWidgetModuleError(module);
+
+        if (moduleError !== null) {
+          // There are known errors with the widget module
+          setCanvasWidgetStates((prev) => ({
+            ...prev,
+            [widgetId]: {
+              display: (
+                <ErrorDisplay
+                  title={`Error in '${widgetId}': invalid widget module`}
+                  error={moduleError}
+                />
+              ),
+              width: defaultContainerWidth,
+              height: defaultContainerHeight,
+              moduleBlobUrl,
+              settings,
+              apisBlobUrl,
+            },
+          }));
+          return;
+        }
+
+        // We have validated the module so we can call `render` safely; there could be
+        // error within `render` so it needs to called in advance, otherwise things will
+        // get broken in the state setter, causing the error to be uncaught and also
+        // affecting other widget displays
+        const widgetDisplay = module.default.render();
+        setCanvasWidgetStates((prev) => ({
+          ...prev,
+          [widgetId]: {
+            display: widgetDisplay,
+            width: module.default.width,
+            height: module.default.height,
+            moduleBlobUrl,
+            settings,
+            apisBlobUrl,
+          },
+        }));
+      } catch (err) {
+        setCanvasWidgetStates((prev) => ({
+          ...prev,
+          [widgetId]: {
+            display: (
+              <ErrorDisplay
+                title={`Error in '${widgetId}': failed to import widget module`}
+                error={grabErrorInfo(err)}
+              />
+            ),
+            width: defaultContainerWidth,
+            height: defaultContainerHeight,
+            moduleBlobUrl,
+            settings,
+            apisBlobUrl,
+          },
+        }));
+      }
+    },
+    [canvasWidgetStates, setCanvasWidgetStates],
+  );
+
   useEffect(() => {
     const unlisten = listenToRenderWidget((event) => {
       const { widgetId, bundle, settings } = event.payload;
@@ -54,127 +172,7 @@ export default function useRenderWidgetListener(
     return () => {
       unlisten.then((f) => f()).catch(console.error);
     };
-  }, [canvasWidgetStates]);
-
-  /**
-   * Bundle the widget and update the canvas state.
-   *
-   * This function assigns or reuses the APIs blob URL, invokes the backend to bundle
-   * the widget, dynamically import the bundled code and update the canvas state (if
-   * possible) so that it can be displayed on the canvas.
-   */
-  async function bundleWidget(
-    widgetId: string,
-    settings: WidgetSettings,
-    isTracked: boolean,
-  ) {
-    // Get the widget APIs blob URL, reusing if applicable
-    let apisBlobUrl: string;
-    if (isTracked) {
-      apisBlobUrl = canvasWidgetStates[widgetId].apisBlobUrl;
-    } else {
-      const apisCode = window.__DESKULPT_CANVAS_INTERNALS__.apisWrapper
-        .replace("__DESKULPT_WIDGET_ID__", widgetId)
-        .replace(
-          "__RAW_APIS_URL__",
-          new URL("/generated/raw-apis.js", baseUrl).href,
-        );
-      const apisBlob = new Blob([apisCode], { type: "application/javascript" });
-      apisBlobUrl = URL.createObjectURL(apisBlob);
-    }
-
-    // Bundle the widget and get the output code
-    let moduleCode: string;
-    try {
-      moduleCode = await invokeBundleWidget({ widgetId, baseUrl, apisBlobUrl });
-    } catch (err) {
-      setCanvasWidgetStates((prev) => ({
-        ...prev,
-        [widgetId]: {
-          display: (
-            <ErrorDisplay
-              title={`Error in '${widgetId}': failed to bundle widget`}
-              error={grabErrorInfo(err)}
-            />
-          ),
-          width: defaultContainerWidth,
-          height: defaultContainerHeight,
-          settings,
-          apisBlobUrl,
-        },
-      }));
-      return;
-    }
-
-    // Create the module blob URL
-    const moduleBlob = new Blob([moduleCode], {
-      type: "application/javascript",
-    });
-    const moduleBlobUrl = URL.createObjectURL(moduleBlob);
-
-    // Dynamically import the module and render the widget
-    try {
-      const module = (await import(
-        /* @vite-ignore */ moduleBlobUrl
-      )) as WidgetModule;
-      const moduleError = getWidgetModuleError(module);
-
-      if (moduleError !== null) {
-        // There are known errors with the widget module
-        setCanvasWidgetStates((prev) => ({
-          ...prev,
-          [widgetId]: {
-            display: (
-              <ErrorDisplay
-                title={`Error in '${widgetId}': invalid widget module`}
-                error={moduleError}
-              />
-            ),
-            width: defaultContainerWidth,
-            height: defaultContainerHeight,
-            moduleBlobUrl,
-            settings,
-            apisBlobUrl,
-          },
-        }));
-        return;
-      }
-
-      // We have validated the module so we can call `render` safely; there could be
-      // error within `render` so it needs to called in advance, otherwise things will
-      // get broken in the state setter, causing the error to be uncaught and also
-      // affecting other widget displays
-      const widgetDisplay = module.default.render();
-      setCanvasWidgetStates((prev) => ({
-        ...prev,
-        [widgetId]: {
-          display: widgetDisplay,
-          width: module.default.width,
-          height: module.default.height,
-          moduleBlobUrl,
-          settings,
-          apisBlobUrl,
-        },
-      }));
-    } catch (err) {
-      setCanvasWidgetStates((prev) => ({
-        ...prev,
-        [widgetId]: {
-          display: (
-            <ErrorDisplay
-              title={`Error in '${widgetId}': failed to import widget module`}
-              error={grabErrorInfo(err)}
-            />
-          ),
-          width: defaultContainerWidth,
-          height: defaultContainerHeight,
-          moduleBlobUrl,
-          settings,
-          apisBlobUrl,
-        },
-      }));
-    }
-  }
+  }, [canvasWidgetStates, setCanvasWidgetStates, bundleWidget]);
 }
 
 /**
