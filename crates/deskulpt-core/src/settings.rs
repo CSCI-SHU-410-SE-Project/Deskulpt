@@ -11,6 +11,36 @@ use serde::{Deserialize, Serialize};
 /// The settings file name in the persistence directory.
 static SETTINGS_FILE: &str = "settings.bin";
 
+/// Light/dark theme of the application.
+#[derive(Default, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+enum Theme {
+    #[default]
+    Light,
+    Dark,
+}
+
+/// Keyboard shortcuts registered in the application.
+///
+/// A keyboard shortcut being `None` means that it is disabled, otherwise it is
+/// a string parsable into [`Shortcut`](tauri_plugin_global_shortcut::Shortcut).
+#[derive(Default, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Shortcuts {
+    /// For toggling canvas click-through.
+    pub toggle_canvas: Option<String>,
+}
+
+/// Application-wide settings.
+#[derive(Default, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+struct AppSettings {
+    /// The application theme.
+    theme: Theme,
+    /// The keyboard shortcuts.
+    shortcuts: Shortcuts,
+}
+
 /// Per-widget settings.
 ///
 /// Different from widget configurations, these are independent of the widget
@@ -25,25 +55,14 @@ struct WidgetSettings {
     opacity: i32,
 }
 
-/// The light/dark theme appearance of the application.
-#[derive(Default, Deserialize, Serialize)]
-#[serde(rename_all = "lowercase")]
-enum Appearance {
-    #[default]
-    Light,
-    Dark,
-}
-
 /// Full settings of the application.
 #[derive(Default, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Settings {
-    /// The theme appearance.
-    appearance: Appearance,
-    /// The keyboard shortcut for toggling canvas click-through.
-    toggle_shortcut: Option<String>,
+    /// Application-wide settings.
+    app: AppSettings,
     /// The mapping from widget IDs to their respective settings.
-    widget_settings_map: HashMap<String, WidgetSettings>,
+    widgets: HashMap<String, WidgetSettings>,
 }
 
 impl Settings {

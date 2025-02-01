@@ -44,8 +44,8 @@ export function invokeRescanWidgets() {
  * Invoke the `update_toggle_shortcut` command.
  */
 export function invokeUpdateToggleShortcut(payload: {
-  oldShortcut?: string;
-  newShortcut?: string;
+  oldShortcut: string | null;
+  newShortcut: string | null;
 }) {
   return invoke<void>("update_toggle_shortcut", payload);
 }

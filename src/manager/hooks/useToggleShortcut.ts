@@ -3,9 +3,9 @@ import { invokeUpdateToggleShortcut } from "../../commands";
 
 export interface UseToggleShortcutOutput {
   /** The current toggle shortcut. */
-  toggleShortcut?: string;
+  toggleShortcut: string | null;
   /** Setter for the toggle shortcut state. */
-  setToggleShortcut: Dispatch<SetStateAction<string | undefined>>;
+  setToggleShortcut: Dispatch<SetStateAction<string | null>>;
 }
 
 /**
@@ -17,20 +17,23 @@ export interface UseToggleShortcutOutput {
  *
  * @param initialToggleShortcut The initial toggle shortcut to use.
  */
-export default function useToggleShortcut(
-  initialToggleShortcut?: string,
-): UseToggleShortcutOutput {
-  const [toggleShortcut, setToggleShortcut] = useState(initialToggleShortcut);
+export default function useToggleShortcut(): UseToggleShortcutOutput {
+  const [toggleShortcut, setToggleShortcut] = useState(
+    window.__DESKULPT_MANAGER_INTERNALS__.initialSettings.app.shortcuts
+      .toggleCanvas,
+  );
 
   useEffect(() => {
-    invokeUpdateToggleShortcut({ newShortcut: toggleShortcut }).catch(
-      console.error,
-    );
+    invokeUpdateToggleShortcut({
+      oldShortcut: null,
+      newShortcut: toggleShortcut,
+    }).catch(console.error);
 
     return () => {
-      invokeUpdateToggleShortcut({ oldShortcut: toggleShortcut }).catch(
-        console.error,
-      );
+      invokeUpdateToggleShortcut({
+        oldShortcut: toggleShortcut,
+        newShortcut: null,
+      }).catch(console.error);
     };
   }, [toggleShortcut]);
 

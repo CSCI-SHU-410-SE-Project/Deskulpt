@@ -6,38 +6,33 @@ import useExitAppListener from "./hooks/useExitAppListener";
 import useToggleShortcut from "./hooks/useToggleShortcut";
 import useManagerWidgetStates from "./hooks/useManagerWidgetStates";
 import useUpdateSettingsListener from "./hooks/useUpdateSettingsListener";
-import { Box, Tabs, Theme } from "@radix-ui/themes";
+import { Box, Theme as RadixTheme, Tabs } from "@radix-ui/themes";
 import ManagerToaster from "./components/ManagerToaster";
-import AppearanceToggler from "./components/AppearanceToggler";
+import ThemeToggler from "./components/ThemeToggler";
 
 /**
  * The main component of the manager window.
  */
 export default function App() {
-  const [appearance, setAppearance] = useState(
-    window.__DESKULPT_MANAGER_INTERNALS__.initialSettings.appearance,
+  const [theme, setTheme] = useState(
+    window.__DESKULPT_MANAGER_INTERNALS__.initialSettings.app.theme,
   );
-  const { toggleShortcut, setToggleShortcut } = useToggleShortcut(
-    window.__DESKULPT_MANAGER_INTERNALS__.initialSettings.toggleShortcut,
-  );
+  const { toggleShortcut, setToggleShortcut } = useToggleShortcut();
   const { managerWidgetStates, setManagerWidgetStates, rescanAndRender } =
     useManagerWidgetStates();
 
-  useExitAppListener(toggleShortcut, appearance, managerWidgetStates);
+  useExitAppListener(toggleShortcut, theme, managerWidgetStates);
   useUpdateSettingsListener(setManagerWidgetStates);
 
   return (
-    <Theme
-      appearance={appearance}
+    <RadixTheme
+      appearance={theme}
       accentColor="indigo"
       grayColor="slate"
       css={{ height: "100vh" }}
     >
-      <ManagerToaster appearance={appearance} />
-      <AppearanceToggler
-        appearance={appearance}
-        setAppearance={setAppearance}
-      />
+      <ManagerToaster theme={theme} />
+      <ThemeToggler theme={theme} setTheme={setTheme} />
       <Tabs.Root defaultValue="widgets" asChild>
         <Box height="100%" p="2">
           <Tabs.List>
@@ -72,6 +67,6 @@ export default function App() {
           </Box>
         </Box>
       </Tabs.Root>
-    </Theme>
+    </RadixTheme>
   );
 }

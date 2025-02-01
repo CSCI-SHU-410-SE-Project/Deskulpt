@@ -1,14 +1,14 @@
 import { Box, IconButton, Tooltip } from "@radix-ui/themes";
-import { Appearance } from "../../types/backend";
+import { Theme } from "../../types/backend";
 import { MdOutlineDarkMode, MdOutlineLightMode } from "react-icons/md";
 import { Dispatch, SetStateAction } from "react";
-import { emitSwitchAppearanceToCanvas } from "../../events";
+import { emitSwitchThemeToCanvas } from "../../events";
 
 export interface AppearanceTogglerProps {
-  /** Theme appearance. */
-  appearance: Appearance;
-  /** State for theme appearance. */
-  setAppearance: Dispatch<SetStateAction<Appearance>>;
+  /** Theme. */
+  theme: Theme;
+  /** State for theme. */
+  setTheme: Dispatch<SetStateAction<Theme>>;
 }
 
 /**
@@ -19,23 +19,23 @@ export interface AppearanceTogglerProps {
  * and dark mode. The tooltip and icon should reflect the current theme appearance.
  */
 export default function AppearanceToggler({
-  appearance,
-  setAppearance,
+  theme,
+  setTheme,
 }: AppearanceTogglerProps) {
-  const toggleAppearance = () => {
-    const newAppearance = appearance === "light" ? "dark" : "light";
-    setAppearance(newAppearance);
-    emitSwitchAppearanceToCanvas(newAppearance).catch(console.error);
+  const toggleTheme = () => {
+    const newTheme = theme === Theme.LIGHT ? Theme.DARK : Theme.LIGHT;
+    setTheme(newTheme);
+    emitSwitchThemeToCanvas(newTheme).catch(console.error);
   };
 
   return (
     <Box position="absolute" right="3" top="4">
       <Tooltip
         side="left"
-        content={`Switch to ${appearance === "light" ? "dark" : "light"} mode`}
+        content={`Switch to ${theme === Theme.LIGHT ? Theme.DARK : Theme.LIGHT} mode`}
       >
-        <IconButton variant="soft" size="1" onClick={toggleAppearance}>
-          {appearance === "light" ? (
+        <IconButton variant="soft" size="1" onClick={toggleTheme}>
+          {theme === Theme.LIGHT ? (
             <MdOutlineLightMode />
           ) : (
             <MdOutlineDarkMode />
