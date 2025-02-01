@@ -6,7 +6,7 @@ use anyhow::Result;
 use tauri::image::Image;
 use tauri::menu::{MenuBuilder, MenuEvent, MenuItemBuilder};
 use tauri::tray::{MouseButton, MouseButtonState, TrayIcon, TrayIconBuilder, TrayIconEvent};
-use tauri::{App, AppHandle, Manager, Runtime};
+use tauri::{App, AppHandle, Runtime};
 use tokio::time::sleep;
 
 use crate::events::EventsExt;
@@ -14,7 +14,7 @@ use crate::states::StatesExtCanvasClickThrough;
 use crate::window::WindowExt;
 
 /// Extention trait for system tray-related operations.
-pub trait TrayExt<R: Runtime>: Manager<R> + StatesExtCanvasClickThrough<R> {
+pub trait TrayExt<R: Runtime>: StatesExtCanvasClickThrough<R> {
     /// Create the system tray.
     fn create_tray(&self, icon: Image) -> Result<()>
     where

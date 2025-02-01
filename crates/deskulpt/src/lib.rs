@@ -41,7 +41,6 @@ pub fn run() {
 
             app.create_manager(&settings)?;
             app.create_canvas(&settings)?;
-
             app.create_tray(DESKULPT_ICON)?;
 
             Ok(())

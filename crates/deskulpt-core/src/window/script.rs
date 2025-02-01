@@ -1,4 +1,5 @@
 //! Window initialization scripts.
+
 use anyhow::Result;
 use serialize_to_javascript::{default_template, DefaultTemplate, Template};
 
