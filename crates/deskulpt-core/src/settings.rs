@@ -13,7 +13,7 @@ static SETTINGS_FILE: &str = "settings.bin";
 
 /// Light/dark theme of the application.
 #[derive(Default, Deserialize, Serialize)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "lowercase")]
 enum Theme {
     #[default]
     Light,

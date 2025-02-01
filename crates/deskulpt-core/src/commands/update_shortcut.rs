@@ -4,6 +4,9 @@ use tauri::{command, AppHandle, Runtime};
 use super::error::CmdResult;
 use crate::shortcuts::ShortcutsExt;
 
+/// The key of the shortcut to update.
+///
+/// This corresponds to `keyof Shortcuts` in TypeScript.
 #[derive(Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub enum ShortcutKey {
@@ -26,15 +29,17 @@ pub enum ShortcutKey {
 pub async fn update_shortcut<R: Runtime>(
     app_handle: AppHandle<R>,
     key: ShortcutKey,
-    from: Option<String>,
-    to: Option<String>,
+    old_shortcut: Option<String>,
+    new_shortcut: Option<String>,
 ) -> CmdResult<()> {
     match key {
         ShortcutKey::ToggleCanvas => {
-            app_handle.update_toggle_canvas_shortcut(from.as_deref(), to.as_deref())?;
+            app_handle
+                .update_toggle_canvas_shortcut(old_shortcut.as_deref(), new_shortcut.as_deref())?;
         },
         ShortcutKey::ShowManager => {
-            app_handle.update_show_manager_shortcut(from.as_deref(), to.as_deref())?;
+            app_handle
+                .update_show_manager_shortcut(old_shortcut.as_deref(), new_shortcut.as_deref())?;
         },
     }
 

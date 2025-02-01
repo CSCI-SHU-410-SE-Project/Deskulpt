@@ -14,13 +14,13 @@ use crate::WindowExt;
 /// top-level docstring. The third argument is the listener to be registered for
 /// the shortcut.
 macro_rules! impl_update_shortcut {
-    ($name: ident, $doc: expr, $listener: expr) => {
-        #[doc = $doc]
+    ($method: ident, $shortcut: expr, $listener: expr) => {
+        #[doc = concat!("Update the keyboard shortcut `", $shortcut, "`.")]
         ///
         /// This will compare the old and new shortcut, and update only when they
         /// are different. For each changed shortcut, the old one (if exists) will
         /// be unregistered and the new one (if exists) will be registered.
-        fn $name(&self, old_shortcut: Option<&str>, new_shortcut: Option<&str>) -> Result<()> {
+        fn $method(&self, old_shortcut: Option<&str>, new_shortcut: Option<&str>) -> Result<()> {
             if old_shortcut == new_shortcut {
                 return Ok(());
             }
@@ -73,7 +73,7 @@ pub trait ShortcutsExt<R: Runtime>: Manager<R> + GlobalShortcutExt<R> {
 
     impl_update_shortcut!(
         update_toggle_canvas_shortcut,
-        "Update the keyboard shortcut for toggling canvas click-through.",
+        "toggle_canvas",
         |app_handle, _, event| {
             if event.state == ShortcutState::Pressed {
                 if let Err(e) = app_handle.toggle_canvas_click_through() {
@@ -85,7 +85,7 @@ pub trait ShortcutsExt<R: Runtime>: Manager<R> + GlobalShortcutExt<R> {
 
     impl_update_shortcut!(
         update_show_manager_shortcut,
-        "Update the keyboard shortcut for showing the manager window.",
+        "show_manager",
         |app_handle, _, _| {
             if let Err(e) = app_handle.show_manager() {
                 eprintln!("Failed to show the manager window: {e}");

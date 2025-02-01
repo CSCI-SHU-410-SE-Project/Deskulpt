@@ -6,23 +6,29 @@ import { toast } from "sonner";
 
 export type UpdateShortcutCallback = (
   key: keyof Shortcuts,
-  from: string | null,
-  to: string | null,
+  oldShortcut: string | null,
+  newShortcut: string | null,
 ) => Promise<void>;
 
 export function useUpdateShortcutCallback(
   appSettingsDispatch: AppSettingsDispatch,
 ) {
   return useCallback(
-    (key: keyof Shortcuts, from: string | null, to: string | null) =>
-      invokeUpdateShortcut({ key, from, to })
+    (
+      key: keyof Shortcuts,
+      oldShortcut: string | null,
+      newShortcut: string | null,
+    ) =>
+      invokeUpdateShortcut({ key, oldShortcut, newShortcut })
         .then(() => {
           appSettingsDispatch({
             type: AppSettingsActionType.SET_SHORTCUT,
-            payload: { key, shortcut: to },
+            payload: { key, shortcut: newShortcut },
           });
           toast.success(
-            to === null ? "Shortcut disabled." : `Shortcut updated: ${to}`,
+            newShortcut === null
+              ? "Shortcut disabled."
+              : `Shortcut updated: ${newShortcut}`,
           );
         })
         .catch((error) => {

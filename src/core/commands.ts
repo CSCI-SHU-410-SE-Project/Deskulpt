@@ -28,8 +28,8 @@ export function invokeRescanWidgets() {
 
 export function invokeUpdateShortcut(payload: {
   key: keyof Shortcuts;
-  from: string | null;
-  to: string | null;
+  oldShortcut: string | null;
+  newShortcut: string | null;
 }) {
   return invoke<void>("update_shortcut", payload);
 }

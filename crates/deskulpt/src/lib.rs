@@ -5,7 +5,7 @@
 )]
 
 use deskulpt_core::{
-    commands, PathExt, Settings, ShortcutsExt, StatesExtCanvasClickThrough, StatesExtRenderReady,
+    PathExt, Settings, ShortcutsExt, StatesExtCanvasClickThrough, StatesExtRenderReady,
     StatesExtWidgetConfigMap, TrayExt, WindowExt,
 };
 use tauri::image::Image;
@@ -21,7 +21,6 @@ pub fn run() {
             app.init_widgets_dir()?;
             app.init_persist_dir()?;
 
-            // Load settings or use default settings if failed to load
             let mut settings = match Settings::load(app.persist_dir()?) {
                 Ok(settings) => settings,
                 Err(e) => {
@@ -40,10 +39,8 @@ pub fn run() {
             #[cfg(target_os = "macos")]
             app.set_activation_policy(tauri::ActivationPolicy::Accessory);
 
-            // Register initial shortcuts
             app.init_shortcuts(&mut settings);
 
-            // Create windows and system tray
             app.create_manager(&settings)?;
             app.create_canvas(&settings)?;
             app.create_tray(DESKULPT_ICON)?;
@@ -52,14 +49,14 @@ pub fn run() {
         })
         .on_window_event(deskulpt_core::on_window_event)
         .invoke_handler(generate_handler![
-            commands::call_plugin,
-            commands::bundle_widget,
-            commands::emit_on_render_ready,
-            commands::exit_app,
-            commands::open_in_widgets_dir,
-            commands::rescan_widgets,
-            commands::set_render_ready,
-            commands::update_shortcut,
+            deskulpt_core::commands::call_plugin,
+            deskulpt_core::commands::bundle_widget,
+            deskulpt_core::commands::emit_on_render_ready,
+            deskulpt_core::commands::exit_app,
+            deskulpt_core::commands::open_in_widgets_dir,
+            deskulpt_core::commands::rescan_widgets,
+            deskulpt_core::commands::set_render_ready,
+            deskulpt_core::commands::update_shortcut,
         ])
         .plugin(tauri_plugin_clipboard_manager::init())
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())
