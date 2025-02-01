@@ -13,13 +13,13 @@ use crate::states::StatesExtCanvasClickThrough;
 /// top-level docstring. The third argument is the listener to be registered for
 /// the shortcut.
 macro_rules! impl_update_shortcut {
-    ($name: ident, $doc: expr, $listener: expr) => {
-        #[doc = $doc]
+    ($method: ident, $shortcut: expr, $listener: expr) => {
+        #[doc = concat!("Update the keyboard shortcut `", $shortcut, "`.")]
         ///
         /// This will compare the old and new shortcut, and update only when they
         /// are different. For each changed shortcut, the old one (if exists) will
         /// be unregistered and the new one (if exists) will be registered.
-        fn $name(&self, old_shortcut: Option<&str>, new_shortcut: Option<&str>) -> Result<()> {
+        fn $method(&self, old_shortcut: Option<&str>, new_shortcut: Option<&str>) -> Result<()> {
             if old_shortcut == new_shortcut {
                 return Ok(());
             }
@@ -64,7 +64,7 @@ pub trait ShortcutsExt<R: Runtime>: Manager<R> + GlobalShortcutExt<R> {
 
     impl_update_shortcut!(
         update_toggle_canvas_shortcut,
-        "Update the keyboard shortcut for toggling canvas click-through.",
+        "toggle_canvas",
         |app_handle, _, event| {
             if event.state == ShortcutState::Pressed {
                 if let Err(e) = app_handle.toggle_canvas_click_through() {

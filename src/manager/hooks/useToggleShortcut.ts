@@ -26,15 +26,15 @@ export default function useToggleShortcut(): UseToggleShortcutOutput {
   useEffect(() => {
     invokeUpdateShortcut({
       key: "toggleCanvas",
-      from: null,
-      to: toggleShortcut,
+      oldShortcut: null,
+      newShortcut: toggleShortcut,
     }).catch(console.error);
 
     return () => {
       invokeUpdateShortcut({
         key: "toggleCanvas",
-        from: toggleShortcut,
-        to: null,
+        oldShortcut: toggleShortcut,
+        newShortcut: null,
       }).catch(console.error);
     };
   }, [toggleShortcut]);
