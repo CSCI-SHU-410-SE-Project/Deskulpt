@@ -1,11 +1,11 @@
-import { Badge, Box, Flex, Tabs, Text } from "@radix-ui/themes";
-import { Result, WidgetConfig } from "../../types/backend";
+import { Box, Flex, Tabs, Text } from "@radix-ui/themes";
+import { WidgetConfig, WidgetConfigType } from "../../types/backend";
 
 export interface WidgetTriggerProps {
   /** The index of the widget in the collection. */
   index: number;
-  /** The widget configuration or error. */
-  config: Result<WidgetConfig, string>;
+  /** The widget configuration. */
+  config: WidgetConfig;
 }
 
 /**
@@ -40,13 +40,13 @@ export default function WidgetTrigger({ index, config }: WidgetTriggerProps) {
           css={{
             borderRadius: "var(--radius-thumb)",
             backgroundColor:
-              "Ok" in config ? "var(--green-10)" : "var(--red-10)",
+              config.type === WidgetConfigType.VALID
+                ? "var(--green-10)"
+                : "var(--red-10)",
             opacity: 1, // TODO: decrease opacity when widget unloaded
           }}
         />
-        <Text>
-          {"Ok" in config ? config.Ok.name : <Badge color="red">Error</Badge>}
-        </Text>
+        <Text>{config.content.dir}</Text>
       </Flex>
     </Tabs.Trigger>
   );

@@ -1,5 +1,5 @@
 import { Code, DataList, Flex, IconButton, Tooltip } from "@radix-ui/themes";
-import { WidgetConfig } from "../../types/backend";
+import { WidgetConfig, WidgetConfigType } from "../../types/backend";
 import WidgetDependencies from "../components/WidgetDependencies";
 import { MdOpenInNew } from "react-icons/md";
 import { invokeOpenInWidgetsDir } from "../../commands";
@@ -8,7 +8,7 @@ export interface WidgetContentConfigListProps {
   /** The widget ID. */
   id: string;
   /** The widget configuration. */
-  config: WidgetConfig;
+  config: Extract<WidgetConfig, { type: WidgetConfigType.VALID }>;
 }
 
 /**
@@ -29,20 +29,20 @@ export default function WidgetContentConfigList({
       </DataList.Item>
       <DataList.Item>
         <DataList.Label>Name</DataList.Label>
-        <DataList.Value>{config.name}</DataList.Value>
+        <DataList.Value>{config.content.name}</DataList.Value>
       </DataList.Item>
       <DataList.Item>
         <DataList.Label>Entry</DataList.Label>
         <DataList.Value>
           <Flex align="center" gap="2">
-            <Code>{config.entry}</Code>
+            <Code>{config.content.entry}</Code>
             <Tooltip content="Open" side="right">
               <IconButton
                 variant="ghost"
                 size="1"
                 onClick={() =>
                   invokeOpenInWidgetsDir({
-                    components: [id, config.entry],
+                    components: [id, config.content.entry],
                   })
                 }
               >
@@ -55,7 +55,7 @@ export default function WidgetContentConfigList({
       <DataList.Item>
         <DataList.Label>Dependencies</DataList.Label>
         <DataList.Value>
-          <WidgetDependencies dependencies={config.dependencies} />
+          <WidgetDependencies dependencies={config.content.dependencies} />
         </DataList.Value>
       </DataList.Item>
     </DataList.Root>

@@ -2,19 +2,30 @@
  * This file contains the types and interfaces that have backend counterparts.
  */
 
-export type Result<T, E> = { Ok: T } | { Err: E };
-
 export type ShowToastPayload = { success: string } | { error: string };
 
-export type WidgetCollection = Record<string, Result<WidgetConfig, string>>;
-
-export interface WidgetConfig {
-  name: string;
-  entry: string;
-  ignore: boolean;
-  dependencies: Record<string, string>;
-  directory: string;
+export enum WidgetConfigType {
+  VALID = "VALID",
+  INVALID = "INVALID",
 }
+
+export type WidgetConfig =
+  | {
+      type: WidgetConfigType.VALID;
+      content: {
+        dir: string;
+        name: string;
+        entry: string;
+        dependencies: Record<string, string>;
+      };
+    }
+  | {
+      type: WidgetConfigType.INVALID;
+      content: {
+        dir: string;
+        error: string;
+      };
+    };
 
 export type Appearance = "light" | "dark";
 
