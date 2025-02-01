@@ -4,7 +4,7 @@ use std::fs::create_dir_all;
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
-use anyhow::Result;
+use anyhow::{anyhow, Result};
 use once_cell::sync::OnceCell;
 use tauri::{App, AppHandle, Manager, Runtime};
 
@@ -33,15 +33,20 @@ pub trait PathExt<R: Runtime>: Manager<R> {
         Ok(())
     }
 
-    /// Get a reference to the widgets directory.
-    ///
-    /// This will panic if the [`init_widgets_dir`](PathExt::init_widgets_dir)
-    /// method has not been called.
-    fn widgets_dir(&self) -> &Path {
-        WIDGETS_DIR
+    /// This will create the widgets directory if it does not exist, which can
+    /// happen if one removes that directory during the application. This will
+    /// error if the [`init_widgets_dir`](PathExt::init_widgets_dir) method has
+    /// not been called.
+    fn widgets_dir(&self) -> Result<&Path> {
+        let widgets_dir = WIDGETS_DIR
             .get()
-            .expect("`create_widgets_dir` must be called first")
-            .as_ref()
+            .ok_or_else(|| anyhow!("`init_widgets_dir` must be called first"))?
+            .as_path();
+
+        if !widgets_dir.exists() {
+            create_dir_all(widgets_dir)?;
+        }
+        Ok(widgets_dir)
     }
 
     /// Initialize the persistence directory.
@@ -61,15 +66,20 @@ pub trait PathExt<R: Runtime>: Manager<R> {
         Ok(())
     }
 
-    /// Get a reference to the persistence directory.
-    ///
-    /// This will panic if the [`init_persist_dir`](PathExt::init_persist_dir)
-    /// method has not been called.
-    fn persist_dir(&self) -> &Path {
-        PERSIST_DIR
+    /// This will create the persistence directory if it does not exist, which
+    /// can happen if one removes that directory during the application. This
+    /// will error if the [`init_persist_dir`](PathExt::init_persist_dir) method
+    /// has not been called.
+    fn persist_dir(&self) -> Result<&Path> {
+        let persist_dir = PERSIST_DIR
             .get()
-            .expect("`init_persist_dir` must be called first")
-            .as_ref()
+            .ok_or_else(|| anyhow!("`init_persist_dir` must be called first"))?
+            .as_path();
+
+        if !persist_dir.exists() {
+            create_dir_all(persist_dir)?;
+        }
+        Ok(persist_dir)
     }
 }
 

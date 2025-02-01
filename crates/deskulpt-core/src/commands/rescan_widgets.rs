@@ -15,13 +15,14 @@ use crate::states::StatesExtWidgetConfigMap;
 ///
 /// ### Errors
 ///
+/// - Failed to access the widgets directory.
 /// - Error traversing the widgets directory.
 /// - Error inferring widget ID from the directory entry.
 #[command]
 pub async fn rescan_widgets<R: Runtime>(
     app_handle: AppHandle<R>,
 ) -> CmdResult<HashMap<String, WidgetConfig>> {
-    let widgets_dir = app_handle.widgets_dir();
+    let widgets_dir = app_handle.widgets_dir()?;
     let mut new_config_map = HashMap::new();
 
     let entries = read_dir(widgets_dir)?;

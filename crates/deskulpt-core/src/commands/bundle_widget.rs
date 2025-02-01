@@ -11,6 +11,7 @@ use crate::states::StatesExtWidgetConfigMap;
 ///
 /// ### Errors
 ///
+/// - Failed to access the widgets directory.
 /// - Widget ID does not exist in the configuration map.
 /// - Widget has a configuration error.
 /// - Error bundling the widget.
@@ -21,7 +22,7 @@ pub async fn bundle_widget<R: Runtime>(
     base_url: String,
     apis_blob_url: String,
 ) -> CmdResult<String> {
-    let widgets_dir = app_handle.widgets_dir();
+    let widgets_dir = app_handle.widgets_dir()?;
 
     let mut bundler = app_handle.with_widget_config_map(|config_map| {
         match config_map
