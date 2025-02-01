@@ -28,7 +28,7 @@ impl PluginCommand for IsFile {
         engine: &EngineInterface,
         input: IsFileInputPayload,
     ) -> Result<bool> {
-        let path = engine.widget_dir(id.as_str()).join(input.path);
+        let path = engine.widget_dir(id.as_str())?.join(input.path);
         Ok(path.is_file())
     }
 }

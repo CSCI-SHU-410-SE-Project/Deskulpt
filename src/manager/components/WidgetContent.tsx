@@ -63,7 +63,9 @@ export default function WidgetContent({
           }
           actionIcon={<LuFolderOpen />}
           actionText="Edit"
-          action={() => invokeOpenInWidgetsDir({ components: [id] })}
+          action={() =>
+            invokeOpenInWidgetsDir({ components: [config.content.dir] })
+          }
         />
         <ScrollArea scrollbars="vertical" asChild>
           <Box px="2" css={{ flex: 3 }}>

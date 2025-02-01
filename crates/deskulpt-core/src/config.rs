@@ -7,6 +7,7 @@ use std::path::Path;
 
 use anyhow::{Context, Result};
 use serde::{Deserialize, Serialize};
+use uuid::Uuid;
 
 /// Deserialized `deskulpt.conf.json`.
 #[derive(Clone, Deserialize, Serialize)]
@@ -132,5 +133,14 @@ impl WidgetConfig {
             WidgetConfig::Valid { dir, .. } => dir,
             WidgetConfig::Invalid { dir, .. } => dir,
         }
+    }
+
+    /// Get the widget ID.
+    ///
+    /// This ID is derived from the widget directory name using UUID v5. It is
+    /// deterministic for the same directory name.
+    pub fn id(&self) -> String {
+        let dir_encoded = self.dir().as_bytes();
+        Uuid::new_v5(&Uuid::NAMESPACE_URL, dir_encoded).to_string()
     }
 }

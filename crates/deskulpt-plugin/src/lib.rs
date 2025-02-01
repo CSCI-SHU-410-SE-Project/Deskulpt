@@ -7,10 +7,11 @@
 mod command;
 mod interface;
 
+use std::path::PathBuf;
+
 use anyhow::{bail, Result};
 pub use command::PluginCommand;
 pub use interface::EngineInterface;
-use tauri::AppHandle;
 pub use {anyhow, serde_json};
 
 /// The API for a Deskulpt plugin.
@@ -40,13 +41,13 @@ pub trait Plugin {
 /// [nushell](https://docs.rs/nu-plugin/0.101.0/nu_plugin/fn.serve_plugin.html)
 /// for reference.
 pub fn call_plugin<P: Plugin>(
-    app_handle: AppHandle,
+    widget_dir_fn: impl Fn(&str) -> Result<PathBuf> + 'static,
     plugin: &P,
     command: &str,
     id: String,
     payload: Option<serde_json::Value>,
 ) -> Result<serde_json::Value> {
-    let engine = EngineInterface::new(app_handle);
+    let engine = EngineInterface::new(widget_dir_fn);
 
     for plugin_command in plugin.commands() {
         if plugin_command.name() == command {

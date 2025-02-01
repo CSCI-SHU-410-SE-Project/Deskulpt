@@ -42,7 +42,7 @@ export default function WidgetContentConfigList({
                 size="1"
                 onClick={() =>
                   invokeOpenInWidgetsDir({
-                    components: [id, config.content.entry],
+                    components: [config.content.dir, config.content.entry],
                   })
                 }
               >
