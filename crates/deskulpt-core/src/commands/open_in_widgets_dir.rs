@@ -12,13 +12,14 @@ use crate::path::PathExt;
 ///
 /// ### Errors
 ///
+/// - Failed to access the widgets directory.
 /// - Error opening the specified path.
 #[command]
 pub async fn open_in_widgets_dir<R: Runtime>(
     app_handle: AppHandle<R>,
     components: Vec<String>,
 ) -> CmdResult<()> {
-    let mut open_path = app_handle.widgets_dir().to_path_buf();
+    let mut open_path = app_handle.widgets_dir()?.to_path_buf();
     open_path.extend(components);
     open::that_detached(open_path)?;
 

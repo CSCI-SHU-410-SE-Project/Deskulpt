@@ -20,7 +20,7 @@ pub fn run() {
             app.init_widgets_dir()?;
             app.init_persist_dir()?;
 
-            let settings = match Settings::load(app.persist_dir()) {
+            let settings = match Settings::load(app.persist_dir()?) {
                 Ok(settings) => settings,
                 Err(e) => {
                     eprintln!("Failed to load settings: {e}");
