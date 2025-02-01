@@ -4,7 +4,7 @@
  */
 
 import { ReactNode } from "react";
-import { Result, WidgetConfig, WidgetSettings } from "./backend";
+import { WidgetConfig, WidgetSettings } from "./backend";
 
 export type DeepReadonly<T> = {
   readonly [P in keyof T]: T[P] extends object ? DeepReadonly<T[P]> : T[P];
@@ -29,8 +29,8 @@ export interface Widget {
  * The state of a widget in the manager.
  */
 export interface ManagerWidgetState {
-  /** Configuration or configuration error of the widget. */
-  config: Result<WidgetConfig, string>;
+  /** Configuration of the widget. */
+  config: WidgetConfig;
   /** Settings of the widget. */
   settings: WidgetSettings;
 }

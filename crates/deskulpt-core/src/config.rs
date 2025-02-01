@@ -1,6 +1,6 @@
 //! Configuration of Deskulpt widgets.
 
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
 use std::fs::File;
 use std::io::BufReader;
 use std::path::Path;
@@ -24,73 +24,113 @@ struct PackageJson {
     dependencies: HashMap<String, String>,
 }
 
-/// Full configuration of a Deskulpt widget.
-#[derive(Clone, Serialize, PartialEq, Debug)]
-pub struct WidgetConfig {
-    /// Name of the widget.
-    name: String,
-    /// Entry file of the widget, relative to the widget directory.
-    entry: String,
-    /// Whether the widget is ignored.
-    ignore: bool,
-    /// The dependency mapping from package names to versions.
-    dependencies: HashMap<String, String>,
+/// Macro for implementing [`DeskulptConf::load`] and [`PackageJson::load`].
+///
+/// The first argument is the type to implement the method on, and the second
+/// argument is the path to the target file within the widget directory.
+macro_rules! impl_load {
+    ($type:ty, $path:expr) => {
+        impl $type {
+            /// Load from a directory.
+            ///
+            /// Target file within the directory:
+            #[doc = $path]
+            ///
+            /// This method returns `Ok(None)` if the target file does not exist
+            /// and `Err` if there is failure to read or parse the file.
+            fn load(dir: &Path) -> Result<Option<Self>> {
+                let path = dir.join($path);
+                if !path.exists() {
+                    return Ok(None);
+                }
+
+                let file = File::open(path)?;
+                let reader = BufReader::new(file);
+                let config = serde_json::from_reader(reader)?;
+                Ok(Some(config))
+            }
+        }
+    };
 }
 
-/// The widget collection.
-///
-/// This is a mapping from widget IDs to either widget configurations if valid
-/// or configuration error messages otherwise.
-pub type WidgetCollection = HashMap<String, Result<WidgetConfig, String>>;
+impl_load!(DeskulptConf, "deskulpt.conf.json");
+impl_load!(PackageJson, "package.json");
+
+#[derive(Serialize, Clone)]
+#[serde(tag = "type", content = "content", rename_all = "SCREAMING_SNAKE_CASE")]
+pub enum WidgetConfig {
+    /// Valid widget configuration.
+    #[serde(rename_all = "camelCase")]
+    Valid {
+        /// The directory name of the widget.
+        dir: String,
+        /// Display name of the widget.
+        name: String,
+        /// Entry file of the widget source code.
+        entry: String,
+        /// External dependencies of the widget as in `package.json`.
+        dependencies: HashMap<String, String>,
+    },
+    /// Invalid widget configuration.
+    #[serde(rename_all = "camelCase")]
+    Invalid {
+        /// The directory name of the widget.
+        dir: String,
+        /// Error message.
+        error: String,
+    },
+}
 
 impl WidgetConfig {
-    /// Read widget configuratoin from a directory.
-    pub fn load<P: AsRef<Path>>(dir: P) -> Result<Option<Self>> {
+    /// Read widget configuration from a directory.
+    ///
+    /// This returns `None` if the directory is not considered a widget
+    /// directory, or if the widget is explicitly marked as ignored.
+    pub fn load<P: AsRef<Path>>(dir: P) -> Option<Self> {
         let dir = dir.as_ref();
-        debug_assert!(dir.is_absolute() && dir.is_dir());
+        let dir_name = dir.file_name()?.to_string_lossy();
 
-        let deskulpt_conf_path = dir.join("deskulpt.conf.json");
-        if !deskulpt_conf_path.exists() {
-            return Ok(None);
-        }
-        let deskulpt_conf_file =
-            File::open(&deskulpt_conf_path).context("Failed to open deskulpt.conf.json")?;
-        let deskulpt_conf_reader = BufReader::new(deskulpt_conf_file);
-        let deskulpt_conf: DeskulptConf = serde_json::from_reader(deskulpt_conf_reader)
-            .context("Failed to parse deskulpt.conf.json")?;
+        let deskulpt_conf =
+            match DeskulptConf::load(dir).context("Failed to load deskulpt.conf.json") {
+                Ok(Some(deskulpt_conf)) => deskulpt_conf,
+                Ok(None) => return None,
+                Err(e) => {
+                    return Some(WidgetConfig::Invalid {
+                        dir: dir_name.to_string(),
+                        error: e.to_string(),
+                    })
+                },
+            };
 
         // Ignore widgets that are explcitly marked as such
         if deskulpt_conf.ignore {
-            return Ok(None);
+            return None;
         }
 
-        let package_json_path = dir.join("package.json");
-        let dependencies = if package_json_path.exists() {
-            let package_json_file =
-                File::open(&package_json_path).context("Failed to open package.json")?;
-            let reader = BufReader::new(package_json_file);
-            let package_json: PackageJson =
-                serde_json::from_reader(reader).context("Failed to parse package.json")?;
-            package_json.dependencies
-        } else {
-            Default::default()
+        let dependencies = match PackageJson::load(dir).context("Failed to load package.json") {
+            Ok(Some(package_json)) => package_json.dependencies,
+            Ok(None) => Default::default(),
+            Err(e) => {
+                return Some(WidgetConfig::Invalid {
+                    dir: dir_name.to_string(),
+                    error: e.to_string(),
+                })
+            },
         };
 
-        Ok(Some(WidgetConfig {
+        Some(WidgetConfig::Valid {
+            dir: dir_name.to_string(),
             name: deskulpt_conf.name,
             entry: deskulpt_conf.entry,
-            ignore: deskulpt_conf.ignore,
             dependencies,
-        }))
+        })
     }
 
-    /// Get the entry file of the widget.
-    pub fn entry(&self) -> String {
-        self.entry.to_string()
-    }
-
-    /// Get the set of external dependencies of the widget.
-    pub fn external_deps(&self) -> HashSet<String> {
-        self.dependencies.keys().cloned().collect()
+    /// Get the directory of the widget inside the widgets directory.
+    pub fn dir(&self) -> &str {
+        match self {
+            WidgetConfig::Valid { dir, .. } => dir,
+            WidgetConfig::Invalid { dir, .. } => dir,
+        }
     }
 }

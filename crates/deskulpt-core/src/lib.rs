@@ -17,6 +17,6 @@ mod window;
 pub use events::EventsExt;
 pub use path::PathExt;
 pub use settings::Settings;
-pub use states::{StatesExtCanvasClickThrough, StatesExtWidgetCollection};
+pub use states::{StatesExtCanvasClickThrough, StatesExtWidgetConfigMap};
 pub use tray::TrayExt;
 pub use window::{on_window_event, WindowExt};

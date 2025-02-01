@@ -4,23 +4,25 @@ use std::fs::read_dir;
 use tauri::{command, AppHandle, Runtime};
 
 use super::error::{cmdbail, CmdResult};
-use crate::config::{WidgetCollection, WidgetConfig};
+use crate::config::WidgetConfig;
 use crate::path::PathExt;
-use crate::states::StatesExtWidgetCollection;
+use crate::states::StatesExtWidgetConfigMap;
 
-/// Rescan the widgets directory and update the widget collection.
+/// Rescan the widgets directory and update the widget configuration map.
 ///
-/// This will update the widget collection state and return the updated
-/// collection as well.
+/// This will update the widget configuration map state and return the updated
+/// configuration map as well.
 ///
 /// ### Errors
 ///
 /// - Error traversing the widgets directory.
 /// - Error inferring widget ID from the directory entry.
 #[command]
-pub async fn rescan_widgets<R: Runtime>(app_handle: AppHandle<R>) -> CmdResult<WidgetCollection> {
+pub async fn rescan_widgets<R: Runtime>(
+    app_handle: AppHandle<R>,
+) -> CmdResult<HashMap<String, WidgetConfig>> {
     let widgets_dir = app_handle.widgets_dir();
-    let mut new_widget_collection = HashMap::new();
+    let mut new_config_map = HashMap::new();
 
     let entries = read_dir(widgets_dir)?;
     for entry in entries {
@@ -36,23 +38,13 @@ pub async fn rescan_widgets<R: Runtime>(app_handle: AppHandle<R>) -> CmdResult<W
             None => cmdbail!("Invalid widget directory: '{}'", path.display()),
         };
 
-        // Load the widget configuration
-        match WidgetConfig::load(&path) {
-            Ok(Some(widget_config)) => {
-                new_widget_collection.insert(id, Ok(widget_config));
-            },
-            Ok(None) => {},
-            Err(e) => {
-                // Configuration errors are recorded as error messages and do
-                // not fail the command
-                new_widget_collection.insert(id, Err(e.to_string()));
-            },
-        };
+        if let Some(widget_config) = WidgetConfig::load(&path) {
+            new_config_map.insert(id, widget_config);
+        }
     }
 
-    // Update the widget collection state
-    app_handle.with_widget_collection_mut(|collection| {
-        collection.clone_from(&new_widget_collection);
+    app_handle.with_widget_config_map_mut(|config_map| {
+        config_map.clone_from(&new_config_map);
     });
-    Ok(new_widget_collection)
+    Ok(new_config_map)
 }

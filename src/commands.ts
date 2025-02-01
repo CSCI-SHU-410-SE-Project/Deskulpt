@@ -6,7 +6,7 @@
  */
 
 import { invoke } from "@tauri-apps/api/core";
-import { Settings, WidgetCollection } from "./types/backend";
+import { Settings, WidgetConfig } from "./types/backend";
 
 /**
  * Invoke the `bundle_widget` command.
@@ -37,7 +37,7 @@ export function invokeOpenInWidgetsDir(payload: { components: string[] }) {
  * Invoke the `rescan_widgets` command.
  */
 export function invokeRescanWidgets() {
-  return invoke<WidgetCollection>("rescan_widgets");
+  return invoke<Record<string, WidgetConfig>>("rescan_widgets");
 }
 
 /**

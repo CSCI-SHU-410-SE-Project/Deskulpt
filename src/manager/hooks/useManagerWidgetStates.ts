@@ -27,10 +27,10 @@ export interface UseManagerWidgetStatesOutput {
 /**
  * Hook for initializing the manager widget states.
  *
- * This initializes the manager widget states with the initial widget settings, and
- * prepares the setter and the {@link UseManagerWidgetStatesOutput.rescanAndRender}
- * function that is the core function for refreshing the widget collection. This will
- * also perform an initial scanning and render on mount with a small timeout.
+ * This initializes the manager widget states with the initial widget settings,
+ * and prepares the setter and the `rescanAndRender` function that is the core
+ * function for refreshing the widget configuration map. This will also perform
+ * an initial scanning and render on mount with a small timeout.
  */
 export default function useManagerWidgetStates(): UseManagerWidgetStatesOutput {
   const [managerWidgetStates, setManagerWidgetStates] = useState<

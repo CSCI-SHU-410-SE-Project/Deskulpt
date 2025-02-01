@@ -9,7 +9,11 @@ import {
 } from "@radix-ui/themes";
 import { LuFolderOpen, LuRepeat } from "react-icons/lu";
 import { invokeOpenInWidgetsDir } from "../../commands";
-import { Result, WidgetConfig, WidgetSettings } from "../../types/backend";
+import {
+  WidgetConfig,
+  WidgetConfigType,
+  WidgetSettings,
+} from "../../types/backend";
 import { emitRenderWidgetToCanvas } from "../../events";
 import { Dispatch, SetStateAction } from "react";
 import { ManagerWidgetState } from "../../types/frontend";
@@ -23,8 +27,8 @@ export interface WidgetContentProps {
   index: number;
   /** The widget ID. */
   id: string;
-  /** The widget configuration or error. */
-  config: Result<WidgetConfig, string>;
+  /** The widget configuration. */
+  config: WidgetConfig;
   /** The widget-specific settings. */
   settings: WidgetSettings;
   /** Setter for the manager widget states. */
@@ -63,8 +67,8 @@ export default function WidgetContent({
         />
         <ScrollArea scrollbars="vertical" asChild>
           <Box px="2" css={{ flex: 3 }}>
-            {"Ok" in config ? (
-              <WidgetContentConfigList id={id} config={config.Ok} />
+            {config.type === WidgetConfigType.VALID ? (
+              <WidgetContentConfigList id={id} config={config} />
             ) : (
               <Text
                 size="1"
@@ -73,7 +77,7 @@ export default function WidgetContent({
                   fontFamily: "var(--code-font-family)",
                 }}
               >
-                {config.Err}
+                {config.content.error}
               </Text>
             )}
           </Box>
