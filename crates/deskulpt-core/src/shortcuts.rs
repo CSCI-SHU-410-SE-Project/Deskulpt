@@ -53,21 +53,18 @@ pub trait ShortcutsExt<R: Runtime>: Manager<R> + GlobalShortcutExt<R> {
     /// modified to remove that shortcut. This is to prevent the application
     /// from panicking only due to non-critical failures, and also sync this
     /// information to the frontend.
-    fn init_shortcuts(&self, initial_settings: &mut Settings) {
-        let initial_shortcuts = initial_settings.shortcuts_mut();
+    fn init_shortcuts(&self, settings: &mut Settings) {
+        let shortcuts = settings.shortcuts_mut();
 
-        if let Err(e) =
-            self.update_toggle_canvas_shortcut(None, initial_shortcuts.toggle_canvas.as_deref())
+        if let Err(e) = self.update_toggle_canvas_shortcut(None, shortcuts.toggle_canvas.as_deref())
         {
             eprintln!("{e}");
-            initial_shortcuts.toggle_canvas = None;
+            shortcuts.toggle_canvas = None;
         }
 
-        if let Err(e) =
-            self.update_show_manager_shortcut(None, initial_shortcuts.show_manager.as_deref())
-        {
+        if let Err(e) = self.update_show_manager_shortcut(None, shortcuts.show_manager.as_deref()) {
             eprintln!("{e}");
-            initial_shortcuts.show_manager = None;
+            shortcuts.show_manager = None;
         }
     }
 
