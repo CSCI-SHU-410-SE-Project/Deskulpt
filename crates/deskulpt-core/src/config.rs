@@ -32,9 +32,7 @@ struct PackageJson {
 macro_rules! impl_load {
     ($type:ty, $path:expr) => {
         impl $type {
-            /// Load `
-            #[doc = $path]
-            /// ` from a directory.
+            #[doc = concat!("Load `", $path, "` from a directory.")]
             ///
             /// This method returns `Ok(None)` if the target file does not exist
             /// and `Err` if there is failure to read or parse the file.

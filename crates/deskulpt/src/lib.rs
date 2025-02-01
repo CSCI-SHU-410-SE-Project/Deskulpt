@@ -5,7 +5,8 @@
 )]
 
 use deskulpt_core::{
-    PathExt, Settings, StatesExtCanvasClickThrough, StatesExtWidgetConfigMap, TrayExt, WindowExt,
+    PathExt, Settings, ShortcutsExt, StatesExtCanvasClickThrough, StatesExtWidgetConfigMap,
+    TrayExt, WindowExt,
 };
 use tauri::image::Image;
 use tauri::{generate_context, generate_handler, include_image, Builder};
@@ -20,7 +21,7 @@ pub fn run() {
             app.init_widgets_dir()?;
             app.init_persist_dir()?;
 
-            let settings = match Settings::load(app.persist_dir()?) {
+            let mut settings = match Settings::load(app.persist_dir()?) {
                 Ok(settings) => settings,
                 Err(e) => {
                     eprintln!("Failed to load settings: {e}");
@@ -36,6 +37,8 @@ pub fn run() {
             #[cfg(target_os = "macos")]
             app.set_activation_policy(tauri::ActivationPolicy::Accessory);
 
+            app.init_shortcuts(&mut settings);
+
             app.create_manager(&settings)?;
             app.create_canvas(&settings)?;
 
@@ -50,7 +53,7 @@ pub fn run() {
             deskulpt_core::commands::exit_app,
             deskulpt_core::commands::open_in_widgets_dir,
             deskulpt_core::commands::rescan_widgets,
-            deskulpt_core::commands::update_toggle_shortcut,
+            deskulpt_core::commands::update_shortcut,
         ])
         .plugin(tauri_plugin_clipboard_manager::init())
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())
