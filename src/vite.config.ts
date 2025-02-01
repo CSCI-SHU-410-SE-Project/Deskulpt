@@ -19,8 +19,8 @@ export default defineConfig({
   build: {
     rollupOptions: {
       input: {
-        manager: resolve(__dirname, "views/manager.html"),
-        canvas: resolve(__dirname, "views/canvas.html"),
+        manager: resolve(__dirname, "manager/index.html"),
+        canvas: resolve(__dirname, "canvas/index.html"),
         // Make the scripts entrypoints so that they are preserved even if not imported
         "generated/jsx-runtime": resolve(__dirname, "generated/jsx-runtime.js"),
         "generated/raw-apis": resolve(__dirname, "generated/raw-apis.js"),
