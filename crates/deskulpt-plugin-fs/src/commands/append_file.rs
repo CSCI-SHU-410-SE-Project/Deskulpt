@@ -10,6 +10,7 @@ use crate::FsPlugin;
 pub struct AppendFile;
 
 #[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct AppendFileInputPayload {
     path: PathBuf,
     content: String,

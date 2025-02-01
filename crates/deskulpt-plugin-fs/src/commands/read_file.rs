@@ -9,6 +9,7 @@ use crate::FsPlugin;
 pub struct ReadFile;
 
 #[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ReadFileInputPayload {
     path: PathBuf,
 }
