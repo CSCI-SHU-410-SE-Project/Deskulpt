@@ -2,7 +2,7 @@
   "$schema": "./node_modules/oxlint/configuration_schema.json",
   "ignorePatterns": [
     "**/dist/**",
-    "src/public/generated/**",
+    "crates/deskulpt-core/generated/**",
     "src/generated/**",
     "**/website/**"
   ],
