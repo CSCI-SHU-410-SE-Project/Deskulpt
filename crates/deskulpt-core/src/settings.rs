@@ -95,4 +95,9 @@ impl Settings {
         bincode::serialize_into(writer, self)?;
         Ok(())
     }
+
+    /// Get the mutable reference to the keyboard shortcuts.
+    pub fn shortcuts_mut(&mut self) -> &mut Shortcuts {
+        &mut self.app.shortcuts
+    }
 }

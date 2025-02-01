@@ -6,7 +6,7 @@
  */
 
 import { invoke } from "@tauri-apps/api/core";
-import { Settings, WidgetConfig } from "./types/backend";
+import { Settings, Shortcuts, WidgetConfig } from "./types/backend";
 
 /**
  * Invoke the `bundle_widget` command.
@@ -41,11 +41,12 @@ export function invokeRescanWidgets() {
 }
 
 /**
- * Invoke the `update_toggle_shortcut` command.
+ * Invoke the `update_shortcut` command.
  */
-export function invokeUpdateToggleShortcut(payload: {
-  oldShortcut: string | null;
-  newShortcut: string | null;
+export function invokeUpdateShortcut(payload: {
+  key: keyof Shortcuts;
+  from: string | null;
+  to: string | null;
 }) {
-  return invoke<void>("update_toggle_shortcut", payload);
+  return invoke<void>("update_shortcut", payload);
 }

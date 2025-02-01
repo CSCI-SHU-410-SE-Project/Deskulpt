@@ -1,5 +1,5 @@
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { invokeUpdateToggleShortcut } from "../../commands";
+import { invokeUpdateShortcut } from "../../commands";
 
 export interface UseToggleShortcutOutput {
   /** The current toggle shortcut. */
@@ -24,15 +24,17 @@ export default function useToggleShortcut(): UseToggleShortcutOutput {
   );
 
   useEffect(() => {
-    invokeUpdateToggleShortcut({
-      oldShortcut: null,
-      newShortcut: toggleShortcut,
+    invokeUpdateShortcut({
+      key: "toggleCanvas",
+      from: null,
+      to: toggleShortcut,
     }).catch(console.error);
 
     return () => {
-      invokeUpdateToggleShortcut({
-        oldShortcut: toggleShortcut,
-        newShortcut: null,
+      invokeUpdateShortcut({
+        key: "toggleCanvas",
+        from: toggleShortcut,
+        to: null,
       }).catch(console.error);
     };
   }, [toggleShortcut]);
