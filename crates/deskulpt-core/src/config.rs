@@ -98,7 +98,7 @@ impl WidgetConfig {
                 Err(e) => {
                     return Some(WidgetConfig::Invalid {
                         dir: dir_name.to_string(),
-                        error: e.to_string(),
+                        error: format!("{e:?}"),
                     })
                 },
             };
@@ -114,7 +114,7 @@ impl WidgetConfig {
             Err(e) => {
                 return Some(WidgetConfig::Invalid {
                     dir: dir_name.to_string(),
-                    error: e.to_string(),
+                    error: format!("{e:?}"),
                 })
             },
         };
