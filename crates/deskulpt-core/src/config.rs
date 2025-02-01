@@ -31,10 +31,9 @@ struct PackageJson {
 macro_rules! impl_load {
     ($type:ty, $path:expr) => {
         impl $type {
-            /// Load from a directory.
-            ///
-            /// Target file within the directory:
+            /// Load `
             #[doc = $path]
+            /// ` from a directory.
             ///
             /// This method returns `Ok(None)` if the target file does not exist
             /// and `Err` if there is failure to read or parse the file.
@@ -56,6 +55,7 @@ macro_rules! impl_load {
 impl_load!(DeskulptConf, "deskulpt.conf.json");
 impl_load!(PackageJson, "package.json");
 
+/// Full configuration of a Deskulpt widget.
 #[derive(Serialize, Clone)]
 #[serde(tag = "type", content = "content", rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum WidgetConfig {
