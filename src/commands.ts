@@ -34,13 +34,6 @@ export function invokeOpenInWidgetsDir(payload: { components: string[] }) {
 }
 
 /**
- * Invoke the `load_settings` command.
- */
-export function invokeLoadSettings() {
-  return invoke<Settings>("load_settings");
-}
-
-/**
  * Invoke the `rescan_widgets` command.
  */
 export function invokeRescanWidgets() {

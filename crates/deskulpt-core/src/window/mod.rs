@@ -2,19 +2,22 @@
 mod script;
 
 use anyhow::{anyhow, Result};
-use script::CanvasInitJS;
+use script::{CanvasInitJS, ManagerInitJS};
 use tauri::{
     App, AppHandle, Manager, Runtime, WebviewUrl, WebviewWindowBuilder, Window, WindowEvent,
 };
 
+use crate::settings::Settings;
+
 /// Extention trait for window-related operations.
 pub trait WindowExt<R: Runtime>: Manager<R> {
     /// Create the manager window.
-    fn create_manager(&mut self) -> Result<()>
+    fn create_manager(&mut self, settings: &Settings) -> Result<()>
     where
         Self: Sized,
     {
         let url = WebviewUrl::App("views/manager.html".into());
+        let init_js = ManagerInitJS::generate(settings)?;
         WebviewWindowBuilder::new(self, "manager", url)
             .title("Deskulpt Manager")
             .inner_size(800.0, 500.0)
@@ -23,18 +26,19 @@ pub trait WindowExt<R: Runtime>: Manager<R> {
             .maximizable(false)
             .minimizable(false)
             .visible(false)
+            .initialization_script(&init_js)
             .build()?;
 
         Ok(())
     }
 
     /// Create the canvas window.
-    fn create_canvas(&mut self) -> Result<()>
+    fn create_canvas(&mut self, settings: &Settings) -> Result<()>
     where
         Self: Sized,
     {
         let url = WebviewUrl::App("views/canvas.html".into());
-        let init_js = CanvasInitJS::generate()?;
+        let init_js = CanvasInitJS::generate(settings)?;
         let canvas = WebviewWindowBuilder::new(self, "canvas", url)
             .maximized(true)
             .transparent(true)

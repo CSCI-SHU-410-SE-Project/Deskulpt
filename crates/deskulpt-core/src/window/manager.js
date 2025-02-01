@@ -1,6 +1,5 @@
-Object.defineProperty(window, "__DESKULPT_CANVAS_INTERNALS__", {
+Object.defineProperty(window, "__DESKULPT_MANAGER_INTERNALS__", {
   value: {
-    apisWrapper: __TEMPLATE_apis_wrapper__,
     initialSettings: __TEMPLATE_initial_settings__,
   },
   writable: false,
