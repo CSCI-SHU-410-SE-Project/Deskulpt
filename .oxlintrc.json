@@ -17,7 +17,7 @@
     "sort-imports": ["error", { "ignoreDeclarationSort": true }],
     "import/max-dependencies": "off",
     "react/react-in-jsx-scope": "off",
-    "react/exhaustive-deps": "warn"
+    "react/exhaustive-deps": "error"
   },
   "overrides": [
     {
