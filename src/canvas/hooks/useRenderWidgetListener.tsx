@@ -73,7 +73,12 @@ export default function useRenderWidgetListener(
     if (isTracked) {
       apisBlobUrl = canvasWidgetStates[widgetId].apisBlobUrl;
     } else {
-      const apisCode = await getWidgetApisCode(widgetId);
+      const apisCode = window.__DESKULPT_CANVAS_INTERNALS__.apisWrapper
+        .replace("__DESKULPT_WIDGET_ID__", widgetId)
+        .replace(
+          "__RAW_APIS_URL__",
+          new URL("/generated/raw-apis.js", baseUrl).href,
+        );
       const apisBlob = new Blob([apisCode], { type: "application/javascript" });
       apisBlobUrl = URL.createObjectURL(apisBlob);
     }
@@ -170,24 +175,6 @@ export default function useRenderWidgetListener(
       }));
     }
   }
-}
-
-/**
- * Get the code for the widget-specific APIs.
- *
- * This function fetches the template of widget APIs and replaces the placeholders with
- * the actual widget ID and the resolved raw APIs URL.
- */
-async function getWidgetApisCode(widgetId: string) {
-  // The template is in the public directory, bundled from `packages/apis`
-  const response = await fetch("/generated/apis.wrapper.js");
-  const template = await response.text();
-  return template
-    .replace("__DESKULPT_WIDGET_ID__", widgetId)
-    .replace(
-      "__RAW_APIS_URL__",
-      new URL("/generated/raw-apis.js", baseUrl).href,
-    );
 }
 
 /**

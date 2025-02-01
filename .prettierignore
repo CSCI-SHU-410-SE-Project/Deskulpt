@@ -1,5 +1,5 @@
 pnpm-lock.yaml
 
 # Auto-generated files
-src/public/generated/
+crates/deskulpt-core/generated/
 src/generated/

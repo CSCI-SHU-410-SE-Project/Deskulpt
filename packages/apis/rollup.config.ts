@@ -29,7 +29,7 @@ export default defineConfig([
     input: "src/index.ts",
     output: {
       format: "esm",
-      file: "../../src/public/generated/apis.wrapper.js",
+      file: "../../crates/deskulpt-core/generated/apis.wrapper.js",
     },
     external: ["@tauri-apps/api/core", "__RAW_APIS_URL__"],
     plugins: [

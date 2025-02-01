@@ -971,6 +971,7 @@ dependencies = [
  "rolldown_common",
  "serde",
  "serde_json",
+ "serialize-to-javascript",
  "sysinfo",
  "tauri",
  "tauri-plugin-global-shortcut",
