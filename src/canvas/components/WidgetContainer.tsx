@@ -1,52 +1,42 @@
-import { RefObject, useRef } from "react";
+import { RefObject, useCallback, useRef } from "react";
 import Draggable, { DraggableData, DraggableEvent } from "react-draggable";
 import { ErrorBoundary } from "react-error-boundary";
 import ErrorDisplay from "../components/ErrorDisplay";
 import { grabErrorInfo } from "../utils";
 import { LuGripVertical } from "react-icons/lu";
 import { Box } from "@radix-ui/themes";
-import { WidgetState, updateWidgetSettings } from "../hooks/useWidgetsStore";
+import {
+  updateWidgetSettings,
+  useWidgetsStore,
+} from "../hooks/useWidgetsStore";
 import { emitUpdateSettingsToManager } from "../../events";
 
 interface WidgetContainerProps {
-  /** ID of the widget. */
   id: string;
-  /** The widget state. */
-  widget: WidgetState;
 }
 
-/**
- * The widget container component that wraps around each user widget.
- *
- * It wraps the widget in a draggable container with a grip handle on the top right
- * corner on hover. It adds no padding within the container to allow users to have full
- * control over the appearance.
- *
- * If the child (i.e., the widget) throws a rendering error, it will be caught by the
- * error boundary and displayed with the {@link ErrorDisplay} component.
- */
-const WidgetContainer = ({ id, widget }: WidgetContainerProps) => {
-  const { Component, width, height, x, y, opacity } = widget;
+const WidgetContainer = ({ id }: WidgetContainerProps) => {
+  const { Component, width, height, x, y, opacity } = useWidgetsStore(
+    (state) => state.widgets[id],
+  );
   const containerRef = useRef<HTMLDivElement>(null);
   let retried = false;
 
-  function updateContainerPos(_: DraggableEvent, data: DraggableData) {
-    updateWidgetSettings(id, {
-      x: x + data.x,
-      y: y + data.y,
-    });
-    emitUpdateSettingsToManager({
-      id,
-      settings: { x: x + data.x, y: y + data.y, opacity },
-    });
-  }
+  const onStop = useCallback(
+    (_: DraggableEvent, data: DraggableData) => {
+      const pos = { x: x + data.x, y: y + data.y };
+      updateWidgetSettings(id, pos);
+      emitUpdateSettingsToManager({ id, settings: pos });
+    },
+    [id, x, y],
+  );
 
   return (
     <Draggable
       // TODO: remove the `as` part which is workaround for React 19:
       // https://github.com/react-grid-layout/react-draggable/issues/768
       nodeRef={containerRef as RefObject<HTMLDivElement>}
-      onStop={updateContainerPos}
+      onStop={onStop}
       bounds="body"
       handle=".draggable-handle"
       position={{ x: 0, y: 0 }}

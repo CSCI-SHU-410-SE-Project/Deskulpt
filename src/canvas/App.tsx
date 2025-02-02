@@ -6,13 +6,13 @@ import { Toaster } from "sonner";
 import { Theme as RadixTheme } from "@radix-ui/themes";
 import useThemeListener from "./hooks/useThemeListener";
 import { useWidgetsStore } from "./hooks/useWidgetsStore";
+import { useShallow } from "zustand/shallow";
 
-/**
- * The main component of the canvas window.
- */
-export default function App() {
+const App = () => {
   const theme = useThemeListener();
-  const widgets = useWidgetsStore((state) => state.widgets);
+  const ids = useWidgetsStore(
+    useShallow((state) => Object.keys(state.widgets)),
+  );
 
   useShowToastListener();
   useRenderWidgetListener();
@@ -37,9 +37,11 @@ export default function App() {
           },
         }}
       />
-      {Object.entries(widgets).map(([id, widget]) => (
-        <WidgetContainer key={id} id={id} widget={widget} />
+      {ids.map((id) => (
+        <WidgetContainer key={id} id={id} />
       ))}
     </RadixTheme>
   );
-}
+};
+
+export default App;

@@ -46,5 +46,5 @@ export interface UpdateSettingsPayload {
   /** The widget ID. */
   id: string;
   /** The widget-specific settings to update. */
-  settings: WidgetSettings;
+  settings: Partial<WidgetSettings>;
 }
