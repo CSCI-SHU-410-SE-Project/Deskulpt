@@ -1,4 +1,4 @@
-import { RefObject, useRef } from "react";
+import { RefObject, memo, useRef } from "react";
 import Draggable, { DraggableData, DraggableEvent } from "react-draggable";
 import { ErrorBoundary } from "react-error-boundary";
 import ErrorDisplay from "../components/ErrorDisplay";
@@ -8,7 +8,7 @@ import { Box } from "@radix-ui/themes";
 import { WidgetState, updateWidgetSettings } from "../hooks/useWidgetsStore";
 import { emitUpdateSettingsToManager } from "../../events";
 
-export interface WidgetContainerProps {
+interface WidgetContainerProps {
   /** ID of the widget. */
   id: string;
   /** The widget state. */
@@ -25,7 +25,7 @@ export interface WidgetContainerProps {
  * If the child (i.e., the widget) throws a rendering error, it will be caught by the
  * error boundary and displayed with the {@link ErrorDisplay} component.
  */
-export default function WidgetContainer({ id, widget }: WidgetContainerProps) {
+const WidgetContainer = memo(({ id, widget }: WidgetContainerProps) => {
   const { Component, width, height, x, y, opacity } = widget;
   const containerRef = useRef<HTMLDivElement>(null);
   let retried = false;
@@ -107,4 +107,6 @@ export default function WidgetContainer({ id, widget }: WidgetContainerProps) {
       </Box>
     </Draggable>
   );
-}
+});
+
+export default WidgetContainer;

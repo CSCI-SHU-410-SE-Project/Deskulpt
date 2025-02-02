@@ -1,6 +1,6 @@
-import { ChangeEvent } from "react";
+import { ChangeEvent, memo } from "react";
 
-export interface NumberInputProps {
+interface NumberInputProps {
   /** The controlled number input value. */
   value: number;
   /** The callback on value change. */
@@ -25,45 +25,43 @@ export interface NumberInputProps {
  * such that it has the increment/decrement buttons, accepts keyboard input, reacts to
  * up/down keys and the scroll wheel, etc.
  */
-export default function NumberInput({
-  value,
-  onChange,
-  min,
-  max,
-  width,
-}: NumberInputProps) {
-  function handleChange(event: ChangeEvent<HTMLInputElement>) {
-    if (event.target.value === "") {
-      onChange(min ?? 0);
-      return;
+const NumberInput = memo(
+  ({ value, onChange, min, max, width }: NumberInputProps) => {
+    function handleChange(event: ChangeEvent<HTMLInputElement>) {
+      if (event.target.value === "") {
+        onChange(min ?? 0);
+        return;
+      }
+
+      const value = parseInt(event.target.value, 10);
+      if (min !== undefined && value < min) {
+        onChange(min);
+        return;
+      }
+      if (max !== undefined && value > max) {
+        onChange(max);
+        return;
+      }
+      onChange(value);
     }
 
-    const value = parseInt(event.target.value, 10);
-    if (min !== undefined && value < min) {
-      onChange(min);
-      return;
-    }
-    if (max !== undefined && value > max) {
-      onChange(max);
-      return;
-    }
-    onChange(value);
-  }
+    return (
+      <input
+        type="number"
+        value={value.toFixed(0)}
+        onChange={handleChange}
+        css={{
+          all: "unset",
+          backgroundColor: "var(--gray-5)",
+          paddingLeft: "var(--space-2)",
+          fontSize: "var(--font-size-2)",
+          lineHeight: 1.6,
+          borderRadius: "var(--radius-2)",
+          width,
+        }}
+      />
+    );
+  },
+);
 
-  return (
-    <input
-      type="number"
-      value={value.toFixed(0)}
-      onChange={handleChange}
-      css={{
-        all: "unset",
-        backgroundColor: "var(--gray-5)",
-        paddingLeft: "var(--space-2)",
-        fontSize: "var(--font-size-2)",
-        lineHeight: 1.6,
-        borderRadius: "var(--radius-2)",
-        width,
-      }}
-    />
-  );
-}
+export default NumberInput;
