@@ -1,37 +1,29 @@
-import { Dispatch, SetStateAction, useCallback, useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { listenToRenderWidget } from "../../events";
-import { CanvasWidgetState, WidgetModule } from "../../types/frontend";
 import { WidgetSettings } from "../../types/backend";
 import { invokeBundleWidget } from "../../commands";
-import ErrorDisplay from "../../canvas/components/ErrorDisplay";
-import { grabErrorInfo } from "../../canvas/utils";
-
-// The default width and height of a widget container, used when the widget module
-// fails to be loaded correctly
-const defaultContainerWidth = "300px";
-const defaultContainerHeight = "150px";
+import {
+  Widget,
+  updateWidgetRender,
+  updateWidgetRenderError,
+  updateWidgetSettings,
+  useWidgetsStore,
+} from "./useWidgetsStore";
 
 // The base URL used for resolving local path imports
 const baseUrl = new URL(import.meta.url).origin;
 
 /**
  * Listen and react to the "render-widget" event.
- *
- * @param canvasWidgetStates Canvas widget states.
- * @param setCanvasWidgetStates Setter for the canvas widget states.
  */
-export default function useRenderWidgetListener(
-  canvasWidgetStates: Record<string, CanvasWidgetState>,
-  setCanvasWidgetStates: Dispatch<
-    SetStateAction<Record<string, CanvasWidgetState>>
-  >,
-) {
+export default function useRenderWidgetListener() {
   const bundleWidget = useCallback(
-    async (id: string, settings: WidgetSettings, isTracked: boolean) => {
+    async (id: string, settings: WidgetSettings) => {
       // Get the widget APIs blob URL, reusing if applicable
       let apisBlobUrl: string;
-      if (isTracked) {
-        apisBlobUrl = canvasWidgetStates[id].apisBlobUrl;
+      const widgets = useWidgetsStore.getState().widgets;
+      if (id in widgets) {
+        apisBlobUrl = widgets[id].apisBlobUrl;
       } else {
         const apisCode = window.__DESKULPT_CANVAS_INTERNALS__.apisWrapper
           .replace("__DESKULPT_WIDGET_ID__", id)
@@ -54,21 +46,7 @@ export default function useRenderWidgetListener(
           apisBlobUrl,
         });
       } catch (err) {
-        setCanvasWidgetStates((prev) => ({
-          ...prev,
-          [id]: {
-            display: (
-              <ErrorDisplay
-                title={`Error in '${id}': failed to bundle widget`}
-                error={grabErrorInfo(err)}
-              />
-            ),
-            width: defaultContainerWidth,
-            height: defaultContainerHeight,
-            settings,
-            apisBlobUrl,
-          },
-        }));
+        updateWidgetRenderError(id, err, apisBlobUrl, settings);
         return;
       }
 
@@ -80,29 +58,15 @@ export default function useRenderWidgetListener(
 
       // Dynamically import the module and render the widget
       try {
-        const module = (await import(
-          /* @vite-ignore */ moduleBlobUrl
-        )) as WidgetModule;
-        const moduleError = getWidgetModuleError(module);
-
-        if (moduleError !== null) {
-          // There are known errors with the widget module
-          setCanvasWidgetStates((prev) => ({
-            ...prev,
-            [id]: {
-              display: (
-                <ErrorDisplay
-                  title={`Error in '${id}': invalid widget module`}
-                  error={moduleError}
-                />
-              ),
-              width: defaultContainerWidth,
-              height: defaultContainerHeight,
-              moduleBlobUrl,
-              settings,
-              apisBlobUrl,
-            },
-          }));
+        const module = await import(/* @vite-ignore */ moduleBlobUrl);
+        const widget = module.default as Widget;
+        if (widget === undefined || widget.Component === undefined) {
+          updateWidgetRenderError(
+            id,
+            "The widget must provide a default export with a `Component` property.",
+            apisBlobUrl,
+            settings,
+          );
           return;
         }
 
@@ -110,44 +74,23 @@ export default function useRenderWidgetListener(
         // error within `render` so it needs to called in advance, otherwise things will
         // get broken in the state setter, causing the error to be uncaught and also
         // affecting other widget displays
-        const widgetDisplay = module.default.render();
-        setCanvasWidgetStates((prev) => ({
-          ...prev,
-          [id]: {
-            display: widgetDisplay,
-            width: module.default.width,
-            height: module.default.height,
-            moduleBlobUrl,
-            settings,
-            apisBlobUrl,
-          },
-        }));
+        updateWidgetRender(
+          id,
+          module.default,
+          moduleBlobUrl,
+          apisBlobUrl,
+          settings,
+        );
       } catch (err) {
-        setCanvasWidgetStates((prev) => ({
-          ...prev,
-          [id]: {
-            display: (
-              <ErrorDisplay
-                title={`Error in '${id}': failed to import widget module`}
-                error={grabErrorInfo(err)}
-              />
-            ),
-            width: defaultContainerWidth,
-            height: defaultContainerHeight,
-            moduleBlobUrl,
-            settings,
-            apisBlobUrl,
-          },
-        }));
+        updateWidgetRenderError(id, err, apisBlobUrl, settings);
       }
     },
-    [canvasWidgetStates, setCanvasWidgetStates],
+    [],
   );
 
   useEffect(() => {
     const unlisten = listenToRenderWidget((event) => {
       const { id, bundle, settings } = event.payload;
-      const isTracked = id in canvasWidgetStates;
 
       // We do not wish to bundle the widget
       if (!bundle) {
@@ -156,45 +99,16 @@ export default function useRenderWidgetListener(
         // manager without having rendered them on the canvas; the case is, when the
         // manager finally requests to bundle, it will carry the latest settings in the
         // payload so the canvas can still get the correct information
-        if (isTracked) {
-          setCanvasWidgetStates((prev) => ({
-            ...prev,
-            [id]: { ...prev[id], settings },
-          }));
-        }
+        updateWidgetSettings(id, settings);
         return;
       }
 
       // We do wish to bundle the widget
-      bundleWidget(id, settings, isTracked).catch(console.error);
+      bundleWidget(id, settings).catch(console.error);
     });
 
     return () => {
       unlisten.then((f) => f()).catch(console.error);
     };
-  }, [canvasWidgetStates, setCanvasWidgetStates, bundleWidget]);
-}
-
-/**
- * Validate a user widget module.
- *
- * If the module is invalid, the function returns an error message, and otherwise it
- * returns `null`. It ensures that the module provides a default export that contains
- * a `render` function.
- */
-function getWidgetModuleError(module: WidgetModule) {
-  const widget = module.default;
-  if (widget === undefined) {
-    return "The widget must provide a default export.";
-  }
-  if (widget.render === undefined) {
-    return "The default export of the widget must provide a `render` function.";
-  }
-  if (typeof widget.render !== "function") {
-    return "The `render` key of the default export must be a function.";
-  }
-  if (widget.width === undefined || widget.height === undefined) {
-    return "The widget must provide `width` and `height` properties.";
-  }
-  return null;
+  }, [bundleWidget]);
 }

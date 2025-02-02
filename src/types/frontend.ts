@@ -3,27 +3,11 @@
  * without corresponding backend implementations.
  */
 
-import { ReactNode } from "react";
 import { WidgetConfig, WidgetSettings } from "./backend";
 
 export type DeepReadonly<T> = {
   readonly [P in keyof T]: T[P] extends object ? DeepReadonly<T[P]> : T[P];
 };
-
-/**
- * The user-defined widget interface.
- *
- * The entry file of each user-defined widget should export an object that fulfills this
- * interface as default.
- */
-export interface Widget {
-  /** Function that returns the React component to render. */
-  render: () => ReactNode;
-  /** Widget widget as accepted in CSS. */
-  width: string;
-  /** Widget height as accepted in CSS. */
-  height: string;
-}
 
 /**
  * The state of a widget in the manager.
@@ -33,32 +17,6 @@ export interface ManagerWidgetState {
   config: WidgetConfig;
   /** Settings of the widget. */
   settings: WidgetSettings;
-}
-
-/**
- * The state of a widget on the canvas.
- */
-export interface CanvasWidgetState {
-  /** The rendered widget component or the error component to display. */
-  display: ReactNode;
-  /** The width of the widget container, as exported from the widget module. */
-  width: Widget["width"];
-  /** The height of the widget container, as exported from the widget module. */
-  height: Widget["height"];
-  /** Settings of the widget. */
-  settings: WidgetSettings;
-  /** The URL of the blob of widget APIs. */
-  apisBlobUrl: string;
-  /** The URL of the blob of the widget module. */
-  moduleBlobUrl?: string;
-}
-
-/**
- * The module obtained by dynamically importing the bundle of widget source code.
- */
-export interface WidgetModule {
-  /** The default export of the entry file of a user-defined widget. */
-  default: Widget;
 }
 
 /**
