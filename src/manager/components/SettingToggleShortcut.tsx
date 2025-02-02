@@ -14,7 +14,7 @@ import Shortcut from "./Shortcut";
 import { FaEdit } from "react-icons/fa";
 import useKeyboardListener from "../hooks/useKeyboardListener";
 
-export interface SettingToggleShortcutProps {
+interface SettingToggleShortcutProps {
   /** Setter for the toggle shortcut state. */
   setToggleShortcut: Dispatch<SetStateAction<string | null>>;
 }
@@ -40,9 +40,9 @@ export interface SettingToggleShortcutProps {
  *   within the popover will be reset to initial. The actual shortcut will not be
  *   touched.
  */
-export default function SettingToggleShortcut({
+const SettingToggleShortcut = ({
   setToggleShortcut,
-}: SettingToggleShortcutProps) {
+}: SettingToggleShortcutProps) => {
   const [popoverOpen, setPopoverOpen] = useState(false);
   const [disableShortcut, setDisableShortcut] = useState(false);
 
@@ -196,4 +196,6 @@ export default function SettingToggleShortcut({
       </Popover.Content>
     </Popover.Root>
   );
-}
+};
+
+export default SettingToggleShortcut;

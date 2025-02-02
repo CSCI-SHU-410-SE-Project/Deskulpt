@@ -1,6 +1,6 @@
 import { ChangeEvent } from "react";
 
-export interface NumberInputProps {
+interface NumberInputProps {
   /** The controlled number input value. */
   value: number;
   /** The callback on value change. */
@@ -25,13 +25,13 @@ export interface NumberInputProps {
  * such that it has the increment/decrement buttons, accepts keyboard input, reacts to
  * up/down keys and the scroll wheel, etc.
  */
-export default function NumberInput({
+const NumberInput = ({
   value,
   onChange,
   min,
   max,
   width,
-}: NumberInputProps) {
+}: NumberInputProps) => {
   function handleChange(event: ChangeEvent<HTMLInputElement>) {
     if (event.target.value === "") {
       onChange(min ?? 0);
@@ -66,4 +66,6 @@ export default function NumberInput({
       }}
     />
   );
-}
+};
+
+export default NumberInput;

@@ -9,7 +9,7 @@ import {
 } from "@radix-ui/themes";
 import { LuView } from "react-icons/lu";
 
-export interface WidgetDependenciesProps {
+interface WidgetDependenciesProps {
   /** The dependencies mapping package name to the corresponding version string. */
   dependencies: Record<string, string>;
 }
@@ -22,9 +22,7 @@ export interface WidgetDependenciesProps {
  * names and corresponding version strings. The package names are linked to their URL
  * on [npmjs.com](https://www.npmjs.com/).
  */
-export default function WidgetDependencies({
-  dependencies,
-}: WidgetDependenciesProps) {
+const WidgetDependencies = ({ dependencies }: WidgetDependenciesProps) => {
   const dependenciesArray = Object.entries(dependencies);
 
   return (
@@ -63,4 +61,6 @@ export default function WidgetDependencies({
       )}
     </Flex>
   );
-}
+};
+
+export default WidgetDependencies;

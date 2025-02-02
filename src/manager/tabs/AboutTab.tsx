@@ -9,7 +9,7 @@ import Logo from "/deskulpt.svg";
  * information of the Deskulpt application, including the version, authors, repository,
  * and documentation.
  */
-export default function AboutTab() {
+const AboutTab = () => {
   return (
     <Flex height="100%" pb="9" px="3" justify="center" align="center" gap="3">
       <Flex align="center" justify="center" css={{ flex: 1 }}>
@@ -59,4 +59,6 @@ export default function AboutTab() {
       </Flex>
     </Flex>
   );
-}
+};
+
+export default AboutTab;

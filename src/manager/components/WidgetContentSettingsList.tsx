@@ -6,7 +6,7 @@ import { DataList, Flex } from "@radix-ui/themes";
 import NumberInput from "../components/NumberInput";
 import { FaTimes } from "react-icons/fa";
 
-export interface WidgetContentSettingListProps {
+interface WidgetContentSettingListProps {
   /** The widget ID. */
   id: string;
   /** The widget-specific setting. */
@@ -24,11 +24,11 @@ export interface WidgetContentSettingListProps {
  * manager will be updated via the setter, and the updated settings will also be sent
  * to the canvas via emitting corresponding events.
  */
-export default function WidgetContentSettingList({
+const WidgetContentSettingList = ({
   id,
   settings,
   setManagerWidgetStates,
-}: WidgetContentSettingListProps) {
+}: WidgetContentSettingListProps) => {
   function updateSetting(partialSettings: Partial<WidgetSettings>) {
     const newSettings = { ...settings, ...partialSettings };
     setManagerWidgetStates((prev) => ({
@@ -78,4 +78,6 @@ export default function WidgetContentSettingList({
       </DataList.Item>
     </DataList.Root>
   );
-}
+};
+
+export default WidgetContentSettingList;

@@ -22,7 +22,7 @@ import { toast } from "sonner";
 import WidgetContentConfigList from "../components/WidgetContentConfigList";
 import WidgetContentSettingsList from "../components/WidgetContentSettingsList";
 
-export interface WidgetContentProps {
+interface WidgetContentProps {
   /** The index of the widget in the collection. */
   index: number;
   /** The widget ID. */
@@ -44,13 +44,13 @@ export interface WidgetContentProps {
  * {@link WidgetContentConfigList} and a setting section
  * {@link WidgetContentSettingsList}.
  */
-export default function WidgetContent({
+const WidgetContent = ({
   index,
   id,
   config,
   settings,
   setManagerWidgetStates,
-}: WidgetContentProps) {
+}: WidgetContentProps) => {
   return (
     <Tabs.Content value={`tab${index}`} asChild>
       <Flex height="100%" gap="3" direction="column" css={{ flex: 3 }}>
@@ -105,4 +105,6 @@ export default function WidgetContent({
       </Flex>
     </Tabs.Content>
   );
-}
+};
+
+export default WidgetContent;

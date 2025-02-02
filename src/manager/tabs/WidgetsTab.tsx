@@ -9,7 +9,7 @@ import WidgetContent from "../components/WidgetContent";
 import FloatButton from "../components/FloatButton";
 import { emitRenderWidgetToCanvas } from "../../events";
 
-export interface WidgetsTabProps {
+interface WidgetsTabProps {
   /** The manager widget states. */
   managerWidgetStates: Record<string, ManagerWidgetState>;
   /** Setter for the manager widget states. */
@@ -27,11 +27,11 @@ export interface WidgetsTabProps {
  * bottom right corner. It contains the triggers {@link WidgetTrigger} and the contents
  * {@link WidgetContent} for each widget in the collection.
  */
-export default function WidgetsTab({
+const WidgetsTab = ({
   managerWidgetStates,
   setManagerWidgetStates,
   rescanAndRender,
-}: WidgetsTabProps) {
+}: WidgetsTabProps) => {
   const managerWidgetStatesArray = Object.entries(managerWidgetStates);
 
   const rerenderAction = async () => {
@@ -109,4 +109,6 @@ export default function WidgetsTab({
       />
     </>
   );
-}
+};
+
+export default WidgetsTab;

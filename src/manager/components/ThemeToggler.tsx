@@ -4,7 +4,7 @@ import { MdOutlineDarkMode, MdOutlineLightMode } from "react-icons/md";
 import { Dispatch, SetStateAction } from "react";
 import { emitSwitchThemeToCanvas } from "../../events";
 
-export interface AppearanceTogglerProps {
+interface AppearanceTogglerProps {
   /** Theme. */
   theme: Theme;
   /** State for theme. */
@@ -18,10 +18,7 @@ export interface AppearanceTogglerProps {
  * window. Clicking the icon button should switch the theme appearance between light
  * and dark mode. The tooltip and icon should reflect the current theme appearance.
  */
-export default function AppearanceToggler({
-  theme,
-  setTheme,
-}: AppearanceTogglerProps) {
+const AppearanceToggler = ({ theme, setTheme }: AppearanceTogglerProps) => {
   const toggleTheme = () => {
     const newTheme = theme === Theme.LIGHT ? Theme.DARK : Theme.LIGHT;
     setTheme(newTheme);
@@ -44,4 +41,6 @@ export default function AppearanceToggler({
       </Tooltip>
     </Box>
   );
-}
+};
+
+export default AppearanceToggler;

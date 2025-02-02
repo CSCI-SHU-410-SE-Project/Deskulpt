@@ -1,6 +1,6 @@
 import { Badge, Box, Flex, Heading, ScrollArea, Text } from "@radix-ui/themes";
 
-export interface ErrorDisplayProps {
+interface ErrorDisplayProps {
   /** Title of the error display. */
   title: string;
   /** The full error message. */
@@ -14,7 +14,7 @@ export interface ErrorDisplayProps {
  * error message displayed as pre-wrap monospace text. The component is wrapped in a
  * scroll area is scrollable in both directions.
  */
-export default function ErrorDisplay({ title, error }: ErrorDisplayProps) {
+const ErrorDisplay = ({ title, error }: ErrorDisplayProps) => {
   return (
     <ScrollArea scrollbars="both" asChild>
       <Box p="2">
@@ -35,4 +35,6 @@ export default function ErrorDisplay({ title, error }: ErrorDisplayProps) {
       </Box>
     </ScrollArea>
   );
-}
+};
+
+export default ErrorDisplay;

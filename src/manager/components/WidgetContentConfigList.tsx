@@ -4,7 +4,7 @@ import WidgetDependencies from "../components/WidgetDependencies";
 import { MdOpenInNew } from "react-icons/md";
 import { invokeOpenInWidgetsDir } from "../../commands";
 
-export interface WidgetContentConfigListProps {
+interface WidgetContentConfigListProps {
   /** The widget ID. */
   id: string;
   /** The widget configuration. */
@@ -17,10 +17,10 @@ export interface WidgetContentConfigListProps {
  * This is rendered as a data list, displaying the widget ID, name, entry, and
  * external dependencies.
  */
-export default function WidgetContentConfigList({
+const WidgetContentConfigList = ({
   id,
   config,
-}: WidgetContentConfigListProps) {
+}: WidgetContentConfigListProps) => {
   return (
     <DataList.Root size="2" css={{ gap: "var(--space-2)" }}>
       <DataList.Item>
@@ -60,4 +60,6 @@ export default function WidgetContentConfigList({
       </DataList.Item>
     </DataList.Root>
   );
-}
+};
+
+export default WidgetContentConfigList;
