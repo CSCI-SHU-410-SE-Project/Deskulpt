@@ -7,7 +7,6 @@ import {
   Text,
   Tooltip,
 } from "@radix-ui/themes";
-import { memo } from "react";
 import { LuView } from "react-icons/lu";
 
 interface WidgetDependenciesProps {
@@ -23,7 +22,7 @@ interface WidgetDependenciesProps {
  * names and corresponding version strings. The package names are linked to their URL
  * on [npmjs.com](https://www.npmjs.com/).
  */
-const WidgetDependencies = memo(({ dependencies }: WidgetDependenciesProps) => {
+const WidgetDependencies = ({ dependencies }: WidgetDependenciesProps) => {
   const dependenciesArray = Object.entries(dependencies);
 
   return (
@@ -62,6 +61,6 @@ const WidgetDependencies = memo(({ dependencies }: WidgetDependenciesProps) => {
       )}
     </Flex>
   );
-});
+};
 
 export default WidgetDependencies;

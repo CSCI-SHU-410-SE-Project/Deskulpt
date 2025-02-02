@@ -9,7 +9,7 @@ import {
 import { RxCopy } from "react-icons/rx";
 import { writeText } from "@tauri-apps/plugin-clipboard-manager";
 import { toast } from "sonner";
-import { PropsWithChildren, memo } from "react";
+import { PropsWithChildren } from "react";
 
 interface ExternalCopyLinkProps {
   /** The external target of the link. */
@@ -24,29 +24,31 @@ interface ExternalCopyLinkProps {
  * The link will be opened in a new tab when clicked. The copy button will copy the link
  * address to the clipboard. Wrap the link text within this component.
  */
-const ExternalCopyLink = memo(
-  ({ href, gap = "3", children }: PropsWithChildren<ExternalCopyLinkProps>) => {
-    return (
-      <Flex gap={gap} align="center">
-        <Link href={href} target="_blank" rel="noreferrer">
-          {children}
-        </Link>
-        <Tooltip content="Copy link" side="right">
-          <IconButton
-            size="1"
-            variant="ghost"
-            onClick={() =>
-              writeText(
-                "https://csci-shu-410-se-project.github.io/Deskulpt/",
-              ).then(() => toast.success("Copied to clipboard."))
-            }
-          >
-            <RxCopy />
-          </IconButton>
-        </Tooltip>
-      </Flex>
-    );
-  },
-);
+const ExternalCopyLink = ({
+  href,
+  gap = "3",
+  children,
+}: PropsWithChildren<ExternalCopyLinkProps>) => {
+  return (
+    <Flex gap={gap} align="center">
+      <Link href={href} target="_blank" rel="noreferrer">
+        {children}
+      </Link>
+      <Tooltip content="Copy link" side="right">
+        <IconButton
+          size="1"
+          variant="ghost"
+          onClick={() =>
+            writeText(
+              "https://csci-shu-410-se-project.github.io/Deskulpt/",
+            ).then(() => toast.success("Copied to clipboard."))
+          }
+        >
+          <RxCopy />
+        </IconButton>
+      </Tooltip>
+    </Flex>
+  );
+};
 
 export default ExternalCopyLink;

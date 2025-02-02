@@ -15,7 +15,7 @@ import {
   WidgetSettings,
 } from "../../types/backend";
 import { emitRenderWidgetToCanvas } from "../../events";
-import { Dispatch, SetStateAction, memo } from "react";
+import { Dispatch, SetStateAction } from "react";
 import { ManagerWidgetState } from "../../types/frontend";
 import WidgetContentHeading from "../components/WidgetContentHeading";
 import { toast } from "sonner";
@@ -44,69 +44,67 @@ interface WidgetContentProps {
  * {@link WidgetContentConfigList} and a setting section
  * {@link WidgetContentSettingsList}.
  */
-const WidgetContent = memo(
-  ({
-    index,
-    id,
-    config,
-    settings,
-    setManagerWidgetStates,
-  }: WidgetContentProps) => {
-    return (
-      <Tabs.Content value={`tab${index}`} asChild>
-        <Flex height="100%" gap="3" direction="column" css={{ flex: 3 }}>
-          <WidgetContentHeading
-            heading={
-              <Flex align="center" gap="2">
-                Configuration{" "}
-                {"Err" in config && <Badge color="red">Error</Badge>}
-              </Flex>
-            }
-            actionIcon={<LuFolderOpen />}
-            actionText="Edit"
-            action={() =>
-              invokeOpenInWidgetsDir({ components: [config.content.dir] })
-            }
-          />
-          <ScrollArea scrollbars="vertical" asChild>
-            <Box px="2" css={{ flex: 3 }}>
-              {config.type === WidgetConfigType.VALID ? (
-                <WidgetContentConfigList id={id} config={config} />
-              ) : (
-                <Text
-                  size="1"
-                  css={{
-                    whiteSpace: "pre-wrap",
-                    fontFamily: "var(--code-font-family)",
-                  }}
-                >
-                  {config.content.error}
-                </Text>
-              )}
-            </Box>
-          </ScrollArea>
-          <Separator size="4" />
-          <WidgetContentHeading
-            heading="Settings"
-            actionIcon={<LuRepeat />}
-            actionText="Re-render"
-            action={() =>
-              emitRenderWidgetToCanvas({ id, settings, bundle: true }).then(
-                () => toast.success(`Re-rendered widget "${id}".`),
-              )
-            }
-          />
-          <Box px="2" css={{ flex: 4 }}>
-            <WidgetContentSettingsList
-              id={id}
-              settings={settings}
-              setManagerWidgetStates={setManagerWidgetStates}
-            />
+const WidgetContent = ({
+  index,
+  id,
+  config,
+  settings,
+  setManagerWidgetStates,
+}: WidgetContentProps) => {
+  return (
+    <Tabs.Content value={`tab${index}`} asChild>
+      <Flex height="100%" gap="3" direction="column" css={{ flex: 3 }}>
+        <WidgetContentHeading
+          heading={
+            <Flex align="center" gap="2">
+              Configuration{" "}
+              {"Err" in config && <Badge color="red">Error</Badge>}
+            </Flex>
+          }
+          actionIcon={<LuFolderOpen />}
+          actionText="Edit"
+          action={() =>
+            invokeOpenInWidgetsDir({ components: [config.content.dir] })
+          }
+        />
+        <ScrollArea scrollbars="vertical" asChild>
+          <Box px="2" css={{ flex: 3 }}>
+            {config.type === WidgetConfigType.VALID ? (
+              <WidgetContentConfigList id={id} config={config} />
+            ) : (
+              <Text
+                size="1"
+                css={{
+                  whiteSpace: "pre-wrap",
+                  fontFamily: "var(--code-font-family)",
+                }}
+              >
+                {config.content.error}
+              </Text>
+            )}
           </Box>
-        </Flex>
-      </Tabs.Content>
-    );
-  },
-);
+        </ScrollArea>
+        <Separator size="4" />
+        <WidgetContentHeading
+          heading="Settings"
+          actionIcon={<LuRepeat />}
+          actionText="Re-render"
+          action={() =>
+            emitRenderWidgetToCanvas({ id, settings, bundle: true }).then(() =>
+              toast.success(`Re-rendered widget "${id}".`),
+            )
+          }
+        />
+        <Box px="2" css={{ flex: 4 }}>
+          <WidgetContentSettingsList
+            id={id}
+            settings={settings}
+            setManagerWidgetStates={setManagerWidgetStates}
+          />
+        </Box>
+      </Flex>
+    </Tabs.Content>
+  );
+};
 
 export default WidgetContent;

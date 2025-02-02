@@ -1,6 +1,5 @@
 import { Toaster } from "sonner";
 import { Theme } from "../../types/backend";
-import { memo } from "react";
 
 interface ManagerToasterProps {
   /** The theme. */
@@ -13,7 +12,7 @@ interface ManagerToasterProps {
  * This is styled on top of [`Toaster`](https://sonner.emilkowal.ski/toaster), rendered
  * in the bottom center of the manager window.
  */
-const ManagerToaster = memo(({ theme }: ManagerToasterProps) => {
+const ManagerToaster = ({ theme }: ManagerToasterProps) => {
   return (
     <Toaster
       position="bottom-center"
@@ -29,6 +28,6 @@ const ManagerToaster = memo(({ theme }: ManagerToasterProps) => {
       }}
     />
   );
-});
+};
 
 export default ManagerToaster;

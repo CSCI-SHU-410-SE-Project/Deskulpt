@@ -1,5 +1,4 @@
 import { Badge, Box, Flex, Heading, ScrollArea, Text } from "@radix-ui/themes";
-import { memo } from "react";
 
 interface ErrorDisplayProps {
   /** Title of the error display. */
@@ -15,7 +14,7 @@ interface ErrorDisplayProps {
  * error message displayed as pre-wrap monospace text. The component is wrapped in a
  * scroll area is scrollable in both directions.
  */
-const ErrorDisplay = memo(({ title, error }: ErrorDisplayProps) => {
+const ErrorDisplay = ({ title, error }: ErrorDisplayProps) => {
   return (
     <ScrollArea scrollbars="both" asChild>
       <Box p="2">
@@ -36,6 +35,6 @@ const ErrorDisplay = memo(({ title, error }: ErrorDisplayProps) => {
       </Box>
     </ScrollArea>
   );
-});
+};
 
 export default ErrorDisplay;
