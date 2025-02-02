@@ -22,7 +22,13 @@ export default function useUpdateSettingListener(
 
       setManagerWidgetStates((prev) => {
         if (id in prev) {
-          return { ...prev, [id]: { ...prev[id], settings } };
+          return {
+            ...prev,
+            [id]: {
+              ...prev[id],
+              settings: { ...prev[id].settings, ...settings },
+            },
+          };
         }
         return prev;
       });

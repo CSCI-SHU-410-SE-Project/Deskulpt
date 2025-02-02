@@ -74,13 +74,7 @@ export default function useRenderWidgetListener() {
         // error within `render` so it needs to called in advance, otherwise things will
         // get broken in the state setter, causing the error to be uncaught and also
         // affecting other widget displays
-        updateWidgetRender(
-          id,
-          module.default,
-          moduleBlobUrl,
-          apisBlobUrl,
-          settings,
-        );
+        updateWidgetRender(id, widget, moduleBlobUrl, apisBlobUrl, settings);
       } catch (err) {
         updateWidgetRenderError(id, err, apisBlobUrl, settings);
       }
