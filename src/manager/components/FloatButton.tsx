@@ -42,4 +42,5 @@ const FloatButton = ({
     </Box>
   );
 };
+
 export default FloatButton;
