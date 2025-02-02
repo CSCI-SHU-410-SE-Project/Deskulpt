@@ -1,24 +1,18 @@
-import { PropsWithChildren, RefObject, useRef } from "react";
+import { RefObject, useRef } from "react";
 import Draggable, { DraggableData, DraggableEvent } from "react-draggable";
 import { ErrorBoundary } from "react-error-boundary";
 import ErrorDisplay from "../components/ErrorDisplay";
 import { grabErrorInfo } from "../utils";
-import { WidgetSettings } from "../../types/backend";
 import { LuGripVertical } from "react-icons/lu";
 import { Box } from "@radix-ui/themes";
-import { Widget } from "../../types/frontend";
+import { WidgetState, updateWidgetSettings } from "../hooks/useWidgetsStore";
+import { emitUpdateSettingsToManager } from "../../events";
 
 export interface WidgetContainerProps {
   /** ID of the widget. */
   id: string;
-  /** The settings of the widget. */
-  settings: WidgetSettings;
-  /** Callback function to update the settings of the specific widget. */
-  setSettings: (settings: WidgetSettings) => void;
-  /** Width of the widget container. */
-  width: Widget["width"];
-  /** Height of the widget container. */
-  height: Widget["height"];
+  /** The widget state. */
+  widget: WidgetState;
 }
 
 /**
@@ -31,22 +25,19 @@ export interface WidgetContainerProps {
  * If the child (i.e., the widget) throws a rendering error, it will be caught by the
  * error boundary and displayed with the {@link ErrorDisplay} component.
  */
-export default function WidgetContainer({
-  id,
-  settings,
-  setSettings,
-  width,
-  height,
-  children,
-}: PropsWithChildren<WidgetContainerProps>) {
+export default function WidgetContainer({ id, widget }: WidgetContainerProps) {
+  const { Component, width, height, x, y, opacity } = widget;
   const containerRef = useRef<HTMLDivElement>(null);
   let retried = false;
 
   function updateContainerPos(_: DraggableEvent, data: DraggableData) {
-    setSettings({
-      ...settings,
-      x: settings.x + data.x,
-      y: settings.y + data.y,
+    updateWidgetSettings(id, {
+      x: x + data.x,
+      y: y + data.y,
+    });
+    emitUpdateSettingsToManager({
+      id,
+      settings: { x: x + data.x, y: y + data.y, opacity },
     });
   }
 
@@ -64,16 +55,16 @@ export default function WidgetContainer({
         ref={containerRef}
         overflow="hidden"
         position="absolute"
-        left={`${settings.x}px`}
-        top={`${settings.y}px`}
-        width={width}
-        height={height}
+        left={`${x}px`}
+        top={`${y}px`}
+        width={width ?? "300px"}
+        height={height ?? "150px"}
         css={{
           color: "var(--gray-12)",
           backgroundColor: "var(--gray-surface)",
           borderRadius: "var(--radius-2)",
           boxShadow: "0 0 2px var(--gray-8)",
-          opacity: `${settings.opacity}%`,
+          opacity: `${opacity}%`,
         }}
       >
         <LuGripVertical
@@ -111,7 +102,7 @@ export default function WidgetContainer({
             );
           }}
         >
-          {children}
+          <Component id={id} />
         </ErrorBoundary>
       </Box>
     </Draggable>
