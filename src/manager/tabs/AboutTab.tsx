@@ -33,7 +33,7 @@ const AboutTab = () => {
         <DataList.Root size="2" css={{ gap: "var(--space-1)" }}>
           <DataList.Item>
             <DataList.Label>Version</DataList.Label>
-            <DataList.Value>0.0.1</DataList.Value>
+            <DataList.Value>{__VERSION__}</DataList.Value>
           </DataList.Item>
           <DataList.Item>
             <DataList.Label>Authors</DataList.Label>
