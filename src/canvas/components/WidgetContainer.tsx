@@ -20,7 +20,6 @@ const WidgetContainer = ({ id }: WidgetContainerProps) => {
     (state) => state.widgets[id],
   );
   const containerRef = useRef<HTMLDivElement>(null);
-  let retried = false;
 
   const onStop = useCallback(
     (_: DraggableEvent, data: DraggableData) => {
@@ -74,23 +73,10 @@ const WidgetContainer = ({ id }: WidgetContainerProps) => {
           }}
         />
         <ErrorBoundary
-          fallbackRender={({ error, resetErrorBoundary }) => {
-            if (!retried) {
-              // Reset the error boundary and retry the render once per re-render of the
-              // widget, since otherwise even if the error in the children is fixed, the
-              // error boundary will not refresh itself; note that the `retried` flag is
-              // reset to false on each re-render and it is here to prevent infinite
-              // loops of resetting error boundary and falling back
-              resetErrorBoundary();
-              retried = true;
-            }
-            return (
-              <ErrorDisplay
-                title={`Error in '${id}': potential issues with the \`render\` function)`}
-                error={grabErrorInfo(error)}
-              />
-            );
-          }}
+          resetKeys={[Component]}
+          fallbackRender={({ error }) => (
+            <ErrorDisplay title={id} error={grabErrorInfo(error)} />
+          )}
         >
           <Component id={id} />
         </ErrorBoundary>
