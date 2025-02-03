@@ -29,6 +29,8 @@ enum Theme {
 pub struct Shortcuts {
     /// For toggling canvas click-through.
     pub toggle_canvas: Option<String>,
+    /// For showing the manager window.
+    pub show_manager: Option<String>,
 }
 
 /// Application-wide settings.

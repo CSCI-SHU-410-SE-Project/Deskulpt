@@ -11,6 +11,7 @@ use crate::shortcuts::ShortcutsExt;
 #[serde(rename_all = "camelCase")]
 pub enum ShortcutKey {
     ToggleCanvas,
+    ShowManager,
 }
 
 /// Update a shortcut registered in the application.
@@ -35,6 +36,10 @@ pub async fn update_shortcut<R: Runtime>(
         ShortcutKey::ToggleCanvas => {
             app_handle
                 .update_toggle_canvas_shortcut(old_shortcut.as_deref(), new_shortcut.as_deref())?;
+        },
+        ShortcutKey::ShowManager => {
+            app_handle
+                .update_show_manager_shortcut(old_shortcut.as_deref(), new_shortcut.as_deref())?;
         },
     }
 

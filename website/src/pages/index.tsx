@@ -109,8 +109,8 @@ export default function Home() {
         <section className={styles.homepageFeaturesSection}>
           <div className="container">
             <div className="row">
-              {features.map((props, index) => (
-                <Feature key={index} {...props} />
+              {features.map((props) => (
+                <Feature key={props.title} {...props} />
               ))}
             </div>
           </div>

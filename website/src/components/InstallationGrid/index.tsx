@@ -36,7 +36,7 @@ function DownloadOption(props: {
   );
 }
 
-export default function InstallationGrid() {
+export default () => {
   const platform = usePlatform("windows");
 
   return (
@@ -88,4 +88,4 @@ export default function InstallationGrid() {
       </TabItem>
     </Tabs>
   );
-}
+};

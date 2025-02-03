@@ -1,22 +1,32 @@
-import WidgetContainer from "./components/WidgetContainer";
-import useRenderListener from "./hooks/useRenderListener";
-import useRemoveWidgetsListener from "./hooks/useRemoveWidgetsListener";
-import useShowToastListener from "./hooks/useShowToastListener";
 import { Toaster } from "sonner";
-import { Theme as RadixTheme } from "@radix-ui/themes";
-import useThemeListener from "./hooks/useThemeListener";
-import { useWidgetsStore } from "./hooks/useWidgetsStore";
+import { Box, Theme as RadixTheme } from "@radix-ui/themes";
+import {
+  useBatchRemoveListener,
+  useRender,
+  useShowToastListener,
+  useTheme,
+  useUpdateSettingsListener,
+  useWidgetsStore,
+} from "./hooks";
+import { RenderingScreen, WidgetContainer } from "./components";
+import { css } from "@emotion/react";
 import { useShallow } from "zustand/shallow";
 
-const App = () => {
-  const theme = useThemeListener();
+const styles = {
+  root: css({ height: "100vh" }),
+};
+
+export default () => {
+  const theme = useTheme();
   const ids = useWidgetsStore(
     useShallow((state) => Object.keys(state.widgets)),
   );
 
+  const isRendering = useRender();
+
+  useBatchRemoveListener();
   useShowToastListener();
-  useRenderListener();
-  useRemoveWidgetsListener();
+  useUpdateSettingsListener();
 
   return (
     <RadixTheme
@@ -24,7 +34,9 @@ const App = () => {
       accentColor="indigo"
       grayColor="slate"
       hasBackground={false}
+      css={styles.root}
     >
+      {isRendering && <RenderingScreen />}
       <Toaster
         position="bottom-right"
         gap={6}
@@ -37,11 +49,11 @@ const App = () => {
           },
         }}
       />
-      {ids.map((id) => (
-        <WidgetContainer key={id} id={id} />
-      ))}
+      <Box>
+        {ids.map((id) => (
+          <WidgetContainer key={id} id={id} />
+        ))}
+      </Box>
     </RadixTheme>
   );
 };
-
-export default App;

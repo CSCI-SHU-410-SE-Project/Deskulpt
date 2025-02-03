@@ -1,38 +1,55 @@
-import { useState } from "react";
-import WidgetsTab from "./tabs/WidgetsTab";
-import SettingsTab from "./tabs/SettingsTab";
-import AboutTab from "./tabs/AboutTab";
-import useExitAppListener from "./hooks/useExitAppListener";
-import useToggleShortcut from "./hooks/useToggleShortcut";
-import useManagerWidgetStates from "./hooks/useManagerWidgetStates";
-import useUpdateSettingsListener from "./hooks/useUpdateSettingsListener";
+import {
+  useAppSettings,
+  useExitAppListener,
+  useRescanCallback,
+  useRescanInitially,
+  useUpdateSettingsListener,
+  useUpdateShortcutCallback,
+  useWidgets,
+} from "./hooks";
 import { Box, Theme as RadixTheme, Tabs } from "@radix-ui/themes";
-import ManagerToaster from "./components/ManagerToaster";
-import ThemeToggler from "./components/ThemeToggler";
+import { ThemeToggler } from "./components";
+import { Toaster } from "sonner";
+import { AboutTab, SettingsTab, WidgetsTab } from "./tabs";
+import { css } from "@emotion/react";
 
-/**
- * The main component of the manager window.
- */
-export default function App() {
-  const [theme, setTheme] = useState(
-    window.__DESKULPT_MANAGER_INTERNALS__.initialSettings.app.theme,
-  );
-  const { toggleShortcut, setToggleShortcut } = useToggleShortcut();
-  const { managerWidgetStates, setManagerWidgetStates, rescanAndRender } =
-    useManagerWidgetStates();
+const styles = {
+  root: css({ height: "100vh" }),
+};
 
-  useExitAppListener(toggleShortcut, theme, managerWidgetStates);
-  useUpdateSettingsListener(setManagerWidgetStates);
+export default () => {
+  const [widgets, widgetsDispatch] = useWidgets();
+  const [appSettings, appSettingsDispatch] = useAppSettings();
+  const rescan = useRescanCallback(widgets, widgetsDispatch);
+  const updateShortcut = useUpdateShortcutCallback(appSettingsDispatch);
+
+  useRescanInitially(widgetsDispatch);
+  useExitAppListener(appSettings, widgets);
+  useUpdateSettingsListener(widgetsDispatch);
 
   return (
     <RadixTheme
-      appearance={theme}
+      appearance={appSettings.theme}
       accentColor="indigo"
       grayColor="slate"
-      css={{ height: "100vh" }}
+      css={styles.root}
     >
-      <ManagerToaster theme={theme} />
-      <ThemeToggler theme={theme} setTheme={setTheme} />
+      <Toaster
+        position="bottom-center"
+        gap={6}
+        toastOptions={{
+          style: {
+            color: "var(--gray-12)",
+            borderColor: "var(--gray-6)",
+            backgroundColor: "var(--gray-2)",
+            padding: "var(--space-2) var(--space-4)",
+          },
+        }}
+      />
+      <ThemeToggler
+        theme={appSettings.theme}
+        appSettingsDispatch={appSettingsDispatch}
+      />
       <Tabs.Root defaultValue="widgets" asChild>
         <Box height="100%" p="2">
           <Tabs.List>
@@ -41,21 +58,21 @@ export default function App() {
             <Tabs.Trigger value="about">About</Tabs.Trigger>
           </Tabs.List>
           {/* Tab triggers have ~40px height */}
-          <Box px="1" py="3" css={{ height: "calc(100% - 40px)" }}>
+          <Box px="1" py="3" height="calc(100% - 40px)">
             <Tabs.Content value="widgets" asChild>
               <Box height="100%">
                 <WidgetsTab
-                  managerWidgetStates={managerWidgetStates}
-                  setManagerWidgetStates={setManagerWidgetStates}
-                  rescanAndRender={rescanAndRender}
+                  widgets={widgets}
+                  widgetsDispatch={widgetsDispatch}
+                  rescan={rescan}
                 />
               </Box>
             </Tabs.Content>
             <Tabs.Content value="settings" asChild>
               <Box height="100%">
                 <SettingsTab
-                  toggleShortcut={toggleShortcut}
-                  setToggleShortcut={setToggleShortcut}
+                  appSettings={appSettings}
+                  updateShortcut={updateShortcut}
                 />
               </Box>
             </Tabs.Content>
@@ -69,4 +86,4 @@ export default function App() {
       </Tabs.Root>
     </RadixTheme>
   );
-}
+};

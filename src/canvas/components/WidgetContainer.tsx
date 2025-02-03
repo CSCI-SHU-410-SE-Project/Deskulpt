@@ -1,21 +1,40 @@
-import { RefObject, useCallback, useRef } from "react";
+import { RefObject, memo, useCallback, useRef } from "react";
 import Draggable, { DraggableData, DraggableEvent } from "react-draggable";
 import { ErrorBoundary } from "react-error-boundary";
-import ErrorDisplay from "../components/ErrorDisplay";
-import { grabErrorInfo } from "../utils";
 import { LuGripVertical } from "react-icons/lu";
 import { Box } from "@radix-ui/themes";
-import {
-  updateWidgetSettings,
-  useWidgetsStore,
-} from "../hooks/useWidgetsStore";
-import { emitUpdateSettingsToManager } from "../../events";
+import { updateWidgetSettings, useWidgetsStore } from "../hooks";
+import ErrorDisplay from "./ErrorDisplay";
+import { stringifyError } from "../utils";
+import { css } from "@emotion/react";
+import { emitUpdateSettingsToManager } from "../../core/events";
 
-interface WidgetContainerProps {
+const styles = {
+  container: css({
+    color: "var(--gray-12)",
+    backgroundColor: "var(--gray-surface)",
+    borderRadius: "var(--radius-2)",
+    boxShadow: "0 0 2px var(--gray-8)",
+  }),
+  dragger: css({
+    position: "absolute",
+    top: "var(--space-1)",
+    right: 0,
+    cursor: "grab",
+    opacity: 0,
+    zIndex: 9999,
+    transition: "opacity 200ms ease-in-out",
+    "&:hover": {
+      opacity: 1,
+    },
+  }),
+};
+
+interface Props {
   id: string;
 }
 
-const WidgetContainer = ({ id }: WidgetContainerProps) => {
+export default memo(({ id }: Props) => {
   const { Component, width, height, x, y, opacity } = useWidgetsStore(
     (state) => state.widgets[id],
   );
@@ -25,7 +44,7 @@ const WidgetContainer = ({ id }: WidgetContainerProps) => {
     (_: DraggableEvent, data: DraggableData) => {
       const pos = { x: x + data.x, y: y + data.y };
       updateWidgetSettings(id, pos);
-      emitUpdateSettingsToManager({ id, settings: pos });
+      emitUpdateSettingsToManager({ id, settings: pos }).catch(console.error);
     },
     [id, x, y],
   );
@@ -48,34 +67,18 @@ const WidgetContainer = ({ id }: WidgetContainerProps) => {
         top={`${y}px`}
         width={width ?? "300px"}
         height={height ?? "150px"}
-        css={{
-          color: "var(--gray-12)",
-          backgroundColor: "var(--gray-surface)",
-          borderRadius: "var(--radius-2)",
-          boxShadow: "0 0 2px var(--gray-8)",
-          opacity: `${opacity}%`,
-        }}
+        css={styles.container}
+        style={{ opacity: `${opacity}%` }}
       >
         <LuGripVertical
           className="draggable-handle"
           size={20}
-          css={{
-            position: "absolute",
-            top: "var(--space-1)",
-            right: "var(--space-1)",
-            cursor: "grab",
-            opacity: "0",
-            zIndex: 9999,
-            transition: "opacity 200ms ease-in-out",
-            "&:hover": {
-              opacity: "1",
-            },
-          }}
+          css={styles.dragger}
         />
         <ErrorBoundary
           resetKeys={[Component]}
           fallbackRender={({ error }) => (
-            <ErrorDisplay title={id} error={grabErrorInfo(error)} />
+            <ErrorDisplay id={id} error={stringifyError(error)} />
           )}
         >
           <Component id={id} />
@@ -83,6 +86,4 @@ const WidgetContainer = ({ id }: WidgetContainerProps) => {
       </Box>
     </Draggable>
   );
-};
-
-export default WidgetContainer;
+});

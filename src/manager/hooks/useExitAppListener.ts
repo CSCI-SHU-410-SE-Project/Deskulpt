@@ -1,41 +1,29 @@
 import { useEffect } from "react";
-import { listenToExitApp } from "../../events";
-import { invokeExitApp } from "../../commands";
-import { ManagerWidgetState } from "../../types/frontend";
-import { Theme } from "../../types/backend";
+import { listenToExitAppOnce } from "../../core/events";
+import { invokeExitApp } from "../../core/commands";
+import { AppSettings, WidgetSettings } from "../../types";
+import { WidgetsState } from "./useWidgets";
 
-/**
- * Listen and react to the "exit-app" event.
- *
- * Upon receiving the event, the hook will collect all current states that needs to be
- * persisted and invoke the backend to persist them and exit the app.
- *
- * @param theme The current theme.
- * @param managerWidgetStates The current manager widget states.
- * @param toggleShortcut The current toggle shortcut.
- */
-export default function useExitAppListener(
-  toggleShortcut: string | null,
-  theme: Theme,
-  managerWidgetStates: Record<string, ManagerWidgetState>,
+export function useExitAppListener(
+  appSettings: AppSettings,
+  widgets: WidgetsState,
 ) {
   useEffect(() => {
-    const unlisten = listenToExitApp(() => {
-      const widgetSettingsMap = Object.fromEntries(
-        Object.entries(managerWidgetStates).map(([id, { settings }]) => [
-          id,
-          settings,
-        ]),
+    const unlisten = listenToExitAppOnce(() => {
+      const widgetSettingsMap = widgets.reduce(
+        (acc, { id, settings }) => {
+          acc[id] = settings;
+          return acc;
+        },
+        {} as Record<string, WidgetSettings>,
       );
-      const settings = {
-        app: { theme, shortcuts: { toggleCanvas: toggleShortcut } },
-        widgets: widgetSettingsMap,
-      };
+
+      const settings = { app: appSettings, widgets: widgetSettingsMap };
       invokeExitApp({ settings }).catch(console.error);
     });
 
     return () => {
       unlisten.then((f) => f()).catch(console.error);
     };
-  }, [toggleShortcut, theme, managerWidgetStates]);
+  }, [appSettings, widgets]);
 }

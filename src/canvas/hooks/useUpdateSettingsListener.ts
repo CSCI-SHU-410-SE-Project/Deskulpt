@@ -1,19 +1,16 @@
 import { useEffect } from "react";
 import { listenToUpdateSettings } from "../../core/events";
-import { WidgetsActionType, WidgetsDispatch } from "./useWidgets";
+import { updateWidgetSettings } from "./useWidgetsStore";
 
-export function useUpdateSettingsListener(widgetsDispatch: WidgetsDispatch) {
+export function useUpdateSettingsListener() {
   useEffect(() => {
     const unlisten = listenToUpdateSettings((event) => {
       const { id, settings } = event.payload;
-      widgetsDispatch({
-        type: WidgetsActionType.SET_SETTINGS,
-        payload: { id, settings },
-      });
+      updateWidgetSettings(id, settings);
     });
 
     return () => {
       unlisten.then((f) => f()).catch(console.error);
     };
-  }, [widgetsDispatch]);
+  }, []);
 }

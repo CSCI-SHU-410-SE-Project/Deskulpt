@@ -1,9 +1,6 @@
 import styles from "./styles.module.scss";
 
-export default function IconTabLabel(props: {
-  icon: React.ReactNode;
-  title: string;
-}) {
+export default (props: { icon: React.ReactNode; title: string }) => {
   const { icon, title } = props;
 
   return (
@@ -12,4 +9,4 @@ export default function IconTabLabel(props: {
       {title}
     </div>
   );
-}
+};
