@@ -16,7 +16,7 @@ const baseUrl = new URL(import.meta.url).origin;
 /**
  * Listen and react to the "render-widgets" event.
  */
-export default function useRenderWidgetsListener() {
+export function useRenderWidgetsListener() {
   const hasInited = useRef(false);
 
   const bundleWidget = useCallback(

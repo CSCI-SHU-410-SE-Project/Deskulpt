@@ -9,9 +9,10 @@ import { EventCallback, emitTo, listen } from "@tauri-apps/api/event";
 import {
   RemoveWidgetsPayload,
   RenderWidgetsPayload,
+  SwitchThemePayload,
   UpdateSettingsPayload,
 } from "./types/frontend";
-import { ShowToastPayload, Theme } from "./types/backend";
+import { ShowToastPayload } from "./types/backend";
 
 /**
  * Emit the "render-widgets" event to the canvas window.
@@ -83,7 +84,7 @@ export function listenToUpdateSettings(
  *
  * @param payload The payload of the event.
  */
-export async function emitSwitchThemeToCanvas(payload: Theme) {
+export async function emitSwitchThemeToCanvas(payload: SwitchThemePayload) {
   await emitTo("canvas", "switch-theme", payload);
 }
 
@@ -93,7 +94,9 @@ export async function emitSwitchThemeToCanvas(payload: Theme) {
  * @param handler The callback function to handle the event.
  * @returns A promise that resolves to a function to unlisten to the event.
  */
-export function listenToSwitchTheme(handler: EventCallback<Theme>) {
+export function listenToSwitchTheme(
+  handler: EventCallback<SwitchThemePayload>,
+) {
   return listen("switch-theme", handler);
 }
 

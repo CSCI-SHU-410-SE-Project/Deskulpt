@@ -1,4 +1,4 @@
-import { RefObject, useCallback, useRef } from "react";
+import { RefObject, memo, useCallback, useRef } from "react";
 import Draggable, { DraggableData, DraggableEvent } from "react-draggable";
 import { ErrorBoundary } from "react-error-boundary";
 import ErrorDisplay from "../components/ErrorDisplay";
@@ -15,7 +15,7 @@ interface WidgetContainerProps {
   id: string;
 }
 
-const WidgetContainer = ({ id }: WidgetContainerProps) => {
+const WidgetContainer = memo(({ id }: WidgetContainerProps) => {
   const { Component, width, height, x, y, opacity } = useWidgetsStore(
     (state) => state.widgets[id],
   );
@@ -83,6 +83,6 @@ const WidgetContainer = ({ id }: WidgetContainerProps) => {
       </Box>
     </Draggable>
   );
-};
+});
 
 export default WidgetContainer;

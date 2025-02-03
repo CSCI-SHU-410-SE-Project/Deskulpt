@@ -132,6 +132,19 @@ export function updateWidgetSettings(
  * Remove a batch of widgets from the store.
  */
 export function removeWidgets(ids: string[]) {
+  const widgets = useWidgetsStore.getState().widgets;
+
+  ids.forEach((id) => {
+    const widget = widgets[id];
+    if (widget === undefined) {
+      return; // This should not happen but let us be safe
+    }
+    URL.revokeObjectURL(widget.apisBlobUrl);
+    if (widget.moduleBlobUrl !== undefined) {
+      URL.revokeObjectURL(widget.moduleBlobUrl);
+    }
+  });
+
   useWidgetsStore.setState((state) => ({
     widgets: Object.fromEntries(
       Object.entries(state.widgets).filter(([id]) => !ids.includes(id)),

@@ -55,12 +55,12 @@ export default function useManagerWidgetStates(): UseManagerWidgetStatesOutput {
 
     // If a widget exists in the previous states but does not exist in the newdetected
     // configurations, we consider it as removed from the collection
-    const removedIds = Object.keys(managerWidgetStates).filter(
+    const ids = Object.keys(managerWidgetStates).filter(
       (id) => !(id in detectedConfigs),
     );
-    if (removedIds.length > 0) {
+    if (ids.length > 0) {
       // Notify the cacnvas to clean up resources allocated for removed widgets
-      await emitRemoveWidgetsToCanvas({ removedIds });
+      await emitRemoveWidgetsToCanvas({ ids });
     }
 
     const newManagerWidgetStates = Object.fromEntries(

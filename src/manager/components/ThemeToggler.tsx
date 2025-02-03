@@ -22,7 +22,7 @@ const AppearanceToggler = ({ theme, setTheme }: AppearanceTogglerProps) => {
   const toggleTheme = () => {
     const newTheme = theme === Theme.LIGHT ? Theme.DARK : Theme.LIGHT;
     setTheme(newTheme);
-    emitSwitchThemeToCanvas(newTheme).catch(console.error);
+    emitSwitchThemeToCanvas({ theme: newTheme }).catch(console.error);
   };
 
   return (
