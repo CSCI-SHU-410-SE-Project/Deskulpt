@@ -2,15 +2,14 @@ import { create } from "zustand";
 import { WidgetSettings } from "../../types/backend";
 import { FC, createElement } from "react";
 import ErrorDisplay from "../components/ErrorDisplay";
-import { stringifyError } from "../utils";
 
-export interface Widget {
+interface Widget {
   Component: FC<{ id: string }>;
   width?: string;
   height?: string;
 }
 
-export interface WidgetState extends Widget, WidgetSettings {
+interface WidgetState extends Widget, WidgetSettings {
   apisBlobUrl: string;
   moduleBlobUrl?: string;
 }
@@ -19,13 +18,6 @@ export const useWidgetsStore = create(() => ({
   widgets: {} as Record<string, WidgetState>,
 }));
 
-/**
- * Update rendering information of a widget.
- *
- * If the widget is in the store, rendering information will be updated, and the
- * settings will be ignored. Otherwise, the settings are required and a new
- * widget will be added to the store.
- */
 export function updateWidgetRender(
   id: string,
   widget: Widget,
@@ -34,6 +26,7 @@ export function updateWidgetRender(
   settings?: WidgetSettings,
 ) {
   useWidgetsStore.setState((state) => {
+    // Settings are ignored if the widget is already in the store
     if (id in state.widgets) {
       return {
         widgets: {
@@ -50,6 +43,8 @@ export function updateWidgetRender(
         },
       };
     }
+
+    // Settings are required if the widget is newly added
     if (settings !== undefined) {
       return {
         widgets: {
@@ -58,24 +53,20 @@ export function updateWidgetRender(
         },
       };
     }
+
     return state;
   });
 }
 
-/**
- * Update rendering error of a widget.
- *
- * If the widget is in the store, its rendering information will be overridden
- * with the error and the settings will be ignored. Otherwise, the settings are
- * required and a new widget will be added to the store with the error.
- */
 export function updateWidgetRenderError(
   id: string,
-  error: unknown,
+  error: string,
+  message: string,
   apisBlobUrl: string,
   settings?: WidgetSettings,
 ) {
   useWidgetsStore.setState((state) => {
+    // Settings are ignored if the widget is already in the store
     if (id in state.widgets) {
       return {
         widgets: {
@@ -83,7 +74,7 @@ export function updateWidgetRenderError(
           [id]: {
             ...state.widgets[id],
             Component: () =>
-              createElement(ErrorDisplay, { id, error: stringifyError(error) }),
+              createElement(ErrorDisplay, { id, error, message }),
             width: undefined,
             height: undefined,
             moduleBlobUrl: undefined,
@@ -91,6 +82,8 @@ export function updateWidgetRenderError(
         },
       };
     }
+
+    // Settings are required if the widget is newly added
     if (settings !== undefined) {
       return {
         widgets: {
@@ -98,19 +91,17 @@ export function updateWidgetRenderError(
           [id]: {
             ...settings,
             Component: () =>
-              createElement(ErrorDisplay, { id, error: stringifyError(error) }),
+              createElement(ErrorDisplay, { id, error, message }),
             apisBlobUrl,
           },
         },
       };
     }
+
     return state;
   });
 }
 
-/**
- * Update (partial) settings of a widget.
- */
 export function updateWidgetSettings(
   id: string,
   settings: Partial<WidgetSettings>,
@@ -128,21 +119,17 @@ export function updateWidgetSettings(
   });
 }
 
-/**
- * Remove a batch of widgets from the store.
- */
 export function removeWidgets(ids: string[]) {
   const widgets = useWidgetsStore.getState().widgets;
 
+  // Revoke object URLs for the widgets being removed
   ids.forEach((id) => {
     const widget = widgets[id];
     if (widget === undefined) {
       return; // This should not happen but let us be safe
     }
     URL.revokeObjectURL(widget.apisBlobUrl);
-    if (widget.moduleBlobUrl !== undefined) {
-      URL.revokeObjectURL(widget.moduleBlobUrl);
-    }
+    widget.moduleBlobUrl && URL.revokeObjectURL(widget.moduleBlobUrl);
   });
 
   useWidgetsStore.setState((state) => ({
