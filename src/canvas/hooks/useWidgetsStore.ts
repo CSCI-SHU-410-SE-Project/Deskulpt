@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { WidgetSettings } from "../../types/backend";
 import { FC, createElement } from "react";
 import ErrorDisplay from "../components/ErrorDisplay";
-import { grabErrorInfo } from "../utils";
+import { stringifyError } from "../utils";
 
 export interface Widget {
   Component: FC<{ id: string }>;
@@ -83,10 +83,7 @@ export function updateWidgetRenderError(
           [id]: {
             ...state.widgets[id],
             Component: () =>
-              createElement(ErrorDisplay, {
-                title: id,
-                error: grabErrorInfo(error),
-              }),
+              createElement(ErrorDisplay, { id, error: stringifyError(error) }),
             width: undefined,
             height: undefined,
             moduleBlobUrl: undefined,
@@ -101,10 +98,7 @@ export function updateWidgetRenderError(
           [id]: {
             ...settings,
             Component: () =>
-              createElement(ErrorDisplay, {
-                title: id,
-                error: grabErrorInfo(error),
-              }),
+              createElement(ErrorDisplay, { id, error: stringifyError(error) }),
             apisBlobUrl,
           },
         },
