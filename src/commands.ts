@@ -7,7 +7,7 @@
 
 import { invoke } from "@tauri-apps/api/core";
 import { Settings, Shortcuts, WidgetConfig } from "./types/backend";
-import { RenderPayload } from "./types/frontend";
+import { RenderWidgetsPayload } from "./types/frontend";
 
 /**
  * Invoke the `bundle_widget` command.
@@ -55,7 +55,9 @@ export function invokeUpdateShortcut(payload: {
 /**
  * Invoke the `emit_on_render_ready` command.
  */
-export function invokeEmitOnRenderReady(payload: { payload: RenderPayload }) {
+export function invokeEmitOnRenderReady(payload: {
+  payload: RenderWidgetsPayload;
+}) {
   return invoke<void>("emit_on_render_ready", payload);
 }
 

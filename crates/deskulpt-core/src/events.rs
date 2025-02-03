@@ -26,9 +26,9 @@ pub trait EventsExt<R: Runtime>: Emitter<R> {
         Ok(self.emit_to("manager", "exit-app", ())?)
     }
 
-    /// Emit the `render` event to the canvas.
-    fn emit_render_to_canvas(&self, payload: serde_json::Value) -> Result<()> {
-        Ok(self.emit_to("canvas", "render", payload)?)
+    /// Emit the `render-widgets` event to the canvas.
+    fn emit_render_widgets_to_canvas(&self, payload: serde_json::Value) -> Result<()> {
+        Ok(self.emit_to("canvas", "render-widgets", payload)?)
     }
 }
 

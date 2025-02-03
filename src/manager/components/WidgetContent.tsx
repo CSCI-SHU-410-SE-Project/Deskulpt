@@ -14,7 +14,7 @@ import {
   WidgetConfigType,
   WidgetSettings,
 } from "../../types/backend";
-import { emitRenderToCanvas } from "../../events";
+import { emitRenderWidgetsToCanvas } from "../../events";
 import { Dispatch, SetStateAction } from "react";
 import { ManagerWidgetState } from "../../types/frontend";
 import WidgetContentHeading from "../components/WidgetContentHeading";
@@ -90,8 +90,8 @@ const WidgetContent = ({
           actionIcon={<LuRepeat />}
           actionText="Re-render"
           action={() =>
-            emitRenderToCanvas([{ id, settings, bundle: true }]).then(() =>
-              toast.success(`Re-rendered widget "${id}".`),
+            emitRenderWidgetsToCanvas([{ id, settings, bundle: true }]).then(
+              () => toast.success(`Re-rendered widget "${id}".`),
             )
           }
         />

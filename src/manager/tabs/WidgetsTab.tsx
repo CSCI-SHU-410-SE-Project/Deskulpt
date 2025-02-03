@@ -7,7 +7,7 @@ import { ManagerWidgetState } from "../../types/frontend";
 import WidgetTrigger from "../components/WidgetTrigger";
 import WidgetContent from "../components/WidgetContent";
 import FloatButton from "../components/FloatButton";
-import { emitRenderToCanvas } from "../../events";
+import { emitRenderWidgetsToCanvas } from "../../events";
 
 interface WidgetsTabProps {
   /** The manager widget states. */
@@ -35,7 +35,7 @@ const WidgetsTab = ({
   const managerWidgetStatesArray = Object.entries(managerWidgetStates);
 
   const rerenderAction = async () => {
-    await emitRenderToCanvas(
+    await emitRenderWidgetsToCanvas(
       managerWidgetStatesArray.map(([id, { settings }]) => ({
         id,
         settings,

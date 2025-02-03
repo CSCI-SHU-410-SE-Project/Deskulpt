@@ -1,17 +1,13 @@
 use tauri::{command, AppHandle, Runtime};
 
 use super::error::CmdResult;
-use crate::states::StatesExtRenderReady;
+use crate::states::StatesExtInitialRender;
 
-/// Set the `render` listener as ready.
-///
-/// This is a wrapper command for
-/// [`set_render_ready`](StatesExtRenderReady::set_render_ready) to be invoked
-/// by the frontend.
+/// Wrapper of [`set_render_ready`](StatesExtInitialRender::set_render_ready).
 ///
 /// ### Errors
 ///
-/// - Failed to emit the `render` event to the canvas.
+/// - Failed to emit the `render-widgets` event to the canvas.
 #[command]
 pub async fn set_render_ready<R: Runtime>(app_handle: AppHandle<R>) -> CmdResult<()> {
     Ok(app_handle.set_render_ready()?)

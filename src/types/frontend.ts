@@ -20,9 +20,9 @@ export interface ManagerWidgetState {
 }
 
 /**
- * The payload of the "render" event.
+ * The payload of the "render-widgets" event.
  */
-export type RenderPayload = {
+export type RenderWidgetsPayload = {
   id: string;
   bundle: boolean;
   settings: WidgetSettings;
