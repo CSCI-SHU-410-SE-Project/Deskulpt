@@ -3,7 +3,7 @@ use tauri::{command, AppHandle, Runtime};
 use super::error::CmdResult;
 use crate::states::StatesExtInitialRender;
 
-/// Set the canvas as ready to render widgets.
+/// Wrapper of [`set_render_ready`](StatesExtInitialRender::set_render_ready).
 ///
 /// ### Errors
 ///
