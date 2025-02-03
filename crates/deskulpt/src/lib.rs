@@ -5,8 +5,8 @@
 )]
 
 use deskulpt_core::{
-    PathExt, Settings, ShortcutsExt, StatesExtCanvasClickThrough, StatesExtWidgetConfigMap,
-    TrayExt, WindowExt,
+    PathExt, Settings, ShortcutsExt, StatesExtCanvasClickThrough, StatesExtRenderReady,
+    StatesExtWidgetConfigMap, TrayExt, WindowExt,
 };
 use tauri::image::Image;
 use tauri::{generate_context, generate_handler, include_image, Builder};
@@ -29,6 +29,7 @@ pub fn run() {
                 },
             };
 
+            app.manage_render_ready();
             app.manage_widget_config_map();
             app.manage_canvas_click_through();
 
@@ -49,9 +50,11 @@ pub fn run() {
         .invoke_handler(generate_handler![
             deskulpt_core::commands::call_plugin,
             deskulpt_core::commands::bundle_widget,
+            deskulpt_core::commands::emit_on_render_ready,
             deskulpt_core::commands::exit_app,
             deskulpt_core::commands::open_in_widgets_dir,
             deskulpt_core::commands::rescan_widgets,
+            deskulpt_core::commands::set_render_ready,
             deskulpt_core::commands::update_shortcut,
         ])
         .plugin(tauri_plugin_clipboard_manager::init())

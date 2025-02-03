@@ -7,11 +7,8 @@ import {
 } from "react";
 import { ManagerWidgetState } from "../../types/frontend";
 import { WidgetSettings } from "../../types/backend";
-import { invokeRescanWidgets } from "../../commands";
-import {
-  emitRemoveWidgetsToCanvas,
-  emitRenderWidgetToCanvas,
-} from "../../events";
+import { invokeEmitOnRenderReady, invokeRescanWidgets } from "../../commands";
+import { emitRemoveWidgetsToCanvas, emitRenderToCanvas } from "../../events";
 
 export interface UseManagerWidgetStatesOutput {
   /** The manager widget states. */
@@ -44,7 +41,13 @@ export default function useManagerWidgetStates(): UseManagerWidgetStatesOutput {
    * the previous states. They will be rendered and the number of newly added widgets
    * will be returned.
    */
-  const rescanAndRender = useCallback(async () => {
+  const rescanAndRenderHelper = async (
+    initial: boolean,
+    managerWidgetStates: Record<string, ManagerWidgetState>,
+    setManagerWidgetStates: Dispatch<
+      SetStateAction<Record<string, ManagerWidgetState>>
+    >,
+  ) => {
     const detectedConfigs = await invokeRescanWidgets();
 
     // If a widget exists in the previous states but does not exist in the newdetected
@@ -81,26 +84,32 @@ export default function useManagerWidgetStates(): UseManagerWidgetStatesOutput {
       ([id]) => !(id in managerWidgetStates),
     );
     setManagerWidgetStates(newManagerWidgetStates); // Direct replacement
-    await Promise.all(
-      addedStates.map(([id, { settings }]) =>
-        emitRenderWidgetToCanvas({ id, settings, bundle: true }),
-      ),
-    );
+
+    const payload = addedStates.map(([id, { settings }]) => ({
+      id,
+      settings,
+      bundle: true,
+    }));
+    if (initial) {
+      await invokeEmitOnRenderReady({ payload });
+    } else {
+      await emitRenderToCanvas(payload);
+    }
+
     return addedStates.length;
-  }, [managerWidgetStates, setManagerWidgetStates]);
+  };
+
+  const rescanAndRender = useCallback(
+    () =>
+      rescanAndRenderHelper(false, managerWidgetStates, setManagerWidgetStates),
+    [managerWidgetStates, setManagerWidgetStates],
+  );
 
   useEffect(() => {
-    // The rescan is guaranteed to succeed because it triggers a command in the backend;
-    // the rendering, however, mail fail due to the canvas not being ready to receive
-    // the rendering events; this should be rare with a 1.5-second timeout
-    const timer = setTimeout(() => {
-      rescanAndRender().catch(console.error);
-    }, 1500);
-
-    return () => {
-      clearTimeout(timer);
-    };
-  }, []);
+    rescanAndRenderHelper(true, {}, setManagerWidgetStates).catch(
+      console.error,
+    );
+  }, [setManagerWidgetStates]);
 
   return { managerWidgetStates, setManagerWidgetStates, rescanAndRender };
 }

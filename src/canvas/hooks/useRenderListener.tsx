@@ -1,7 +1,7 @@
-import { useCallback, useEffect } from "react";
-import { listenToRenderWidget } from "../../events";
+import { useCallback, useEffect, useRef } from "react";
+import { listenToRender } from "../../events";
 import { WidgetSettings } from "../../types/backend";
-import { invokeBundleWidget } from "../../commands";
+import { invokeBundleWidget, invokeSetRenderReady } from "../../commands";
 import {
   Widget,
   updateWidgetRender,
@@ -14,9 +14,11 @@ import {
 const baseUrl = new URL(import.meta.url).origin;
 
 /**
- * Listen and react to the "render-widget" event.
+ * Listen and react to the "render" event.
  */
-export default function useRenderWidgetListener() {
+export default function useRenderListener() {
+  const hasInited = useRef(false);
+
   const bundleWidget = useCallback(
     async (id: string, settings: WidgetSettings) => {
       // Get the widget APIs blob URL, reusing if applicable
@@ -83,23 +85,31 @@ export default function useRenderWidgetListener() {
   );
 
   useEffect(() => {
-    const unlisten = listenToRenderWidget((event) => {
-      const { id, bundle, settings } = event.payload;
+    const unlisten = listenToRender(async (event) => {
+      const promises = event.payload.map(async ({ id, bundle, settings }) => {
+        if (bundle) {
+          await bundleWidget(id, settings);
+        } else {
+          // We do not wish to bundle the widget
+          // Make sure that we do not update settings of a not-yet-rendered widget; note
+          // that is not an errorneous case because users can update settings in the
+          // manager without having rendered them on the canvas; the case is, when the
+          // manager finally requests to bundle, it will carry the latest settings in the
+          // payload so the canvas can still get the correct information
+          updateWidgetSettings(id, settings);
+        }
+      });
 
-      // We do not wish to bundle the widget
-      if (!bundle) {
-        // Make sure that we do not update settings of a not-yet-rendered widget; note
-        // that is not an errorneous case because users can update settings in the
-        // manager without having rendered them on the canvas; the case is, when the
-        // manager finally requests to bundle, it will carry the latest settings in the
-        // payload so the canvas can still get the correct information
-        updateWidgetSettings(id, settings);
-        return;
-      }
-
-      // We do wish to bundle the widget
-      bundleWidget(id, settings).catch(console.error);
+      await Promise.all(promises);
     });
+
+    if (!hasInited.current) {
+      invokeSetRenderReady()
+        .then(() => {
+          hasInited.current = true;
+        })
+        .catch(console.error);
+    }
 
     return () => {
       unlisten.then((f) => f()).catch(console.error);
