@@ -3,7 +3,7 @@
  * without corresponding backend implementations.
  */
 
-import { WidgetConfig, WidgetSettings } from "./backend";
+import { Theme, WidgetConfig, WidgetSettings } from "./backend";
 
 export type DeepReadonly<T> = {
   readonly [P in keyof T]: T[P] extends object ? DeepReadonly<T[P]> : T[P];
@@ -44,4 +44,8 @@ export interface UpdateSettingsPayload {
   id: string;
   /** The widget-specific settings to update. */
   settings: Partial<WidgetSettings>;
+}
+
+export interface SwitchThemePayload {
+  theme: Theme;
 }

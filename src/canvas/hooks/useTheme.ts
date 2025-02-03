@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
-import { listenToToggleTheme } from "../../events";
-import { Theme } from "../../types/backend";
+import { listenToSwitchTheme } from "../../events";
 
 export function useTheme() {
   const [theme, setTheme] = useState(
@@ -8,10 +7,9 @@ export function useTheme() {
   );
 
   useEffect(() => {
-    const unlisten = listenToToggleTheme(() => {
-      setTheme((prevTheme) =>
-        prevTheme === Theme.LIGHT ? Theme.DARK : Theme.LIGHT,
-      );
+    const unlisten = listenToSwitchTheme((event) => {
+      const { theme } = event.payload;
+      setTheme(theme);
     });
 
     return () => {
