@@ -20,7 +20,7 @@ interface RemoveWidgetsPayload {
 export const removeWidgets = {
   on: (handler: EventCallback<RemoveWidgetsPayload>) =>
     listen("remove-widgets", handler),
-  tocanvas: (payload: RemoveWidgetsPayload) =>
+  toCanvas: (payload: RemoveWidgetsPayload) =>
     emitTo("canvas", "remove-widgets", payload),
 };
 
@@ -37,7 +37,7 @@ export type RenderWidgetsPayload = {
 export const renderWidgets = {
   on: (handler: EventCallback<RenderWidgetsPayload>) =>
     listen("render-widgets", handler),
-  tocanvas: (payload: RenderWidgetsPayload) =>
+  toCanvas: (payload: RenderWidgetsPayload) =>
     emitTo("canvas", "render-widgets", payload),
 };
 
@@ -69,7 +69,7 @@ interface SwitchThemePayload {
 export const switchTheme = {
   on: (handler: EventCallback<SwitchThemePayload>) =>
     listen("switch-theme", handler),
-  tocanvas: (payload: SwitchThemePayload) =>
+  toCanvas: (payload: SwitchThemePayload) =>
     emitTo("canvas", "switch-theme", payload),
 };
 
@@ -86,8 +86,8 @@ interface UpdateSettingsPayload {
 export const updateSettings = {
   on: (handler: EventCallback<UpdateSettingsPayload>) =>
     listen("update-settings", handler),
-  tocanvas: (payload: UpdateSettingsPayload) =>
+  toCanvas: (payload: UpdateSettingsPayload) =>
     emitTo("canvas", "update-settings", payload),
-  tomanager: (payload: UpdateSettingsPayload) =>
+  toManager: (payload: UpdateSettingsPayload) =>
     emitTo("manager", "update-settings", payload),
 };

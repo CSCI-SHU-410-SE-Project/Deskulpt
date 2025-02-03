@@ -34,7 +34,7 @@ const WidgetsTab = ({
   const managerWidgetStatesArray = Object.entries(managerWidgetStates);
 
   const rerenderAction = async () => {
-    await events.renderWidgets.tocanvas(
+    await events.renderWidgets.toCanvas(
       managerWidgetStatesArray.map(([id, { settings }]) => ({ id, settings })),
     );
     toast.success(`Re-rendered ${managerWidgetStatesArray.length} widgets.`);

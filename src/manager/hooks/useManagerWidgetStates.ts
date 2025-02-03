@@ -56,7 +56,7 @@ export default function useManagerWidgetStates(): UseManagerWidgetStatesOutput {
     );
     if (ids.length > 0) {
       // Notify the cacnvas to clean up resources allocated for removed widgets
-      await events.removeWidgets.tocanvas({ ids });
+      await events.removeWidgets.toCanvas({ ids });
     }
 
     const newManagerWidgetStates = Object.fromEntries(
@@ -88,7 +88,7 @@ export default function useManagerWidgetStates(): UseManagerWidgetStatesOutput {
     if (initial) {
       await commands.emitOnRenderReady({ payload });
     } else {
-      await events.renderWidgets.tocanvas(payload);
+      await events.renderWidgets.toCanvas(payload);
     }
 
     return addedStates.length;

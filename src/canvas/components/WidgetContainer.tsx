@@ -25,7 +25,7 @@ const WidgetContainer = memo(({ id }: WidgetContainerProps) => {
     (_: DraggableEvent, data: DraggableData) => {
       const pos = { x: x + data.x, y: y + data.y };
       updateWidgetSettings(id, pos);
-      events.updateSettings.tomanager({ id, settings: pos });
+      events.updateSettings.toManager({ id, settings: pos });
     },
     [id, x, y],
   );

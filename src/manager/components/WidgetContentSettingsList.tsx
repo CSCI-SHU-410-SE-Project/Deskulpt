@@ -35,7 +35,7 @@ const WidgetContentSettingList = ({
       [id]: { ...prev[id], settings: { ...settings, ...partialSettings } },
     }));
     events.updateSettings
-      .tocanvas({ id, settings: partialSettings })
+      .toCanvas({ id, settings: partialSettings })
       .catch(console.error);
   }
 

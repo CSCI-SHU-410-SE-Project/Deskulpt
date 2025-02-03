@@ -86,7 +86,7 @@ const WidgetContent = ({
           actionText="Re-render"
           action={() =>
             events.renderWidgets
-              .tocanvas([{ id }])
+              .toCanvas([{ id }])
               .then(() => toast.success("Re-rendered widget."))
           }
         />
