@@ -8,13 +8,8 @@ import {
   Text,
 } from "@radix-ui/themes";
 import { LuFolderOpen, LuRepeat } from "react-icons/lu";
-import { invokeOpenInWidgetsDir } from "../../commands";
-import {
-  WidgetConfig,
-  WidgetConfigType,
-  WidgetSettings,
-} from "../../types/backend";
-import { emitRenderWidgetsToCanvas } from "../../events";
+import { commands, events } from "../../core";
+import { WidgetConfig, WidgetConfigType, WidgetSettings } from "../../types";
 import { Dispatch, SetStateAction } from "react";
 import { ManagerWidgetState } from "../../types/frontend";
 import WidgetContentHeading from "../components/WidgetContentHeading";
@@ -64,7 +59,7 @@ const WidgetContent = ({
           actionIcon={<LuFolderOpen />}
           actionText="Edit"
           action={() =>
-            invokeOpenInWidgetsDir({ components: [config.content.dir] })
+            commands.openInWidgetsDir({ components: [config.content.dir] })
           }
         />
         <ScrollArea scrollbars="vertical" asChild>
@@ -90,9 +85,9 @@ const WidgetContent = ({
           actionIcon={<LuRepeat />}
           actionText="Re-render"
           action={() =>
-            emitRenderWidgetsToCanvas([{ id }]).then(() =>
-              toast.success("Re-rendered widget."),
-            )
+            events.renderWidgets
+              .toCanvas([{ id }])
+              .then(() => toast.success("Re-rendered widget."))
           }
         />
         <Box px="2" css={{ flex: 4 }}>

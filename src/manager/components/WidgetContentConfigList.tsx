@@ -1,8 +1,8 @@
 import { Code, DataList, Flex, IconButton, Tooltip } from "@radix-ui/themes";
-import { WidgetConfig, WidgetConfigType } from "../../types/backend";
+import { WidgetConfig, WidgetConfigType } from "../../types";
 import WidgetDependencies from "../components/WidgetDependencies";
 import { MdOpenInNew } from "react-icons/md";
-import { invokeOpenInWidgetsDir } from "../../commands";
+import { commands } from "../../core";
 
 interface WidgetContentConfigListProps {
   /** The widget ID. */
@@ -41,7 +41,7 @@ const WidgetContentConfigList = ({
                 variant="ghost"
                 size="1"
                 onClick={() =>
-                  invokeOpenInWidgetsDir({
+                  commands.openInWidgetsDir({
                     components: [config.content.dir, config.content.entry],
                   })
                 }

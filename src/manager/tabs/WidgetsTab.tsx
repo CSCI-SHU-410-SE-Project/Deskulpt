@@ -1,13 +1,12 @@
 import { Dispatch, SetStateAction } from "react";
 import { LuFileScan, LuFolderOpen, LuRepeat } from "react-icons/lu";
-import { invokeOpenInWidgetsDir } from "../../commands";
+import { commands, events } from "../../core";
 import { Flex, ScrollArea, Tabs } from "@radix-ui/themes";
 import { toast } from "sonner";
 import { ManagerWidgetState } from "../../types/frontend";
 import WidgetTrigger from "../components/WidgetTrigger";
 import WidgetContent from "../components/WidgetContent";
 import FloatButton from "../components/FloatButton";
-import { emitRenderWidgetsToCanvas } from "../../events";
 
 interface WidgetsTabProps {
   /** The manager widget states. */
@@ -35,7 +34,7 @@ const WidgetsTab = ({
   const managerWidgetStatesArray = Object.entries(managerWidgetStates);
 
   const rerenderAction = async () => {
-    await emitRenderWidgetsToCanvas(
+    await events.renderWidgets.toCanvas(
       managerWidgetStatesArray.map(([id, { settings }]) => ({ id, settings })),
     );
     toast.success(`Re-rendered ${managerWidgetStatesArray.length} widgets.`);
@@ -103,7 +102,7 @@ const WidgetsTab = ({
         order={1}
         icon={<LuFolderOpen />}
         tooltip="Open base directory"
-        onClick={() => invokeOpenInWidgetsDir({ components: [] })}
+        onClick={() => commands.openInWidgetsDir({ components: [] })}
       />
     </>
   );

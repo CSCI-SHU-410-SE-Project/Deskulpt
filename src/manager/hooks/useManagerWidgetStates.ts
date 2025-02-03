@@ -6,12 +6,8 @@ import {
   useState,
 } from "react";
 import { ManagerWidgetState } from "../../types/frontend";
-import { WidgetSettings } from "../../types/backend";
-import { invokeEmitOnRenderReady, invokeRescanWidgets } from "../../commands";
-import {
-  emitRemoveWidgetsToCanvas,
-  emitRenderWidgetsToCanvas,
-} from "../../events";
+import { WidgetSettings } from "../../types";
+import { commands, events } from "../../core";
 
 export interface UseManagerWidgetStatesOutput {
   /** The manager widget states. */
@@ -51,7 +47,7 @@ export default function useManagerWidgetStates(): UseManagerWidgetStatesOutput {
       SetStateAction<Record<string, ManagerWidgetState>>
     >,
   ) => {
-    const detectedConfigs = await invokeRescanWidgets();
+    const detectedConfigs = await commands.rescanWidgets();
 
     // If a widget exists in the previous states but does not exist in the newdetected
     // configurations, we consider it as removed from the collection
@@ -60,7 +56,7 @@ export default function useManagerWidgetStates(): UseManagerWidgetStatesOutput {
     );
     if (ids.length > 0) {
       // Notify the cacnvas to clean up resources allocated for removed widgets
-      await emitRemoveWidgetsToCanvas({ ids });
+      await events.removeWidgets.toCanvas({ ids });
     }
 
     const newManagerWidgetStates = Object.fromEntries(
@@ -90,9 +86,9 @@ export default function useManagerWidgetStates(): UseManagerWidgetStatesOutput {
 
     const payload = addedStates.map(([id, { settings }]) => ({ id, settings }));
     if (initial) {
-      await invokeEmitOnRenderReady({ payload });
+      await commands.emitOnRenderReady({ payload });
     } else {
-      await emitRenderWidgetsToCanvas(payload);
+      await events.renderWidgets.toCanvas(payload);
     }
 
     return addedStates.length;

@@ -1,17 +1,16 @@
 import { useEffect } from "react";
-import { listenToShowToast } from "../../events";
+import { events } from "../../core";
 import { toast } from "sonner";
-import { ShowToastPayloadType } from "../../types/backend";
 
 export function useShowToastListener() {
   useEffect(() => {
-    const unlisten = listenToShowToast((event) => {
+    const unlisten = events.showToast.on((event) => {
       const { type, content } = event.payload;
       switch (type) {
-        case ShowToastPayloadType.SUCCESS:
+        case events.ShowToastPayloadType.SUCCESS:
           void toast.success(content);
           break;
-        case ShowToastPayloadType.ERROR:
+        case events.ShowToastPayloadType.ERROR:
           void toast.error(content);
           break;
       }
