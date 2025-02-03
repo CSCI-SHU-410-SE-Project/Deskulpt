@@ -5,7 +5,7 @@
 )]
 
 use deskulpt_core::{
-    PathExt, Settings, ShortcutsExt, StatesExtCanvasClickThrough, StatesExtRenderReady,
+    PathExt, Settings, ShortcutsExt, StatesExtCanvasClickThrough, StatesExtInitialRender,
     StatesExtWidgetConfigMap, TrayExt, WindowExt,
 };
 use tauri::image::Image;
@@ -29,7 +29,7 @@ pub fn run() {
                 },
             };
 
-            app.manage_render_ready();
+            app.manage_initial_render();
             app.manage_widget_config_map();
             app.manage_canvas_click_through();
 
