@@ -8,6 +8,7 @@ import {
   useRenderWidgetsListener,
   useShowToastListener,
   useTheme,
+  useUpdateSettingsListener,
 } from "./hooks";
 
 const App = () => {
@@ -16,9 +17,10 @@ const App = () => {
     useShallow((state) => Object.keys(state.widgets)),
   );
 
-  useShowToastListener();
-  useRenderWidgetsListener();
   useRemoveWidgetsListener();
+  useRenderWidgetsListener();
+  useShowToastListener();
+  useUpdateSettingsListener();
 
   return (
     <RadixTheme

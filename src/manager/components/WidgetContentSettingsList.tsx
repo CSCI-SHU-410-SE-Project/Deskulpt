@@ -1,7 +1,7 @@
 import { Dispatch, SetStateAction } from "react";
 import { WidgetSettings } from "../../types/backend";
 import { ManagerWidgetState } from "../../types/frontend";
-import { emitRenderWidgetsToCanvas } from "../../events";
+import { emitUpdateSettingsToCanvas } from "../../events";
 import { DataList, Flex } from "@radix-ui/themes";
 import NumberInput from "../components/NumberInput";
 import { FaTimes } from "react-icons/fa";
@@ -30,18 +30,13 @@ const WidgetContentSettingList = ({
   setManagerWidgetStates,
 }: WidgetContentSettingListProps) => {
   function updateSetting(partialSettings: Partial<WidgetSettings>) {
-    const newSettings = { ...settings, ...partialSettings };
     setManagerWidgetStates((prev) => ({
       ...prev,
-      [id]: { ...prev[id], settings: newSettings },
+      [id]: { ...prev[id], settings: { ...settings, ...partialSettings } },
     }));
-    emitRenderWidgetsToCanvas([
-      {
-        id,
-        settings: newSettings,
-        bundle: false,
-      },
-    ]).catch(console.error);
+    emitUpdateSettingsToCanvas({ id, settings: partialSettings }).catch(
+      console.error,
+    );
   }
 
   return (

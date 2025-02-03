@@ -24,8 +24,8 @@ export interface ManagerWidgetState {
  */
 export type RenderWidgetsPayload = {
   id: string;
-  bundle: boolean;
-  settings: WidgetSettings;
+  settings?: WidgetSettings;
+  code?: string;
 }[];
 
 /**
