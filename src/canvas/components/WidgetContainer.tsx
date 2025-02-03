@@ -2,7 +2,7 @@ import { RefObject, useCallback, useRef } from "react";
 import Draggable, { DraggableData, DraggableEvent } from "react-draggable";
 import { ErrorBoundary } from "react-error-boundary";
 import ErrorDisplay from "../components/ErrorDisplay";
-import { grabErrorInfo } from "../utils";
+import { stringifyError } from "../utils";
 import { LuGripVertical } from "react-icons/lu";
 import { Box } from "@radix-ui/themes";
 import {
@@ -75,7 +75,7 @@ const WidgetContainer = ({ id }: WidgetContainerProps) => {
         <ErrorBoundary
           resetKeys={[Component]}
           fallbackRender={({ error }) => (
-            <ErrorDisplay title={id} error={grabErrorInfo(error)} />
+            <ErrorDisplay id={id} error={stringifyError(error)} />
           )}
         >
           <Component id={id} />

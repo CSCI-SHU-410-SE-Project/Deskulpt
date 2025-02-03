@@ -1,14 +1,11 @@
 /**
- * Grab as much information as possible from an unknown error.
+ * Stringify an unknown error into a human-readable format.
  *
- * A string error will be returned as is. An `Error` object will return its stack if it
- * exists, otherwise its message. If the error does not fall into any of the above
- * categories, a generic message will be returned.
- *
- * @param err The unknown error, commonly from `catch`.
- * @returns The error information.
+ * A string error will be returned as is. An `Error` object will return its
+ * stack if available, otherwise its message. If the error does not fall into
+ * any of the above categories, a generic message will be returned.
  */
-export function grabErrorInfo(err: unknown) {
+export function stringifyError(err: unknown) {
   if (typeof err === "string") {
     return err;
   }
