@@ -2,7 +2,14 @@
  * This file contains the types and interfaces that have backend counterparts.
  */
 
-export type ShowToastPayload = { success: string } | { error: string };
+export enum ShowToastPayloadType {
+  SUCCESS = "SUCCESS",
+  ERROR = "ERROR",
+}
+
+export type ShowToastPayload =
+  | { type: ShowToastPayloadType.SUCCESS; content: string }
+  | { type: ShowToastPayloadType.ERROR; content: string };
 
 export enum WidgetConfigType {
   VALID = "VALID",

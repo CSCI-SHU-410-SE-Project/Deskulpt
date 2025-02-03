@@ -2,11 +2,11 @@ import { useEffect, useRef } from "react";
 import { listenToRenderWidgets } from "../../events";
 import { invokeBundleWidget, invokeSetRenderReady } from "../../commands";
 import {
-  Widget,
   updateWidgetRender,
   updateWidgetRenderError,
   useWidgetsStore,
 } from "./useWidgetsStore";
+import { stringifyError } from "../utils";
 
 const BASE_URL = new URL(import.meta.url).origin;
 const RAW_APIS_URL = new URL("/generated/raw-apis.js", BASE_URL).href;
@@ -48,7 +48,13 @@ export function useRenderWidgetsListener() {
               apisBlobUrl,
             });
           } catch (error) {
-            updateWidgetRenderError(id, error, apisBlobUrl, settings);
+            updateWidgetRenderError(
+              id,
+              "Error bundling the widget",
+              stringifyError(error),
+              apisBlobUrl,
+              settings,
+            );
             return;
           }
         }
@@ -58,31 +64,35 @@ export function useRenderWidgetsListener() {
         let module;
         try {
           module = await import(/* @vite-ignore */ moduleBlobUrl);
+          if (module.default === undefined) {
+            throw new Error("Missing default export");
+          }
         } catch (error) {
-          URL.revokeObjectURL(moduleBlobUrl);
-          updateWidgetRenderError(id, error, apisBlobUrl, settings);
-          return;
-        }
-
-        const widget = module.default as Widget;
-        if (widget === undefined || widget.Component === undefined) {
           URL.revokeObjectURL(moduleBlobUrl);
           updateWidgetRenderError(
             id,
-            "The widget must provide a default export with a `Component` property.",
+            "Error importing the widget module",
+            stringifyError(error),
             apisBlobUrl,
             settings,
           );
           return;
         }
 
-        updateWidgetRender(id, widget, moduleBlobUrl, apisBlobUrl, settings);
+        updateWidgetRender(
+          id,
+          module.default,
+          moduleBlobUrl,
+          apisBlobUrl,
+          settings,
+        );
       });
 
       await Promise.all(promises);
     });
 
     if (!hasInited.current) {
+      // Set the canvas as ready to render only once
       invokeSetRenderReady()
         .then(() => {
           hasInited.current = true;
