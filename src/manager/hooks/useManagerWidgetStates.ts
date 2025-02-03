@@ -88,11 +88,7 @@ export default function useManagerWidgetStates(): UseManagerWidgetStatesOutput {
     );
     setManagerWidgetStates(newManagerWidgetStates); // Direct replacement
 
-    const payload = addedStates.map(([id, { settings }]) => ({
-      id,
-      settings,
-      bundle: true,
-    }));
+    const payload = addedStates.map(([id, { settings }]) => ({ id, settings }));
     if (initial) {
       await invokeEmitOnRenderReady({ payload });
     } else {

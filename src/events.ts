@@ -68,6 +68,17 @@ export async function emitUpdateSettingsToManager(
 }
 
 /**
+ * Emit the "update-settings" event to the canvas window.
+ *
+ * @param payload The payload of the event.
+ */
+export async function emitUpdateSettingsToCanvas(
+  payload: UpdateSettingsPayload,
+) {
+  await emitTo("canvas", "update-settings", payload);
+}
+
+/**
  * Listen to the "update-settings" event.
  *
  * @param handler The callback function to handle the event.

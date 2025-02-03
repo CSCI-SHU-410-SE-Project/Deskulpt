@@ -90,8 +90,8 @@ const WidgetContent = ({
           actionIcon={<LuRepeat />}
           actionText="Re-render"
           action={() =>
-            emitRenderWidgetsToCanvas([{ id, settings, bundle: true }]).then(
-              () => toast.success(`Re-rendered widget "${id}".`),
+            emitRenderWidgetsToCanvas([{ id }]).then(() =>
+              toast.success("Re-rendered widget."),
             )
           }
         />
