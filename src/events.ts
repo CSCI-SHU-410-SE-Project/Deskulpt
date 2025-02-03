@@ -8,28 +8,30 @@
 import { EventCallback, emitTo, listen } from "@tauri-apps/api/event";
 import {
   RemoveWidgetsPayload,
-  RenderPayload,
+  RenderWidgetsPayload,
   UpdateSettingsPayload,
 } from "./types/frontend";
 import { ShowToastPayload, Theme } from "./types/backend";
 
 /**
- * Emit the "render" event to the canvas window.
+ * Emit the "render-widgets" event to the canvas window.
  *
  * @param payload The payload of the event.
  */
-export async function emitRenderToCanvas(payload: RenderPayload) {
-  await emitTo("canvas", "render", payload);
+export async function emitRenderWidgetsToCanvas(payload: RenderWidgetsPayload) {
+  await emitTo("canvas", "render-widgets", payload);
 }
 
 /**
- * Listen to the "render" event.
+ * Listen to the "render-widgets" event.
  *
  * @param handler The callback function to handle the event.
  * @returns A promise that resolves to a function to unlisten to the event.
  */
-export function listenToRender(handler: EventCallback<RenderPayload>) {
-  return listen("render", handler);
+export function listenToRenderWidgets(
+  handler: EventCallback<RenderWidgetsPayload>,
+) {
+  return listen("render-widgets", handler);
 }
 
 /**

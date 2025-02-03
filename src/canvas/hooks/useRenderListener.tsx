@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef } from "react";
-import { listenToRender } from "../../events";
+import { listenToRenderWidgets } from "../../events";
 import { WidgetSettings } from "../../types/backend";
 import { invokeBundleWidget, invokeSetRenderReady } from "../../commands";
 import {
@@ -14,9 +14,9 @@ import {
 const baseUrl = new URL(import.meta.url).origin;
 
 /**
- * Listen and react to the "render" event.
+ * Listen and react to the "render-widgets" event.
  */
-export default function useRenderListener() {
+export default function useRenderWidgetsListener() {
   const hasInited = useRef(false);
 
   const bundleWidget = useCallback(
@@ -71,11 +71,6 @@ export default function useRenderListener() {
           );
           return;
         }
-
-        // We have validated the module so we can call `render` safely; there could be
-        // error within `render` so it needs to called in advance, otherwise things will
-        // get broken in the state setter, causing the error to be uncaught and also
-        // affecting other widget displays
         updateWidgetRender(id, widget, moduleBlobUrl, apisBlobUrl, settings);
       } catch (err) {
         updateWidgetRenderError(id, err, apisBlobUrl, settings);
@@ -85,7 +80,7 @@ export default function useRenderListener() {
   );
 
   useEffect(() => {
-    const unlisten = listenToRender(async (event) => {
+    const unlisten = listenToRenderWidgets(async (event) => {
       const promises = event.payload.map(async ({ id, bundle, settings }) => {
         if (bundle) {
           await bundleWidget(id, settings);

@@ -1,7 +1,7 @@
 import { Dispatch, SetStateAction } from "react";
 import { WidgetSettings } from "../../types/backend";
 import { ManagerWidgetState } from "../../types/frontend";
-import { emitRenderToCanvas } from "../../events";
+import { emitRenderWidgetsToCanvas } from "../../events";
 import { DataList, Flex } from "@radix-ui/themes";
 import NumberInput from "../components/NumberInput";
 import { FaTimes } from "react-icons/fa";
@@ -35,7 +35,7 @@ const WidgetContentSettingList = ({
       ...prev,
       [id]: { ...prev[id], settings: newSettings },
     }));
-    emitRenderToCanvas([
+    emitRenderWidgetsToCanvas([
       {
         id,
         settings: newSettings,

@@ -8,7 +8,10 @@ import {
 import { ManagerWidgetState } from "../../types/frontend";
 import { WidgetSettings } from "../../types/backend";
 import { invokeEmitOnRenderReady, invokeRescanWidgets } from "../../commands";
-import { emitRemoveWidgetsToCanvas, emitRenderToCanvas } from "../../events";
+import {
+  emitRemoveWidgetsToCanvas,
+  emitRenderWidgetsToCanvas,
+} from "../../events";
 
 export interface UseManagerWidgetStatesOutput {
   /** The manager widget states. */
@@ -93,7 +96,7 @@ export default function useManagerWidgetStates(): UseManagerWidgetStatesOutput {
     if (initial) {
       await invokeEmitOnRenderReady({ payload });
     } else {
-      await emitRenderToCanvas(payload);
+      await emitRenderWidgetsToCanvas(payload);
     }
 
     return addedStates.length;
