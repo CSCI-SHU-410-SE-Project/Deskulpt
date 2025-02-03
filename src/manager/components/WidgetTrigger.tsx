@@ -1,5 +1,5 @@
 import { Box, Flex, Tabs, Text } from "@radix-ui/themes";
-import { WidgetConfig, WidgetConfigType } from "../../types/backend";
+import { WidgetConfig, WidgetConfigType } from "../../types";
 
 interface WidgetTriggerProps {
   /** The index of the widget in the collection. */

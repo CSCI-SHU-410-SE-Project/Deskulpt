@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { WidgetSettings } from "../../types/backend";
+import { WidgetSettings } from "../../types";
 import { FC, createElement } from "react";
 import ErrorDisplay from "../components/ErrorDisplay";
 

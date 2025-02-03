@@ -1,5 +1,5 @@
 import { Dispatch, SetStateAction, useEffect } from "react";
-import { listenToUpdateSettings } from "../../events";
+import { events } from "../../core";
 import { ManagerWidgetState } from "../../types/frontend";
 
 /**
@@ -17,7 +17,7 @@ export default function useUpdateSettingListener(
   >,
 ) {
   useEffect(() => {
-    const unlisten = listenToUpdateSettings((event) => {
+    const unlisten = events.updateSettings.on((event) => {
       const { id, settings } = event.payload;
 
       setManagerWidgetStates((prev) => {

@@ -1,7 +1,6 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { DeepReadonly } from "../types/frontend";
-import { Settings } from "../types/backend";
+import { DeepReadonly, Settings } from "../types";
 import App from "./App";
 import "@radix-ui/themes/styles.css";
 

@@ -9,7 +9,7 @@ import {
   updateWidgetSettings,
   useWidgetsStore,
 } from "../hooks/useWidgetsStore";
-import { emitUpdateSettingsToManager } from "../../events";
+import { events } from "../../core";
 
 interface WidgetContainerProps {
   id: string;
@@ -25,7 +25,7 @@ const WidgetContainer = memo(({ id }: WidgetContainerProps) => {
     (_: DraggableEvent, data: DraggableData) => {
       const pos = { x: x + data.x, y: y + data.y };
       updateWidgetSettings(id, pos);
-      emitUpdateSettingsToManager({ id, settings: pos });
+      events.updateSettings.tomanager({ id, settings: pos });
     },
     [id, x, y],
   );

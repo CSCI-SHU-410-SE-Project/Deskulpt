@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { listenToSwitchTheme } from "../../events";
+import { events } from "../../core";
 
 export function useTheme() {
   const [theme, setTheme] = useState(
@@ -7,7 +7,7 @@ export function useTheme() {
   );
 
   useEffect(() => {
-    const unlisten = listenToSwitchTheme((event) => {
+    const unlisten = events.switchTheme.on((event) => {
       setTheme(event.payload.theme);
     });
 

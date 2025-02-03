@@ -1,6 +1,5 @@
 import { useEffect, useRef } from "react";
-import { listenToRenderWidgets } from "../../events";
-import { invokeBundleWidget, invokeSetRenderReady } from "../../commands";
+import { commands, events } from "../../core";
 import {
   updateWidgetRender,
   updateWidgetRenderError,
@@ -15,7 +14,7 @@ export function useRenderWidgetsListener() {
   const hasInited = useRef(false);
 
   useEffect(() => {
-    const unlisten = listenToRenderWidgets(async (event) => {
+    const unlisten = events.renderWidgets.on(async (event) => {
       const widgets = useWidgetsStore.getState().widgets;
 
       const promises = event.payload.map(async ({ id, settings, code }) => {
@@ -42,7 +41,7 @@ export function useRenderWidgetsListener() {
         if (code === undefined) {
           // If code is not provided, we need to bundle the widget
           try {
-            code = await invokeBundleWidget({
+            code = await commands.bundleWidget({
               id,
               baseUrl: BASE_URL,
               apisBlobUrl,
@@ -93,7 +92,8 @@ export function useRenderWidgetsListener() {
 
     if (!hasInited.current) {
       // Set the canvas as ready to render only once
-      invokeSetRenderReady()
+      commands
+        .setRenderReady()
         .then(() => {
           hasInited.current = true;
         })

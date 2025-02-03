@@ -1,8 +1,7 @@
 import { useEffect } from "react";
-import { listenToExitApp } from "../../events";
-import { invokeExitApp } from "../../commands";
+import { commands, events } from "../../core";
 import { ManagerWidgetState } from "../../types/frontend";
-import { Theme } from "../../types/backend";
+import { Theme } from "../../types";
 
 /**
  * Listen and react to the "exit-app" event.
@@ -20,7 +19,7 @@ export default function useExitAppListener(
   managerWidgetStates: Record<string, ManagerWidgetState>,
 ) {
   useEffect(() => {
-    const unlisten = listenToExitApp(() => {
+    const unlisten = events.exitApp.on(() => {
       const widgetSettingsMap = Object.fromEntries(
         Object.entries(managerWidgetStates).map(([id, { settings }]) => [
           id,
@@ -31,7 +30,7 @@ export default function useExitAppListener(
         app: { theme, shortcuts: { toggleCanvas: toggleShortcut } },
         widgets: widgetSettingsMap,
       };
-      invokeExitApp({ settings }).catch(console.error);
+      commands.exitApp({ settings }).catch(console.error);
     });
 
     return () => {
