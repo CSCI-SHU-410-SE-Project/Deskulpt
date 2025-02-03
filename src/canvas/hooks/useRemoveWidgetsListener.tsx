@@ -5,8 +5,7 @@ import { removeWidgets } from "./useWidgetsStore";
 export function useRemoveWidgetsListener() {
   useEffect(() => {
     const unlisten = listenToRemoveWidgets((event) => {
-      const { ids } = event.payload;
-      removeWidgets(ids);
+      removeWidgets(event.payload.ids);
     });
 
     return () => {

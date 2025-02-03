@@ -8,8 +8,7 @@ export function useTheme() {
 
   useEffect(() => {
     const unlisten = listenToSwitchTheme((event) => {
-      const { theme } = event.payload;
-      setTheme(theme);
+      setTheme(event.payload.theme);
     });
 
     return () => {
