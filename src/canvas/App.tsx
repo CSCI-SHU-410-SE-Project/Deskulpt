@@ -1,5 +1,5 @@
 import WidgetContainer from "./components/WidgetContainer";
-import useRenderWidgetListener from "./hooks/useRenderWidgetListener";
+import useRenderListener from "./hooks/useRenderListener";
 import useRemoveWidgetsListener from "./hooks/useRemoveWidgetsListener";
 import useShowToastListener from "./hooks/useShowToastListener";
 import { Toaster } from "sonner";
@@ -15,7 +15,7 @@ const App = () => {
   );
 
   useShowToastListener();
-  useRenderWidgetListener();
+  useRenderListener();
   useRemoveWidgetsListener();
 
   return (

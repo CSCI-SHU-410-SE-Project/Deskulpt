@@ -20,16 +20,13 @@ export interface ManagerWidgetState {
 }
 
 /**
- * The payload of the "render-widget" event.
+ * The payload of the "render" event.
  */
-export interface RenderWidgetPayload {
-  /** The widget ID. */
+export type RenderPayload = {
   id: string;
-  /** Whether to call the backend to bundle the widget. */
   bundle: boolean;
-  /** The widget-specific settings. */
   settings: WidgetSettings;
-}
+}[];
 
 /**
  * The payload of the "remove-widgets" event.
