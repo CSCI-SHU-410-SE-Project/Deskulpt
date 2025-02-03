@@ -33,7 +33,7 @@ export type RenderWidgetsPayload = {
  */
 export interface RemoveWidgetsPayload {
   /** The widget IDs to remove. */
-  removedIds: string[];
+  ids: string[];
 }
 
 /**

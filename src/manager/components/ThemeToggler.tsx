@@ -2,7 +2,7 @@ import { Box, IconButton, Tooltip } from "@radix-ui/themes";
 import { Theme } from "../../types/backend";
 import { MdOutlineDarkMode, MdOutlineLightMode } from "react-icons/md";
 import { Dispatch, SetStateAction } from "react";
-import { emitSwitchThemeToCanvas } from "../../events";
+import { emitToggleThemeToCanvas } from "../../events";
 
 interface AppearanceTogglerProps {
   /** Theme. */
@@ -20,9 +20,10 @@ interface AppearanceTogglerProps {
  */
 const AppearanceToggler = ({ theme, setTheme }: AppearanceTogglerProps) => {
   const toggleTheme = () => {
-    const newTheme = theme === Theme.LIGHT ? Theme.DARK : Theme.LIGHT;
-    setTheme(newTheme);
-    emitSwitchThemeToCanvas(newTheme).catch(console.error);
+    setTheme((prevTheme) =>
+      prevTheme === Theme.LIGHT ? Theme.DARK : Theme.LIGHT,
+    );
+    emitToggleThemeToCanvas().catch(console.error);
   };
 
   return (

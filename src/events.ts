@@ -11,7 +11,7 @@ import {
   RenderWidgetsPayload,
   UpdateSettingsPayload,
 } from "./types/frontend";
-import { ShowToastPayload, Theme } from "./types/backend";
+import { ShowToastPayload } from "./types/backend";
 
 /**
  * Emit the "render-widgets" event to the canvas window.
@@ -79,22 +79,20 @@ export function listenToUpdateSettings(
 }
 
 /**
- * Emit the "switch-theme" event to the canvas window.
- *
- * @param payload The payload of the event.
+ * Emit the "toggle-theme" event to the canvas window.
  */
-export async function emitSwitchThemeToCanvas(payload: Theme) {
-  await emitTo("canvas", "switch-theme", payload);
+export async function emitToggleThemeToCanvas() {
+  await emitTo("canvas", "toggle-theme");
 }
 
 /**
- * Listen to the "switch-theme" event.
+ * Listen to the "toggle-theme" event.
  *
  * @param handler The callback function to handle the event.
  * @returns A promise that resolves to a function to unlisten to the event.
  */
-export function listenToSwitchTheme(handler: EventCallback<Theme>) {
-  return listen("switch-theme", handler);
+export function listenToToggleTheme(handler: EventCallback<void>) {
+  return listen("toggle-theme", handler);
 }
 
 /**
