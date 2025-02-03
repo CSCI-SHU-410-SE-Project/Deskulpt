@@ -1,14 +1,12 @@
 import { useEffect } from "react";
 import { listenToBatchRemove } from "../../core/events";
-import { WidgetsActionType, WidgetsDispatch, WidgetsState } from "./useWidgets";
+import { removeWidgets, useWidgetsStore } from "./useWidgetsStore";
 
-export function useBatchRemoveListener(
-  widgets: WidgetsState,
-  widgetsDispatch: WidgetsDispatch,
-) {
+export function useBatchRemoveListener() {
   useEffect(() => {
     const unlisten = listenToBatchRemove((event) => {
       const { ids } = event.payload;
+      const widgets = useWidgetsStore.getState().widgets;
 
       ids.forEach((id) => {
         const widget = widgets[id];
@@ -21,14 +19,11 @@ export function useBatchRemoveListener(
         }
       });
 
-      widgetsDispatch({
-        type: WidgetsActionType.BATCH_REMOVE,
-        payload: { ids },
-      });
+      removeWidgets(ids);
     });
 
     return () => {
       unlisten.then((f) => f()).catch(console.error);
     };
-  }, [widgets, widgetsDispatch]);
+  }, []);
 }

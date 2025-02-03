@@ -29,7 +29,6 @@ pub fn run() {
                 },
             };
 
-            // Initialize application state management
             app.manage_render_ready();
             app.manage_widget_config_map();
             app.manage_canvas_click_through();

@@ -5,12 +5,12 @@ import {
   useRender,
   useShowToastListener,
   useTheme,
-  useUpdateSettingsCallback,
   useUpdateSettingsListener,
-  useWidgets,
+  useWidgetsStore,
 } from "./hooks";
 import { RenderingScreen, WidgetContainer } from "./components";
 import { css } from "@emotion/react";
+import { useShallow } from "zustand/shallow";
 
 const styles = {
   root: css({ height: "100vh" }),
@@ -18,13 +18,15 @@ const styles = {
 
 export default () => {
   const theme = useTheme();
-  const [widgets, widgetsDispatch] = useWidgets();
-  const isRendering = useRender(widgets, widgetsDispatch);
-  const updateSettings = useUpdateSettingsCallback(widgetsDispatch);
+  const ids = useWidgetsStore(
+    useShallow((state) => Object.keys(state.widgets)),
+  );
 
-  useBatchRemoveListener(widgets, widgetsDispatch);
+  const isRendering = useRender();
+
+  useBatchRemoveListener();
   useShowToastListener();
-  useUpdateSettingsListener(widgetsDispatch);
+  useUpdateSettingsListener();
 
   return (
     <RadixTheme
@@ -48,13 +50,8 @@ export default () => {
         }}
       />
       <Box>
-        {Object.entries(widgets).map(([id, widget]) => (
-          <WidgetContainer
-            key={id}
-            id={id}
-            widget={widget}
-            updateSettings={updateSettings}
-          />
+        {ids.map((id) => (
+          <WidgetContainer key={id} id={id} />
         ))}
       </Box>
     </RadixTheme>

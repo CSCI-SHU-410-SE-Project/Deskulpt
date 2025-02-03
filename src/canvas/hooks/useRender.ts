@@ -1,18 +1,16 @@
 import { useEffect, useRef, useState } from "react";
 import { BASE_URL } from "../consts";
 import { invokeBundleWidget, invokeSetRenderReady } from "../../core/commands";
+
+import { listenToRender } from "../../core/events";
 import {
   Widget,
-  WidgetsActionType,
-  WidgetsDispatch,
-  WidgetsState,
-} from "./useWidgets";
-import { listenToRender } from "../../core/events";
+  updateWidgetRender,
+  updateWidgetRenderError,
+  useWidgetsStore,
+} from "./useWidgetsStore";
 
-export function useRender(
-  widgets: WidgetsState,
-  widgetsDispatch: WidgetsDispatch,
-) {
+export function useRender() {
   const [isRendering, setIsRendering] = useState(true);
   const hasInited = useRef(false);
 
@@ -21,6 +19,7 @@ export function useRender(
       // If rendering is done within 1s, we do not set loading state at all
       const timer = setTimeout(() => setIsRendering(true), 1000);
 
+      const widgets = useWidgetsStore.getState().widgets;
       const promises = event.payload.map(async ({ id, settings, code }) => {
         let apisBlobUrl;
 
@@ -52,16 +51,9 @@ export function useRender(
             apisBlobUrl,
             code,
           );
-
-          widgetsDispatch({
-            type: WidgetsActionType.SET_RENDER,
-            payload: { id, widget, settings, apisBlobUrl, moduleBlobUrl },
-          });
+          updateWidgetRender(id, widget, moduleBlobUrl, apisBlobUrl, settings);
         } catch (error) {
-          widgetsDispatch({
-            type: WidgetsActionType.SET_RENDER_ERROR,
-            payload: { id, error, settings, apisBlobUrl },
-          });
+          updateWidgetRenderError(id, error, apisBlobUrl, settings);
         }
       });
 
@@ -81,7 +73,7 @@ export function useRender(
     return () => {
       unlisten.then((f) => f()).catch(console.error);
     };
-  }, [widgets, widgetsDispatch, setIsRendering]);
+  }, [setIsRendering]);
 
   return isRendering;
 }

@@ -1,12 +1,13 @@
-import { RefObject, memo, useRef } from "react";
+import { RefObject, memo, useCallback, useRef } from "react";
 import Draggable, { DraggableData, DraggableEvent } from "react-draggable";
 import { ErrorBoundary } from "react-error-boundary";
 import { LuGripVertical } from "react-icons/lu";
 import { Box } from "@radix-ui/themes";
-import { UpdateSettingsCallback, WidgetState } from "../hooks";
+import { updateWidgetSettings, useWidgetsStore } from "../hooks";
 import ErrorDisplay from "./ErrorDisplay";
 import { stringifyError } from "../utils";
 import { css } from "@emotion/react";
+import { emitUpdateSettingsToManager } from "../../core/events";
 
 const styles = {
   container: css({
@@ -31,24 +32,29 @@ const styles = {
 
 interface Props {
   id: string;
-  widget: WidgetState;
-  updateSettings: UpdateSettingsCallback;
 }
 
-export default memo(({ id, widget, updateSettings }: Props) => {
-  const { Component, width, height, x, y, opacity } = widget;
+export default memo(({ id }: Props) => {
+  const { Component, width, height, x, y, opacity } = useWidgetsStore(
+    (state) => state.widgets[id],
+  );
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const updateContainerPos = (_: DraggableEvent, data: DraggableData) => {
-    updateSettings(id, { x: x + data.x, y: y + data.y });
-  };
+  const onStop = useCallback(
+    (_: DraggableEvent, data: DraggableData) => {
+      const pos = { x: x + data.x, y: y + data.y };
+      updateWidgetSettings(id, pos);
+      emitUpdateSettingsToManager({ id, settings: pos }).catch(console.error);
+    },
+    [id, x, y],
+  );
 
   return (
     <Draggable
       // TODO: remove the `as` part which is workaround for React 19:
       // https://github.com/react-grid-layout/react-draggable/issues/768
       nodeRef={containerRef as RefObject<HTMLDivElement>}
-      onStop={updateContainerPos}
+      onStop={onStop}
       bounds="body"
       handle=".draggable-handle"
       position={{ x: 0, y: 0 }}
@@ -70,7 +76,7 @@ export default memo(({ id, widget, updateSettings }: Props) => {
           css={styles.dragger}
         />
         <ErrorBoundary
-          resetKeys={[id, widget]}
+          resetKeys={[Component]}
           fallbackRender={({ error }) => (
             <ErrorDisplay id={id} error={stringifyError(error)} />
           )}
