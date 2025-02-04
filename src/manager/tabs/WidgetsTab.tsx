@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import WidgetTrigger from "../components/WidgetTrigger";
 import WidgetContent from "../components/WidgetContent";
 import FloatButton from "../components/FloatButton";
-import { rescan, useWidgetsStore } from "../hooks/useWidgetsStore";
+import { rescan, useWidgetsStore } from "../hooks";
 
 const WidgetsTab = () => {
   const widgets = useWidgetsStore((state) => state.widgets);

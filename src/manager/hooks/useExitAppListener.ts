@@ -1,12 +1,10 @@
 import { useEffect } from "react";
 import { commands, events } from "../../core";
-import { Theme, WidgetSettings } from "../../types";
+import { WidgetSettings } from "../../types";
 import { useWidgetsStore } from "./useWidgetsStore";
+import { useAppSettingsStore } from "./useAppSettingsStore";
 
-export default function useExitAppListener(
-  toggleShortcut: string | null,
-  theme: Theme,
-) {
+export function useExitAppListener() {
   useEffect(() => {
     const unlisten = events.exitApp.on(() => {
       const widgets = useWidgetsStore.getState().widgets.reduce(
@@ -17,15 +15,13 @@ export default function useExitAppListener(
         {} as Record<string, WidgetSettings>,
       );
 
-      const settings = {
-        app: { theme, shortcuts: { toggleCanvas: toggleShortcut } },
-        widgets,
-      };
+      const app = useAppSettingsStore.getState();
+      const settings = { app, widgets };
       commands.exitApp({ settings }).catch(console.error);
     });
 
     return () => {
       unlisten.then((f) => f()).catch(console.error);
     };
-  }, [toggleShortcut, theme]);
+  }, []);
 }

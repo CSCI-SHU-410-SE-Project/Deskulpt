@@ -9,40 +9,16 @@ import {
   Strong,
   Text,
 } from "@radix-ui/themes";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Shortcut from "./Shortcut";
 import { FaEdit } from "react-icons/fa";
-import useKeyboardListener from "../hooks/useKeyboardListener";
+import { updateShortcut, useKeyboardListener } from "../hooks";
 
 interface SettingToggleShortcutProps {
-  /** Setter for the toggle shortcut state. */
-  setToggleShortcut: Dispatch<SetStateAction<string | null>>;
+  shortcut: string | null;
 }
 
-/**
- * The popover for setting the toggle shortcut.
- *
- * This is rendered as a button, which on click will show the popover. The popover can
- * be closed by clicking again the button, clicking submit (if allowed) or cancel, or
- * pressing the escape key. It cannot be closed by simply clicking outside.
- *
- * - **Checkbox whether to disable the shortcut:** If checked, everything related to the
- *   shortcut setter will be cleaned up. The submit button will be enabled. By default
- *   this is unchecked.
- * - **Shortcut setting panel:** Interactive panel for setting the shortcut. After
- *   clicking the start listening button, pressed shortcut keys will be displayed in
- *   this panel. The submit button will be enabled when the shortcut is valid.
- * - **Start/stop listening button:** Toggles the listening state of the shortcut.
- *   Stopping listening will not clear the shortcut setting panel.
- * - **Confirm button:** Submits the shortcut to the parent component. This is the only
- *   way to actually set the shortcut.
- * - **Cancel button:** Closes the popover without submitting the shortcut. All states
- *   within the popover will be reset to initial. The actual shortcut will not be
- *   touched.
- */
-const SettingToggleShortcut = ({
-  setToggleShortcut,
-}: SettingToggleShortcutProps) => {
+const SettingToggleShortcut = ({ shortcut }: SettingToggleShortcutProps) => {
   const [popoverOpen, setPopoverOpen] = useState(false);
   const [disableShortcut, setDisableShortcut] = useState(false);
 
@@ -161,7 +137,9 @@ const SettingToggleShortcut = ({
               highContrast
               disabled={!disableShortcut && (!hasModifier || !hasKey)}
               onClick={() => {
-                setToggleShortcut(
+                updateShortcut(
+                  "toggleCanvas",
+                  shortcut,
                   disableShortcut ? null : listenedShortcut.join("+"),
                 );
                 setPopoverOpen(false);

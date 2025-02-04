@@ -1,25 +1,23 @@
-import { useState } from "react";
 import WidgetsTab from "./tabs/WidgetsTab";
 import SettingsTab from "./tabs/SettingsTab";
 import AboutTab from "./tabs/AboutTab";
-import useExitAppListener from "./hooks/useExitAppListener";
-import useToggleShortcut from "./hooks/useToggleShortcut";
-import useUpdateSettingsListener from "./hooks/useUpdateSettingsListener";
 import { Box, Theme as RadixTheme, Tabs } from "@radix-ui/themes";
 import ManagerToaster from "./components/ManagerToaster";
 import ThemeToggler from "./components/ThemeToggler";
-import useInitialRescan from "./hooks/useInitialRescan";
+import {
+  useAppSettingsStore,
+  useExitAppListener,
+  useInitialRescan,
+  useUpdateSettingsListener,
+} from "./hooks";
 
 /**
  * The main component of the manager window.
  */
 export default function App() {
-  const [theme, setTheme] = useState(
-    window.__DESKULPT_MANAGER_INTERNALS__.initialSettings.app.theme,
-  );
-  const { toggleShortcut, setToggleShortcut } = useToggleShortcut();
+  const theme = useAppSettingsStore((state) => state.theme);
 
-  useExitAppListener(toggleShortcut, theme);
+  useExitAppListener();
   useInitialRescan();
   useUpdateSettingsListener();
 
@@ -31,7 +29,7 @@ export default function App() {
       css={{ height: "100vh" }}
     >
       <ManagerToaster theme={theme} />
-      <ThemeToggler theme={theme} setTheme={setTheme} />
+      <ThemeToggler theme={theme} />
       <Tabs.Root defaultValue="widgets" asChild>
         <Box height="100%" p="2">
           <Tabs.List>
@@ -48,10 +46,7 @@ export default function App() {
             </Tabs.Content>
             <Tabs.Content value="settings" asChild>
               <Box height="100%">
-                <SettingsTab
-                  toggleShortcut={toggleShortcut}
-                  setToggleShortcut={setToggleShortcut}
-                />
+                <SettingsTab />
               </Box>
             </Tabs.Content>
             <Tabs.Content value="about" asChild>

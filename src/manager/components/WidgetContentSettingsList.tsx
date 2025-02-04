@@ -3,7 +3,7 @@ import { events } from "../../core";
 import { DataList, Flex } from "@radix-ui/themes";
 import NumberInput from "../components/NumberInput";
 import { FaTimes } from "react-icons/fa";
-import { updateWidgetSettings } from "../hooks/useWidgetsStore";
+import { updateWidgetSettings } from "../hooks";
 
 interface WidgetContentSettingListProps {
   id: string;
