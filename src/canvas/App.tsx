@@ -1,7 +1,6 @@
 import WidgetContainer from "./components/WidgetContainer";
 import { Toaster } from "sonner";
 import { Theme as RadixTheme } from "@radix-ui/themes";
-import { useWidgetsStore } from "./hooks/useWidgetsStore";
 import { useShallow } from "zustand/shallow";
 import {
   useRemoveWidgetsListener,
@@ -9,6 +8,7 @@ import {
   useShowToastListener,
   useTheme,
   useUpdateSettingsListener,
+  useWidgetsStore,
 } from "./hooks";
 
 const App = () => {

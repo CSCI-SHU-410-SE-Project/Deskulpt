@@ -5,10 +5,7 @@ import ErrorDisplay from "./ErrorDisplay";
 import { stringifyError } from "../utils";
 import { LuGripVertical } from "react-icons/lu";
 import { Box } from "@radix-ui/themes";
-import {
-  updateWidgetSettings,
-  useWidgetsStore,
-} from "../hooks/useWidgetsStore";
+import { updateWidgetSettings, useWidgetsStore } from "../hooks";
 import { events } from "../../core";
 
 interface WidgetContainerProps {
