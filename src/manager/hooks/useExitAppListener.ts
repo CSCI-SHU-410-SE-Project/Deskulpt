@@ -1,22 +1,19 @@
 import { useEffect } from "react";
 import { commands, events } from "../../core";
-import { WidgetSettings } from "../../types";
 import { useWidgetsStore } from "./useWidgetsStore";
 import { useAppSettingsStore } from "./useAppSettingsStore";
 
 export function useExitAppListener() {
   useEffect(() => {
     const unlisten = events.exitApp.on(() => {
-      const widgets = useWidgetsStore.getState().widgets.reduce(
-        (acc, { id, settings }) => {
-          acc[id] = settings;
-          return acc;
-        },
-        {} as Record<string, WidgetSettings>,
-      );
-
-      const app = useAppSettingsStore.getState();
-      const settings = { app, widgets };
+      const settings = {
+        app: useAppSettingsStore.getState(),
+        widgets: Object.fromEntries(
+          Object.entries(useWidgetsStore.getState().widgets).map(
+            ([id, { settings }]) => [id, settings],
+          ),
+        ),
+      };
       commands.exitApp({ settings }).catch(console.error);
     });
 

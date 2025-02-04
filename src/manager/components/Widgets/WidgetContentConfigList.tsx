@@ -1,8 +1,8 @@
 import { Code, DataList, Flex, IconButton, Tooltip } from "@radix-ui/themes";
-import { WidgetConfig, WidgetConfigType } from "../../types";
-import WidgetDependencies from "../components/WidgetDependencies";
+import { WidgetConfig, WidgetConfigType } from "../../../types";
+import WidgetDependencies from "./WidgetDependencies";
 import { MdOpenInNew } from "react-icons/md";
-import { commands } from "../../core";
+import { commands } from "../../../core";
 
 interface WidgetContentConfigListProps {
   /** The widget ID. */

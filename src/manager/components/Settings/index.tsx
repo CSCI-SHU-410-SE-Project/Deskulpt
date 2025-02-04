@@ -1,9 +1,10 @@
 import { DataList, Flex } from "@radix-ui/themes";
-import SettingToggleShortcut from "../components/SettingToggleShortcut";
-import Shortcut from "../components/Shortcut";
-import { useAppSettingsStore } from "../hooks";
+import SettingToggleShortcut from "./SettingToggleShortcut";
+import Shortcut from "./Shortcut";
+import { useAppSettingsStore } from "../../hooks";
+import { memo } from "react";
 
-const SettingsTab = () => {
+const SettingsTab = memo(() => {
   const toggleCanvas = useAppSettingsStore(
     (state) => state.shortcuts.toggleCanvas,
   );
@@ -22,6 +23,6 @@ const SettingsTab = () => {
       </DataList.Item>
     </DataList.Root>
   );
-};
+});
 
 export default SettingsTab;

@@ -12,7 +12,7 @@ import {
 import { useEffect, useState } from "react";
 import Shortcut from "./Shortcut";
 import { FaEdit } from "react-icons/fa";
-import { updateShortcut, useKeyboardListener } from "../hooks";
+import { updateShortcut, useKeyboardListener } from "../../hooks";
 
 interface SettingToggleShortcutProps {
   shortcut: string | null;
