@@ -4,16 +4,16 @@ import { useWidgetsStore } from "../../hooks";
 import { memo } from "react";
 
 interface WidgetTriggerProps {
-  index: number;
   id: string;
+  value: string;
 }
 
-const WidgetTrigger = memo(({ index, id }: WidgetTriggerProps) => {
+const WidgetTrigger = memo(({ id, value }: WidgetTriggerProps) => {
   const config = useWidgetsStore((state) => state.widgets[id].config);
 
   return (
     <Tabs.Trigger
-      value={`tab${index}`}
+      value={value}
       css={{
         justifyContent: "start",
         height: "35px",

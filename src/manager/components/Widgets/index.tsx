@@ -1,33 +1,16 @@
 import { Flex, ScrollArea, Separator, Tabs } from "@radix-ui/themes";
 import WidgetTrigger from "./WidgetTrigger";
-import WidgetContent from "./WidgetContent";
 import { useWidgetsStore } from "../../hooks";
 import { memo } from "react";
 import { useShallow } from "zustand/shallow";
 import GlobalActions from "./GlobalActions";
+import Config from "./Config";
+import Settings from "./Settings";
 
 const WidgetsTab = memo(() => {
   const ids = useWidgetsStore(
     useShallow((state) => Object.keys(state.widgets)),
   );
-
-  // const rerenderAction = async () => {
-  //   await events.renderWidgets.toCanvas(
-  //     widgets.map(({ id, settings }) => ({ id, settings })),
-  //   );
-  //   toast.success(`Re-rendered ${widgets.length} widgets.`);
-  // };
-
-  // const rescanAction = async () => {
-  //   const count = await rescan();
-  //   if (count === 0) {
-  //     toast.success("Rescanned base directory.");
-  //   } else {
-  //     toast.success(
-  //       `Rescanned base directory and re-rendered ${count} widgets.`,
-  //     );
-  //   }
-  // };
 
   return (
     <Tabs.Root orientation="vertical" defaultValue="tab0" asChild>
@@ -37,7 +20,7 @@ const WidgetsTab = memo(() => {
             <ScrollArea scrollbars="vertical" asChild>
               <Flex direction="column">
                 {ids.map((id, index) => (
-                  <WidgetTrigger key={id} index={index} id={id} />
+                  <WidgetTrigger key={id} id={id} value={`tab${index}`} />
                 ))}
               </Flex>
             </ScrollArea>
@@ -46,7 +29,19 @@ const WidgetsTab = memo(() => {
           </Flex>
         </Tabs.List>
         {ids.map((id, index) => (
-          <WidgetContent key={id} index={index} id={id} />
+          <Tabs.Content key={id} value={`tab${index}`} asChild>
+            <Flex
+              height="100%"
+              direction="column"
+              gap="4"
+              pl="2"
+              css={{ flex: 3, boxShadow: "inset 1px 0 0 0 var(--gray-a5)" }}
+            >
+              <Config id={id} />
+              <Separator size="4" />
+              <Settings id={id} />
+            </Flex>
+          </Tabs.Content>
         ))}
       </Flex>
     </Tabs.Root>
