@@ -4,11 +4,11 @@ import SettingsTab from "./tabs/SettingsTab";
 import AboutTab from "./tabs/AboutTab";
 import useExitAppListener from "./hooks/useExitAppListener";
 import useToggleShortcut from "./hooks/useToggleShortcut";
-import useManagerWidgetStates from "./hooks/useManagerWidgetStates";
 import useUpdateSettingsListener from "./hooks/useUpdateSettingsListener";
 import { Box, Theme as RadixTheme, Tabs } from "@radix-ui/themes";
 import ManagerToaster from "./components/ManagerToaster";
 import ThemeToggler from "./components/ThemeToggler";
+import useInitialRescan from "./hooks/useInitialRescan";
 
 /**
  * The main component of the manager window.
@@ -18,11 +18,10 @@ export default function App() {
     window.__DESKULPT_MANAGER_INTERNALS__.initialSettings.app.theme,
   );
   const { toggleShortcut, setToggleShortcut } = useToggleShortcut();
-  const { managerWidgetStates, setManagerWidgetStates, rescanAndRender } =
-    useManagerWidgetStates();
 
-  useExitAppListener(toggleShortcut, theme, managerWidgetStates);
-  useUpdateSettingsListener(setManagerWidgetStates);
+  useExitAppListener(toggleShortcut, theme);
+  useInitialRescan();
+  useUpdateSettingsListener();
 
   return (
     <RadixTheme
@@ -44,11 +43,7 @@ export default function App() {
           <Box px="1" py="3" css={{ height: "calc(100% - 40px)" }}>
             <Tabs.Content value="widgets" asChild>
               <Box height="100%">
-                <WidgetsTab
-                  managerWidgetStates={managerWidgetStates}
-                  setManagerWidgetStates={setManagerWidgetStates}
-                  rescanAndRender={rescanAndRender}
-                />
+                <WidgetsTab />
               </Box>
             </Tabs.Content>
             <Tabs.Content value="settings" asChild>
