@@ -8,24 +8,33 @@ import {
   Text,
 } from "@radix-ui/themes";
 import { LuFolderOpen, LuRepeat } from "react-icons/lu";
-import { commands, events } from "../../core";
-import { WidgetConfig, WidgetConfigType, WidgetSettings } from "../../types";
-import WidgetContentHeading from "../components/WidgetContentHeading";
+import { commands, events } from "../../../core";
+import { WidgetConfigType } from "../../../types";
 import { toast } from "sonner";
-import WidgetContentConfigList from "../components/WidgetContentConfigList";
-import WidgetContentSettingsList from "../components/WidgetContentSettingsList";
+import WidgetContentHeading from "./WidgetContentHeading";
+import WidgetContentConfigList from "./WidgetContentConfigList";
+import WidgetContentSettingsList from "./WidgetContentSettingsList";
+import { useWidgetsStore } from "../../hooks";
+import { memo } from "react";
 
 interface WidgetContentProps {
   index: number;
   id: string;
-  config: WidgetConfig;
-  settings: WidgetSettings;
 }
 
-const WidgetContent = ({ index, id, config, settings }: WidgetContentProps) => {
+const WidgetContent = memo(({ index, id }: WidgetContentProps) => {
+  const config = useWidgetsStore((state) => state.widgets[id].config);
+  const settings = useWidgetsStore((state) => state.widgets[id].settings);
+
   return (
     <Tabs.Content value={`tab${index}`} asChild>
-      <Flex height="100%" gap="3" direction="column" css={{ flex: 3 }}>
+      <Flex
+        height="100%"
+        direction="column"
+        gap="4"
+        pl="2"
+        css={{ flex: 3, boxShadow: "inset 1px 0 0 0 var(--gray-a5)" }}
+      >
         <WidgetContentHeading
           heading={
             <Flex align="center" gap="2">
@@ -73,6 +82,6 @@ const WidgetContent = ({ index, id, config, settings }: WidgetContentProps) => {
       </Flex>
     </Tabs.Content>
   );
-};
+});
 
 export default WidgetContent;

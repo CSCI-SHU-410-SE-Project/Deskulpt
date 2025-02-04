@@ -1,21 +1,16 @@
 import { Box, Flex, Tabs, Text } from "@radix-ui/themes";
-import { WidgetConfig, WidgetConfigType } from "../../types";
+import { WidgetConfigType } from "../../../types";
+import { useWidgetsStore } from "../../hooks";
+import { memo } from "react";
 
 interface WidgetTriggerProps {
-  /** The index of the widget in the collection. */
   index: number;
-  /** The widget configuration. */
-  config: WidgetConfig;
+  id: string;
 }
 
-/**
- * The widget tab trigger component.
- *
- * It will be rendered as a trigger in the tab list. If the configuration is valid, it
- * will display the widget name with a green indicator. Otherwise, it will display an
- * error badge with a red indicator.
- */
-const WidgetTrigger = ({ index, config }: WidgetTriggerProps) => {
+const WidgetTrigger = memo(({ index, id }: WidgetTriggerProps) => {
+  const config = useWidgetsStore((state) => state.widgets[id].config);
+
   return (
     <Tabs.Trigger
       value={`tab${index}`}
@@ -50,6 +45,6 @@ const WidgetTrigger = ({ index, config }: WidgetTriggerProps) => {
       </Flex>
     </Tabs.Trigger>
   );
-};
+});
 
 export default WidgetTrigger;

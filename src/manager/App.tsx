@@ -1,20 +1,17 @@
-import WidgetsTab from "./tabs/WidgetsTab";
-import SettingsTab from "./tabs/SettingsTab";
-import AboutTab from "./tabs/AboutTab";
 import { Box, Theme as RadixTheme, Tabs } from "@radix-ui/themes";
-import ManagerToaster from "./components/ManagerToaster";
-import ThemeToggler from "./components/ThemeToggler";
+import { Toaster } from "sonner";
 import {
   useAppSettingsStore,
   useExitAppListener,
   useInitialRescan,
   useUpdateSettingsListener,
 } from "./hooks";
+import About from "./components/About";
+import Widgets from "./components/Widgets";
+import Settings from "./components/Settings";
+import ThemeToggler from "./components/ThemeToggler";
 
-/**
- * The main component of the manager window.
- */
-export default function App() {
+const App = () => {
   const theme = useAppSettingsStore((state) => state.theme);
 
   useExitAppListener();
@@ -28,7 +25,19 @@ export default function App() {
       grayColor="slate"
       css={{ height: "100vh" }}
     >
-      <ManagerToaster theme={theme} />
+      <Toaster
+        position="bottom-center"
+        theme={theme}
+        gap={6}
+        toastOptions={{
+          style: {
+            color: "var(--gray-12)",
+            borderColor: "var(--gray-6)",
+            backgroundColor: "var(--gray-2)",
+            padding: "var(--space-2) var(--space-4)",
+          },
+        }}
+      />
       <ThemeToggler theme={theme} />
       <Tabs.Root defaultValue="widgets" asChild>
         <Box height="100%" p="2">
@@ -37,21 +46,20 @@ export default function App() {
             <Tabs.Trigger value="settings">Settings</Tabs.Trigger>
             <Tabs.Trigger value="about">About</Tabs.Trigger>
           </Tabs.List>
-          {/* Tab triggers have ~40px height */}
           <Box px="1" py="3" css={{ height: "calc(100% - 40px)" }}>
             <Tabs.Content value="widgets" asChild>
               <Box height="100%">
-                <WidgetsTab />
+                <Widgets />
               </Box>
             </Tabs.Content>
             <Tabs.Content value="settings" asChild>
               <Box height="100%">
-                <SettingsTab />
+                <Settings />
               </Box>
             </Tabs.Content>
             <Tabs.Content value="about" asChild>
               <Box height="100%">
-                <AboutTab />
+                <About />
               </Box>
             </Tabs.Content>
           </Box>
@@ -59,4 +67,6 @@ export default function App() {
       </Tabs.Root>
     </RadixTheme>
   );
-}
+};
+
+export default App;

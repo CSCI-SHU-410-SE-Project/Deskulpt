@@ -1,15 +1,9 @@
 import { Avatar, DataList, Flex, Heading, Text } from "@radix-ui/themes";
-import ExternalCopyLink from "../components/ExternalCopyLink";
+import ExternalCopyLink from "./ExternalCopyLink";
 import Logo from "/deskulpt.svg";
+import { memo } from "react";
 
-/**
- * The about tab in the manager.
- *
- * This tab is rendered as a flex container with 100% height. It displays static
- * information of the Deskulpt application, including the version, authors, repository,
- * and documentation.
- */
-const AboutTab = () => {
+const AboutTab = memo(() => {
   return (
     <Flex height="100%" pb="9" px="3" justify="center" align="center" gap="3">
       <Flex align="center" justify="center" css={{ flex: 1 }}>
@@ -59,6 +53,6 @@ const AboutTab = () => {
       </Flex>
     </Flex>
   );
-};
+});
 
 export default AboutTab;

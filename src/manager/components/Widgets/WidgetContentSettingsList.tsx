@@ -1,9 +1,9 @@
-import { WidgetSettings } from "../../types";
-import { events } from "../../core";
+import { WidgetSettings } from "../../../types";
+import { events } from "../../../core";
 import { DataList, Flex } from "@radix-ui/themes";
-import NumberInput from "../components/NumberInput";
+import NumberInput from "./NumberInput";
 import { FaTimes } from "react-icons/fa";
-import { updateWidgetSettings } from "../hooks";
+import { updateWidgetSettings } from "../../hooks";
 
 interface WidgetContentSettingListProps {
   id: string;
