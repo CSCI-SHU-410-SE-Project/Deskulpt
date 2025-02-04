@@ -1,34 +1,25 @@
 import { useEffect } from "react";
 import { commands, events } from "../../core";
-import { ManagerWidgetState } from "../../types/frontend";
-import { Theme } from "../../types";
+import { Theme, WidgetSettings } from "../../types";
+import { useWidgetsStore } from "./useWidgetsStore";
 
-/**
- * Listen and react to the "exit-app" event.
- *
- * Upon receiving the event, the hook will collect all current states that needs to be
- * persisted and invoke the backend to persist them and exit the app.
- *
- * @param theme The current theme.
- * @param managerWidgetStates The current manager widget states.
- * @param toggleShortcut The current toggle shortcut.
- */
 export default function useExitAppListener(
   toggleShortcut: string | null,
   theme: Theme,
-  managerWidgetStates: Record<string, ManagerWidgetState>,
 ) {
   useEffect(() => {
     const unlisten = events.exitApp.on(() => {
-      const widgetSettingsMap = Object.fromEntries(
-        Object.entries(managerWidgetStates).map(([id, { settings }]) => [
-          id,
-          settings,
-        ]),
+      const widgets = useWidgetsStore.getState().widgets.reduce(
+        (acc, { id, settings }) => {
+          acc[id] = settings;
+          return acc;
+        },
+        {} as Record<string, WidgetSettings>,
       );
+
       const settings = {
         app: { theme, shortcuts: { toggleCanvas: toggleShortcut } },
-        widgets: widgetSettingsMap,
+        widgets,
       };
       commands.exitApp({ settings }).catch(console.error);
     });
@@ -36,5 +27,5 @@ export default function useExitAppListener(
     return () => {
       unlisten.then((f) => f()).catch(console.error);
     };
-  }, [toggleShortcut, theme, managerWidgetStates]);
+  }, [toggleShortcut, theme]);
 }

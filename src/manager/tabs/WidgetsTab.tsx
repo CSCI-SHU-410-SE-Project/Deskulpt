@@ -1,52 +1,29 @@
-import { Dispatch, SetStateAction } from "react";
 import { LuFileScan, LuFolderOpen, LuRepeat } from "react-icons/lu";
 import { commands, events } from "../../core";
 import { Flex, ScrollArea, Tabs } from "@radix-ui/themes";
 import { toast } from "sonner";
-import { ManagerWidgetState } from "../../types/frontend";
 import WidgetTrigger from "../components/WidgetTrigger";
 import WidgetContent from "../components/WidgetContent";
 import FloatButton from "../components/FloatButton";
+import { rescan, useWidgetsStore } from "../hooks/useWidgetsStore";
 
-interface WidgetsTabProps {
-  /** The manager widget states. */
-  managerWidgetStates: Record<string, ManagerWidgetState>;
-  /** Setter for the manager widget states. */
-  setManagerWidgetStates: Dispatch<
-    SetStateAction<Record<string, ManagerWidgetState>>
-  >;
-  /** The function for refreshing the widget collection. */
-  rescanAndRender: () => Promise<number>;
-}
-
-/**
- * The widgets tab in the manager.
- *
- * This tab is rendered as a vertical tab list along with {@link FloatButton}s in the
- * bottom right corner. It contains the triggers {@link WidgetTrigger} and the contents
- * {@link WidgetContent} for each widget in the collection.
- */
-const WidgetsTab = ({
-  managerWidgetStates,
-  setManagerWidgetStates,
-  rescanAndRender,
-}: WidgetsTabProps) => {
-  const managerWidgetStatesArray = Object.entries(managerWidgetStates);
+const WidgetsTab = () => {
+  const widgets = useWidgetsStore((state) => state.widgets);
 
   const rerenderAction = async () => {
     await events.renderWidgets.toCanvas(
-      managerWidgetStatesArray.map(([id, { settings }]) => ({ id, settings })),
+      widgets.map(({ id, settings }) => ({ id, settings })),
     );
-    toast.success(`Re-rendered ${managerWidgetStatesArray.length} widgets.`);
+    toast.success(`Re-rendered ${widgets.length} widgets.`);
   };
 
   const rescanAction = async () => {
-    const count = await rescanAndRender();
+    const count = await rescan();
     if (count === 0) {
       toast.success("Rescanned base directory.");
     } else {
       toast.success(
-        `Rescanned base directory and rendered ${count} newly added widgets.`,
+        `Rescanned base directory and re-rendered ${count} widgets.`,
       );
     }
   };
@@ -55,7 +32,7 @@ const WidgetsTab = ({
     <>
       <Tabs.Root orientation="vertical" defaultValue="tab0" asChild>
         <Flex gap="3" height="100%">
-          {managerWidgetStatesArray.length > 0 && (
+          {widgets.length > 0 && (
             <Tabs.List
               css={{
                 flex: 1,
@@ -66,21 +43,20 @@ const WidgetsTab = ({
             >
               <ScrollArea scrollbars="vertical" asChild>
                 <Flex direction="column">
-                  {managerWidgetStatesArray.map(([id, { config }], index) => (
+                  {widgets.map(({ id, config }, index) => (
                     <WidgetTrigger key={id} index={index} config={config} />
                   ))}
                 </Flex>
               </ScrollArea>
             </Tabs.List>
           )}
-          {managerWidgetStatesArray.map(([id, { config, settings }], index) => (
+          {widgets.map(({ id, config, settings }, index) => (
             <WidgetContent
               key={id}
               index={index}
               id={id}
               config={config}
               settings={settings}
-              setManagerWidgetStates={setManagerWidgetStates}
             />
           ))}
         </Flex>
@@ -90,7 +66,7 @@ const WidgetsTab = ({
         icon={<LuRepeat />}
         tooltip="Re-render all widgets"
         onClick={rerenderAction}
-        disabled={managerWidgetStatesArray.length === 0}
+        disabled={widgets.length === 0}
       />
       <FloatButton
         order={2}

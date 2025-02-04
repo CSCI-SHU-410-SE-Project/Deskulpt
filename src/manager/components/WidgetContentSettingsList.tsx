@@ -1,20 +1,13 @@
-import { Dispatch, SetStateAction } from "react";
 import { WidgetSettings } from "../../types";
-import { ManagerWidgetState } from "../../types/frontend";
 import { events } from "../../core";
 import { DataList, Flex } from "@radix-ui/themes";
 import NumberInput from "../components/NumberInput";
 import { FaTimes } from "react-icons/fa";
+import { updateWidgetSettings } from "../hooks/useWidgetsStore";
 
 interface WidgetContentSettingListProps {
-  /** The widget ID. */
   id: string;
-  /** The widget-specific setting. */
   settings: WidgetSettings;
-  /** Setter for the manager widget states. */
-  setManagerWidgetStates: Dispatch<
-    SetStateAction<Record<string, ManagerWidgetState>>
-  >;
 }
 
 /**
@@ -27,16 +20,10 @@ interface WidgetContentSettingListProps {
 const WidgetContentSettingList = ({
   id,
   settings,
-  setManagerWidgetStates,
 }: WidgetContentSettingListProps) => {
-  function updateSetting(partialSettings: Partial<WidgetSettings>) {
-    setManagerWidgetStates((prev) => ({
-      ...prev,
-      [id]: { ...prev[id], settings: { ...settings, ...partialSettings } },
-    }));
-    events.updateSettings
-      .toCanvas({ id, settings: partialSettings })
-      .catch(console.error);
+  function updateSetting(settings: Partial<WidgetSettings>) {
+    updateWidgetSettings(id, settings);
+    events.updateSettings.toCanvas({ id, settings }).catch(console.error);
   }
 
   return (

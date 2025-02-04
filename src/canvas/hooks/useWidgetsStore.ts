@@ -54,7 +54,7 @@ export function updateWidgetRender(
       };
     }
 
-    return state;
+    return {};
   });
 }
 
@@ -98,7 +98,7 @@ export function updateWidgetRenderError(
       };
     }
 
-    return state;
+    return {};
   });
 }
 
@@ -115,7 +115,7 @@ export function updateWidgetSettings(
         },
       };
     }
-    return state;
+    return {};
   });
 }
 
