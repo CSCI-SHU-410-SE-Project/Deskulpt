@@ -2,7 +2,7 @@ import { Box, Code, ScrollArea, Table } from "@radix-ui/themes";
 import { WidgetConfigType } from "../../../types";
 import { useWidgetsStore } from "../../hooks";
 import { memo } from "react";
-import WidgetDependencies from "./WidgetDependencies";
+import Dependencies from "./Dependencies";
 
 interface ConfigProps {
   id: string;
@@ -38,9 +38,7 @@ const Config = memo(({ id }: ConfigProps) => {
               <Table.Row>
                 <Table.RowHeaderCell>Dependencies</Table.RowHeaderCell>
                 <Table.Cell>
-                  <WidgetDependencies
-                    dependencies={config.content.dependencies}
-                  />
+                  <Dependencies dependencies={config.content.dependencies} />
                 </Table.Cell>
               </Table.Row>
             </Table.Body>
