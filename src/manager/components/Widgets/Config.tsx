@@ -22,7 +22,7 @@ const Config = memo(({ id }: ConfigProps) => {
             css={{
               "--table-cell-padding": "var(--space-1) var(--space-2)",
               "--table-cell-min-height": 0,
-              "--table-row-box-shadow": "none",
+              "& tr": { "--table-row-box-shadow": "none" },
               "& th": { color: "var(--gray-11)", width: "120px" },
             }}
           >
@@ -46,9 +46,9 @@ const Config = memo(({ id }: ConfigProps) => {
             </Table.Body>
           </Table.Root>
         ) : (
-          <Box pl="2" asChild>
+          <Box pl="2" m="0" asChild>
             <pre>
-              <Code size="2" variant="ghost" color="red">
+              <Code size="2" variant="ghost">
                 {config.content.error}
               </Code>
             </pre>
