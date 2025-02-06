@@ -3,11 +3,11 @@ import { Theme } from "../../types";
 import { MdOutlineDarkMode, MdOutlineLightMode } from "react-icons/md";
 import { toggleTheme } from "../hooks";
 
-interface AppearanceTogglerProps {
+interface ThemeTogglerProps {
   theme: Theme;
 }
 
-const AppearanceToggler = ({ theme }: AppearanceTogglerProps) => {
+const ThemeToggler = ({ theme }: ThemeTogglerProps) => {
   return (
     <Box position="absolute" right="3" top="4">
       <IconButton
@@ -22,4 +22,4 @@ const AppearanceToggler = ({ theme }: AppearanceTogglerProps) => {
   );
 };
 
-export default AppearanceToggler;
+export default ThemeToggler;
