@@ -1,4 +1,4 @@
-import { Box } from "@radix-ui/themes";
+import { Box, Flex } from "@radix-ui/themes";
 import { LuRepeat } from "react-icons/lu";
 import { events } from "../../../core";
 import { toast } from "sonner";
@@ -15,7 +15,7 @@ const Settings = memo(({ id }: SettingsProps) => {
   const settings = useWidgetsStore((state) => state.widgets[id].settings);
 
   return (
-    <>
+    <Flex direction="column" gap="4">
       <WidgetContentHeading
         heading="Settings"
         actionIcon={<LuRepeat />}
@@ -29,7 +29,7 @@ const Settings = memo(({ id }: SettingsProps) => {
       <Box px="2" css={{ flex: 4 }}>
         <WidgetContentSettingsList id={id} settings={settings} />
       </Box>
-    </>
+    </Flex>
   );
 });
 

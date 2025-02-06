@@ -15,7 +15,7 @@ const WidgetsTab = memo(() => {
   return (
     <Tabs.Root orientation="vertical" defaultValue="tab0" asChild>
       <Flex height="100%">
-        <Tabs.List css={{ flex: 1, height: "100%", boxShadow: "none" }}>
+        <Tabs.List css={{ width: "25%", height: "100%", boxShadow: "none" }}>
           <Flex direction="column" width="100%" gap="4">
             <ScrollArea scrollbars="vertical" asChild>
               <Flex direction="column">
@@ -33,9 +33,12 @@ const WidgetsTab = memo(() => {
             <Flex
               height="100%"
               direction="column"
-              gap="4"
               pl="2"
-              css={{ flex: 3, boxShadow: "inset 1px 0 0 0 var(--gray-a5)" }}
+              gap="2"
+              css={{
+                width: "75%",
+                boxShadow: "inset 1px 0 0 0 var(--gray-a5)",
+              }}
             >
               <Config id={id} />
               <Separator size="4" />
