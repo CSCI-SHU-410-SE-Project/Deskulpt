@@ -1,4 +1,4 @@
-import { Box, Theme as RadixTheme, Tabs } from "@radix-ui/themes";
+import { Box, Flex, Theme as RadixTheme, Tabs } from "@radix-ui/themes";
 import { Toaster } from "sonner";
 import {
   useAppSettingsStore,
@@ -47,7 +47,7 @@ const App = () => {
       />
       <ThemeToggler theme={theme} />
       <Tabs.Root defaultValue="widgets" asChild>
-        <Box height="100%" p="2">
+        <Flex direction="column" gap="2" height="100%" p="2">
           <Tabs.List>
             {tabs.map((tab) => (
               <Tabs.Trigger key={tab.value} value={tab.value}>
@@ -55,14 +55,14 @@ const App = () => {
               </Tabs.Trigger>
             ))}
           </Tabs.List>
-          <Box px="1" py="3" css={{ height: "calc(100% - 40px)" }}>
+          <Box p="1" height="calc(100% - var(--space-8))">
             {tabs.map((tab) => (
               <Tabs.Content key={tab.value} value={tab.value} asChild>
                 <Box height="100%">{tab.content}</Box>
               </Tabs.Content>
             ))}
           </Box>
-        </Box>
+        </Flex>
       </Tabs.Root>
     </RadixTheme>
   );
