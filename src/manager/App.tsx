@@ -11,8 +11,15 @@ import Widgets from "./components/Widgets";
 import Settings from "./components/Settings";
 import ThemeToggler from "./components/ThemeToggler";
 
+const tabs = [
+  { value: "widgets", label: "Widgets", content: <Widgets /> },
+  { value: "settings", label: "Settings", content: <Settings /> },
+  { value: "about", label: "About", content: <About /> },
+];
+
 const App = () => {
   const theme = useAppSettingsStore((state) => state.theme);
+  console.log("Rerendered!");
 
   useExitAppListener();
   useInitialRescan();
@@ -42,26 +49,18 @@ const App = () => {
       <Tabs.Root defaultValue="widgets" asChild>
         <Box height="100%" p="2">
           <Tabs.List>
-            <Tabs.Trigger value="widgets">Widgets</Tabs.Trigger>
-            <Tabs.Trigger value="settings">Settings</Tabs.Trigger>
-            <Tabs.Trigger value="about">About</Tabs.Trigger>
+            {tabs.map((tab) => (
+              <Tabs.Trigger key={tab.value} value={tab.value}>
+                {tab.label}
+              </Tabs.Trigger>
+            ))}
           </Tabs.List>
           <Box px="1" py="3" css={{ height: "calc(100% - 40px)" }}>
-            <Tabs.Content value="widgets" asChild>
-              <Box height="100%">
-                <Widgets />
-              </Box>
-            </Tabs.Content>
-            <Tabs.Content value="settings" asChild>
-              <Box height="100%">
-                <Settings />
-              </Box>
-            </Tabs.Content>
-            <Tabs.Content value="about" asChild>
-              <Box height="100%">
-                <About />
-              </Box>
-            </Tabs.Content>
+            {tabs.map((tab) => (
+              <Tabs.Content key={tab.value} value={tab.value} asChild>
+                <Box height="100%">{tab.content}</Box>
+              </Tabs.Content>
+            ))}
           </Box>
         </Box>
       </Tabs.Root>
