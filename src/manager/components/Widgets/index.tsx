@@ -36,10 +36,8 @@ const WidgetsTab = memo(() => {
               direction="column"
               pl="2"
               gap="2"
-              css={{
-                width: "75%",
-                boxShadow: "inset 1px 0 0 0 var(--gray-a5)",
-              }}
+              width="75%"
+              css={{ boxShadow: "inset 1px 0 0 0 var(--gray-a5)" }}
             >
               <Header id={id} />
               <Config id={id} />
