@@ -52,7 +52,7 @@ pub fn run() {
             deskulpt_core::commands::bundle_widget,
             deskulpt_core::commands::emit_on_render_ready,
             deskulpt_core::commands::exit_app,
-            deskulpt_core::commands::open_in_widgets_dir,
+            deskulpt_core::commands::open_widget,
             deskulpt_core::commands::rescan_widgets,
             deskulpt_core::commands::set_render_ready,
             deskulpt_core::commands::update_shortcut,

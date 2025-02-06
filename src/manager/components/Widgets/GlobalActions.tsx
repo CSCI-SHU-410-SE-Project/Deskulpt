@@ -31,7 +31,7 @@ const GlobalActions = memo(({ length }: GlobalActionsProps) => {
   }, []);
 
   const openAction = useCallback(() => {
-    commands.openInWidgetsDir({ components: [] }).catch(console.error);
+    commands.openWidget().catch(console.error);
   }, []);
 
   return (

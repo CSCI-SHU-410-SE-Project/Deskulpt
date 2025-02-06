@@ -14,8 +14,8 @@ export const emitOnRenderReady = (payload: { payload: RenderWidgetsPayload }) =>
 export const exitApp = (payload: { settings: Settings }) =>
   invoke<void>("exit_app", payload);
 
-export const openInWidgetsDir = (payload: { components: string[] }) =>
-  invoke<void>("open_in_widgets_dir", payload);
+export const openWidget = (payload?: { id?: string }) =>
+  invoke<void>("open_widget", payload);
 
 export const rescanWidgets = () =>
   invoke<Record<string, WidgetConfig>>("rescan_widgets");
