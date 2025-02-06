@@ -1,10 +1,9 @@
-use anyhow::anyhow;
 use once_cell::sync::Lazy;
 use tauri::{command, AppHandle};
 use tokio::sync::Mutex;
 
 use super::error::{cmdbail, CmdResult};
-use crate::{PathExt, StatesExtWidgetConfigMap};
+use crate::StatesExtWidgetConfigMap;
 
 // TODO: Remove this temporary implementation
 static FS_PLUGIN: Lazy<Mutex<deskulpt_plugin_fs::FsPlugin>> =
@@ -34,15 +33,7 @@ pub async fn call_plugin(
     id: String,
     payload: Option<serde_json::Value>,
 ) -> CmdResult<serde_json::Value> {
-    let widget_dir_fn = move |id: &str| {
-        let widgets_dir = app_handle.widgets_dir()?;
-        app_handle.with_widget_config_map(|config_map| {
-            config_map
-                .get(id)
-                .ok_or_else(|| anyhow!("Widget {} not found in the collection", id))
-                .map(|config| widgets_dir.join(config.dir()))
-        })
-    };
+    let widget_dir_fn = move |id: &str| app_handle.widget_dir(id);
 
     match plugin.as_str() {
         "fs" => {

@@ -6,6 +6,7 @@ import { useShallow } from "zustand/shallow";
 import GlobalActions from "./GlobalActions";
 import Config from "./Config";
 import Settings from "./Settings";
+import Header from "./Header";
 
 const WidgetsTab = memo(() => {
   const ids = useWidgetsStore(
@@ -40,6 +41,7 @@ const WidgetsTab = memo(() => {
                 boxShadow: "inset 1px 0 0 0 var(--gray-a5)",
               }}
             >
+              <Header id={id} />
               <Config id={id} />
               <Separator size="4" />
               <Settings id={id} />
