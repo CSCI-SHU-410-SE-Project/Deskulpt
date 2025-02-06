@@ -2,7 +2,7 @@ import { Box, Code, ScrollArea, Table } from "@radix-ui/themes";
 import { WidgetConfigType } from "../../../types";
 import { useWidgetsStore } from "../../hooks";
 import { memo } from "react";
-import WidgetDependencies from "./WidgetDependencies";
+import WidgetDependencies from "./Dependencies";
 
 interface ConfigProps {
   id: string;
