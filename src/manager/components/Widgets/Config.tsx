@@ -13,7 +13,7 @@ const Config = memo(({ id }: ConfigProps) => {
 
   return (
     <ScrollArea asChild>
-      <Box height="160px" pr="3" pb="3">
+      <Box height="200px" pr="3" pb="3">
         {config.type === WidgetConfigType.VALID ? (
           <Table.Root
             size="1"
@@ -27,15 +27,15 @@ const Config = memo(({ id }: ConfigProps) => {
             }}
           >
             <Table.Body>
-              <Table.Row>
+              <Table.Row align="center">
                 <Table.RowHeaderCell>Name</Table.RowHeaderCell>
                 <Table.Cell>{config.content.name}</Table.Cell>
               </Table.Row>
-              <Table.Row>
+              <Table.Row align="center">
                 <Table.RowHeaderCell>Entry</Table.RowHeaderCell>
                 <Table.Cell>{config.content.entry}</Table.Cell>
               </Table.Row>
-              <Table.Row>
+              <Table.Row align="center">
                 <Table.RowHeaderCell>Dependencies</Table.RowHeaderCell>
                 <Table.Cell>
                   <Dependencies dependencies={config.content.dependencies} />

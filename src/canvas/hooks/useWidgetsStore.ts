@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { WidgetSettings } from "../../types";
 import { FC, createElement } from "react";
+import { events } from "../../core";
 import ErrorDisplay from "../components/ErrorDisplay";
 
 interface Widget {
@@ -105,6 +106,7 @@ export function updateWidgetRenderError(
 export function updateWidgetSettings(
   id: string,
   settings: Partial<WidgetSettings>,
+  emit: boolean = false,
 ) {
   useWidgetsStore.setState((state) => {
     if (id in state.widgets) {
@@ -117,6 +119,10 @@ export function updateWidgetSettings(
     }
     return {};
   });
+
+  if (emit) {
+    events.updateSettings.toManager({ id, settings }).catch(console.error);
+  }
 }
 
 export function removeWidgets(ids: string[]) {
