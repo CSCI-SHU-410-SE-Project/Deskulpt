@@ -66,6 +66,7 @@ export async function rescan(initial: boolean = false) {
 export function updateWidgetSettings(
   id: string,
   settings: Partial<WidgetSettings>,
+  emit: boolean = false,
 ) {
   useWidgetsStore.setState((state) => {
     if (id in state.widgets) {
@@ -81,6 +82,10 @@ export function updateWidgetSettings(
     }
     return {};
   });
+
+  if (emit) {
+    events.updateSettings.toCanvas({ id, settings }).catch(console.error);
+  }
 }
 
 export function removeWidgets(ids: string[]) {

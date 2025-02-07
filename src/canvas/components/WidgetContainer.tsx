@@ -6,7 +6,6 @@ import { stringifyError } from "../utils";
 import { LuGripVertical } from "react-icons/lu";
 import { Box } from "@radix-ui/themes";
 import { updateWidgetSettings, useWidgetsStore } from "../hooks";
-import { events } from "../../core";
 
 interface WidgetContainerProps {
   id: string;
@@ -20,9 +19,7 @@ const WidgetContainer = memo(({ id }: WidgetContainerProps) => {
 
   const onStop = useCallback(
     (_: DraggableEvent, data: DraggableData) => {
-      const pos = { x: x + data.x, y: y + data.y };
-      updateWidgetSettings(id, pos);
-      events.updateSettings.toManager({ id, settings: pos });
+      updateWidgetSettings(id, { x: x + data.x, y: y + data.y }, true);
     },
     [id, x, y],
   );
