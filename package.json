@@ -28,7 +28,7 @@
     "husky": "^9.1.6",
     "lint-staged": "^15.4.1",
     "oxlint": "^0.15.6",
-    "prettier": "^3.4.2"
+    "prettier": "^3.5.0"
   },
   "prettier": {},
   "lint-staged": {
