@@ -76,14 +76,12 @@ const Settings = memo(({ id }: SettingsProps) => {
         "--table-cell-padding": "var(--space-1) var(--space-2)",
         "--table-cell-min-height": 0,
         "& tr": { "--table-row-box-shadow": "none" },
-        // Did not use <th> because we may have another column in the future,
-        // so header is not semantically correct
-        "& .label": { color: "var(--gray-11)", width: "100px" },
+        "& th": { color: "var(--gray-11)", width: "100px" },
       }}
     >
       <Table.Body>
         <Table.Row align="center">
-          <Table.Cell className="label">Position (px)</Table.Cell>
+          <Table.RowHeaderCell>Position (px)</Table.RowHeaderCell>
           <Table.Cell>
             <Flex gap="1" align="center">
               <X id={id} />
@@ -93,7 +91,7 @@ const Settings = memo(({ id }: SettingsProps) => {
           </Table.Cell>
         </Table.Row>
         <Table.Row align="center">
-          <Table.Cell className="label">Opacity (%)</Table.Cell>
+          <Table.RowHeaderCell>Opacity (%)</Table.RowHeaderCell>
           <Table.Cell>
             <Opacity id={id} />
           </Table.Cell>
