@@ -74,10 +74,10 @@ const KEYCODES = {
 const INVALID_KEYCODES = {
   Minus: "-",
   Equal: "=",
-  Backspace: "\u232b",
+  Backspace: "\u232B",
   BracketLeft: "[",
   BracketRight: "]",
-  Enter: "\u23ce",
+  Enter: "\u23CE",
   Semicolon: ";",
   Quote: "'",
   Backquote: "`",
@@ -86,11 +86,11 @@ const INVALID_KEYCODES = {
   Period: ".",
   Slash: "/",
   Space: "\u2423",
-  CapsLock: "\u21ea",
-  Home: "\u21f1",
-  End: "\u21f2",
-  PageUp: "\u21de",
-  PageDown: "\u21df",
+  CapsLock: "\u21EA",
+  Home: "\u21F1",
+  End: "\u21F2",
+  PageUp: "\u21DE",
+  PageDown: "\u21DF",
   ArrowUp: "\u2191",
   ArrowDown: "\u2193",
   ArrowLeft: "\u2190",
@@ -102,7 +102,7 @@ const INVALID_KEYCODES = {
   NumpadMultiply: "*",
   NumpadDivide: "/",
   NumpadDecimal: ".",
-  NumpadEnter: "\u23ce",
+  NumpadEnter: "\u23CE",
   NumpadEqual: "=",
   NumpadComma: ",",
 };
@@ -280,17 +280,18 @@ const ShortcutAction = memo(({ shortcutKey }: Props) => {
                 </IconButton>
               </TextField.Slot>
             </TextField.Root>
-            <Popover.Close>
-              <Button
-                ref={confirmButtonRef}
-                size="1"
-                variant="surface"
-                disabled={!isValid || (shortcut ?? "") === value}
-                onClick={confirmAction}
-              >
-                {value === "" ? "Disable" : "Confirm"}
-              </Button>
-            </Popover.Close>
+            {isValid && (shortcut ?? "") !== value && (
+              <Popover.Close>
+                <Button
+                  ref={confirmButtonRef}
+                  size="1"
+                  variant="surface"
+                  onClick={confirmAction}
+                >
+                  {value === "" ? "Disable" : "Confirm"}
+                </Button>
+              </Popover.Close>
+            )}
           </Flex>
         </Popover.Content>
       </Popover.Root>
