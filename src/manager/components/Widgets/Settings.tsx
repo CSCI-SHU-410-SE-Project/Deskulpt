@@ -1,40 +1,60 @@
 import { Flex, Table } from "@radix-ui/themes";
-import { FaTimes } from "react-icons/fa";
+import { LiaTimesSolid } from "react-icons/lia";
 import { updateWidgetSettings, useWidgetsStore } from "../../hooks";
 import { memo, useCallback } from "react";
-import NumberInput from "./NumberInput";
+import IntegerInput from "../IntegerInput";
 
 const X = ({ id }: SettingsProps) => {
   const x = useWidgetsStore((state) => state.widgets[id].settings.x);
-  const onChange = useCallback(
+  const onValueChange = useCallback(
     (value: number) => updateWidgetSettings(id, { x: value }, true),
     [id],
   );
 
-  return <NumberInput value={x} min={0} width="50px" onChange={onChange} />;
+  return (
+    <IntegerInput
+      value={x}
+      min={0}
+      onValueChange={onValueChange}
+      width="60px"
+    />
+  );
 };
 
 const Y = ({ id }: SettingsProps) => {
   const y = useWidgetsStore((state) => state.widgets[id].settings.y);
-  const onChange = useCallback(
+  const onValueChange = useCallback(
     (value: number) => updateWidgetSettings(id, { y: value }, true),
     [id],
   );
 
-  return <NumberInput value={y} min={0} width="50px" onChange={onChange} />;
+  return (
+    <IntegerInput
+      value={y}
+      min={0}
+      onValueChange={onValueChange}
+      width="60px"
+    />
+  );
 };
 
 const Opacity = ({ id }: SettingsProps) => {
   const opacity = useWidgetsStore(
     (state) => state.widgets[id].settings.opacity,
   );
-  const onChange = useCallback(
+  const onValueChange = useCallback(
     (value: number) => updateWidgetSettings(id, { opacity: value }, true),
     [id],
   );
 
   return (
-    <NumberInput value={opacity} min={0} width="50px" onChange={onChange} />
+    <IntegerInput
+      value={opacity}
+      min={0}
+      max={100}
+      onValueChange={onValueChange}
+      width="60px"
+    />
   );
 };
 
@@ -67,7 +87,7 @@ const Settings = memo(({ id }: SettingsProps) => {
           <Table.Cell>
             <Flex gap="1" align="center">
               <X id={id} />
-              <FaTimes size={12} color="var(--gray-11)" />
+              <LiaTimesSolid size={12} color="var(--gray-11)" />
               <Y id={id} />
             </Flex>
           </Table.Cell>

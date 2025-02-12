@@ -19,7 +19,6 @@ const tabs = [
 
 const App = () => {
   const theme = useAppSettingsStore((state) => state.theme);
-  console.log("Rerendered!");
 
   useExitAppListener();
   useInitialRescan();

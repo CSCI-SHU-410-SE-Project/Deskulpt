@@ -3,12 +3,12 @@ import { WidgetConfigType } from "../../../types";
 import { useWidgetsStore } from "../../hooks";
 import { memo } from "react";
 
-interface WidgetTriggerProps {
+interface TriggerProps {
   id: string;
   value: string;
 }
 
-const WidgetTrigger = memo(({ id, value }: WidgetTriggerProps) => {
+const Trigger = memo(({ id, value }: TriggerProps) => {
   const config = useWidgetsStore((state) => state.widgets[id].config);
 
   return (
@@ -47,4 +47,4 @@ const WidgetTrigger = memo(({ id, value }: WidgetTriggerProps) => {
   );
 });
 
-export default WidgetTrigger;
+export default Trigger;
