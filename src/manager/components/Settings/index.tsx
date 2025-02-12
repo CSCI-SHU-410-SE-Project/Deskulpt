@@ -1,28 +1,32 @@
-import { DataList, Flex } from "@radix-ui/themes";
-import SettingToggleShortcut from "./SettingToggleShortcut";
-import Shortcut from "./Shortcut";
-import { useAppSettingsStore } from "../../hooks";
+import { Box, Flex, ScrollArea, Table } from "@radix-ui/themes";
 import { memo } from "react";
+import Shortcut from "./Shortcut";
+import InfoCell from "./InfoCell";
+import SectionTable from "./SectionTable";
 
-const SettingsTab = memo(() => {
-  const toggleCanvas = useAppSettingsStore(
-    (state) => state.shortcuts.toggleCanvas,
-  );
-  const shortcutKeys = toggleCanvas?.split("+") ?? [];
-
+const Settings = memo(() => {
   return (
-    <DataList.Root size="2" mx="3" my="2" css={{ gap: "var(--space-2)" }}>
-      <DataList.Item align="center">
-        <DataList.Label>Toggle shortcut</DataList.Label>
-        <DataList.Value>
-          <Flex align="center" justify="between" width="100%">
-            <Shortcut keys={shortcutKeys} gap="1" />
-            <SettingToggleShortcut shortcut={toggleCanvas} />
-          </Flex>
-        </DataList.Value>
-      </DataList.Item>
-    </DataList.Root>
+    <ScrollArea asChild>
+      <Box height="420px" mt="1" pr="3">
+        <Flex direction="column" gap="4">
+          <SectionTable title="Keyboard Shortcuts">
+            <Table.Row align="center">
+              <InfoCell>
+                Toggle canvas click-through, i.e., sink or float the canvas. If
+                the canvas is sunk (click-through), you can interact with the
+                desktop but not the widgets. If the canvas is floating, you can
+                interact with the widgets but not the desktop.
+              </InfoCell>
+              <Table.RowHeaderCell>Toggle Canvas</Table.RowHeaderCell>
+              <Table.Cell>
+                <Shortcut shortcutKey="toggleCanvas" />
+              </Table.Cell>
+            </Table.Row>
+          </SectionTable>
+        </Flex>
+      </Box>
+    </ScrollArea>
   );
 });
 
-export default SettingsTab;
+export default Settings;
