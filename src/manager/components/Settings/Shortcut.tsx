@@ -10,7 +10,6 @@ import {
 import {
   FocusEvent,
   KeyboardEvent as ReactKeyboardEvent,
-  memo,
   useCallback,
   useRef,
   useState,
@@ -120,7 +119,7 @@ interface Props {
   shortcutKey: keyof Shortcuts;
 }
 
-const ShortcutAction = memo(({ shortcutKey }: Props) => {
+const ShortcutAction = ({ shortcutKey }: Props) => {
   const shortcut = useAppSettingsStore((state) => state.shortcuts[shortcutKey]);
 
   const inputRef = useRef<HTMLInputElement>(null);
@@ -297,6 +296,6 @@ const ShortcutAction = memo(({ shortcutKey }: Props) => {
       </Popover.Root>
     </Flex>
   );
-});
+};
 
 export default ShortcutAction;
