@@ -21,6 +21,7 @@ import { Shortcuts } from "../../../types";
 import { updateShortcut, useAppSettingsStore } from "../../hooks";
 import { toast } from "sonner";
 
+// https://developer.mozilla.org/en-US/docs/Web/API/UI_Events/Keyboard_event_code_values
 const KEYCODES = {
   Digit0: "0",
   Digit1: "1",
@@ -32,6 +33,16 @@ const KEYCODES = {
   Digit7: "7",
   Digit8: "8",
   Digit9: "9",
+  Numpad0: "0",
+  Numpad1: "1",
+  Numpad2: "2",
+  Numpad3: "3",
+  Numpad4: "4",
+  Numpad5: "5",
+  Numpad6: "6",
+  Numpad7: "7",
+  Numpad8: "8",
+  Numpad9: "9",
   KeyA: "A",
   KeyB: "B",
   KeyC: "C",
@@ -58,6 +69,42 @@ const KEYCODES = {
   KeyX: "X",
   KeyY: "Y",
   KeyZ: "Z",
+};
+
+const INVALID_KEYCODES = {
+  Minus: "-",
+  Equal: "=",
+  Backspace: "\u232b",
+  BracketLeft: "[",
+  BracketRight: "]",
+  Enter: "\u23ce",
+  Semicolon: ";",
+  Quote: "'",
+  Backquote: "`",
+  Backslash: "\\",
+  Comma: ",",
+  Period: ".",
+  Slash: "/",
+  Space: "\u2423",
+  CapsLock: "\u21ea",
+  Home: "\u21f1",
+  End: "\u21f2",
+  PageUp: "\u21de",
+  PageDown: "\u21df",
+  ArrowUp: "\u2191",
+  ArrowDown: "\u2193",
+  ArrowLeft: "\u2190",
+  ArrowRight: "\u2192",
+  Insert: "\u2380",
+  Delete: "\u2326",
+  NumpadAdd: "+",
+  NumpadSubtract: "-",
+  NumpadMultiply: "*",
+  NumpadDivide: "/",
+  NumpadDecimal: ".",
+  NumpadEnter: "\u23ce",
+  NumpadEqual: "=",
+  NumpadComma: ",",
 };
 
 const MODIFIERS = {
@@ -151,6 +198,8 @@ const ShortcutAction = memo(({ shortcutKey }: Props) => {
     if (event.code in KEYCODES) {
       keys.push(KEYCODES[event.code as keyof typeof KEYCODES]);
       localHasKey = true;
+    } else if (event.code in INVALID_KEYCODES) {
+      keys.push(INVALID_KEYCODES[event.code as keyof typeof INVALID_KEYCODES]);
     }
 
     setValue(keys.join(" + "));
@@ -239,7 +288,7 @@ const ShortcutAction = memo(({ shortcutKey }: Props) => {
                 disabled={!isValid || (shortcut ?? "") === value}
                 onClick={confirmAction}
               >
-                Confirm
+                {value === "" ? "Disable" : "Confirm"}
               </Button>
             </Popover.Close>
           </Flex>
