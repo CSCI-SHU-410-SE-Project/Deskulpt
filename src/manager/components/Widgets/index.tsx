@@ -1,8 +1,8 @@
 import { Flex, ScrollArea, Separator, Tabs } from "@radix-ui/themes";
-import WidgetTrigger from "./WidgetTrigger";
 import { useWidgetsStore } from "../../hooks";
 import { memo } from "react";
 import { useShallow } from "zustand/shallow";
+import Trigger from "./Trigger";
 import GlobalActions from "./GlobalActions";
 import Config from "./Config";
 import Settings from "./Settings";
@@ -21,7 +21,7 @@ const WidgetsTab = memo(() => {
             <ScrollArea scrollbars="vertical" asChild>
               <Flex direction="column">
                 {ids.map((id, index) => (
-                  <WidgetTrigger key={id} id={id} value={`tab${index}`} />
+                  <Trigger key={id} id={id} value={`tab${index}`} />
                 ))}
               </Flex>
             </ScrollArea>
