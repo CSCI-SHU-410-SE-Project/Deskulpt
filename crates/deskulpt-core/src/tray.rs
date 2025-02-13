@@ -63,8 +63,8 @@ fn on_menu_event<R: Runtime>(app_handle: &AppHandle<R>, event: MenuEvent) {
             }
         },
         "tray-manage" => {
-            if let Err(e) = app_handle.show_manager() {
-                eprintln!("Error showing manager window: {}", e);
+            if let Err(e) = app_handle.open_manager() {
+                eprintln!("Error opening manager window: {}", e);
             }
         },
         "tray-exit" => {

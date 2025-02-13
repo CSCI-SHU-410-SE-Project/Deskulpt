@@ -105,8 +105,8 @@ impl_shortcuts! {
         }
     },
     open_manager => |app_handle, _, _| {
-        if let Err(e) = app_handle.show_manager() {
-            eprintln!("Failed to show the manager window: {e}");
+        if let Err(e) = app_handle.open_manager() {
+            eprintln!("Failed to open the manager window: {e}");
         }
     },
 }

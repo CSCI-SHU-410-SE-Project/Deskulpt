@@ -30,7 +30,7 @@ pub struct Shortcuts {
     /// For toggling canvas click-through.
     #[serde(default)]
     pub toggle_canvas: Option<String>,
-    /// For showing the manager window.
+    /// For opening the manager window.
     #[serde(default)]
     pub open_manager: Option<String>,
 }
