@@ -25,12 +25,7 @@ const App = () => {
   useUpdateSettingsListener();
 
   return (
-    <RadixTheme
-      appearance={theme}
-      accentColor="indigo"
-      grayColor="slate"
-      css={{ height: "100vh" }}
-    >
+    <RadixTheme appearance={theme} accentColor="indigo" grayColor="slate">
       <Toaster
         position="bottom-center"
         theme={theme}
