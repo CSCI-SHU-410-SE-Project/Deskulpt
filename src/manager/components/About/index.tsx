@@ -30,7 +30,7 @@ const AboutTab = memo(() => {
         <Table.Root
           size="1"
           css={{
-            "--table-cell-padding": "var(--space-1)",
+            "--table-cell-padding": "var(--space-1) 0",
             "--table-cell-min-height": 0,
             "& tr": { "--table-row-box-shadow": "none" },
             "& th": { color: "var(--gray-11)", width: "100px" },
@@ -55,7 +55,7 @@ const AboutTab = memo(() => {
                 </ExternalCopyLink>
               </Table.Cell>
             </Table.Row>
-            <Table.Row>
+            <Table.Row align="center">
               <Table.RowHeaderCell>Homepage</Table.RowHeaderCell>
               <Table.Cell>
                 <ExternalCopyLink href="https://csci-shu-410-se-project.github.io/Deskulpt">
