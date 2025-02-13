@@ -14,8 +14,9 @@ const Settings = memo(() => {
               <InfoCell>
                 Toggle canvas click-through, i.e., sink or float the canvas. If
                 the canvas is sunk (click-through), you can interact with the
-                desktop but not the widgets. If the canvas is floating, you can
-                interact with the widgets but not the desktop.
+                desktop but not the widgets. If the canvas is floating (not
+                click-through), you can interact with the widgets but not the
+                desktop.
               </InfoCell>
               <Table.RowHeaderCell>Toggle Canvas</Table.RowHeaderCell>
               <Table.Cell>
@@ -23,10 +24,10 @@ const Settings = memo(() => {
               </Table.Cell>
             </Table.Row>
             <Table.Row align="center">
-              <InfoCell>Show the manager window.</InfoCell>
-              <Table.RowHeaderCell>Show Manager</Table.RowHeaderCell>
+              <InfoCell>Open this manager window.</InfoCell>
+              <Table.RowHeaderCell>Open Manager</Table.RowHeaderCell>
               <Table.Cell>
-                <Shortcut shortcutKey="showManager" />
+                <Shortcut shortcutKey="openManager" />
               </Table.Cell>
             </Table.Row>
           </SectionTable>

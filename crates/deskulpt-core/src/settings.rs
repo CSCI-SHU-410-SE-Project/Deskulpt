@@ -32,7 +32,7 @@ pub struct Shortcuts {
     pub toggle_canvas: Option<String>,
     /// For showing the manager window.
     #[serde(default)]
-    pub show_manager: Option<String>,
+    pub open_manager: Option<String>,
 }
 
 /// Application-wide settings.
