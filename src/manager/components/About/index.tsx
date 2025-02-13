@@ -6,7 +6,7 @@ import { FaGithub } from "react-icons/fa";
 
 const AboutTab = memo(() => {
   return (
-    <Flex height="100%" pb="9" px="3" justify="center" align="center" gap="3">
+    <Flex height="100%" pb="8" justify="center" align="center">
       <Flex align="center" justify="center" flexGrow="1">
         <Avatar
           src={Logo}
@@ -30,10 +30,10 @@ const AboutTab = memo(() => {
         <Table.Root
           size="1"
           css={{
-            "--table-cell-padding": "var(--space-1) 0",
+            "--table-cell-padding": "var(--space-1)",
             "--table-cell-min-height": 0,
             "& tr": { "--table-row-box-shadow": "none" },
-            "& th": { color: "var(--gray-11)", width: "120px" },
+            "& th": { color: "var(--gray-11)", width: "100px" },
           }}
         >
           <Table.Body>
@@ -65,34 +65,6 @@ const AboutTab = memo(() => {
             </Table.Row>
           </Table.Body>
         </Table.Root>
-        {/* <DataList.Root size="2" css={{ gap: "var(--space-1) 0" }}>
-          <DataList.Item>
-            <DataList.Label>Version</DataList.Label>
-            <DataList.Value>{__VERSION__}</DataList.Value>
-          </DataList.Item>
-          <DataList.Item>
-            <DataList.Label>Authors</DataList.Label>
-            <DataList.Value>The Deskulpt Development Team</DataList.Value>
-          </DataList.Item>
-          <DataList.Item>
-            <DataList.Label>Repository</DataList.Label>
-            <DataList.Value>
-              <ExternalCopyLink href="https://github.com/CSCI-SHU-410-SE-Project/Deskulpt">
-                <Flex align="center" gap="1">
-                  <FaGithub /> CSCI-SHU-410-SE-Project/Deskulpt
-                </Flex>
-              </ExternalCopyLink>
-            </DataList.Value>
-          </DataList.Item>
-          <DataList.Item>
-            <DataList.Label>Homepage</DataList.Label>
-            <DataList.Value>
-              <ExternalCopyLink href="https://csci-shu-410-se-project.github.io/Deskulpt">
-                csci-shu-410-se-project.github.io/Deskulpt
-              </ExternalCopyLink>
-            </DataList.Value>
-          </DataList.Item>
-        </DataList.Root> */}
       </Box>
     </Flex>
   );
