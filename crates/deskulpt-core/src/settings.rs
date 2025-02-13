@@ -9,7 +9,7 @@ use anyhow::Result;
 use serde::{Deserialize, Serialize};
 
 /// The settings file name in the persistence directory.
-static SETTINGS_FILE: &str = "settings.bin";
+static SETTINGS_FILE: &str = "settings.json";
 
 /// Light/dark theme of the application.
 #[derive(Default, Deserialize, Serialize)]
@@ -28,7 +28,11 @@ enum Theme {
 #[serde(rename_all = "camelCase")]
 pub struct Shortcuts {
     /// For toggling canvas click-through.
+    #[serde(default)]
     pub toggle_canvas: Option<String>,
+    /// For showing the manager window.
+    #[serde(default)]
+    pub show_manager: Option<String>,
 }
 
 /// Application-wide settings.
@@ -36,8 +40,10 @@ pub struct Shortcuts {
 #[serde(rename_all = "camelCase")]
 struct AppSettings {
     /// The application theme.
+    #[serde(default)]
     theme: Theme,
     /// The keyboard shortcuts.
+    #[serde(default)]
     shortcuts: Shortcuts,
 }
 
@@ -49,11 +55,18 @@ struct AppSettings {
 #[serde(rename_all = "camelCase")]
 struct WidgetSettings {
     /// The leftmost x-coordinate in pixels.
+    #[serde(default)]
     x: i32,
     /// The topmost y-coordinate in pixels.
+    #[serde(default)]
     y: i32,
     /// The opacity in percentage.
+    #[serde(default = "default_opacity")]
     opacity: i32,
+}
+
+fn default_opacity() -> i32 {
+    100
 }
 
 /// Full settings of the application.
@@ -61,8 +74,10 @@ struct WidgetSettings {
 #[serde(rename_all = "camelCase")]
 pub struct Settings {
     /// Application-wide settings.
+    #[serde(default)]
     app: AppSettings,
     /// The mapping from widget IDs to their respective settings.
+    #[serde(default)]
     widgets: HashMap<String, WidgetSettings>,
 }
 
@@ -77,7 +92,7 @@ impl Settings {
         }
         let file = File::open(settings_path)?;
         let reader = BufReader::new(file);
-        let settings: Settings = bincode::deserialize_from(reader)?;
+        let settings: Settings = serde_json::from_reader(reader)?;
         Ok(settings)
     }
 
@@ -92,7 +107,7 @@ impl Settings {
         }
         let file = File::create(persist_dir.join(SETTINGS_FILE))?;
         let writer = BufWriter::new(file);
-        bincode::serialize_into(writer, self)?;
+        serde_json::to_writer(writer, self)?;
         Ok(())
     }
 

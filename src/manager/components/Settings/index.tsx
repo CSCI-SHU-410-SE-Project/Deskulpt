@@ -7,7 +7,7 @@ import SectionTable from "./SectionTable";
 const Settings = memo(() => {
   return (
     <ScrollArea asChild>
-      <Box height="420px" mt="1" pr="3">
+      <Box height="420px" mt="1" pl="1" pr="3">
         <Flex direction="column" gap="4">
           <SectionTable title="Keyboard Shortcuts">
             <Table.Row align="center">
@@ -20,6 +20,13 @@ const Settings = memo(() => {
               <Table.RowHeaderCell>Toggle Canvas</Table.RowHeaderCell>
               <Table.Cell>
                 <Shortcut shortcutKey="toggleCanvas" />
+              </Table.Cell>
+            </Table.Row>
+            <Table.Row align="center">
+              <InfoCell>Show the manager window.</InfoCell>
+              <Table.RowHeaderCell>Show Manager</Table.RowHeaderCell>
+              <Table.Cell>
+                <Shortcut shortcutKey="showManager" />
               </Table.Cell>
             </Table.Row>
           </SectionTable>

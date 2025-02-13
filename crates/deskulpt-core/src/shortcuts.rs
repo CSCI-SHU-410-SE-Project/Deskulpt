@@ -1,78 +1,114 @@
-//! Keyboard shortcut registration.
+//! Keyboard shortcut management.
 
 use anyhow::{bail, Result};
+use paste::paste;
+use serde::Deserialize;
 use tauri::{App, AppHandle, Manager, Runtime};
 use tauri_plugin_global_shortcut::{GlobalShortcutExt, ShortcutState};
 
 use crate::settings::Settings;
 use crate::states::StatesExtCanvasClickThrough;
+use crate::WindowExt;
 
-/// Implement a shortcut update function in [`ShortcutsExt`].
+/// Implement [`ShortcutKey`] and [`ShortcutsExt`] for the given shortcuts.
 ///
-/// The first argument is the name of the function. The second argument is the
-/// top-level docstring. The third argument is the listener to be registered for
-/// the shortcut.
-macro_rules! impl_update_shortcut {
-    ($method: ident, $shortcut: expr, $listener: expr) => {
-        #[doc = concat!("Update the keyboard shortcut `", $shortcut, "`.")]
-        ///
-        /// This will compare the old and new shortcut, and update only when they
-        /// are different. For each changed shortcut, the old one (if exists) will
-        /// be unregistered and the new one (if exists) will be registered.
-        fn $method(&self, old_shortcut: Option<&str>, new_shortcut: Option<&str>) -> Result<()> {
-            if old_shortcut == new_shortcut {
-                return Ok(());
+/// This macro takes a list of `key => listener` pairs, where `key` corresponds
+/// to the keys of [`Shortcuts`](crate::settings::Shortcuts) and `listener` is
+/// the corresponding shortcut handler callback.
+macro_rules! impl_shortcuts {
+    ($($key: ident => $listener: expr),* $(,)?) => {
+        paste! {
+            /// Keyboard shortcuts registered in the application.
+            #[derive(Deserialize)]
+            #[serde(rename_all = "camelCase")]
+            pub enum ShortcutKey {
+                $(
+                    [<$key:upper:camel>], // lower_snake_case => UpperCamelCase
+                )*
             }
-            let manager = self.global_shortcut();
+        }
 
-            if let Some(shortcut) = old_shortcut {
-                if !manager.is_registered(shortcut) {
-                    bail!("Failed to unregister '{shortcut}' because it is not registered yet");
+        /// Extension trait for keyboard shortcuts.
+        pub trait ShortcutsExt<R: Runtime>: Manager<R> + GlobalShortcutExt<R> {
+            /// Initialize keyboard shortcuts according to the initial settings.
+            ///
+            /// If any shortcut fails to be registered, the initial settings will be
+            /// modified to remove that shortcut. This is to prevent the application
+            /// from panicking only due to non-critical failures, and also sync this
+            /// information to the frontend.
+            fn init_shortcuts(&self, settings: &mut Settings) {
+                let shortcuts = settings.shortcuts_mut();
+                paste! {
+                    $(
+                        if let Err(e) = self.update_shortcut(
+                            ShortcutKey::[<$key:upper:camel>],
+                            None,
+                            shortcuts.$key.as_deref(),
+                        ) {
+                            eprintln!("{}: {}", stringify!($key), e);
+                            shortcuts.$key = None;
+                        }
+                    )*
                 }
-                manager.unregister(shortcut)?;
             }
 
-            if let Some(shortcut) = new_shortcut {
-                if manager.is_registered(shortcut) {
-                    bail!("Failed to register '{shortcut}' because it is already registered");
+            /// Update a shortcut registered in the application.
+            ///
+            /// This function will compare the old and new shortcuts and perform an update
+            /// only if it has changed. In that case, the old shortcut (if exists) will be
+            /// unregistered and the new shortcut (if exists) will be registered.
+            fn update_shortcut(
+                &self,
+                key: ShortcutKey,
+                old_shortcut: Option<&str>,
+                new_shortcut: Option<&str>,
+            ) -> Result<()> {
+                if old_shortcut == new_shortcut {
+                    return Ok(());
                 }
-                manager.on_shortcut(shortcut, $listener)?;
-            }
+                let manager = self.global_shortcut();
 
-            Ok(())
+                if let Some(shortcut) = old_shortcut {
+                    if !manager.is_registered(shortcut) {
+                        bail!("Cannot unregister '{shortcut}': not registered yet");
+                    }
+                    manager.unregister(shortcut)?;
+                }
+
+                if let Some(shortcut) = new_shortcut {
+                    if manager.is_registered(shortcut) {
+                        bail!("Cannot register '{shortcut}': already registered");
+                    }
+                    paste! {
+                        match key {
+                            $(
+                                ShortcutKey::[<$key:upper:camel>] => {
+                                    manager.on_shortcut(shortcut, $listener)?;
+                                },
+                            )*
+                        }
+                    }
+                }
+
+                Ok(())
+            }
         }
     };
 }
 
-/// Extension trait for keyboard shortcuts.
-pub trait ShortcutsExt<R: Runtime>: Manager<R> + GlobalShortcutExt<R> {
-    /// Initialize keyboard shortcuts according to the initial settings.
-    ///
-    /// If any shortcut fails to be registered, the initial settings will be
-    /// modified to remove that shortcut. This is to prevent the application
-    /// from panicking only due to non-critical failures, and also sync this
-    /// information to the frontend.
-    fn init_shortcuts(&self, settings: &mut Settings) {
-        let shortcuts = settings.shortcuts_mut();
-
-        if let Err(e) = self.update_toggle_canvas_shortcut(None, shortcuts.toggle_canvas.as_deref())
-        {
-            eprintln!("{e}");
-            shortcuts.toggle_canvas = None;
-        }
-    }
-
-    impl_update_shortcut!(
-        update_toggle_canvas_shortcut,
-        "toggle_canvas",
-        |app_handle, _, event| {
-            if event.state == ShortcutState::Pressed {
-                if let Err(e) = app_handle.toggle_canvas_click_through() {
-                    eprintln!("Failed to toggle canvas click-through: {e}");
-                }
+impl_shortcuts! {
+    toggle_canvas => |app_handle, _, event| {
+        if event.state == ShortcutState::Pressed {
+            if let Err(e) = app_handle.toggle_canvas_click_through() {
+                eprintln!("Failed to toggle canvas click-through: {e}");
             }
         }
-    );
+    },
+    show_manager => |app_handle, _, _| {
+        if let Err(e) = app_handle.show_manager() {
+            eprintln!("Failed to show the manager window: {e}");
+        }
+    },
 }
 
 impl<R: Runtime> ShortcutsExt<R> for App<R> {}
