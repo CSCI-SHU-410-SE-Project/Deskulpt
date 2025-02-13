@@ -1,12 +1,13 @@
-import { Avatar, DataList, Flex, Heading, Text } from "@radix-ui/themes";
-import ExternalCopyLink from "./ExternalCopyLink";
+import { Avatar, Box, Flex, Heading, Table } from "@radix-ui/themes";
+import ExternalCopyLink from "../ExternalCopyLink";
 import Logo from "/deskulpt.svg";
 import { memo } from "react";
+import { FaGithub } from "react-icons/fa";
 
 const AboutTab = memo(() => {
   return (
-    <Flex height="100%" pb="9" px="3" justify="center" align="center" gap="3">
-      <Flex align="center" justify="center" css={{ flex: 1 }}>
+    <Flex height="100%" pb="8" justify="center" align="center">
+      <Flex align="center" justify="center" flexGrow="1">
         <Avatar
           src={Logo}
           fallback="D"
@@ -19,38 +20,52 @@ const AboutTab = memo(() => {
           }}
         />
       </Flex>
-      <Flex direction="column" gap="3" css={{ flex: 2 }}>
-        <Flex direction="column">
-          <Heading size="6">Deskulpt</Heading>
-          <Text>A cross-platform desktop customization tool</Text>
-        </Flex>
-        <DataList.Root size="2" css={{ gap: "var(--space-1)" }}>
-          <DataList.Item>
-            <DataList.Label>Version</DataList.Label>
-            <DataList.Value>{__VERSION__}</DataList.Value>
-          </DataList.Item>
-          <DataList.Item>
-            <DataList.Label>Authors</DataList.Label>
-            <DataList.Value>The Deskulpt Development Team</DataList.Value>
-          </DataList.Item>
-          <DataList.Item>
-            <DataList.Label>Repository</DataList.Label>
-            <DataList.Value>
-              <ExternalCopyLink href="https://github.com/CSCI-SHU-410-SE-Project/Deskulpt">
-                CSCI-SHU-410-SE-Project/Deskulpt
-              </ExternalCopyLink>
-            </DataList.Value>
-          </DataList.Item>
-          <DataList.Item>
-            <DataList.Label>Documentation</DataList.Label>
-            <DataList.Value>
-              <ExternalCopyLink href="https://csci-shu-410-se-project.github.io/Deskulpt/">
-                Website
-              </ExternalCopyLink>
-            </DataList.Value>
-          </DataList.Item>
-        </DataList.Root>
-      </Flex>
+      <Box flexGrow="1">
+        <Heading size="6" mb="1">
+          Deskulpt
+        </Heading>
+        <Heading size="3" mb="4" weight="regular" color="gray">
+          A cross-platform desktop customization tool
+        </Heading>
+        <Table.Root
+          size="1"
+          css={{
+            "--table-cell-padding": "var(--space-1) 0",
+            "--table-cell-min-height": 0,
+            "& tr": { "--table-row-box-shadow": "none" },
+            "& th": { color: "var(--gray-11)", width: "100px" },
+          }}
+        >
+          <Table.Body>
+            <Table.Row align="center">
+              <Table.RowHeaderCell>Version</Table.RowHeaderCell>
+              <Table.Cell>{__VERSION__}</Table.Cell>
+            </Table.Row>
+            <Table.Row align="center">
+              <Table.RowHeaderCell>Authors</Table.RowHeaderCell>
+              <Table.Cell>The Deskulpt Development Team</Table.Cell>
+            </Table.Row>
+            <Table.Row align="center">
+              <Table.RowHeaderCell>Repository</Table.RowHeaderCell>
+              <Table.Cell>
+                <ExternalCopyLink href="https://github.com/CSCI-SHU-410-SE-Project/Deskulpt">
+                  <Flex align="center" gap="1">
+                    <FaGithub /> CSCI-SHU-410-SE-Project/Deskulpt
+                  </Flex>
+                </ExternalCopyLink>
+              </Table.Cell>
+            </Table.Row>
+            <Table.Row align="center">
+              <Table.RowHeaderCell>Homepage</Table.RowHeaderCell>
+              <Table.Cell>
+                <ExternalCopyLink href="https://csci-shu-410-se-project.github.io/Deskulpt">
+                  csci-shu-410-se-project.github.io/Deskulpt
+                </ExternalCopyLink>
+              </Table.Cell>
+            </Table.Row>
+          </Table.Body>
+        </Table.Root>
+      </Box>
     </Flex>
   );
 });

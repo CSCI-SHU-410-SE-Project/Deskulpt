@@ -70,7 +70,6 @@ const Settings = memo(({ id }: SettingsProps) => {
   return (
     <Table.Root
       size="1"
-      variant="ghost"
       layout="fixed"
       css={{
         "--table-cell-padding": "var(--space-1) var(--space-2)",
