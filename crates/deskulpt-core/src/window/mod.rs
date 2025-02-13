@@ -76,8 +76,8 @@ pub trait WindowExt<R: Runtime>: Manager<R> {
         Ok(())
     }
 
-    /// Show the manager window.
-    fn show_manager(&self) -> Result<()> {
+    /// Open the manager window.
+    fn open_manager(&self) -> Result<()> {
         let manager = self
             .get_webview_window("manager")
             .ok_or(anyhow!("Manager window not found"))?;
