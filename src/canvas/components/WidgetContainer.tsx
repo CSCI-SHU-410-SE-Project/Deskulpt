@@ -1,4 +1,4 @@
-import { RefObject, memo, useCallback, useRef } from "react";
+import { RefObject, memo, useRef } from "react";
 import Draggable, { DraggableData, DraggableEvent } from "react-draggable";
 import { ErrorBoundary } from "react-error-boundary";
 import ErrorDisplay from "./ErrorDisplay";
@@ -6,6 +6,23 @@ import { stringifyError } from "../utils";
 import { LuGripVertical } from "react-icons/lu";
 import { Box } from "@radix-ui/themes";
 import { updateWidgetSettings, useWidgetsStore } from "../hooks";
+import { css } from "@emotion/react";
+
+const styles = {
+  wrapper: css({
+    "&:hover": { ".handle": { opacity: 1 } },
+  }),
+  handle: css({
+    cursor: "grab",
+    opacity: 0,
+    zIndex: 2,
+    transition: "opacity 200ms ease-in-out",
+  }),
+  container: css({
+    color: "var(--gray-12)",
+    zIndex: 1,
+  }),
+};
 
 interface WidgetContainerProps {
   id: string;
@@ -15,69 +32,59 @@ const WidgetContainer = memo(({ id }: WidgetContainerProps) => {
   const { Component, width, height, x, y, opacity } = useWidgetsStore(
     (state) => state.widgets[id],
   );
-  const containerRef = useRef<HTMLDivElement>(null);
+  const wrapperRef = useRef<HTMLDivElement>(null);
 
-  const onStop = useCallback(
-    (_: DraggableEvent, data: DraggableData) => {
-      updateWidgetSettings(id, { x: x + data.x, y: y + data.y }, true);
-    },
-    [id, x, y],
-  );
+  const onStop = (_: DraggableEvent, data: DraggableData) => {
+    updateWidgetSettings(id, { x: x + data.x, y: y + data.y }, true);
+  };
 
   return (
     <Draggable
       // TODO: remove the `as` part which is workaround for React 19:
       // https://github.com/react-grid-layout/react-draggable/issues/768
-      nodeRef={containerRef as RefObject<HTMLDivElement>}
+      nodeRef={wrapperRef as RefObject<HTMLDivElement>}
       onStop={onStop}
       bounds="body"
-      handle=".draggable-handle"
+      handle=".handle"
       position={{ x: 0, y: 0 }}
     >
       <Box
-        ref={containerRef}
+        ref={wrapperRef}
         overflow="hidden"
         position="absolute"
-        left={`${x}px`}
-        top={`${y}px`}
-        width={width ?? "300px"}
-        height={height ?? "150px"}
-        css={{
-          color: "var(--gray-12)",
-          backgroundColor: "var(--gray-surface)",
-          borderRadius: "var(--radius-2)",
-          boxShadow: "0 0 2px var(--gray-8)",
-          opacity: `${opacity}%`,
-        }}
+        css={styles.wrapper}
+        style={{ left: x, top: y }}
       >
-        <LuGripVertical
-          className="draggable-handle"
-          size={20}
-          css={{
-            position: "absolute",
-            top: "var(--space-1)",
-            right: "var(--space-1)",
-            cursor: "grab",
-            opacity: "0",
-            zIndex: 9999,
-            transition: "opacity 200ms ease-in-out",
-            "&:hover": {
-              opacity: "1",
-            },
-          }}
-        />
-        <ErrorBoundary
-          resetKeys={[Component]}
-          fallbackRender={({ error }) => (
-            <ErrorDisplay
-              id={id}
-              error="Error in the widget component [React error boundary]"
-              message={stringifyError(error)}
-            />
-          )}
+        <Box
+          className="handle"
+          position="absolute"
+          top="1"
+          right="1"
+          css={styles.handle}
+          asChild
         >
-          <Component id={id} />
-        </ErrorBoundary>
+          <LuGripVertical size={20} />
+        </Box>
+        <Box
+          position="relative"
+          width={width ?? "300px"}
+          height={height ?? "150px"}
+          css={styles.container}
+          style={{ opacity: opacity / 100 }}
+        >
+          <ErrorBoundary
+            resetKeys={[Component]}
+            fallbackRender={({ error }) => (
+              <ErrorDisplay
+                id={id}
+                error="Error in the widget component [React error boundary]"
+                message={stringifyError(error)}
+              />
+            )}
+          >
+            <Component id={id} />
+          </ErrorBoundary>
+        </Box>
       </Box>
     </Draggable>
   );

@@ -3,6 +3,16 @@ import { LiaTimesSolid } from "react-icons/lia";
 import { updateWidgetSettings, useWidgetsStore } from "../../hooks";
 import { memo, useCallback } from "react";
 import IntegerInput from "../IntegerInput";
+import { css } from "@emotion/react";
+
+const styles = {
+  table: css({
+    "--table-cell-padding": "var(--space-1) var(--space-2)",
+    "--table-cell-min-height": 0,
+    "& tr": { "--table-row-box-shadow": "none" },
+    "& th": { color: "var(--gray-11)", width: "100px" },
+  }),
+};
 
 const X = ({ id }: SettingsProps) => {
   const x = useWidgetsStore((state) => state.widgets[id].settings.x);
@@ -68,16 +78,7 @@ interface SettingsProps {
 
 const Settings = memo(({ id }: SettingsProps) => {
   return (
-    <Table.Root
-      size="1"
-      layout="fixed"
-      css={{
-        "--table-cell-padding": "var(--space-1) var(--space-2)",
-        "--table-cell-min-height": 0,
-        "& tr": { "--table-row-box-shadow": "none" },
-        "& th": { color: "var(--gray-11)", width: "100px" },
-      }}
-    >
+    <Table.Root size="1" layout="fixed" css={styles.table}>
       <Table.Body>
         <Table.Row align="center">
           <Table.RowHeaderCell>Position (px)</Table.RowHeaderCell>

@@ -20,8 +20,20 @@ import { Shortcuts } from "../../../types";
 import { updateShortcut, useAppSettingsStore } from "../../hooks";
 import { toast } from "sonner";
 import { INVALID_KEYCODES, KEYCODES, MODIFIERS } from "./keyboard";
+import { css } from "@emotion/react";
 
 const INITIAL_PLACEHOLDER = "Shortcut disabled";
+
+const styles = {
+  input: css({
+    width: "240px",
+    fontSize: "var(--font-size-2)",
+    paddingLeft: "var(--space-1)",
+    "> input": { cursor: "text" },
+    "--text-field-focus-color": "var(--accent-8)",
+  }),
+  inputInvalid: css({ "--text-field-focus-color": "var(--red-8)" }),
+};
 
 interface Props {
   shortcutKey: keyof Shortcuts;
@@ -165,15 +177,7 @@ const ShortcutAction = ({ shortcutKey }: Props) => {
               onFocus={handleFocus}
               onBlur={handleBlur}
               onKeyDown={handleKeyDown}
-              css={{
-                width: "240px",
-                fontSize: "var(--font-size-2)",
-                paddingLeft: "var(--space-1)",
-                "> input": { cursor: "text" },
-                "--text-field-focus-color": isValid
-                  ? "var(--accent-8)"
-                  : "var(--red-8)",
-              }}
+              css={[styles.input, !isValid && styles.inputInvalid]}
             >
               <TextField.Slot side="right">
                 <IconButton

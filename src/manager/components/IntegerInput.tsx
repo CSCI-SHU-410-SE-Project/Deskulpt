@@ -1,5 +1,14 @@
+import { css } from "@emotion/react";
 import { Box, BoxProps, Reset } from "@radix-ui/themes";
 import { ChangeEvent, KeyboardEvent, useCallback } from "react";
+
+const styles = {
+  root: css({
+    backgroundColor: "var(--gray-5)",
+    borderRadius: "var(--radius-2)",
+    lineHeight: "1.6",
+  }),
+};
 
 type IntegerInputProps = BoxProps & {
   value: number;
@@ -78,16 +87,7 @@ const IntegerInput = ({
   };
 
   return (
-    <Box
-      pl="2"
-      css={{
-        backgroundColor: "var(--gray-5)",
-        borderRadius: "var(--radius-2)",
-        lineHeight: "1.6",
-      }}
-      {...boxProps}
-      asChild
-    >
+    <Box pl="2" css={styles.root} {...boxProps} asChild>
       <Reset>
         <input
           type="number"
