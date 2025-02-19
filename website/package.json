@@ -18,7 +18,7 @@
     "docusaurus-plugin-typedoc": "^1.2.1",
     "prism-react-renderer": "^2.4.0",
     "react-icons": "^5.4.0",
-    "sass": "^1.84.0",
+    "sass": "^1.85.0",
     "typedoc": "^0.27.5",
     "typedoc-plugin-markdown": "^4.4.1"
   },
