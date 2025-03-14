@@ -4,8 +4,15 @@ import { FC, createElement } from "react";
 import { events } from "../../core";
 import ErrorDisplay from "../components/ErrorDisplay";
 
+interface WidgetProps {
+  id: string;
+  x: number;
+  y: number;
+  opacity: number;
+}
+
 interface Widget {
-  Component: FC<{ id: string }>;
+  Component: FC<WidgetProps>;
   width?: string;
   height?: string;
 }
