@@ -8,7 +8,7 @@ use std::sync::Arc;
 use alias::AliasPlugin;
 use anyhow::{anyhow, bail, Result};
 use oxc::transformer::{JsxOptions, JsxRuntime};
-use rolldown::{Bundler, BundlerOptions, Jsx, OutputFormat, Platform};
+use rolldown::{Bundler, BundlerOptions, Jsx, OutputFormat, Platform, RawMinifyOptions};
 use rolldown_common::Output;
 
 /// Builder for the Deskulpt widget bundler.
@@ -46,7 +46,7 @@ impl WidgetBundlerBuilder {
             cwd: Some(self.root),
             format: Some(OutputFormat::Esm),
             platform: Some(Platform::Browser),
-            minify: Some(true),
+            minify: Some(RawMinifyOptions::Bool(true)),
             // Use automatic runtime for JSX transforms, which will refer to
             // `@deskulpt-test/emotion/jsx-runtime`
             jsx: Some(Jsx::Enable(JsxOptions {
