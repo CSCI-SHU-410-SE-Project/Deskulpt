@@ -82,7 +82,7 @@ const WidgetContainer = memo(({ id }: WidgetContainerProps) => {
               />
             )}
           >
-            <Component id={id} />
+            <Component id={id} x={x} y={y} opacity={opacity} />
           </ErrorBoundary>
         </Box>
       </Box>
