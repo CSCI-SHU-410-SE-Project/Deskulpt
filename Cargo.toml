@@ -30,7 +30,7 @@ tauri-plugin-clipboard-manager = "2.2.0"
 tauri-plugin-global-shortcut   = "2.2.0"
 tempfile                       = "3.19.0"
 thiserror                      = "2.0.9"
-tokio                          = "1.44.0"
+tokio                          = "1.44.2"
 uuid                           = "1.16.0"
 
 # Deskulpt crates
