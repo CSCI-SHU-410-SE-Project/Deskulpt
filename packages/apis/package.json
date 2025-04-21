@@ -23,7 +23,7 @@
   },
   "homepage": "https://csci-shu-410-se-project.github.io/Deskulpt/",
   "dependencies": {
-    "@tauri-apps/api": "^2.4.0"
+    "@tauri-apps/api": "^2.5.0"
   },
   "devDependencies": {
     "@rollup/plugin-replace": "^6.0.2",
