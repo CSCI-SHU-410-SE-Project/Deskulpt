@@ -24,7 +24,7 @@
     "build:packages": "pnpm run --filter \"@deskulpt-test/*\" build"
   },
   "devDependencies": {
-    "@tauri-apps/cli": "^2.4.0",
+    "@tauri-apps/cli": "^2.5.0",
     "husky": "^9.1.6",
     "lint-staged": "^15.5.0",
     "oxlint": "^0.16.4",
