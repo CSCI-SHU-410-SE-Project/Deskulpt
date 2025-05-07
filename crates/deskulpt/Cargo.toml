@@ -15,9 +15,7 @@ tauri                          = { workspace = true, features = ["macos-private-
 tauri-plugin-clipboard-manager = { workspace = true }
 tauri-plugin-global-shortcut   = { workspace = true }
 tauri-plugin-opener            = { workspace = true }
-# required by tauri-plugin-opener
-serde_json                     = { workspace = true }
-
+serde_json                     = { workspace = true }   # required by tauri-plugin-opener
 [build-dependencies]
 tauri-build = { workspace = true, features = ["codegen"] }
 
