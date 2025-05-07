@@ -14,6 +14,9 @@ deskulpt-core                  = { workspace = true }
 tauri                          = { workspace = true, features = ["macos-private-api"] }
 tauri-plugin-clipboard-manager = { workspace = true }
 tauri-plugin-global-shortcut   = { workspace = true }
+tauri-plugin-opener            = { workspace = true }
+# required by tauri-plugin-opener
+serde_json                     = { workspace = true }
 
 [build-dependencies]
 tauri-build = { workspace = true, features = ["codegen"] }
