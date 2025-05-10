@@ -5,7 +5,7 @@ use std::collections::HashMap;
 use std::sync::Arc;
 
 use rolldown::plugin::{
-    HookResolveIdArgs, HookResolveIdOutput, HookResolveIdReturn, Plugin, PluginContext,
+    HookResolveIdArgs, HookResolveIdOutput, HookResolveIdReturn, HookUsage, Plugin, PluginContext,
     PluginContextResolveOptions,
 };
 
@@ -39,22 +39,25 @@ impl Plugin for AliasPlugin {
             None => return Ok(None),
         };
 
-        Ok(ctx
+        let resolved_id = ctx
             .resolve(
                 update_id,
-                None,
+                args.importer,
                 Some(PluginContextResolveOptions {
                     import_kind: args.kind,
                     skip_self: true,
                     custom: Arc::clone(&args.custom),
                 }),
             )
-            .await?
-            .map(|resolved_id| {
-                Some(HookResolveIdOutput {
-                    id: resolved_id.id,
-                    ..Default::default()
-                })
-            })?)
+            .await??;
+
+        Ok(Some(HookResolveIdOutput {
+            id: resolved_id.id,
+            ..Default::default()
+        }))
+    }
+
+    fn register_hook_usage(&self) -> HookUsage {
+        HookUsage::ResolveId
     }
 }
