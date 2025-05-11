@@ -1,9 +1,9 @@
 import { openUrl } from "@tauri-apps/plugin-opener";
 
 /**
- * Adapted from https://github.com/tauri-apps/plugins-workspace/blob/a6b854032d0b10f0f17c4ffa6bdf4a05429e05fb/plugins/opener/guest-js/init.ts
+ * Adapted from [the init script of Tauri's Opener plugin](https://github.com/tauri-apps/plugins-workspace/blob/a6b854032d0b10f0f17c4ffa6bdf4a05429e05fb/plugins/opener/guest-js/init.ts)
  *
- * Force all <a> elements to have attribute `target`  of value `_blank`.
+ * Force all `<a>` elements to have attribute `target`  of value `_blank`.
  * This ensures all hyperlinks are opened in the default browser, instead of the webview window
  */
 export function enforceOpenNewTab() {
