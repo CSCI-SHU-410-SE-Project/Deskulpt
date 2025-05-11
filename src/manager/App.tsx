@@ -10,7 +10,6 @@ import About from "./components/About";
 import Widgets from "./components/Widgets";
 import Settings from "./components/Settings";
 import ThemeToggler from "./components/ThemeToggler";
-import { useEnforceOpenNewTab } from "../core/hooks/useEnforceOpenNewTab";
 
 const tabs = [
   { value: "widgets", label: "Widgets", content: <Widgets /> },
@@ -24,7 +23,6 @@ const App = () => {
   useExitAppListener();
   useInitialRescan();
   useUpdateSettingsListener();
-  useEnforceOpenNewTab();
 
   return (
     <RadixTheme appearance={theme} accentColor="indigo" grayColor="slate">

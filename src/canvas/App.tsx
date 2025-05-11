@@ -10,7 +10,6 @@ import {
   useUpdateSettingsListener,
   useWidgetsStore,
 } from "./hooks";
-import { useEnforceOpenNewTab } from "../core/hooks/useEnforceOpenNewTab";
 
 const App = () => {
   const theme = useTheme();
@@ -22,7 +21,6 @@ const App = () => {
   useRenderWidgetsListener();
   useShowToastListener();
   useUpdateSettingsListener();
-  useEnforceOpenNewTab();
 
   return (
     <RadixTheme
