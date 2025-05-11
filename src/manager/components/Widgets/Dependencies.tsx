@@ -34,7 +34,6 @@ const Dependencies = memo(({ dependencies }: DependenciesProps) => {
                   <Table.RowHeaderCell>
                     <Link
                       href={`https://www.npmjs.com/package/${name}`}
-                      target="_blank"
                       rel="noreferrer"
                     >
                       {name}
