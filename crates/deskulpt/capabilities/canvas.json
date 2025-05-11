@@ -4,5 +4,9 @@
   "description": "Capabilities of the canvas window.",
   "local": true,
   "windows": ["canvas"],
-  "permissions": ["core:event:default", "opener:default"]
+  "permissions": [
+    "core:event:default",
+    "opener:allow-open-url",
+    "opener:allow-default-urls"
+  ]
 }
