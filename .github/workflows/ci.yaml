@@ -27,11 +27,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - uses: ./.github/actions/setup
+      - uses: ./.github/actions/setup-rust
         with:
           platform: ${{ matrix.platform }}
           format: ${{ matrix.platform == 'ubuntu-latest' }}
           lint: true
+
+      - uses: ./.github/actions/setup-node
 
       - name: Check formatting
         if: ${{ matrix.platform == 'ubuntu-latest' }}
@@ -51,9 +53,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - uses: ./.github/actions/setup
+      - uses: ./.github/actions/setup-rust
         with:
           platform: ${{ matrix.platform }}
+
+      - uses: ./.github/actions/setup-node
 
       - name: Run test suite
         run: pnpm test
@@ -69,9 +73,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - uses: ./.github/actions/setup
+      - uses: ./.github/actions/setup-rust
         with:
           platform: ${{ matrix.platform }}
+
+      - uses: ./.github/actions/setup-node
 
       - name: Build Deskulpt
         id: build-deskulpt

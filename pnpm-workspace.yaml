@@ -1,4 +1,4 @@
 packages:
   - src
-  - website
   - packages/*
+  - docs

@@ -7,29 +7,33 @@ on:
   pull_request:
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
-  doc-build:
+  docs-build:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - uses: ./.github/actions/setup
+      - uses: ./.github/actions/setup-node
+
+      - name: Configure
+        uses: actions/configure-pages@v4
 
       - name: Build docs
-        run: |
-          cd website
-          pnpm build
+        run: pnpm docs:build
 
       - name: Upload build artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: website/build
+          path: docs/.vitepress/dist
 
-  doc-deploy:
-    needs: doc-build
+  docs-deploy:
+    needs: docs-build
     if: github.event_name == 'push'
     permissions:
       pages: write
@@ -40,6 +44,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Deploy to GitHub pages
+      - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4

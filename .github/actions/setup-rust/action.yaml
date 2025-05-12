@@ -1,5 +1,5 @@
-name: Setup Deskulpt
-description: Composite action to set up the environment for Deskulpt workflows.
+name: Setup Rust
+description: Composite action to set up the Rust environment for Deskulpt workflows.
 
 inputs:
   platform:
@@ -43,7 +43,7 @@ runs:
         components: ${{ inputs.lint == 'true' && 'clippy' || '' }}
         targets: ${{ inputs.targets }}
 
-    - name: Install formatting tools
+    - name: Rust formatting tools
       if: inputs.format == 'true'
       shell: bash
       run: |
@@ -55,18 +55,3 @@ runs:
       uses: swatinem/rust-cache@v2
       with:
         workspaces: . -> target
-
-    - name: Install pnpm
-      uses: pnpm/action-setup@v4
-      with:
-        version: 9
-
-    - name: Node setup and cache
-      uses: actions/setup-node@v4
-      with:
-        node-version: lts/*
-        cache: pnpm
-
-    - name: Install frontend dependencies
-      shell: bash
-      run: pnpm install --frozen-lockfile
