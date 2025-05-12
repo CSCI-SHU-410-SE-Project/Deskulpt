@@ -23,7 +23,7 @@ const ExternalCopyLink = ({
 
   return (
     <Flex gap={gap} align="center">
-      <Link {...linkProps} rel="noreferrer">
+      <Link {...linkProps} target="_blank" rel="noreferrer">
         {children}
       </Link>
       {linkProps.href !== undefined && (
