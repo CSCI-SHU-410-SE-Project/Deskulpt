@@ -4,15 +4,11 @@ import { writeText } from "@tauri-apps/plugin-clipboard-manager";
 import { toast } from "sonner";
 import { useCallback } from "react";
 
-interface ExternalCopyLinkProps extends LinkProps {
+interface CopyLinkProps extends LinkProps {
   gap?: FlexProps["gap"];
 }
 
-const ExternalCopyLink = ({
-  gap = "2",
-  children,
-  ...linkProps
-}: ExternalCopyLinkProps) => {
+const CopyLink = ({ gap = "2", children, ...linkProps }: CopyLinkProps) => {
   const handleCopy = useCallback(() => {
     if (linkProps.href !== undefined) {
       writeText(linkProps.href).then(() =>
@@ -23,9 +19,7 @@ const ExternalCopyLink = ({
 
   return (
     <Flex gap={gap} align="center">
-      <Link {...linkProps} target="_blank" rel="noreferrer">
-        {children}
-      </Link>
+      <Link {...linkProps}>{children}</Link>
       {linkProps.href !== undefined && (
         <IconButton
           size="1"
@@ -40,4 +34,4 @@ const ExternalCopyLink = ({
   );
 };
 
-export default ExternalCopyLink;
+export default CopyLink;

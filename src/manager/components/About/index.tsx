@@ -1,5 +1,5 @@
 import { Avatar, Box, Flex, Heading, Table } from "@radix-ui/themes";
-import ExternalCopyLink from "../ExternalCopyLink";
+import CopyLink from "../CopyLink";
 import Logo from "/deskulpt.svg";
 import { memo } from "react";
 import { FaGithub } from "react-icons/fa";
@@ -46,19 +46,19 @@ const AboutTab = memo(() => {
             <Table.Row align="center">
               <Table.RowHeaderCell>Repository</Table.RowHeaderCell>
               <Table.Cell>
-                <ExternalCopyLink href="https://github.com/CSCI-SHU-410-SE-Project/Deskulpt">
+                <CopyLink href="https://github.com/CSCI-SHU-410-SE-Project/Deskulpt">
                   <Flex align="center" gap="1">
                     <FaGithub /> CSCI-SHU-410-SE-Project/Deskulpt
                   </Flex>
-                </ExternalCopyLink>
+                </CopyLink>
               </Table.Cell>
             </Table.Row>
             <Table.Row align="center">
               <Table.RowHeaderCell>Homepage</Table.RowHeaderCell>
               <Table.Cell>
-                <ExternalCopyLink href="https://csci-shu-410-se-project.github.io/Deskulpt">
+                <CopyLink href="https://csci-shu-410-se-project.github.io/Deskulpt">
                   csci-shu-410-se-project.github.io/Deskulpt
-                </ExternalCopyLink>
+                </CopyLink>
               </Table.Cell>
             </Table.Row>
           </Table.Body>
