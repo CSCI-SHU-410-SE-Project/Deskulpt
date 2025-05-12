@@ -2,7 +2,7 @@ import { RefObject, memo, useRef } from "react";
 import Draggable, { DraggableData, DraggableEvent } from "react-draggable";
 import { ErrorBoundary } from "react-error-boundary";
 import ErrorDisplay from "./ErrorDisplay";
-import { stringifyError } from "../utils";
+import { stringifyError } from "../../utils/stringifyError";
 import { LuGripVertical } from "react-icons/lu";
 import { Box } from "@radix-ui/themes";
 import { updateWidgetSettings, useWidgetsStore } from "../hooks";

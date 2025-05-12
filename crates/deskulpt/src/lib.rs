@@ -59,6 +59,13 @@ pub fn run() {
         ])
         .plugin(tauri_plugin_clipboard_manager::init())
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())
+        // Prevent the opener plugin from registering handler for click event
+        // so we can register our own that opens non-_blank anchors in new tab
+        .plugin(
+            tauri_plugin_opener::Builder::new()
+                .open_js_links_on_click(false)
+                .build(),
+        )
         .run(generate_context!())
         .expect("Error running the Deskulpt application");
 }

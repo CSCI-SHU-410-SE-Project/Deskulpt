@@ -4,5 +4,10 @@
   "description": "Capabilities of the manager window.",
   "local": true,
   "windows": ["manager"],
-  "permissions": ["core:event:default", "clipboard-manager:allow-write-text"]
+  "permissions": [
+    "core:event:default",
+    "clipboard-manager:allow-write-text",
+    "opener:allow-open-url",
+    "opener:allow-default-urls"
+  ]
 }

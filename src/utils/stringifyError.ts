@@ -1,3 +1,6 @@
+/**
+ * Convert an unknown error to a string for logging and displaying.
+ */
 export function stringifyError(err: unknown) {
   if (typeof err === "string") {
     return err;

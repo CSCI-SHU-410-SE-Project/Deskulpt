@@ -32,11 +32,7 @@ const Dependencies = memo(({ dependencies }: DependenciesProps) => {
               {dependenciesArray.map(([name, version]) => (
                 <Table.Row key={name}>
                   <Table.RowHeaderCell>
-                    <Link
-                      href={`https://www.npmjs.com/package/${name}`}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
+                    <Link href={`https://www.npmjs.com/package/${name}`}>
                       {name}
                     </Link>
                   </Table.RowHeaderCell>
