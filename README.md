@@ -18,7 +18,7 @@
 ## Introduction
 
 **Deskulpt** is a cross-platform desktop customization tool that allows you to write
-React code to define widgets on your desktop. It is powered by [Tauri](https://tauri.app/),
+React code to define widgets on your desktop. It is powered by [Tauri v2](https://v2.tauri.app/),
 and written in Rust and TypeScript.
 
 The project was started in 2024 as a final project for the Software Engineering course
@@ -60,10 +60,3 @@ has detailed information about contributing code, documentation, tests, and more
 also provide [developers' API references](https://csci-shu-410-se-project.github.io/Deskulpt/category/references/)
 for both the frontend and backend of Deskulpt to help contributors better understand the
 codebase.
-
-## Authors
-
-- [Xinyu-Li-123](https://github.com/Xinyu-Li-123)
-- [Charlie-XIAO](https://github.com/Charlie-XIAO)
-- [ROMEEZHOU](https://github.com/ROMEEZHOU)
-- [rz2606](https://github.com/rz2606)

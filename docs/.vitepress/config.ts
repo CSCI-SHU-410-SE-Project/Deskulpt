@@ -2,7 +2,8 @@ import { defineConfig } from "vitepress";
 
 export default defineConfig({
   title: "Deskulpt",
-  description: "Cross-Platform Desktop Customization Tool",
+  description: "A cross-platform desktop customization tool.",
+  base: "/Deskulpt/",
   srcDir: "src",
   themeConfig: {
     logo: {
@@ -26,7 +27,10 @@ export default defineConfig({
       "/contribute/": [
         {
           text: "Contribution Guide",
-          items: [{ text: "Overview", link: "/contribute/overview" }],
+          items: [
+            { text: "Overview", link: "/contribute/overview" },
+            { text: "Build and Run", link: "/contribute/build-and-run" },
+          ],
         },
       ],
     },

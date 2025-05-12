@@ -16,4 +16,4 @@ Before requesting new features, please make sure to look through the [issue trac
 
 ## Submitting Pull Requests
 
-We accept pull requests for bug fixes, improvements, and new features. Pull requests should be made from your own fork of the Deskulpt project towards the `main` branch, with the "Allow edits by maintainers" option checked.
+We accept pull requests for bug fixes, improvements, and new features. Pull requests should be made from your own fork of the Deskulpt project towards the `main` branch, with the "Allow edits by maintainers" option checked. All pull requests need to pass our contiguous integration (CI) and go through the same review process.
