@@ -33,15 +33,6 @@ export function enforceOpenNewTab() {
       !a ||
       // or doesn't have a href
       !a.href
-      // or not supposed to be open in a new tab
-      // || !(
-      // open new tab whether or not target is _blank
-      // a.target === '_blank'
-      // or ctrl key pressed
-      // event.ctrlKey
-      // or shift key pressed
-      // || event.shiftKey
-      // )
     )
       return;
 
@@ -58,9 +49,7 @@ export function enforceOpenNewTab() {
 
     event.preventDefault();
 
-    // void invoke("plugin:opener|open_url", {
-    //   url,
-    // });
+    // Open url with default browser
     openUrl(url.toString());
   };
   document.addEventListener("click", handleClick);
