@@ -5,14 +5,63 @@ export default defineConfig({
   description: "A cross-platform desktop customization tool.",
   base: "/Deskulpt/",
   srcDir: "src",
+  lastUpdated: true,
+  head: [
+    [
+      "link",
+      {
+        rel: "icon",
+        type: "image/svg+xml",
+        href: "/Deskulpt/deskulpt.svg",
+        media: "(prefers-color-scheme: light)",
+      },
+    ],
+    [
+      "link",
+      {
+        rel: "icon",
+        type: "image/svg+xml",
+        href: "/Deskulpt/deskulpt-dark.svg",
+        media: "(prefers-color-scheme: dark)",
+      },
+    ],
+    [
+      "link",
+      { rel: "icon", type: "image/png", href: "/Deskulpt/deskulpt.png" },
+    ],
+    ["meta", { property: "og:type", content: "website" }],
+    ["meta", { property: "og:site_name", content: "Deskulpt" }],
+    [
+      "meta",
+      {
+        property: "og:title",
+        content: "Deskulpt | Desktop Customization Tool",
+      },
+    ],
+    [
+      "meta",
+      {
+        property: "og:url",
+        content: "https://csci-shu-410-se-project.github.io/Deskulpt/",
+      },
+    ],
+  ],
   themeConfig: {
     logo: {
       light: "/deskulpt.svg",
       dark: "/deskulpt-dark.svg",
     },
     nav: [
-      { text: "User Guide", link: "/guide/introduction" },
-      { text: "Contribute", link: "/contribute/overview" },
+      {
+        text: "User Guide",
+        link: "/guide/introduction",
+        activeMatch: "/guide/",
+      },
+      {
+        text: "Contribute",
+        link: "/contribute/overview",
+        activeMatch: "/contribute/",
+      },
     ],
     sidebar: {
       "/guide/": [
@@ -59,7 +108,6 @@ export default defineConfig({
       message: "Released under the MIT License.",
       copyright: "Copyright © 2023-2025 The Deskulpt Development Team",
     },
-    lastUpdated: {},
     search: {
       provider: "local",
     },

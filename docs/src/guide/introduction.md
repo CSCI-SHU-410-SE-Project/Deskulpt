@@ -1,12 +1,12 @@
 # Introduction
 
-## Overview
+## What is Deskulpt?
 
 **Deskulpt** is a free, modern, and cross-platform desktop customization tool designed to transform your desktop experience. It allows you to create, run, and manage widgets directly on your desktop.
 
 ### Deskulpt Widgets
 
-A **Deskulpt widget** is a small, interactive web component rendered on the [Deskulpt canvas](#deskulpt-canvas) (a transparent webview window layered on your desktop). Widgets can range from simple, single-purpose tools such as clocks, weather forecasts, or system monitoring displays, to more complex mini-applications with rich interaction and detailed information such as an interactive calendar. Deskulpt widgets can be freely moved and arranged on your desktop, personalizing your workspace exactly as you like.
+A **Deskulpt widget** is a small, interactive web component rendered on the Deskulpt canvas. Widgets can range from simple, single-purpose tools such as clocks, weather forecasts, or system monitoring displays, to more complex mini-applications with rich interaction and detailed information such as an interactive calendar. Deskulpt widgets can be freely moved and arranged on your desktop, personalizing your workspace exactly as you like.
 
 Deskulpt widgets are built with web technologies, primarily React, JavaScript, and TypeScript. This allows widgets to leverage the full power and flexibility of modern web development. Anything you can build as a web application can become a Deskulpt widget, empowering you to bring advanced functionalities directly onto your desktop. Widgets can seamlessly gather data from your system, web APIs, local files, etc., and dynamically present data using rich and interactive visual elements and user interfaces.
 
@@ -19,7 +19,13 @@ The **Deskulpt canvas** is a transparent webview window layered on your desktop,
 
 This means you cannot interact with your widgets and the desktop at the same time, but you can easily switch between these two modes to gain the best experience.
 
-### Do I Need Coding Skills?
+## Why Deskulpt?
+
+:::warning 🚧 Under Construction 🚧
+We are working on this part of the documentation.
+:::
+
+## Do I Need Coding Skills?
 
 If you simply want to use widgets from Deskulpt's widget library as is, you don't need any coding skills. Deskulpt provides an intuitive user interface to easily download and manage widgets, customize their positions, transparency, visibility, and other basic settings.
 
