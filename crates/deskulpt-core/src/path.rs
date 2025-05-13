@@ -22,17 +22,13 @@ pub trait PathExt<R: Runtime>: Manager<R> {
     /// called before calling the [`widgets_dir`](PathExt::widgets_dir) method.
     fn init_widgets_dir(&self) -> Result<()> {
         let widgets_dir = WIDGETS_DIR.get_or_init(|| {
-            let widget_dir = if cfg!(debug_assertions) {
-                let widget_base_dir = self.path().resource_dir().unwrap();
-                let widget_base_dir = dunce::simplified(&widget_base_dir);
-                widget_base_dir.join("widgets")
+            let widgets_base_dir = if cfg!(debug_assertions) {
+                self.path().resource_dir().unwrap()
             } else {
-                let widget_base_dir = self.path().document_dir().unwrap();
-                let widget_base_dir = dunce::simplified(&widget_base_dir);
-                let widget_base_dir = widget_base_dir.join("Deskulpt");
-                widget_base_dir.join("widgets")
+                self.path().document_dir().unwrap().join("Deskulpt")
             };
-            Arc::new(widget_dir)
+            let widgets_base_dir = dunce::simplified(&widgets_base_dir);
+            Arc::new(widgets_base_dir.join("widgets"))
         });
 
         if !widgets_dir.exists() {
