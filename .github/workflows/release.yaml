@@ -27,12 +27,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - uses: ./.github/actions/setup-rust
+      - uses: ./.github/actions/setup
         with:
           platform: ${{ matrix.platform }}
           targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
-
-      - uses: ./.github/actions/setup-node
 
       - uses: tauri-apps/tauri-action@v0
         env:
