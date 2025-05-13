@@ -61,3 +61,11 @@ Again, refer to its printout for the locations of the bundled artifacts, or use 
 ```
 
 If you want only the executable but not the bundled artifacts, you can add the `--no-bundle` flag to the build command.
+
+## Widgets Directory
+
+The widgets directory would always be under the directory of your executable. If you used the development mode or made a debug build, it will be `./target/debug/widgets/`. If you made a release build, it will be `./target/release/widgets/`. If you used the bundled artifacts, it will be under your installation directory.
+
+:::warning
+If you clean up the Rust artifacts e.g. using `cargo clean`, the widgets under the `./target/` directory will be deleted as well. Please remember to backup the widgets that you might reuse to avoid accidental loss of work.
+:::

@@ -19,13 +19,21 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: ./.github/actions/setup-node
+      - uses: ./.github/actions/setup
+        with:
+          platform: ubuntu-latest
 
       - name: Configure
         uses: actions/configure-pages@v4
 
       - name: Build docs
         run: pnpm docs:build
+
+      - name: Build rustdoc
+        run: |
+          pnpm docs:rs
+          rm -f target/doc/.lock
+          cp -r target/doc/ docs/.vitepress/dist/rustdoc/
 
       - name: Upload build artifact
         uses: actions/upload-pages-artifact@v3

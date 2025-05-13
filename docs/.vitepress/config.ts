@@ -30,6 +30,21 @@ export default defineConfig({
           items: [
             { text: "Overview", link: "/contribute/overview" },
             { text: "Build and Run", link: "/contribute/build-and-run" },
+            { text: "Testing", link: "/contribute/testing" },
+            {
+              text: "Quality Assurance",
+              link: "/contribute/quality-assurance",
+            },
+            { text: "Documentation", link: "/contribute/documentation" },
+          ],
+        },
+        {
+          text: "Developers' Reference",
+          items: [
+            {
+              text: "Backend Rustdoc",
+              link: "https://csci-shu-410-se-project.github.io/Deskulpt/rustdoc/deskulpt/",
+            },
           ],
         },
       ],
