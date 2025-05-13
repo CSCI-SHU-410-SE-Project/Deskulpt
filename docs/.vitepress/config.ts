@@ -3,7 +3,7 @@ import { defineConfig } from "vitepress";
 export default defineConfig({
   title: "Deskulpt",
   description: "A cross-platform desktop customization tool.",
-  base: "/Deskulpt/",
+  base: "/",
   srcDir: "src",
   lastUpdated: true,
   head: [
@@ -12,7 +12,7 @@ export default defineConfig({
       {
         rel: "icon",
         type: "image/svg+xml",
-        href: "/Deskulpt/deskulpt.svg",
+        href: "/deskulpt.svg",
         media: "(prefers-color-scheme: light)",
       },
     ],
@@ -21,14 +21,11 @@ export default defineConfig({
       {
         rel: "icon",
         type: "image/svg+xml",
-        href: "/Deskulpt/deskulpt-dark.svg",
+        href: "/deskulpt-dark.svg",
         media: "(prefers-color-scheme: dark)",
       },
     ],
-    [
-      "link",
-      { rel: "icon", type: "image/png", href: "/Deskulpt/deskulpt.png" },
-    ],
+    ["link", { rel: "icon", type: "image/png", href: "/deskulpt.png" }],
     ["meta", { property: "og:type", content: "website" }],
     ["meta", { property: "og:site_name", content: "Deskulpt" }],
     [
@@ -42,7 +39,7 @@ export default defineConfig({
       "meta",
       {
         property: "og:url",
-        content: "https://csci-shu-410-se-project.github.io/Deskulpt/",
+        content: "https://csci-shu-410-se-project.github.io/",
       },
     ],
   ],
@@ -92,7 +89,7 @@ export default defineConfig({
           items: [
             {
               text: "Backend Rustdoc",
-              link: "https://csci-shu-410-se-project.github.io/Deskulpt/rustdoc/deskulpt/",
+              link: "https://csci-shu-410-se-project.github.io/rustdoc/deskulpt/",
             },
           ],
         },

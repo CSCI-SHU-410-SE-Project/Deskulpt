@@ -56,8 +56,8 @@ const AboutTab = memo(() => {
             <Table.Row align="center">
               <Table.RowHeaderCell>Homepage</Table.RowHeaderCell>
               <Table.Cell>
-                <CopyLink href="https://csci-shu-410-se-project.github.io/Deskulpt">
-                  csci-shu-410-se-project.github.io/Deskulpt
+                <CopyLink href="https://csci-shu-410-se-project.github.io/">
+                  csci-shu-410-se-project.github.io
                 </CopyLink>
               </Table.Cell>
             </Table.Row>
