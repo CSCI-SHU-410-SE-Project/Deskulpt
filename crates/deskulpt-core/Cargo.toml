@@ -39,4 +39,4 @@ sysinfo             = { workspace = true }
 objc2 = { workspace = true }
 
 [package.metadata.docs.rs]
-rustdoc-args = ["--document-private-items", "--extend-css", "../rustdoc.css"]
+rustdoc-args = ["--extend-css", "../rustdoc.css"]

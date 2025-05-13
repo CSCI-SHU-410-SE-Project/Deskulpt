@@ -16,4 +16,4 @@ serde           = { workspace = true, features = ["derive"] }
 sysinfo         = { workspace = true }
 
 [package.metadata.docs.rs]
-rustdoc-args = ["--document-private-items", "--extend-css", "../rustdoc.css"]
+rustdoc-args = ["--extend-css", "../rustdoc.css"]

@@ -1,0 +1,15 @@
+{
+  "name": "deskulpt-docs",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm",
+    "dev": "vitepress dev",
+    "build": "vitepress build",
+    "preview": "vitepress preview"
+  },
+  "devDependencies": {
+    "sass": "^1.88.0",
+    "vitepress": "^1.6.3"
+  }
+}

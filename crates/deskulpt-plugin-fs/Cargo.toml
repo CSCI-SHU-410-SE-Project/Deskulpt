@@ -15,4 +15,4 @@ deskulpt-plugin = { workspace = true }
 serde           = { workspace = true, features = ["derive"] }
 
 [package.metadata.docs.rs]
-rustdoc-args = ["--document-private-items", "--extend-css", "../rustdoc.css"]
+rustdoc-args = ["--extend-css", "../rustdoc.css"]
