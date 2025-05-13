@@ -30,7 +30,7 @@ pub trait PathExt<R: Runtime>: Manager<R> {
                 let widget_base_dir = self.path().document_dir().unwrap();
                 let widget_base_dir = dunce::simplified(&widget_base_dir);
                 let widget_base_dir = widget_base_dir.join("Deskulpt");
-                widget_base_dir.join("Widgets")
+                widget_base_dir.join("widgets")
             };
             Arc::new(widget_dir)
         });
