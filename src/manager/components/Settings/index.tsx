@@ -3,6 +3,7 @@ import { memo } from "react";
 import Shortcut from "./Shortcut";
 import InfoCell from "./InfoCell";
 import SectionTable from "./SectionTable";
+import { ShortcutKey } from "../../../types";
 
 const Settings = memo(() => {
   return (
@@ -20,14 +21,14 @@ const Settings = memo(() => {
               </InfoCell>
               <Table.RowHeaderCell>Toggle Canvas</Table.RowHeaderCell>
               <Table.Cell>
-                <Shortcut shortcutKey="toggleCanvas" />
+                <Shortcut shortcutKey={ShortcutKey.TOGGLE_CANVAS} />
               </Table.Cell>
             </Table.Row>
             <Table.Row align="center">
               <InfoCell>Open this manager window.</InfoCell>
               <Table.RowHeaderCell>Open Manager</Table.RowHeaderCell>
               <Table.Cell>
-                <Shortcut shortcutKey="openManager" />
+                <Shortcut shortcutKey={ShortcutKey.OPEN_MANAGER} />
               </Table.Cell>
             </Table.Row>
           </SectionTable>

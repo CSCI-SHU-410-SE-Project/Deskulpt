@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { Shortcuts, Theme } from "../../types";
+import { ShortcutKey, Theme } from "../../types";
 import { commands, events } from "../../core";
 
 export const useAppSettingsStore = create(() => ({
@@ -15,9 +15,9 @@ export async function toggleTheme() {
 }
 
 export async function updateShortcut(
-  key: keyof Shortcuts,
-  oldShortcut: string | null,
-  newShortcut: string | null,
+  key: ShortcutKey,
+  oldShortcut?: string,
+  newShortcut?: string,
 ) {
   await commands.updateShortcut({ key, oldShortcut, newShortcut });
   useAppSettingsStore.setState((state) => ({
