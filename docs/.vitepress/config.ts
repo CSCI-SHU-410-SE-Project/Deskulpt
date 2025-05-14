@@ -103,7 +103,7 @@ export default defineConfig({
     ],
     footer: {
       message: "Released under the MIT License.",
-      copyright: "Copyright © 2023-2025 The Deskulpt Development Team",
+      copyright: "Copyright © 2024-2025 The Deskulpt Development Team",
     },
     search: {
       provider: "local",

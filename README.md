@@ -47,8 +47,8 @@ Website: [https://csci-shu-410-se-project.github.io/](https://csci-shu-410-se-pr
 
 ## Download
 
-Download the latest release of Deskulpt [here](https://github.com/CSCI-SHU-410-SE-Project/Deskulpt/releases). See [Quick Start](https://csci-shu-410-se-project.github.io/guide/quick-start/) for more details.
+Download the latest release of Deskulpt [here](https://github.com/CSCI-SHU-410-SE-Project/Deskulpt/releases). See [Quick Start](https://csci-shu-410-se-project.github.io/guide/quick-start.html) for more details.
 
 ## Contributing
 
-We welcome all sorts of contributions, no matter how large or small! See the [Contribution Guide](https://csci-shu-410-se-project.github.io/contribute/overview/) for more details.
+We welcome all sorts of contributions, no matter how large or small! See the [Contribution Guide](https://csci-shu-410-se-project.github.io/contribute/overview.html) for more details.
