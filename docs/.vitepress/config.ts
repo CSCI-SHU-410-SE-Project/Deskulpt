@@ -5,6 +5,7 @@ export default defineConfig({
   description: "A cross-platform desktop customization tool.",
   base: "/",
   srcDir: "src",
+  cleanUrls: true,
   lastUpdated: true,
   head: [
     [
