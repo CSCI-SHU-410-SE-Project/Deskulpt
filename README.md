@@ -1,6 +1,6 @@
 <div align="center">
 
-<a href="https://csci-shu-410-se-project.github.io/Deskulpt/">
+<a href="https://csci-shu-410-se-project.github.io/">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="https://github.com/CSCI-SHU-410-SE-Project/Deskulpt/raw/main/src/public/deskulpt-wide-dark.svg" />
     <img alt="Deskulpt" src="https://github.com/CSCI-SHU-410-SE-Project/Deskulpt/raw/main/src/public/deskulpt-wide.svg" width="300px" />
@@ -11,14 +11,14 @@
 
 <br />
 
-[![release](https://img.shields.io/github/v/release/CSCI-SHU-410-SE-Project/Deskulpt)](https://github.com/CSCI-SHU-410-SE-Project/Deskulpt/releases/latest) [![ci](https://img.shields.io/github/actions/workflow/status/CSCI-SHU-410-SE-Project/Deskulpt/ci.yaml?label=ci&logo=github)](https://github.com/CSCI-SHU-410-SE-Project/Deskulpt/actions/workflows/ci.yaml) [![hompage](https://img.shields.io/badge/homepage-Deskulpt-blue.svg)](https://csci-shu-410-se-project.github.io/Deskulpt/)
+[![release](https://img.shields.io/github/v/release/CSCI-SHU-410-SE-Project/Deskulpt)](https://github.com/CSCI-SHU-410-SE-Project/Deskulpt/releases/latest) [![ci](https://img.shields.io/github/actions/workflow/status/CSCI-SHU-410-SE-Project/Deskulpt/ci.yaml?label=ci&logo=github)](https://github.com/CSCI-SHU-410-SE-Project/Deskulpt/actions/workflows/ci.yaml) [![hompage](https://img.shields.io/badge/homepage-Deskulpt-blue.svg)](https://csci-shu-410-se-project.github.io/)
 
 </div>
 
 ## Introduction
 
 **Deskulpt** is a cross-platform desktop customization tool that allows you to write
-React code to define widgets on your desktop. It is powered by [Tauri](https://tauri.app/),
+React code to define widgets on your desktop. It is powered by [Tauri v2](https://v2.tauri.app/),
 and written in Rust and TypeScript.
 
 The project was started in 2024 as a final project for the Software Engineering course
@@ -43,27 +43,12 @@ Currently, Deskulpt supports the following platforms:
 - MacOS
 - Linux (X11, tested on Ubuntu)
 
-Website: [https://csci-shu-410-se-project.github.io/Deskulpt/](https://csci-shu-410-se-project.github.io/Deskulpt/)
+Website: [https://csci-shu-410-se-project.github.io/](https://csci-shu-410-se-project.github.io/)
 
 ## Download
 
-Download the latest release of Deskulpt [here](https://github.com/CSCI-SHU-410-SE-Project/Deskulpt/releases).
-To install and build Deskulpt from source, see [development](#development). Refer to the
-[installation guide](https://csci-shu-410-se-project.github.io/Deskulpt/guides/getting-started/installation)
-for more details.
+Download the latest release of Deskulpt [here](https://github.com/CSCI-SHU-410-SE-Project/Deskulpt/releases). See [Quick Start](https://csci-shu-410-se-project.github.io/guide/quick-start/) for more details.
 
-## Development
+## Contributing
 
-We welcome new contributors of all experience levels. The goals of the Deskulpt
-community are to be helpful, welcoming, and effective. The [developers' guide](https://csci-shu-410-se-project.github.io/Deskulpt/development/developer-guide/)
-has detailed information about contributing code, documentation, tests, and more. We
-also provide [developers' API references](https://csci-shu-410-se-project.github.io/Deskulpt/category/references/)
-for both the frontend and backend of Deskulpt to help contributors better understand the
-codebase.
-
-## Authors
-
-- [Xinyu-Li-123](https://github.com/Xinyu-Li-123)
-- [Charlie-XIAO](https://github.com/Charlie-XIAO)
-- [ROMEEZHOU](https://github.com/ROMEEZHOU)
-- [rz2606](https://github.com/rz2606)
+We welcome all sorts of contributions, no matter how large or small! See the [Contribution Guide](https://csci-shu-410-se-project.github.io/contribute/overview/) for more details.

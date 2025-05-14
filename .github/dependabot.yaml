@@ -16,10 +16,6 @@ updates:
           - "*"
 
   # Node dependencies
-  # TODO: Documentation dependencies should have a separate group, but we cannot
-  # because of the issue with pnpm workspace:
-  # https://github.com/dependabot/dependabot-core/issues/7501
-  # We may also want to rework the documentation setup in the future
   - package-ecosystem: npm
     directory: /
     schedule:

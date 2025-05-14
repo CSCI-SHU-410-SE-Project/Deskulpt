@@ -17,4 +17,4 @@ quote = "1.0.38"
 syn   = "2.0.95"
 
 [package.metadata.docs.rs]
-rustdoc-args = ["--document-private-items", "--extend-css", "../rustdoc.css"]
+rustdoc-args = ["--extend-css", "../rustdoc.css"]
