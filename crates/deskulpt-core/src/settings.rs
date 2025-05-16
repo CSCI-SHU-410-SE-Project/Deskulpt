@@ -2,6 +2,7 @@
 
 use std::collections::HashMap;
 use std::fs::{create_dir_all, File};
+use std::hash::Hash;
 use std::io::{BufReader, BufWriter};
 use std::path::Path;
 
@@ -20,19 +21,14 @@ enum Theme {
     Dark,
 }
 
-/// Keyboard shortcuts registered in the application.
-///
-/// A keyboard shortcut being `None` means that it is disabled, otherwise it is
-/// a string parsable into [`Shortcut`](tauri_plugin_global_shortcut::Shortcut).
-#[derive(Default, Deserialize, Serialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Shortcuts {
+/// Keys of keyboard shortcuts registered in the application.
+#[derive(Eq, PartialEq, Hash, Deserialize, Serialize, Debug)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+pub enum ShortcutKey {
     /// For toggling canvas click-through.
-    #[serde(default)]
-    pub toggle_canvas: Option<String>,
+    ToggleCanvas,
     /// For opening the manager window.
-    #[serde(default)]
-    pub open_manager: Option<String>,
+    OpenManager,
 }
 
 /// Application-wide settings.
@@ -44,7 +40,7 @@ struct AppSettings {
     theme: Theme,
     /// The keyboard shortcuts.
     #[serde(default)]
-    shortcuts: Shortcuts,
+    shortcuts: HashMap<ShortcutKey, String>,
 }
 
 /// Per-widget settings.
@@ -65,6 +61,7 @@ struct WidgetSettings {
     opacity: i32,
 }
 
+/// Default value for [`WidgetSettings::opacity`].
 fn default_opacity() -> i32 {
     100
 }
@@ -112,7 +109,7 @@ impl Settings {
     }
 
     /// Get the mutable reference to the keyboard shortcuts.
-    pub fn shortcuts_mut(&mut self) -> &mut Shortcuts {
+    pub fn shortcuts_mut(&mut self) -> &mut HashMap<ShortcutKey, String> {
         &mut self.app.shortcuts
     }
 }

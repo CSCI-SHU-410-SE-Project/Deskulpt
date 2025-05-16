@@ -3,14 +3,14 @@ export enum Theme {
   DARK = "dark",
 }
 
-export interface Shortcuts {
-  toggleCanvas: string | null;
-  openManager: string | null;
+export enum ShortcutKey {
+  TOGGLE_CANVAS = "TOGGLE_CANVAS",
+  OPEN_MANAGER = "OPEN_MANAGER",
 }
 
 export interface AppSettings {
   theme: Theme;
-  shortcuts: Shortcuts;
+  shortcuts: Partial<Record<ShortcutKey, string>>;
 }
 
 export interface WidgetSettings {

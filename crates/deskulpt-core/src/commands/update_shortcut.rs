@@ -1,7 +1,8 @@
 use tauri::{command, AppHandle, Runtime};
 
 use super::error::CmdResult;
-use crate::shortcuts::{ShortcutKey, ShortcutsExt};
+use crate::settings::ShortcutKey;
+use crate::shortcuts::ShortcutsExt;
 
 /// Wrapper of [`update_shortcut`](ShortcutsExt::update_shortcut).
 ///
@@ -17,6 +18,6 @@ pub async fn update_shortcut<R: Runtime>(
     old_shortcut: Option<String>,
     new_shortcut: Option<String>,
 ) -> CmdResult<()> {
-    app_handle.update_shortcut(key, old_shortcut.as_deref(), new_shortcut.as_deref())?;
+    app_handle.update_shortcut(&key, old_shortcut.as_deref(), new_shortcut.as_deref())?;
     Ok(())
 }
