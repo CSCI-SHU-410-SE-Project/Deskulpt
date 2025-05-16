@@ -10,19 +10,19 @@ use tauri::{App, AppHandle, Runtime};
 use tokio::time::sleep;
 
 use crate::events::EventsExt;
-use crate::states::StatesExtCanvasClickThrough;
+use crate::states::StatesExtCanvasIMode;
 use crate::window::WindowExt;
 
 /// Extention trait for system tray-related operations.
-pub trait TrayExt<R: Runtime>: StatesExtCanvasClickThrough<R> {
+pub trait TrayExt<R: Runtime>: StatesExtCanvasIMode<R> {
     /// Create the system tray.
     fn create_tray(&self, icon: Image) -> Result<()>
     where
         Self: Sized,
     {
-        // Store the menu item for toggling canvas click-through
+        // Store the menu item for toggling canvas interaction mode
         let menu_item_toggle = MenuItemBuilder::with_id("tray-toggle", "Float").build(self)?;
-        self.set_canvas_click_through_menu_item(&menu_item_toggle);
+        self.set_canvas_imode_menu_item(&menu_item_toggle);
 
         // Build the system tray menu
         let tray_menu = MenuBuilder::new(self)
@@ -58,8 +58,8 @@ impl<R: Runtime> TrayExt<R> for AppHandle<R> {}
 fn on_menu_event<R: Runtime>(app_handle: &AppHandle<R>, event: MenuEvent) {
     match event.id().as_ref() {
         "tray-toggle" => {
-            if let Err(e) = app_handle.toggle_canvas_click_through() {
-                eprintln!("Error toggling canvas click-through: {}", e);
+            if let Err(e) = app_handle.toggle_canvas_imode() {
+                eprintln!("Error toggling canvas interaction mode: {}", e);
             }
         },
         "tray-manage" => {
@@ -95,9 +95,9 @@ fn on_tray_icon_event<R: Runtime>(tray: &TrayIcon<R>, event: TrayIconEvent) {
     } = event
     {
         if button == MouseButton::Left && button_state == MouseButtonState::Down {
-            // Toggle canvas click-through on left-click
-            if let Err(e) = tray.app_handle().toggle_canvas_click_through() {
-                eprintln!("Error toggling canvas click-through: {}", e);
+            // Toggle canvas interaction mode on left-click
+            if let Err(e) = tray.app_handle().toggle_canvas_imode() {
+                eprintln!("Error toggling canvas interaction mode: {}", e);
             }
         }
     }

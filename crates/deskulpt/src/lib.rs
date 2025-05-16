@@ -5,7 +5,7 @@
 )]
 
 use deskulpt_core::{
-    PathExt, Settings, ShortcutsExt, StatesExtCanvasClickThrough, StatesExtInitialRender,
+    PathExt, Settings, ShortcutsExt, StatesExtCanvasIMode, StatesExtInitialRender,
     StatesExtWidgetConfigMap, TrayExt, WindowExt,
 };
 use tauri::image::Image;
@@ -31,7 +31,7 @@ pub fn run() {
 
             app.manage_initial_render();
             app.manage_widget_config_map();
-            app.manage_canvas_click_through();
+            app.manage_canvas_imode();
 
             // Hide the application from the dock on macOS because skipping
             // taskbar is not applicable for macOS
