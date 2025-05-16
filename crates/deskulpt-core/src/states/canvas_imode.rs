@@ -10,7 +10,7 @@ use crate::events::{EventsExt, ShowToastPayload};
 
 /// Canvas interaction mode.
 #[derive(Clone)]
-enum CanvasIMode {
+enum CanvasImode {
     /// Sink mode.
     ///
     /// The canvas is click-through. Widgets are not interactable. The desktop
@@ -24,14 +24,14 @@ enum CanvasIMode {
 }
 
 /// The internal of the managed state for canvas interaction mode.
-struct CanvasIModeStateInner<R: Runtime> {
+struct CanvasImodeStateInner<R: Runtime> {
     /// The interaction mode of the canvas.
-    mode: CanvasIMode,
+    mode: CanvasImode,
     /// The menu item for toggling the canvas interaction mode.
     menu_item: Option<MenuItem<R>>,
 }
 
-impl<R: Runtime> CanvasIModeStateInner<R> {
+impl<R: Runtime> CanvasImodeStateInner<R> {
     /// Toggle the interaction mode.
     ///
     /// This will change the mode and update the menu item text if it exists.
@@ -39,8 +39,8 @@ impl<R: Runtime> CanvasIModeStateInner<R> {
         // The menu item shows the action that will be performed on click, so it
         // should be the opposite of the mode
         let (new_mode, new_text) = match self.mode {
-            CanvasIMode::Sink => (CanvasIMode::Float, "Sink"),
-            CanvasIMode::Float => (CanvasIMode::Sink, "Float"),
+            CanvasImode::Sink => (CanvasImode::Float, "Sink"),
+            CanvasImode::Float => (CanvasImode::Sink, "Float"),
         };
 
         self.mode = new_mode;
@@ -52,24 +52,24 @@ impl<R: Runtime> CanvasIModeStateInner<R> {
 }
 
 /// Managed state for canvas interaction mode.
-struct CanvasIModeState<R: Runtime>(Mutex<CanvasIModeStateInner<R>>);
+struct CanvasImodeState<R: Runtime>(Mutex<CanvasImodeStateInner<R>>);
 
 /// Extension trait for operations on canvas interaction mode.
-pub trait StatesExtCanvasIMode<R: Runtime>: Manager<R> + EventsExt<R> {
+pub trait StatesExtCanvasImode<R: Runtime>: Manager<R> + EventsExt<R> {
     /// Initialize state management for canvas interaction mode.
     ///
     /// The canvas is in sink mode by default.
     fn manage_canvas_imode(&self) {
-        let inner = CanvasIModeStateInner {
-            mode: CanvasIMode::Sink,
+        let inner = CanvasImodeStateInner {
+            mode: CanvasImode::Sink,
             menu_item: None::<MenuItem<R>>,
         };
-        self.manage(CanvasIModeState(Mutex::new(inner)));
+        self.manage(CanvasImodeState(Mutex::new(inner)));
     }
 
     /// Set the menu item for toggling canvas interaction mode.
     fn set_canvas_imode_menu_item(&self, menu_item: &MenuItem<R>) {
-        let state = self.state::<CanvasIModeState<R>>();
+        let state = self.state::<CanvasImodeState<R>>();
         let mut state = state.0.lock().unwrap();
 
         // Cloning works because menu items are behind shared references
@@ -85,13 +85,13 @@ pub trait StatesExtCanvasIMode<R: Runtime>: Manager<R> + EventsExt<R> {
             .get_webview_window("canvas")
             .expect("Canvas window not found");
 
-        let state = self.state::<CanvasIModeState<R>>();
+        let state = self.state::<CanvasImodeState<R>>();
         let mut state = state.0.lock().unwrap();
         state.toggle()?;
 
         let toast_message = match state.mode {
-            CanvasIMode::Float => "Canvas floated.",
-            CanvasIMode::Sink => {
+            CanvasImode::Float => "Canvas floated.",
+            CanvasImode::Sink => {
                 // Toggled from float to sink, so we try to regain focus to
                 // avoid flickering on the first click; failure to do so is not
                 // critical so we consume the error
@@ -112,5 +112,5 @@ pub trait StatesExtCanvasIMode<R: Runtime>: Manager<R> + EventsExt<R> {
     }
 }
 
-impl<R: Runtime> StatesExtCanvasIMode<R> for App<R> {}
-impl<R: Runtime> StatesExtCanvasIMode<R> for AppHandle<R> {}
+impl<R: Runtime> StatesExtCanvasImode<R> for App<R> {}
+impl<R: Runtime> StatesExtCanvasImode<R> for AppHandle<R> {}

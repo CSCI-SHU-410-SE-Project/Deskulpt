@@ -5,7 +5,7 @@
 )]
 
 use deskulpt_core::{
-    PathExt, Settings, ShortcutsExt, StatesExtCanvasIMode, StatesExtInitialRender,
+    PathExt, Settings, ShortcutsExt, StatesExtCanvasImode, StatesExtInitialRender,
     StatesExtWidgetConfigMap, TrayExt, WindowExt,
 };
 use tauri::image::Image;
