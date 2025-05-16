@@ -6,6 +6,7 @@ use std::io::BufReader;
 use std::path::Path;
 
 use anyhow::{Context, Result};
+use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -25,34 +26,34 @@ struct PackageJson {
     dependencies: HashMap<String, String>,
 }
 
-/// Macro for implementing [`DeskulptConf::load`] and [`PackageJson::load`].
-///
-/// The first argument is the type to implement the method on, and the second
-/// argument is the path to the target file within the widget directory.
-macro_rules! impl_load {
-    ($type:ty, $path:expr) => {
-        impl $type {
-            #[doc = concat!("Load `", $path, "` from a directory.")]
-            ///
-            /// This method returns `Ok(None)` if the target file does not exist
-            /// and `Err` if there is failure to read or parse the file.
-            fn load(dir: &Path) -> Result<Option<Self>> {
-                let path = dir.join($path);
-                if !path.exists() {
-                    return Ok(None);
-                }
+/// Helper trait for loading configuration files from a directory.
+trait LoadFromFile: Sized + DeserializeOwned {
+    /// The name of the configuration file.
+    const FILE_NAME: &'static str;
 
-                let file = File::open(path)?;
-                let reader = BufReader::new(file);
-                let config = serde_json::from_reader(reader)?;
-                Ok(Some(config))
-            }
+    /// Load the configuration file from the given directory.
+    ///
+    /// This method returns `Ok(None)` if the target file does not exist and
+    /// `Err` if there is failure to read or parse the file.
+    fn load(dir: &Path) -> Result<Option<Self>> {
+        let path = dir.join(Self::FILE_NAME);
+        if !path.exists() {
+            return Ok(None);
         }
-    };
+        let file = File::open(path)?;
+        let reader = BufReader::new(file);
+        let config = serde_json::from_reader(reader)?;
+        Ok(Some(config))
+    }
 }
 
-impl_load!(DeskulptConf, "deskulpt.conf.json");
-impl_load!(PackageJson, "package.json");
+impl LoadFromFile for DeskulptConf {
+    const FILE_NAME: &'static str = "deskulpt.conf.json";
+}
+
+impl LoadFromFile for PackageJson {
+    const FILE_NAME: &'static str = "package.json";
+}
 
 /// Full configuration of a Deskulpt widget.
 #[derive(Serialize, Clone)]
