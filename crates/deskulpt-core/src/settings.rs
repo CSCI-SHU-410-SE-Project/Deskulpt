@@ -27,9 +27,9 @@ enum Theme {
 #[derive(Default, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Shortcuts {
-    /// For toggling canvas click-through.
+    /// For toggling canvas interaction mode.
     #[serde(default)]
-    pub toggle_canvas: Option<String>,
+    pub toggle_canvas_imode: Option<String>,
     /// For opening the manager window.
     #[serde(default)]
     pub open_manager: Option<String>,
