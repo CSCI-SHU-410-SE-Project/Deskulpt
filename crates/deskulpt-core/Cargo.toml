@@ -15,7 +15,6 @@ dunce                        = { workspace = true }
 once_cell                    = { workspace = true }
 open                         = { workspace = true, features = ["shellexecute-on-windows"] }
 oxc                          = { workspace = true }
-paste                        = { workspace = true }
 path-clean                   = { workspace = true }
 rolldown                     = { workspace = true }
 rolldown_common              = { workspace = true }
