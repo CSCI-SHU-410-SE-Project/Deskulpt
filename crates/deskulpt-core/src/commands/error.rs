@@ -9,6 +9,8 @@ pub enum CmdError {
     Anyhow(#[from] anyhow::Error),
     #[error("I/O error: {0}")]
     Io(#[from] std::io::Error),
+    #[error("MessagePack decode error: {0}")]
+    MessagePackDecode(#[from] rmp_serde::decode::Error),
     #[error("Global shortcut error: {0}")]
     TauriPluginGlobalShortcut(#[from] tauri_plugin_global_shortcut::Error),
 }

@@ -17,6 +17,7 @@ open                         = { workspace = true, features = ["shellexecute-on-
 oxc                          = { workspace = true }
 paste                        = { workspace = true }
 path-clean                   = { workspace = true }
+rmp-serde                    = { workspace = true }
 rolldown                     = { workspace = true }
 rolldown_common              = { workspace = true }
 serde                        = { workspace = true, features = ["derive"] }
@@ -30,10 +31,9 @@ tokio                        = { workspace = true }
 uuid                         = { workspace = true, features = ["v5"] }
 
 # TODO: Remove these when finalized
-deskulpt-plugin     = { workspace = true } # maybe remove
+deskulpt-plugin     = { workspace = true }
 deskulpt-plugin-fs  = { workspace = true }
 deskulpt-plugin-sys = { workspace = true }
-sysinfo             = { workspace = true }
 
 [target."cfg(target_os = \"macos\")".dependencies]
 objc2 = { workspace = true }

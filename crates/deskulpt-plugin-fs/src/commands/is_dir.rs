@@ -24,12 +24,12 @@ impl PluginCommand for IsDir {
     #[dispatch]
     fn run(
         &self,
-        id: String,
+        id: &str,
         _plugin: &Self::Plugin,
         engine: &EngineInterface,
         input: IsDirInputPayload,
     ) -> Result<bool> {
-        let path = engine.widget_dir(id.as_str())?.join(input.path);
+        let path = engine.widget_dir(id)?.join(input.path);
         Ok(path.is_dir())
     }
 }

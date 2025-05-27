@@ -1,4 +1,4 @@
-import { invoke } from "@tauri-apps/api/core";
+import { callPlugin } from "./helper";
 
 interface CpuInfo {
   vendorId: string;
@@ -36,11 +36,12 @@ interface GetSystemInfoOutputPayload {
 }
 
 function getSystemInfo(id: string) {
-  return invoke<GetSystemInfoOutputPayload>("call_plugin", {
-    plugin: "sys",
-    command: "get_system_info",
+  return callPlugin<GetSystemInfoOutputPayload>(
+    "sys",
+    "get_system_info",
     id,
-  });
+    null,
+  );
 }
 
 export { getSystemInfo };

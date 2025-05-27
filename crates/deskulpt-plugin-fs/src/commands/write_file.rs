@@ -25,12 +25,12 @@ impl PluginCommand for WriteFile {
     #[dispatch]
     fn run(
         &self,
-        id: String,
+        id: &str,
         _plugin: &Self::Plugin,
         engine: &EngineInterface,
         input: WriteFileInputPayload,
     ) -> Result<()> {
-        let path = engine.widget_dir(id.as_str())?.join(input.path);
+        let path = engine.widget_dir(id)?.join(input.path);
         std::fs::write(&path, input.content)?;
         Ok(())
     }
