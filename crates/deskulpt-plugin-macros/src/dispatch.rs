@@ -10,10 +10,9 @@ use syn::{parse_macro_input, parse_quote, FnArg, ItemFn, Pat, PatType, ReturnTyp
 /// modifications:
 ///
 /// - Get the type of the `input` parameter of the function and replace it with
-///   `serde_json::Value`. Not having an `input` parameter panics.
+///   `&[u8]`. Not having an `input` parameter panics.
 /// - Get the return type of the function and replace it with
-///   `anyhow::Result<serde_json::Value>`. Not specifying an explicit return
-///   type panics.
+///   `anyhow::Result<Vec<u8>>`. Not specifying an explicit return type panics.
 /// - Wrap the original function body in a block that deserializes the input,
 ///   calls the original function, serializes the output, and returns it. Note
 ///   that the original function must have a return type that the `?` operator
@@ -27,7 +26,7 @@ pub fn proc_dispatch(_attr: TokenStream, item: TokenStream) -> TokenStream {
             if let Pat::Ident(ident) = &**pat {
                 if ident.ident == "input" {
                     input_type = Some(ty.clone());
-                    *ty = Box::new(parse_quote!(::deskulpt_plugin::serde_json::Value));
+                    *ty = Box::new(parse_quote!(&[u8]));
                 }
             }
         }
@@ -39,16 +38,14 @@ pub fn proc_dispatch(_attr: TokenStream, item: TokenStream) -> TokenStream {
     } else {
         panic!("Return type must be specified");
     };
-    meth.sig.output =
-        parse_quote!(-> ::deskulpt_plugin::anyhow::Result<::deskulpt_plugin::serde_json::Value>);
+    meth.sig.output = parse_quote!(-> ::deskulpt_plugin::anyhow::Result<Vec<u8>>);
 
     let original_body = meth.block.clone();
     meth.block = Box::new(parse_quote!({
-        let context = format!("Failed to deserialize input: {:?}", input);
-        let input: #input_type = ::deskulpt_plugin::anyhow::Context::context(::deskulpt_plugin::serde_json::from_value(input), context)?;
+        let input: #input_type = ::deskulpt_plugin::anyhow::Context::context(::deskulpt_plugin::rmp_serde::from_slice(input), "Failed to deserialize input")?;
         let result: #output_type = #original_body;
         let result = result?;
-        let output = ::deskulpt_plugin::anyhow::Context::context(::deskulpt_plugin::serde_json::to_value(result), "Failed to serialize output")?;
+        let output = ::deskulpt_plugin::anyhow::Context::context(::deskulpt_plugin::rmp_serde::to_vec_named(&result), "Failed to serialize output")?;
         Ok(output)
     }));
 

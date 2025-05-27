@@ -24,12 +24,12 @@ impl PluginCommand for CreateDir {
     #[dispatch]
     fn run(
         &self,
-        id: String,
+        id: &str,
         _plugin: &Self::Plugin,
         engine: &EngineInterface,
         input: CreateDirInputPayload,
     ) -> Result<()> {
-        let path = engine.widget_dir(id.as_str())?.join(input.path);
+        let path = engine.widget_dir(id)?.join(input.path);
         std::fs::create_dir_all(&path)?;
         Ok(())
     }

@@ -24,7 +24,7 @@ impl PluginCommand for Exists {
     #[dispatch]
     fn run(
         &self,
-        id: String,
+        id: &str,
         _plugin: &Self::Plugin,
         engine: &EngineInterface,
         input: ExistsInputPayload,

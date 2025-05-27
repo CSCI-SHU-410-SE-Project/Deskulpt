@@ -35,9 +35,9 @@ pub trait PluginCommand {
     ///   engine. See [`EngineInterface`] for available methods.
     fn run(
         &self,
-        id: String,
+        id: &str,
         plugin: &Self::Plugin,
         engine: &EngineInterface,
-        input: serde_json::Value,
-    ) -> Result<serde_json::Value>;
+        input: &[u8],
+    ) -> Result<Vec<u8>>;
 }

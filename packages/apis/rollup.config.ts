@@ -2,6 +2,7 @@ import { RollupLog, defineConfig } from "rollup";
 import typescript from "@rollup/plugin-typescript";
 import terser from "@rollup/plugin-terser";
 import replace from "@rollup/plugin-replace";
+import { nodeResolve } from "@rollup/plugin-node-resolve";
 import { fileURLToPath } from "url";
 import { join } from "path";
 import { Dir, opendirSync, rmSync } from "fs";
@@ -19,7 +20,7 @@ export default defineConfig([
       file: "../../src/generated/raw-apis.js",
     },
     external: ["@tauri-apps/api/core"],
-    plugins: [typescript(), terser()],
+    plugins: [nodeResolve(), typescript(), terser()],
     onwarn,
   },
   // ESM build of wrapped APIs, but with raw APIs externalized; essentially we replace
@@ -38,6 +39,7 @@ export default defineConfig([
         delimiters: ["", ""],
         preventAssignment: true,
       }),
+      nodeResolve(),
       typescript(),
       terser(),
     ],
@@ -52,6 +54,7 @@ export default defineConfig([
     },
     external: ["@tauri-apps/api/core"],
     plugins: [
+      nodeResolve(),
       typescript({
         declaration: true,
         declarationDir: "./dist",

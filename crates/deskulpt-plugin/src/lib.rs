@@ -12,7 +12,7 @@ use std::path::PathBuf;
 use anyhow::{bail, Result};
 pub use command::PluginCommand;
 pub use interface::EngineInterface;
-pub use {anyhow, serde_json};
+pub use {anyhow, rmp_serde};
 
 /// The API for a Deskulpt plugin.
 pub trait Plugin {
@@ -44,19 +44,14 @@ pub fn call_plugin<P: Plugin>(
     widget_dir_fn: impl Fn(&str) -> Result<PathBuf> + 'static,
     plugin: &P,
     command: &str,
-    id: String,
-    payload: Option<serde_json::Value>,
-) -> Result<serde_json::Value> {
+    id: &str,
+    payload: &[u8],
+) -> Result<Vec<u8>> {
     let engine = EngineInterface::new(widget_dir_fn);
 
     for plugin_command in plugin.commands() {
         if plugin_command.name() == command {
-            return plugin_command.run(
-                id,
-                plugin,
-                &engine,
-                payload.unwrap_or(serde_json::Value::Null),
-            );
+            return plugin_command.run(id, plugin, &engine, payload);
         }
     }
     bail!("Unknown command: {}", command)
@@ -89,10 +84,9 @@ macro_rules! register_commands {
 
 /// Dispatch a Deskulpt plugin command.
 ///
-/// The [`PluginCommand::run`] method requires the [`serde_json::Value`] type
-/// for command input and output so as to interoperate with calls from the
-/// widgets in the frontend. This would require manual deserialization and
-/// serialization when implementing any command.
+/// The [`PluginCommand::run`] method takes serialized `&[u8]` as input and
+/// returns deserialized `Vec<u8>` as output. This would require manual
+/// deserialization and serialization when implementing any command.
 ///
 /// When marked with `#[dispatch]`, the signature of the method remains the
 /// same, except that `input` is allowed to be any type that implements
