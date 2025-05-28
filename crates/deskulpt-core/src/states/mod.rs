@@ -1,11 +1,11 @@
 //! Deskulpt runtime state management.
 
-mod canvas_click_through;
+mod canvas_imode;
 mod initial_render;
 mod widget_config_map;
 
 #[doc(hidden)]
-pub use canvas_click_through::StatesExtCanvasClickThrough;
+pub use canvas_imode::StatesExtCanvasImode;
 #[doc(hidden)]
 pub use initial_render::StatesExtInitialRender;
 #[doc(hidden)]

@@ -19,6 +19,6 @@ pub use events::EventsExt;
 pub use path::PathExt;
 pub use settings::Settings;
 pub use shortcuts::ShortcutsExt;
-pub use states::{StatesExtCanvasClickThrough, StatesExtInitialRender, StatesExtWidgetConfigMap};
+pub use states::{StatesExtCanvasImode, StatesExtInitialRender, StatesExtWidgetConfigMap};
 pub use tray::TrayExt;
 pub use window::{on_window_event, WindowExt};
