@@ -16,7 +16,7 @@ import {
 } from "react";
 import { FaEdit } from "react-icons/fa";
 import { MdClear } from "react-icons/md";
-import { Shortcuts } from "../../../types";
+import { ShortcutKey } from "../../../types";
 import { updateShortcut, useAppSettingsStore } from "../../hooks";
 import { toast } from "sonner";
 import { INVALID_KEYCODES, KEYCODES, MODIFIERS } from "./keyboard";
@@ -36,7 +36,7 @@ const styles = {
 };
 
 interface Props {
-  shortcutKey: keyof Shortcuts;
+  shortcutKey: ShortcutKey;
 }
 
 const ShortcutAction = ({ shortcutKey }: Props) => {
@@ -126,7 +126,7 @@ const ShortcutAction = ({ shortcutKey }: Props) => {
   }, []);
 
   const confirmAction = useCallback(() => {
-    updateShortcut(shortcutKey, shortcut, value === "" ? null : value)
+    updateShortcut(shortcutKey, shortcut, value === "" ? undefined : value)
       .then(() => {
         setPlaceholder(INITIAL_PLACEHOLDER);
         setIsValid(true);
