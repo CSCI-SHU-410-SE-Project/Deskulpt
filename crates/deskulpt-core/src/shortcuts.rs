@@ -7,7 +7,7 @@ use tauri::{App, AppHandle, Manager, Runtime};
 use tauri_plugin_global_shortcut::{GlobalShortcutExt, ShortcutState};
 
 use crate::settings::Settings;
-use crate::states::StatesExtCanvasClickThrough;
+use crate::states::StatesExtCanvasImode;
 use crate::WindowExt;
 
 /// Implement [`ShortcutKey`] and [`ShortcutsExt`] for the given shortcuts.
@@ -97,10 +97,10 @@ macro_rules! impl_shortcuts {
 }
 
 impl_shortcuts! {
-    toggle_canvas => |app_handle, _, event| {
+    toggle_canvas_imode => |app_handle, _, event| {
         if event.state == ShortcutState::Pressed {
-            if let Err(e) = app_handle.toggle_canvas_click_through() {
-                eprintln!("Failed to toggle canvas click-through: {e}");
+            if let Err(e) = app_handle.toggle_canvas_imode() {
+                eprintln!("Failed to toggle canvas interaction mode: {e}");
             }
         }
     },

@@ -12,7 +12,7 @@ const styles = {
     "--table-cell-padding": "var(--space-1) var(--space-2)",
     "--table-cell-min-height": 0,
     "& tr": { "--table-row-box-shadow": "none" },
-    "& th": { width: "120px" },
+    "& th": { width: "240px", paddingLeft: "var(--space-3)" },
   }),
 };
 
