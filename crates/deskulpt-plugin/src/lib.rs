@@ -137,7 +137,7 @@ macro_rules! register_commands {
 ///     #[dispatch]
 ///     fn run(
 ///         &self,
-///         _id: String,
+///         _id: &str,
 ///         _plugin: &Self::Plugin,
 ///         _engine: &EngineInterface,
 ///         input: InputPayload,     // Custom deserializable input type
