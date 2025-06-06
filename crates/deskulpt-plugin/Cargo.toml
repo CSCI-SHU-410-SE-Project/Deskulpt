@@ -12,8 +12,8 @@ version    = { workspace = true }
 [dependencies]
 anyhow                 = { workspace = true }
 deskulpt-plugin-macros = { workspace = true }
+rmp-serde              = { workspace = true }
 serde                  = { workspace = true }
-serde_json             = { workspace = true }
 
 # TODO: The plugin system for downstream consumption should be standalone and
 # does not depend on Tauri. The part that depends on Tauri for interaction

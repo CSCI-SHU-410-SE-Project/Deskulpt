@@ -26,12 +26,12 @@ impl PluginCommand for AppendFile {
     #[dispatch]
     fn run(
         &self,
-        id: String,
+        id: &str,
         _plugin: &Self::Plugin,
         engine: &EngineInterface,
         input: AppendFileInputPayload,
     ) -> Result<()> {
-        let path = engine.widget_dir(id.as_str())?.join(input.path);
+        let path = engine.widget_dir(id)?.join(input.path);
         let mut file = std::fs::OpenOptions::new().append(true).open(&path)?;
         file.write_all(input.content.as_bytes())?;
         Ok(())

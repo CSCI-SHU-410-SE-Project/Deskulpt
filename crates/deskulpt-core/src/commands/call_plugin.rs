@@ -1,4 +1,9 @@
+use std::io::Cursor;
+
 use once_cell::sync::Lazy;
+use rmp_serde::Deserializer;
+use serde::Deserialize;
+use tauri::ipc::{InvokeBody, Request, Response};
 use tauri::{command, AppHandle};
 use tokio::sync::Mutex;
 
@@ -26,37 +31,31 @@ static SYS_PLUGIN: Lazy<Mutex<deskulpt_plugin_sys::SysPlugin>> =
 /// a temporary implementation), `app_handle` is using the default runtime but
 /// it should be a generic `R: Runtime` parameter in the final implementation.
 #[command]
-pub async fn call_plugin(
-    app_handle: AppHandle,
-    plugin: String,
-    command: String,
-    id: String,
-    payload: Option<serde_json::Value>,
-) -> CmdResult<serde_json::Value> {
-    let widget_dir_fn = move |id: &str| app_handle.widget_dir(id);
+pub async fn call_plugin(app_handle: AppHandle, request: Request<'_>) -> CmdResult<Response> {
+    let InvokeBody::Raw(data) = request.body() else {
+        cmdbail!("Expected raw data in the request body");
+    };
 
+    let mut cursor = Cursor::new(data);
+    let mut de = Deserializer::new(&mut cursor);
+    let (plugin, command, id): (String, String, String) = Deserialize::deserialize(&mut de)?;
+
+    let pos = cursor.position() as usize;
+    let payload = &cursor.get_ref()[pos..];
+
+    let widget_dir_fn = move |id: &str| app_handle.widget_dir(id);
     match plugin.as_str() {
         "fs" => {
             let plugin = FS_PLUGIN.lock().await;
-            let result = deskulpt_plugin::call_plugin(
-                widget_dir_fn,
-                &*plugin,
-                command.as_str(),
-                id,
-                payload,
-            )?;
-            Ok(result)
+            let result =
+                deskulpt_plugin::call_plugin(widget_dir_fn, &*plugin, &command, &id, payload)?;
+            Ok(Response::new(result))
         },
         "sys" => {
             let plugin = SYS_PLUGIN.lock().await;
-            let result = deskulpt_plugin::call_plugin(
-                widget_dir_fn,
-                &*plugin,
-                command.as_str(),
-                id,
-                payload,
-            )?;
-            Ok(result)
+            let result =
+                deskulpt_plugin::call_plugin(widget_dir_fn, &*plugin, &command, &id, payload)?;
+            Ok(Response::new(result))
         },
         _ => cmdbail!("Unknown plugin: {}", plugin),
     }
