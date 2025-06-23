@@ -33,8 +33,8 @@
     "@tauri-apps/cli": "^2.5.0",
     "husky": "^9.1.6",
     "lint-staged": "^16.1.0",
-    "oxlint": "^1.1.0",
-    "prettier": "^3.5.0"
+    "oxlint": "^1.3.0",
+    "prettier": "^3.6.0"
   },
   "prettier": {},
   "lint-staged": {
