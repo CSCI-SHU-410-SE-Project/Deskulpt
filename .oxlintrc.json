@@ -19,6 +19,7 @@
     "max-nested-callbacks": "off",
     "sort-imports": ["error", { "ignoreDeclarationSort": true }],
     "import/max-dependencies": "off",
+    "import/no-absolute-path": "off",
     "import/no-unassigned-import": ["error", { "allow": ["*.css"] }],
     "react/react-in-jsx-scope": "off",
     "react/exhaustive-deps": "error"
