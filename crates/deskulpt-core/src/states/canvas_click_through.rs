@@ -53,7 +53,7 @@ pub trait StatesExtCanvasClickThrough<R: Runtime>: Manager<R> + EventsExt<R> {
             // If the canvas is toggled to not click-through, try to regain
             // focus to avoid flickering on the first click
             if let Err(e) = canvas.set_focus() {
-                eprintln!("Failed to gain focus on canvas: {}", e);
+                eprintln!("Failed to gain focus on canvas: {e}");
             }
             ("Sink", "Canvas floated.")
         } else {
@@ -63,10 +63,7 @@ pub trait StatesExtCanvasClickThrough<R: Runtime>: Manager<R> + EventsExt<R> {
         // Update menu item text if it exists
         if let Some(menu_item) = canvas_click_through.1.as_ref() {
             if let Err(e) = menu_item.set_text(menu_item_text) {
-                eprintln!(
-                    "Failed to update menu item for toggling canvas click-through: {}",
-                    e
-                );
+                eprintln!("Failed to update menu item for toggling canvas click-through: {e}");
             }
         }
 
@@ -74,7 +71,7 @@ pub trait StatesExtCanvasClickThrough<R: Runtime>: Manager<R> + EventsExt<R> {
         if let Err(e) =
             self.emit_show_toast_to_canvas(ShowToastPayload::Success(toast_message.to_string()))
         {
-            eprintln!("Failed to emit show-toast to canvas: {}", e);
+            eprintln!("Failed to emit show-toast to canvas: {e}");
         }
 
         Ok(())
