@@ -45,6 +45,6 @@ pub async fn bundle_widget<R: Runtime>(
     let code = bundler
         .bundle()
         .await
-        .context(format!("Failed to bundle widget (id={})", id))?;
+        .context(format!("Failed to bundle widget (id={id})"))?;
     Ok(code)
 }
