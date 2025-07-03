@@ -59,19 +59,19 @@ fn on_menu_event<R: Runtime>(app_handle: &AppHandle<R>, event: MenuEvent) {
     match event.id().as_ref() {
         "tray-toggle" => {
             if let Err(e) = app_handle.toggle_canvas_click_through() {
-                eprintln!("Error toggling canvas click-through: {}", e);
+                eprintln!("Error toggling canvas click-through: {e}");
             }
         },
         "tray-manage" => {
             if let Err(e) = app_handle.open_manager() {
-                eprintln!("Error opening manager window: {}", e);
+                eprintln!("Error opening manager window: {e}");
             }
         },
         "tray-exit" => {
             // Emit the "exit-app" event to the manager, which will invoke the
             // `exit_app` command to clean up and actually exit the application
             if let Err(e) = app_handle.emit_exit_app_to_manager() {
-                eprintln!("Failed to emit exit-app to manager: {}", e);
+                eprintln!("Failed to emit exit-app to manager: {e}");
                 app_handle.exit(1); // Safeguard exit
             }
 
@@ -97,7 +97,7 @@ fn on_tray_icon_event<R: Runtime>(tray: &TrayIcon<R>, event: TrayIconEvent) {
         if button == MouseButton::Left && button_state == MouseButtonState::Down {
             // Toggle canvas click-through on left-click
             if let Err(e) = tray.app_handle().toggle_canvas_click_through() {
-                eprintln!("Error toggling canvas click-through: {}", e);
+                eprintln!("Error toggling canvas click-through: {e}");
             }
         }
     }
