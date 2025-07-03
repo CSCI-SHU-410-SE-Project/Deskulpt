@@ -1,4 +1,4 @@
-import { RefObject, memo, useRef } from "react";
+import { memo, useRef } from "react";
 import Draggable, { DraggableData, DraggableEvent } from "react-draggable";
 import { ErrorBoundary } from "react-error-boundary";
 import ErrorDisplay from "./ErrorDisplay";
@@ -40,9 +40,7 @@ const WidgetContainer = memo(({ id }: WidgetContainerProps) => {
 
   return (
     <Draggable
-      // TODO: remove the `as` part which is workaround for React 19:
-      // https://github.com/react-grid-layout/react-draggable/issues/768
-      nodeRef={wrapperRef as RefObject<HTMLDivElement>}
+      nodeRef={wrapperRef}
       onStop={onStop}
       bounds="body"
       handle=".handle"
