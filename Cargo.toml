@@ -19,8 +19,8 @@ open                           = "5.3.1"
 oxc                            = "0.75.0"
 paste                          = "1.0.15"
 path-clean                     = "1.0.1"
-rolldown                       = { git = "https://github.com/rolldown/rolldown.git", tag = "v1.0.0-beta.22" }
-rolldown_common                = { git = "https://github.com/rolldown/rolldown.git", tag = "v1.0.0-beta.22" }
+rolldown                       = { git = "https://github.com/rolldown/rolldown.git", tag = "v1.0.0-beta.24" }
+rolldown_common                = { git = "https://github.com/rolldown/rolldown.git", tag = "v1.0.0-beta.24" }
 serde                          = "1.0.210"
 serde_json                     = "1.0.128"
 serialize-to-javascript        = "0.1.1"
@@ -31,7 +31,7 @@ tauri-plugin-global-shortcut   = "2.3.0"
 tauri-plugin-opener            = "2.4.0"
 tempfile                       = "3.20.0"
 thiserror                      = "2.0.9"
-tokio                          = "1.45.0"
+tokio                          = "1.46.1"
 uuid                           = "1.16.0"
 
 # Deskulpt crates
