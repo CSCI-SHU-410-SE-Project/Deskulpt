@@ -45,6 +45,7 @@ impl Plugin for AliasPlugin {
                 args.importer,
                 Some(PluginContextResolveOptions {
                     import_kind: args.kind,
+                    is_entry: args.is_entry,
                     skip_self: true,
                     custom: Arc::clone(&args.custom),
                 }),
