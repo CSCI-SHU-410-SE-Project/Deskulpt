@@ -4,7 +4,7 @@ export enum Theme {
 }
 
 export interface Shortcuts {
-  toggleCanvas: string | null;
+  toggleCanvasImode: string | null;
   openManager: string | null;
 }
 
