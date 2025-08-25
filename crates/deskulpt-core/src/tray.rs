@@ -58,8 +58,8 @@ impl<R: Runtime> TrayExt<R> for AppHandle<R> {}
 fn on_menu_event<R: Runtime>(app_handle: &AppHandle<R>, event: MenuEvent) {
     match event.id().as_ref() {
         "tray-toggle" => {
-            if let Err(e) = app_handle.toggle_canvas_click_through() {
-                eprintln!("Error toggling canvas click-through: {e}");
+            if let Err(e) = app_handle.toggle_canvas_imode() {
+                eprintln!("Error toggling canvas interaction mode: {e}");
             }
         },
         "tray-manage" => {
@@ -95,9 +95,9 @@ fn on_tray_icon_event<R: Runtime>(tray: &TrayIcon<R>, event: TrayIconEvent) {
     } = event
     {
         if button == MouseButton::Left && button_state == MouseButtonState::Down {
-            // Toggle canvas click-through on left-click
-            if let Err(e) = tray.app_handle().toggle_canvas_click_through() {
-                eprintln!("Error toggling canvas click-through: {e}");
+            // Toggle canvas interaction mode on left-click
+            if let Err(e) = tray.app_handle().toggle_canvas_imode() {
+                eprintln!("Error toggling canvas interaction mode: {e}");
             }
         }
     }
