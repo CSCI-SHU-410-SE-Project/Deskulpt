@@ -48,7 +48,7 @@ runs:
       shell: bash
       run: |
         rustup toolchain install nightly --component rustfmt --profile minimal --no-self-update
-        curl -fsSL https://github.com/tamasfe/taplo/releases/latest/download/taplo-full-linux-x86_64.gz | \
+        curl -fsSL https://github.com/tamasfe/taplo/releases/latest/download/taplo-linux-x86_64.gz | \
           gzip -d - | install -m 755 /dev/stdin /usr/local/bin/taplo
 
     - name: Rust cache
@@ -59,7 +59,7 @@ runs:
     - name: Install pnpm
       uses: pnpm/action-setup@v4
       with:
-        version: 9
+        version: 10
 
     - name: Node setup and cache
       uses: actions/setup-node@v4

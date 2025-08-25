@@ -98,7 +98,7 @@ pub fn on_window_event(window: &Window, event: &WindowEvent) {
         if let WindowEvent::CloseRequested { api, .. } = event {
             api.prevent_close();
             if let Err(e) = window.hide() {
-                eprintln!("Failed to hide the manager window: {}", e);
+                eprintln!("Failed to hide the manager window: {e}");
             }
         }
     }

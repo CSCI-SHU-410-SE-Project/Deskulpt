@@ -30,11 +30,11 @@
     "build:packages": "pnpm run --filter \"@deskulpt-test/*\" build"
   },
   "devDependencies": {
-    "@tauri-apps/cli": "^2.5.0",
+    "@tauri-apps/cli": "^2.6.2",
     "husky": "^9.1.6",
-    "lint-staged": "^16.0.0",
-    "oxlint": "^0.16.4",
-    "prettier": "^3.5.0"
+    "lint-staged": "^16.1.0",
+    "oxlint": "^1.6.0",
+    "prettier": "^3.6.2"
   },
   "prettier": {},
   "lint-staged": {
