@@ -10,11 +10,11 @@ use tauri::{App, AppHandle, Runtime};
 use tokio::time::sleep;
 
 use crate::events::EventsExt;
-use crate::states::StatesExtCanvasImode;
+use crate::states::StatesExtSettings;
 use crate::window::WindowExt;
 
 /// Extention trait for system tray-related operations.
-pub trait TrayExt<R: Runtime>: StatesExtCanvasImode<R> {
+pub trait TrayExt<R: Runtime>: StatesExtSettings<R> {
     /// Create the system tray.
     fn create_tray(&self, icon: Image) -> Result<()>
     where

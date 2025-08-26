@@ -5,8 +5,8 @@
 )]
 
 use deskulpt_core::{
-    PathExt, Settings, ShortcutsExt, StatesExtCanvasImode, StatesExtInitialRender,
-    StatesExtWidgetConfigMap, TrayExt, WindowExt,
+    PathExt, ShortcutsExt, StatesExtInitialRender, StatesExtSettings, StatesExtWidgetConfigMap,
+    TrayExt, WindowExt,
 };
 use tauri::image::Image;
 use tauri::{generate_context, generate_handler, include_image, Builder};
@@ -21,27 +21,17 @@ pub fn run() {
             app.init_widgets_dir()?;
             app.init_persist_dir()?;
 
-            let mut settings = match Settings::load(app.persist_dir()?) {
-                Ok(settings) => settings,
-                Err(e) => {
-                    eprintln!("Failed to load settings: {e}");
-                    Settings::default()
-                },
-            };
-
             app.manage_initial_render();
+            app.manage_settings();
             app.manage_widget_config_map();
-            app.manage_canvas_imode();
 
             // Hide the application from the dock on macOS because skipping
             // taskbar is not applicable for macOS
             #[cfg(target_os = "macos")]
             app.set_activation_policy(tauri::ActivationPolicy::Accessory);
 
-            app.init_shortcuts(&mut settings);
-
-            app.create_manager(&settings)?;
-            app.create_canvas(&settings)?;
+            app.create_manager()?;
+            app.create_canvas()?;
             app.create_tray(DESKULPT_ICON)?;
 
             Ok(())
@@ -55,7 +45,7 @@ pub fn run() {
             deskulpt_core::commands::open_widget,
             deskulpt_core::commands::rescan_widgets,
             deskulpt_core::commands::set_render_ready,
-            deskulpt_core::commands::update_shortcut,
+            deskulpt_core::commands::update_settings,
         ])
         .plugin(tauri_plugin_clipboard_manager::init())
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())
