@@ -4,7 +4,7 @@ use std::sync::Mutex;
 
 use anyhow::Result;
 use tauri::menu::MenuItem;
-use tauri::{App, AppHandle, Manager, Runtime};
+use tauri::{App, AppHandle, Manager, Runtime, WebviewWindow};
 
 use crate::events::{EventsExt, ShowToastPayload};
 
@@ -35,12 +35,18 @@ impl<R: Runtime> CanvasImodeStateInner<R> {
     /// Toggle the interaction mode.
     ///
     /// This will change the mode and update the menu item text if it exists.
-    fn toggle(&mut self) -> Result<()> {
+    fn toggle(&mut self, canvas: &WebviewWindow<R>) -> Result<()> {
         // The menu item shows the action that will be performed on click, so it
         // should be the opposite of the mode
         let (new_mode, new_text) = match self.mode {
-            CanvasImode::Sink => (CanvasImode::Float, "Sink"),
-            CanvasImode::Float => (CanvasImode::Sink, "Float"),
+            CanvasImode::Sink => {
+                canvas.set_ignore_cursor_events(false)?;
+                (CanvasImode::Float, "Sink")
+            },
+            CanvasImode::Float => {
+                canvas.set_ignore_cursor_events(true)?;
+                (CanvasImode::Sink, "Float")
+            },
         };
 
         self.mode = new_mode;
@@ -87,7 +93,7 @@ pub trait StatesExtCanvasImode<R: Runtime>: Manager<R> + EventsExt<R> {
 
         let state = self.state::<CanvasImodeState<R>>();
         let mut state = state.0.lock().unwrap();
-        state.toggle()?;
+        state.toggle(&canvas)?;
 
         let toast_message = match state.mode {
             CanvasImode::Float => "Canvas floated.",
