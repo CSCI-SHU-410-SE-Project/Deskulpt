@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { Shortcuts, Theme } from "../../types";
+import { Shortcuts } from "../../types";
 import { commands, events } from "../../core";
 
 export const useAppSettingsStore = create(() => ({
@@ -8,7 +8,7 @@ export const useAppSettingsStore = create(() => ({
 
 export async function toggleTheme() {
   const theme = useAppSettingsStore.getState().theme;
-  const newTheme = theme === Theme.LIGHT ? Theme.DARK : Theme.LIGHT;
+  const newTheme = theme === "light" ? "dark" : "light";
 
   useAppSettingsStore.setState({ theme: newTheme });
   await events.switchTheme.toCanvas({ theme: newTheme });

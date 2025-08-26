@@ -4,7 +4,6 @@ import { commands, events } from "../../../core";
 import { toast } from "sonner";
 import { LuFolderOpen, LuRepeat } from "react-icons/lu";
 import { useWidgetsStore } from "../../hooks";
-import { WidgetConfigType } from "../../../types";
 
 interface HeaderProps {
   id: string;
@@ -25,9 +24,7 @@ const Header = memo(({ id }: HeaderProps) => {
 
   return (
     <Flex align="center" justify="between">
-      <Badge color={type === WidgetConfigType.VALID ? "gray" : "red"}>
-        ID: {id}
-      </Badge>
+      <Badge color={type === "VALID" ? "gray" : "red"}>ID: {id}</Badge>
       <Flex align="center" gap="2">
         <Button
           title="Refresh this widget"

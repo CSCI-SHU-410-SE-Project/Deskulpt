@@ -16,7 +16,7 @@ const ThemeToggler = ({ theme }: ThemeTogglerProps) => {
         size="1"
         onClick={toggleTheme}
       >
-        {theme === Theme.LIGHT ? <MdOutlineLightMode /> : <MdOutlineDarkMode />}
+        {theme === "light" ? <MdOutlineLightMode /> : <MdOutlineDarkMode />}
       </IconButton>
     </Box>
   );

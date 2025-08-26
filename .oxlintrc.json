@@ -4,6 +4,7 @@
     "**/dist/**",
     "crates/deskulpt-core/generated/**",
     "src/generated/**",
+    "src/bindings/**",
     "**/docs/**"
   ],
   "plugins": ["import", "oxc", "react", "typescript", "unicorn"],

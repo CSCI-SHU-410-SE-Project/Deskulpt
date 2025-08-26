@@ -1,5 +1,4 @@
 import { Box, Code, ScrollArea, Table } from "@radix-ui/themes";
-import { WidgetConfigType } from "../../../types";
 import { useWidgetsStore } from "../../hooks";
 import { memo } from "react";
 import Dependencies from "./Dependencies";
@@ -24,7 +23,7 @@ const Config = memo(({ id }: ConfigProps) => {
   return (
     <ScrollArea asChild>
       <Box height="200px" pr="3" pb="3">
-        {config.type === WidgetConfigType.VALID ? (
+        {config.type === "VALID" ? (
           <Table.Root size="1" layout="fixed" css={styles.table}>
             <Table.Body>
               <Table.Row align="center">

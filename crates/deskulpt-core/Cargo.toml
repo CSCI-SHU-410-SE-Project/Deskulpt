@@ -22,11 +22,12 @@ rolldown_common              = { workspace = true }
 serde                        = { workspace = true, features = ["derive"] }
 serde_json                   = { workspace = true }
 serialize-to-javascript      = { workspace = true }
-tauri                        = { workspace = true, features = ["tray-icon"] }
+tauri                        = { workspace = true, features = ["tray-icon", "macos-private-api"] }
 tauri-plugin-global-shortcut = { workspace = true }
 tempfile                     = { workspace = true }
 thiserror                    = { workspace = true }
 tokio                        = { workspace = true }
+ts-rs                        = { workspace = true }
 uuid                         = { workspace = true, features = ["v5"] }
 
 # TODO: Remove these when finalized

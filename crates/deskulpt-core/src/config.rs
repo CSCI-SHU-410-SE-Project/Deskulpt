@@ -56,8 +56,9 @@ impl LoadFromFile for PackageJson {
 }
 
 /// Full configuration of a Deskulpt widget.
-#[derive(Serialize, Clone)]
+#[derive(Serialize, Clone, ts_rs::TS)]
 #[serde(tag = "type", content = "content", rename_all = "SCREAMING_SNAKE_CASE")]
+#[ts(export)]
 pub enum WidgetConfig {
     /// Valid widget configuration.
     #[serde(rename_all = "camelCase")]
