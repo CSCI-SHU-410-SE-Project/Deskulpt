@@ -4,7 +4,7 @@ import { DeepReadonly, Settings } from "../types";
 import { enforceOpenNewTab } from "../utils/enforceOpenNewTab";
 import App from "./App";
 import "@radix-ui/themes/styles.css";
-import "../custom.css";
+import "../styles/custom.css";
 
 declare global {
   interface Window {
