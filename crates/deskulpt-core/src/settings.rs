@@ -56,7 +56,7 @@ pub struct Shortcuts {
     pub open_manager: Option<String>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, ts_rs::TS)]
 #[serde(tag = "field", rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum ShortcutsUpdate {
     ToggleCanvasImode { value: Option<String> },
@@ -92,7 +92,7 @@ pub struct AppSettings {
     pub shortcuts: Shortcuts,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, ts_rs::TS)]
 #[serde(tag = "field", rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum AppSettingsUpdate {
     Theme { value: Theme },
@@ -139,7 +139,7 @@ fn default_opacity() -> i32 {
     100
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, ts_rs::TS)]
 #[serde(tag = "field", rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum WidgetSettingsUpdate {
     X { value: i32 },
@@ -157,7 +157,7 @@ impl Apply<WidgetSettingsUpdate> for WidgetSettings {
                 self.y = value;
             },
             WidgetSettingsUpdate::Opacity { value } => {
-                if value < 0 || value > 100 {
+                if !(0..=100).contains(&value) {
                     bail!("Opacity must be between 0 and 100; got {value}");
                 }
                 self.opacity = value;
@@ -180,8 +180,9 @@ pub struct Settings {
     pub widgets: HashMap<String, WidgetSettings>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, ts_rs::TS)]
 #[serde(tag = "field", rename_all = "SCREAMING_SNAKE_CASE")]
+#[ts(export)]
 pub enum SettingsUpdate {
     App {
         value: AppSettingsUpdate,

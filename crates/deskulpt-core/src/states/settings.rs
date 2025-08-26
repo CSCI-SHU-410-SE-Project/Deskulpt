@@ -24,7 +24,7 @@ pub trait StatesExtSettings<R: Runtime>: Manager<R> + PathExt<R> + ShortcutsExt<
     fn manage_settings(&self) {
         let mut settings = self
             .persist_dir()
-            .and_then(|dir| Settings::load(dir))
+            .and_then(Settings::load)
             .unwrap_or_else(|e| {
                 eprintln!("Failed to load settings: {e}");
                 Settings::default()
@@ -37,11 +37,13 @@ pub trait StatesExtSettings<R: Runtime>: Manager<R> + PathExt<R> + ShortcutsExt<
         });
     }
 
+    /// Get a read-only reference to the settings.
     fn get_readable_settings(&self) -> RwLockReadGuard<'_, Settings> {
         let state = self.state::<SettingsState>().inner();
         state.inner.read().unwrap()
     }
 
+    /// Get a read-and-write reference to the settings.
     fn get_writable_settings(&self) -> RwLockWriteGuard<'_, Settings> {
         let state = self.state::<SettingsState>().inner();
         state.inner.write().unwrap()
