@@ -20,7 +20,10 @@
     "sort-imports": ["error", { "ignoreDeclarationSort": true }],
     "import/max-dependencies": "off",
     "import/no-absolute-path": "off",
-    "import/no-unassigned-import": ["error", { "allow": ["*.css"] }],
+    "import/no-unassigned-import": [
+      "error",
+      { "allow": ["@radix-ui/themes/styles.css", "**/styles/custom.css"] }
+    ],
     "react/react-in-jsx-scope": "off",
     "react/exhaustive-deps": "error"
   },
