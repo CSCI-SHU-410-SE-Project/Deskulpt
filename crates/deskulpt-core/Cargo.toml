@@ -27,6 +27,7 @@ tauri-plugin-global-shortcut = { workspace = true }
 tempfile                     = { workspace = true }
 thiserror                    = { workspace = true }
 tokio                        = { workspace = true }
+ts-rs                        = { workspace = true }
 uuid                         = { workspace = true, features = ["v5"] }
 
 # TODO: Remove these when finalized

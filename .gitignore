@@ -35,6 +35,9 @@ target/
 # Tauri generated files
 crates/deskulpt/gen/schemas
 
+# TS-RS generated files
+src/bindings
+
 # Docs
 docs/.vitepress/dist
 docs/.vitepress/cache

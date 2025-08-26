@@ -12,7 +12,7 @@ const styles = {
 };
 
 interface DependenciesProps {
-  dependencies: Record<string, string>;
+  dependencies: { [key in string]?: string };
 }
 
 const Dependencies = memo(({ dependencies }: DependenciesProps) => {

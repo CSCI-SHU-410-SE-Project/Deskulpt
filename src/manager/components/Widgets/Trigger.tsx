@@ -1,5 +1,4 @@
 import { Box, Flex, Tabs, Text } from "@radix-ui/themes";
-import { WidgetConfigType } from "../../../types";
 import { useWidgetsStore } from "../../hooks";
 import { memo } from "react";
 import { css } from "@emotion/react";
@@ -41,7 +40,7 @@ const Trigger = memo(({ id, value }: TriggerProps) => {
           height="6px"
           css={[
             styles.indicator,
-            config.type === WidgetConfigType.INVALID && styles.indicatorInvalid,
+            config.type === "INVALID" && styles.indicatorInvalid,
           ]}
         />
         <Text>{config.content.dir}</Text>

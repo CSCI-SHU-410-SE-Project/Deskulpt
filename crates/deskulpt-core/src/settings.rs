@@ -12,7 +12,7 @@ use serde::{Deserialize, Serialize};
 static SETTINGS_FILE: &str = "settings.json";
 
 /// Light/dark theme of the application.
-#[derive(Default, Deserialize, Serialize)]
+#[derive(Default, Deserialize, Serialize, ts_rs::TS)]
 #[serde(rename_all = "lowercase")]
 enum Theme {
     #[default]
@@ -24,7 +24,7 @@ enum Theme {
 ///
 /// A keyboard shortcut being `None` means that it is disabled, otherwise it is
 /// a string parsable into [`Shortcut`](tauri_plugin_global_shortcut::Shortcut).
-#[derive(Default, Deserialize, Serialize)]
+#[derive(Default, Deserialize, Serialize, ts_rs::TS)]
 #[serde(rename_all = "camelCase")]
 pub struct Shortcuts {
     /// For toggling canvas interaction mode.
@@ -36,7 +36,7 @@ pub struct Shortcuts {
 }
 
 /// Application-wide settings.
-#[derive(Default, Deserialize, Serialize)]
+#[derive(Default, Deserialize, Serialize, ts_rs::TS)]
 #[serde(rename_all = "camelCase")]
 struct AppSettings {
     /// The application theme.
@@ -51,7 +51,7 @@ struct AppSettings {
 ///
 /// Different from widget configurations, these are independent of the widget
 /// configuration files and are managed internally by the application.
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, ts_rs::TS)]
 #[serde(rename_all = "camelCase")]
 struct WidgetSettings {
     /// The leftmost x-coordinate in pixels.
@@ -70,8 +70,9 @@ fn default_opacity() -> i32 {
 }
 
 /// Full settings of the application.
-#[derive(Default, Deserialize, Serialize)]
+#[derive(Default, Deserialize, Serialize, ts_rs::TS)]
 #[serde(rename_all = "camelCase")]
+#[ts(export)]
 pub struct Settings {
     /// Application-wide settings.
     #[serde(default)]
