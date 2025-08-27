@@ -16,10 +16,11 @@ export default defineConfig([
     input: "src/raw.ts",
     output: {
       format: "esm",
-      file: "../../src/generated/raw-apis.js",
+      file: "../../src/gen/raw-apis.js",
+      banner: "/*! Auto-generated from packages/apis. DO NOT EDIT! */",
     },
     external: ["@tauri-apps/api/core"],
-    plugins: [typescript(), terser()],
+    plugins: [typescript(), terser({ format: { comments: "some" } })],
     onwarn,
   },
   // ESM build of wrapped APIs, but with raw APIs externalized; essentially we replace
@@ -29,7 +30,8 @@ export default defineConfig([
     input: "src/index.ts",
     output: {
       format: "esm",
-      file: "../../crates/deskulpt-core/generated/apis.wrapper.js",
+      file: "../../crates/deskulpt-core/gen/apis.wrapper.js",
+      banner: "/*! Auto-generated from packages/apis. DO NOT EDIT! */",
     },
     external: ["@tauri-apps/api/core", "__RAW_APIS_URL__"],
     plugins: [
@@ -39,7 +41,7 @@ export default defineConfig([
         preventAssignment: true,
       }),
       typescript(),
-      terser(),
+      terser({ format: { comments: "some" } }),
     ],
     onwarn,
   },

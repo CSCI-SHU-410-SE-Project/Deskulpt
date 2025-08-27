@@ -4,8 +4,8 @@
   "type": "module",
   "scripts": {
     "preinstall": "npx only-allow pnpm",
-    "dev": "pnpm -C ../ build:ts-rs && vite",
-    "build": "pnpm -C ../ build:ts-rs && tsc && vite build",
+    "dev": "vite",
+    "build": "tsc && vite build",
     "preview": "vite preview"
   },
   "dependencies": {

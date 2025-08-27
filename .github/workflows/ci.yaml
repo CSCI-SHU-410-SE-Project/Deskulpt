@@ -40,6 +40,30 @@ jobs:
       - name: Check linting
         run: pnpm lint:check
 
+      - name: Regenerate auto-generate files
+        if: ${{ matrix.platform == 'ubuntu-latest' }}
+        run: |
+          pnpm build:packages
+          pnpm build:bindings
+
+      - name: Check that auto-generated files are up to date
+        if: ${{ matrix.platform == 'ubuntu-latest' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "::group::Uncommitted changes after regenerating auto-generated files"
+            git status --porcelain
+            echo
+            git --no-pager diff || true
+            echo "::endgroup::"
+            echo "::error::Auto-generated files are out of date"
+            echo "To fix this issue, run the following commands and commit the changes:"
+            echo "  pnpm build:packages"
+            echo "  pnpm build:bindings"
+            exit 1
+          fi
+
   ci-test:
     strategy:
       fail-fast: false
