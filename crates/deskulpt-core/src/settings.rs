@@ -11,8 +11,8 @@ use serde::{Deserialize, Serialize};
 /// The settings file name in the persistence directory.
 static SETTINGS_FILE: &str = "settings.json";
 
-trait Apply<U> {
-    fn apply(&mut self, u: U) -> Result<()>;
+pub trait ApplyUpdate<U> {
+    fn apply_update(&mut self, u: U) -> Result<()>;
 }
 
 /// Light/dark theme of the application.
@@ -25,7 +25,7 @@ pub enum Theme {
 }
 
 /// Canvas interaction mode.
-#[derive(Clone, Default, Deserialize, Serialize, ts_rs::TS)]
+#[derive(Clone, Debug, Default, PartialEq, Deserialize, Serialize, ts_rs::TS)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum CanvasImode {
     /// Sink mode.
@@ -39,6 +39,17 @@ pub enum CanvasImode {
     /// The canvas is not click-through. Widgets are interactable. The desktop
     /// is not interactable.
     Float,
+}
+
+impl std::ops::Not for CanvasImode {
+    type Output = Self;
+
+    fn not(self) -> Self::Output {
+        match self {
+            CanvasImode::Sink => CanvasImode::Float,
+            CanvasImode::Float => CanvasImode::Sink,
+        }
+    }
 }
 
 /// Keyboard shortcuts registered in the application.
@@ -56,15 +67,15 @@ pub struct Shortcuts {
     pub open_manager: Option<String>,
 }
 
-#[derive(Deserialize, ts_rs::TS)]
+#[derive(Clone, Deserialize, ts_rs::TS)]
 #[serde(tag = "field", rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum ShortcutsUpdate {
     ToggleCanvasImode { value: Option<String> },
     OpenManager { value: Option<String> },
 }
 
-impl Apply<ShortcutsUpdate> for Shortcuts {
-    fn apply(&mut self, u: ShortcutsUpdate) -> Result<()> {
+impl ApplyUpdate<ShortcutsUpdate> for Shortcuts {
+    fn apply_update(&mut self, u: ShortcutsUpdate) -> Result<()> {
         match u {
             ShortcutsUpdate::ToggleCanvasImode { value } => {
                 self.toggle_canvas_imode = value;
@@ -92,7 +103,7 @@ pub struct AppSettings {
     pub shortcuts: Shortcuts,
 }
 
-#[derive(Deserialize, ts_rs::TS)]
+#[derive(Clone, Deserialize, ts_rs::TS)]
 #[serde(tag = "field", rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum AppSettingsUpdate {
     Theme { value: Theme },
@@ -100,8 +111,8 @@ pub enum AppSettingsUpdate {
     Shortcuts { value: ShortcutsUpdate },
 }
 
-impl Apply<AppSettingsUpdate> for AppSettings {
-    fn apply(&mut self, u: AppSettingsUpdate) -> Result<()> {
+impl ApplyUpdate<AppSettingsUpdate> for AppSettings {
+    fn apply_update(&mut self, u: AppSettingsUpdate) -> Result<()> {
         match u {
             AppSettingsUpdate::Theme { value } => {
                 self.theme = value;
@@ -110,7 +121,7 @@ impl Apply<AppSettingsUpdate> for AppSettings {
                 self.canvas_imode = value;
             },
             AppSettingsUpdate::Shortcuts { value } => {
-                self.shortcuts.apply(value)?;
+                self.shortcuts.apply_update(value)?;
             },
         }
         Ok(())
@@ -139,7 +150,7 @@ fn default_opacity() -> i32 {
     100
 }
 
-#[derive(Deserialize, ts_rs::TS)]
+#[derive(Clone, Deserialize, ts_rs::TS)]
 #[serde(tag = "field", rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum WidgetSettingsUpdate {
     X { value: i32 },
@@ -147,8 +158,8 @@ pub enum WidgetSettingsUpdate {
     Opacity { value: i32 },
 }
 
-impl Apply<WidgetSettingsUpdate> for WidgetSettings {
-    fn apply(&mut self, u: WidgetSettingsUpdate) -> Result<()> {
+impl ApplyUpdate<WidgetSettingsUpdate> for WidgetSettings {
+    fn apply_update(&mut self, u: WidgetSettingsUpdate) -> Result<()> {
         match u {
             WidgetSettingsUpdate::X { value } => {
                 self.x = value;
@@ -180,7 +191,7 @@ pub struct Settings {
     pub widgets: HashMap<String, WidgetSettings>,
 }
 
-#[derive(Deserialize, ts_rs::TS)]
+#[derive(Clone, Deserialize, ts_rs::TS)]
 #[serde(tag = "field", rename_all = "SCREAMING_SNAKE_CASE")]
 #[ts(export)]
 pub enum SettingsUpdate {
@@ -193,14 +204,14 @@ pub enum SettingsUpdate {
     },
 }
 
-impl Apply<SettingsUpdate> for Settings {
-    fn apply(&mut self, u: SettingsUpdate) -> Result<()> {
+impl ApplyUpdate<SettingsUpdate> for Settings {
+    fn apply_update(&mut self, u: SettingsUpdate) -> Result<()> {
         match u {
             SettingsUpdate::App { value } => {
-                self.app.apply(value)?;
+                self.app.apply_update(value)?;
             },
             SettingsUpdate::Widget { key, value } => {
-                self.widgets.entry(key).or_default().apply(value)?;
+                self.widgets.entry(key).or_default().apply_update(value)?;
             },
         }
         Ok(())
@@ -236,32 +247,12 @@ impl Settings {
         serde_json::to_writer(writer, self)?;
         Ok(())
     }
+}
 
-    /// Apply a sequence of updates to the settings.
-    ///
-    /// This will apply each update in the order they are provided. It will not
-    /// terminate on error, but will accumulate any errors that occur and does
-    /// the best effort to apply all updates. The update is not atomic.
-    pub fn update<I>(&mut self, u: I) -> Result<()>
-    where
-        I: IntoIterator<Item = SettingsUpdate>,
-    {
-        let mut errors = Vec::new();
-        for update in u {
-            if let Err(e) = self.apply(update) {
-                errors.push(e);
-            }
-        }
-
-        if errors.is_empty() {
-            Ok(())
-        } else {
-            let msg = errors
-                .into_iter()
-                .map(|e| format!("{e}"))
-                .collect::<Vec<_>>()
-                .join("; ");
-            bail!("Settings update errors: {msg}")
+impl SettingsUpdate {
+    pub fn canvas_imode(value: CanvasImode) -> Self {
+        SettingsUpdate::App {
+            value: AppSettingsUpdate::CanvasImode { value },
         }
     }
 }

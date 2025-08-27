@@ -1,5 +1,5 @@
 import { invoke } from "@tauri-apps/api/core";
-import { Settings, Shortcuts, WidgetConfig } from "../types";
+import { Settings, SettingsUpdate, WidgetConfig } from "../types";
 import { RenderWidgetsPayload } from "./events";
 
 export const bundleWidget = (payload: {
@@ -22,8 +22,5 @@ export const rescanWidgets = () =>
 
 export const setRenderReady = () => invoke<void>("set_render_ready");
 
-export const updateShortcut = (payload: {
-  key: keyof Shortcuts;
-  oldShortcut: string | null;
-  newShortcut: string | null;
-}) => invoke<void>("update_shortcut", payload);
+export const updateSettings = (payload: { updates: SettingsUpdate[] }) =>
+  invoke<void>("update_settings", payload);

@@ -2,59 +2,19 @@
 
 use std::sync::Mutex;
 
-use anyhow::Result;
-use tauri::menu::MenuItem;
+use anyhow::{bail, Result};
 use tauri::{App, AppHandle, Manager, Runtime, WebviewWindow};
 
 use crate::events::{EventsExt, ShowToastPayload};
-
-/// Canvas interaction mode.
-#[derive(Clone)]
-enum CanvasImode {
-    /// Sink mode.
-    ///
-    /// The canvas is click-through. Widgets are not interactable. The desktop
-    /// is interactable.
-    Sink,
-    /// Float mode.
-    ///
-    /// The canvas is not click-through. Widgets are interactable. The desktop
-    /// is not interactable.
-    Float,
-}
+use crate::settings::CanvasImode;
+use crate::tray::MenuItems;
 
 /// The internal of the managed state for canvas interaction mode.
 struct CanvasImodeStateInner<R: Runtime> {
-    /// The interaction mode of the canvas.
-    mode: CanvasImode,
-    /// The menu item for toggling the canvas interaction mode.
-    menu_item: Option<MenuItem<R>>,
-}
-
-impl<R: Runtime> CanvasImodeStateInner<R> {
-    /// Toggle the interaction mode.
-    ///
-    /// This will change the mode and update the menu item text if it exists.
-    fn toggle(&mut self, canvas: &WebviewWindow<R>) -> Result<()> {
-        // The menu item shows the action that will be performed on click, so it
-        // should be the opposite of the mode
-        let (new_mode, new_text) = match self.mode {
-            CanvasImode::Sink => {
-                canvas.set_ignore_cursor_events(false)?;
-                (CanvasImode::Float, "Sink")
-            },
-            CanvasImode::Float => {
-                canvas.set_ignore_cursor_events(true)?;
-                (CanvasImode::Sink, "Float")
-            },
-        };
-
-        self.mode = new_mode;
-        if let Some(menu_item) = &self.menu_item {
-            menu_item.set_text(new_text)?;
-        }
-        Ok(())
-    }
+    /// The canvas window.
+    canvas: Option<WebviewWindow<R>>,
+    /// The tray menu items.
+    menu_items: Option<MenuItems<R>>,
 }
 
 /// Managed state for canvas interaction mode.
@@ -67,50 +27,55 @@ pub trait StatesExtCanvasImode<R: Runtime>: Manager<R> + EventsExt<R> {
     /// The canvas is in sink mode by default.
     fn manage_canvas_imode(&self) {
         let inner = CanvasImodeStateInner {
-            mode: CanvasImode::Sink,
-            menu_item: None::<MenuItem<R>>,
+            canvas: None::<WebviewWindow<R>>,
+            menu_items: None::<MenuItems<R>>,
         };
         self.manage(CanvasImodeState(Mutex::new(inner)));
     }
 
-    /// Set the menu item for toggling canvas interaction mode.
-    fn set_canvas_imode_menu_item(&self, menu_item: &MenuItem<R>) {
+    fn post_manage_canvas_imode(&self, menu_items: MenuItems<R>) {
         let state = self.state::<CanvasImodeState<R>>();
         let mut state = state.0.lock().unwrap();
-
-        // Cloning works because menu items are behind shared references
-        state.menu_item = Some(menu_item.clone());
+        state.canvas = Some(
+            self.get_webview_window("canvas")
+                .expect("Canvas window not found"),
+        );
+        state.menu_items = Some(menu_items);
     }
 
-    /// Toggle the interaction mode of the canvas window.
-    ///
-    /// This will show a toast message on the canvas window indicating the new
-    /// interaction mode.
-    fn toggle_canvas_imode(&self) -> Result<()> {
-        let canvas = self
-            .get_webview_window("canvas")
-            .expect("Canvas window not found");
-
+    fn set_canvas_imode(&self, mode: CanvasImode) -> Result<()> {
         let state = self.state::<CanvasImodeState<R>>();
-        let mut state = state.0.lock().unwrap();
-        state.toggle(&canvas)?;
+        let state = state.0.lock().unwrap();
+        if state.canvas.is_none() || state.menu_items.is_none() {
+            bail!(
+                "Canvas interaction mode state is not properly initialized; \
+                 post_manage_canvas_imode must be called first"
+            );
+        }
+        // Safe to unwrap because we have already checked for None
+        let canvas = state.canvas.as_ref().unwrap();
+        let menu_items = state.menu_items.as_ref().unwrap();
 
-        let toast_message = match state.mode {
-            CanvasImode::Float => "Canvas floated.",
+        match mode {
+            CanvasImode::Float => {
+                canvas.set_ignore_cursor_events(false)?;
+            },
             CanvasImode::Sink => {
+                canvas.set_ignore_cursor_events(true)?;
                 // Toggled from float to sink, so we try to regain focus to
                 // avoid flickering on the first click; failure to do so is not
                 // critical so we consume the error
                 if let Err(e) = canvas.set_focus() {
                     eprintln!("Failed to gain focus on canvas: {}", e);
                 }
-                "Canvas sunk."
             },
-        };
+        }
 
-        if let Err(e) =
-            self.emit_show_toast_to_canvas(ShowToastPayload::Success(toast_message.to_string()))
-        {
+        let toast_message = format!("Canvas: {mode:?}");
+        menu_items.set_canvas_imode(mode)?;
+
+        // Failure to emit toast is not critical so we consume the error
+        if let Err(e) = self.emit_show_toast_to_canvas(ShowToastPayload::Success(toast_message)) {
             eprintln!("Failed to emit show-toast to canvas: {}", e);
         }
 

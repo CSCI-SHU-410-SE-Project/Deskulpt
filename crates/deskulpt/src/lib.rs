@@ -5,8 +5,8 @@
 )]
 
 use deskulpt_core::{
-    PathExt, StatesExtInitialRender, StatesExtSettings, StatesExtWidgetConfigMap, TrayExt,
-    WindowExt,
+    PathExt, StatesExtCanvasImode, StatesExtInitialRender, StatesExtSettings,
+    StatesExtWidgetConfigMap, TrayExt, WindowExt,
 };
 use tauri::image::Image;
 use tauri::{generate_context, generate_handler, include_image, Builder};
@@ -22,6 +22,7 @@ pub fn run() {
             app.init_persist_dir()?;
 
             app.manage_initial_render();
+            app.manage_canvas_imode();
             app.manage_settings();
             app.manage_widget_config_map();
 
@@ -32,7 +33,9 @@ pub fn run() {
 
             app.create_manager()?;
             app.create_canvas()?;
-            app.create_tray(DESKULPT_ICON)?;
+            let menu_items = app.create_tray(DESKULPT_ICON)?;
+
+            app.post_manage_canvas_imode(menu_items);
 
             Ok(())
         })

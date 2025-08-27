@@ -16,7 +16,7 @@ import {
 } from "react";
 import { FaEdit } from "react-icons/fa";
 import { MdClear } from "react-icons/md";
-import { Shortcuts } from "../../../types";
+import { Shortcuts, ShortcutsUpdate } from "../../../types";
 import { updateShortcut, useAppSettingsStore } from "../../hooks";
 import { toast } from "sonner";
 import { INVALID_KEYCODES, KEYCODES, MODIFIERS } from "./keyboard";
@@ -126,7 +126,17 @@ const ShortcutAction = ({ shortcutKey }: Props) => {
   }, []);
 
   const confirmAction = useCallback(() => {
-    updateShortcut(shortcutKey, shortcut, value === "" ? null : value)
+    let field: ShortcutsUpdate["field"];
+    switch (shortcutKey) {
+      case "toggleCanvasImode":
+        field = "TOGGLE_CANVAS_IMODE";
+        break;
+      case "openManager":
+        field = "OPEN_MANAGER";
+        break;
+    }
+
+    updateShortcut({ field, value: value === "" ? null : value })
       .then(() => {
         setPlaceholder(INITIAL_PLACEHOLDER);
         setIsValid(true);
@@ -135,7 +145,7 @@ const ShortcutAction = ({ shortcutKey }: Props) => {
       .catch(() => {
         toast.error("Failed to update shortcut.");
       });
-  }, [shortcutKey, shortcut, value]);
+  }, [shortcutKey, value]);
 
   const clearAction = useCallback(() => {
     if (inputRef.current === null) {
