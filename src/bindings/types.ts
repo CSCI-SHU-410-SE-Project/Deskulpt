@@ -9,9 +9,20 @@ export type AppSettings = {
  */
 theme: Theme, 
 /**
+ * Canvas interaction mode.
+ */
+canvasImode: CanvasImode, 
+/**
  * The keyboard shortcuts.
  */
 shortcuts: Shortcuts, };
+
+export type AppSettingsUpdate = { "field": "THEME", value: Theme, } | { "field": "CANVAS_IMODE", value: CanvasImode, } | { "field": "SHORTCUTS", value: ShortcutsUpdate, };
+
+/**
+ * Canvas interaction mode.
+ */
+export type CanvasImode = "SINK" | "FLOAT";
 
 /**
  * Deskulpt window enum.
@@ -73,6 +84,8 @@ app: AppSettings,
  */
 widgets: { [key in string]?: WidgetSettings }, };
 
+export type SettingsUpdate = { "field": "APP", value: AppSettingsUpdate, } | { "field": "WIDGET", key: string, value: WidgetSettingsUpdate, };
+
 /**
  * Keyboard shortcuts registered in the application.
  *
@@ -88,6 +101,8 @@ toggleCanvasImode: string | null,
  * For opening the manager window.
  */
 openManager: string | null, };
+
+export type ShortcutsUpdate = { "field": "TOGGLE_CANVAS_IMODE", value: string | null, } | { "field": "OPEN_MANAGER", value: string | null, };
 
 /**
  * Event for showing a toast notification.
@@ -182,3 +197,5 @@ y: number,
  * The opacity in percentage.
  */
 opacity: number, };
+
+export type WidgetSettingsUpdate = { "field": "X", value: number, } | { "field": "Y", value: number, } | { "field": "OPACITY", value: number, };

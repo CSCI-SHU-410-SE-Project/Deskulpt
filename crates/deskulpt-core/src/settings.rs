@@ -28,6 +28,7 @@ pub enum Theme {
 /// Canvas interaction mode.
 #[derive(Clone, Debug, Default, PartialEq, Deserialize, Serialize, ts_rs::TS)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+#[ts(export_to = "types.ts")]
 pub enum CanvasImode {
     /// Sink mode.
     ///
@@ -71,6 +72,7 @@ pub struct Shortcuts {
 
 #[derive(Clone, Deserialize, ts_rs::TS)]
 #[serde(tag = "field", rename_all = "SCREAMING_SNAKE_CASE")]
+#[ts(export_to = "types.ts")]
 pub enum ShortcutsUpdate {
     ToggleCanvasImode { value: Option<String> },
     OpenManager { value: Option<String> },
@@ -108,6 +110,7 @@ pub struct AppSettings {
 
 #[derive(Clone, Deserialize, ts_rs::TS)]
 #[serde(tag = "field", rename_all = "SCREAMING_SNAKE_CASE")]
+#[ts(export_to = "types.ts")]
 pub enum AppSettingsUpdate {
     Theme { value: Theme },
     CanvasImode { value: CanvasImode },
@@ -156,6 +159,7 @@ fn default_opacity() -> i32 {
 
 #[derive(Clone, Deserialize, ts_rs::TS)]
 #[serde(tag = "field", rename_all = "SCREAMING_SNAKE_CASE")]
+#[ts(export_to = "types.ts")]
 pub enum WidgetSettingsUpdate {
     X { value: i32 },
     Y { value: i32 },
@@ -197,7 +201,7 @@ pub struct Settings {
 
 #[derive(Clone, Deserialize, ts_rs::TS)]
 #[serde(tag = "field", rename_all = "SCREAMING_SNAKE_CASE")]
-#[ts(export)]
+#[ts(export, export_to = "types.ts")]
 pub enum SettingsUpdate {
     App {
         value: AppSettingsUpdate,

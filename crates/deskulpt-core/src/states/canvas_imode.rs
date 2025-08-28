@@ -3,9 +3,9 @@
 use std::sync::Mutex;
 
 use anyhow::{bail, Result};
-use tauri::{App, AppHandle, Manager, Runtime, WebviewWindow};
+use tauri::{App, AppHandle, Emitter, Manager, Runtime};
 
-use crate::events::ShowToastEvent;
+use crate::events::{DeskulptEvent, ShowToastEvent};
 use crate::settings::CanvasImode;
 use crate::tray::MenuItems;
 use crate::window::DeskulptWindow;
@@ -46,7 +46,7 @@ pub trait StatesExtCanvasImode<R: Runtime>: Manager<R> + Emitter<R> {
                  post_manage_canvas_imode must be called first"
             );
         }
-        let canvas = DeskulptWindow::Canvas.webview_window(self)?;
+        let canvas = DeskulptWindow::Canvas.webview_window(self);
         let menu_items = state.menu_items.as_ref().unwrap();
 
         match mode {
