@@ -5,7 +5,7 @@ use deskulpt_macros::{register_deskulpt_events, DeskulptEvent};
 use serde::{Deserialize, Serialize};
 use tauri::{Emitter, Runtime};
 
-use crate::settings::WidgetSettings;
+use crate::settings::{Theme, WidgetSettings};
 use crate::window::DeskulptWindow;
 
 /// Trait for all Deskulpt events.
@@ -80,4 +80,29 @@ pub struct RenderWidgetsEvent(
     Vec<RenderWidgetsEventInner>,
 );
 
-register_deskulpt_events![ShowToastEvent, ExitAppEvent, RenderWidgetsEvent];
+/// Event for removing widgets.
+///
+/// This event is emitted from the manager window to the canvas window when
+/// widgets need to be removed.
+#[derive(Serialize, ts_rs::TS, DeskulptEvent)]
+#[ts(export, export_to = "types.ts")]
+pub struct RemoveWidgetsEvent(
+    /// The list of widget IDs to be removed.
+    Vec<String>,
+);
+
+/// Event for switching the app theme.
+#[derive(Serialize, ts_rs::TS, DeskulptEvent)]
+#[ts(export, export_to = "types.ts")]
+pub struct SwitchThemeEvent(
+    /// The theme to switch to.
+    Theme,
+);
+
+register_deskulpt_events![
+    ShowToastEvent,
+    ExitAppEvent,
+    RenderWidgetsEvent,
+    RemoveWidgetsEvent,
+    SwitchThemeEvent,
+];

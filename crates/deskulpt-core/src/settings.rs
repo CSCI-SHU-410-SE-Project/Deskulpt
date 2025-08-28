@@ -15,7 +15,7 @@ static SETTINGS_FILE: &str = "settings.json";
 #[derive(Default, Deserialize, Serialize, ts_rs::TS)]
 #[serde(rename_all = "lowercase")]
 #[ts(export_to = "types.ts")]
-enum Theme {
+pub enum Theme {
     #[default]
     Light,
     Dark,

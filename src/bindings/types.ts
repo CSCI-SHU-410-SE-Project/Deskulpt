@@ -27,6 +27,14 @@ export type DeskulptWindow = "manager" | "canvas";
 export type ExitAppEvent = null;
 
 /**
+ * Event for removing widgets.
+ *
+ * This event is emitted from the manager window to the canvas window when
+ * widgets need to be removed.
+ */
+export type RemoveWidgetsEvent = Array<string>;
+
+/**
  * Event for re-rendering widgets.
  *
  * This event is mainly emitted from the manager window to the canvas window
@@ -88,6 +96,11 @@ openManager: string | null, };
  * notification needs to be displayed.
  */
 export type ShowToastEvent = { "type": "SUCCESS", "content": string } | { "type": "ERROR", "content": string };
+
+/**
+ * Event for switching the app theme.
+ */
+export type SwitchThemeEvent = Theme;
 
 /**
  * Light/dark theme of the application.

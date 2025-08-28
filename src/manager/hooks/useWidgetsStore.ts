@@ -1,7 +1,10 @@
 import { create } from "zustand";
 import { WidgetConfig, WidgetSettings } from "../../bindings/types";
 import { commands, events } from "../../core";
-import { RenderWidgetsEventAPI } from "../../bindings/events";
+import {
+  RemoveWidgetsEventAPI,
+  RenderWidgetsEventAPI,
+} from "../../bindings/events";
 
 const DEFAULT_WIDGET_SETTINGS: WidgetSettings = { x: 0, y: 0, opacity: 100 };
 
@@ -41,7 +44,7 @@ export async function rescan(initial: boolean = false) {
       (id) => !(id in configs),
     );
     if (removedIds.length > 0) {
-      await events.removeWidgets.toCanvas({ ids: removedIds });
+      await RemoveWidgetsEventAPI.emitTo("canvas", removedIds);
     }
   }
 

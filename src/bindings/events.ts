@@ -11,3 +11,9 @@ export const ExitAppEventAPI = __makeEventAPI__<ExitAppEvent>("exit-app");
 import { RenderWidgetsEvent } from "./types";
 export const RenderWidgetsEventAPI = __makeEventAPI__<RenderWidgetsEvent>("render-widgets");
 
+import { RemoveWidgetsEvent } from "./types";
+export const RemoveWidgetsEventAPI = __makeEventAPI__<RemoveWidgetsEvent>("remove-widgets");
+
+import { SwitchThemeEvent } from "./types";
+export const SwitchThemeEventAPI = __makeEventAPI__<SwitchThemeEvent>("switch-theme");
+
