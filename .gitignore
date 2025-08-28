@@ -29,7 +29,7 @@ dist-ssr
 .env.test.local
 .env.production.local
 
-# Auto-generated files
+# Cargo generated files
 target/
 
 # Tauri generated files
