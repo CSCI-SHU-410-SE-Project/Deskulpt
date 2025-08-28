@@ -48,7 +48,7 @@ impl DeskulptWindow {
     {
         manager
             .get_webview_window(self.label())
-            .expect(&format!("Window not found: {}", self.label()))
+            .unwrap_or_else(|| unreachable!("Window not found: {}", self.label()))
     }
 }
 
