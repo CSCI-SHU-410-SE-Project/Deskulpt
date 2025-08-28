@@ -43,6 +43,7 @@ jobs:
       - name: Regenerate auto-generated files
         if: ${{ matrix.platform == 'ubuntu-latest' }}
         run: |
+          rm -r src/bindings/
           pnpm build:packages
           pnpm build:bindings
 
@@ -61,6 +62,7 @@ jobs:
             echo "To fix this issue, run the following commands and commit the changes:"
             echo "  pnpm build:packages"
             echo "  pnpm build:bindings"
+            echo "If the issue persists, try removing the src/bindings/ directory and run again."
             exit 1
           fi
 

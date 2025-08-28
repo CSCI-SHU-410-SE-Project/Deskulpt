@@ -13,6 +13,9 @@ theme: Theme,
  */
 shortcuts: Shortcuts, };
 
+/**
+ * Deskulpt window enum.
+ */
 export type DeskulptWindow = "manager" | "canvas";
 
 /**
@@ -24,10 +27,11 @@ export type DeskulptWindow = "manager" | "canvas";
 export type ExitAppEvent = null;
 
 /**
- * Event for the initial render of the application.
+ * Event for re-rendering widgets.
  *
- * This event is emitted from the backend to the canvas window when we are sure
- * that it is ready for the initial render.
+ * This event is mainly emitted from the manager window to the canvas window
+ * when settings or code of a widget needs to be re-rendered. It may also be
+ * emitted from the backend to the canvas window for the initial render.
  */
 export type RenderWidgetsEvent = Array<RenderWidgetsEventInner>;
 
@@ -36,7 +40,7 @@ export type RenderWidgetsEvent = Array<RenderWidgetsEventInner>;
  */
 export type RenderWidgetsEventInner = { 
 /**
- * The ID of the widget being rendered.
+ * The ID of the widget being re-rendered.
  */
 id: string, 
 /**
