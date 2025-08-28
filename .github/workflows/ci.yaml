@@ -53,12 +53,12 @@ jobs:
         run: |
           set -euo pipefail
           if [ -n "$(git status --porcelain)" ]; then
-            echo "::group::Uncommitted changes after regenerating auto-generated files"
+            echo "::error::Auto-generated files are out of date"
+            echo "::group::Diff of auto-generated files"
             git status --porcelain
             echo
             git --no-pager diff || true
             echo "::endgroup::"
-            echo "::error::Auto-generated files are out of date"
             echo "To fix this issue, run the following commands and commit the changes:"
             echo "  pnpm build:packages"
             echo "  pnpm build:bindings"
