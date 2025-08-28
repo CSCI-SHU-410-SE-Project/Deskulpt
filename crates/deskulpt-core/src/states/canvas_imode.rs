@@ -5,14 +5,13 @@ use std::sync::Mutex;
 use anyhow::{bail, Result};
 use tauri::{App, AppHandle, Manager, Runtime, WebviewWindow};
 
-use crate::events::{EventsExt, ShowToastPayload};
+use crate::events::ShowToastEvent;
 use crate::settings::CanvasImode;
 use crate::tray::MenuItems;
+use crate::window::DeskulptWindow;
 
 /// The internal of the managed state for canvas interaction mode.
 struct CanvasImodeStateInner<R: Runtime> {
-    /// The canvas window.
-    canvas: Option<WebviewWindow<R>>,
     /// The tray menu items.
     menu_items: Option<MenuItems<R>>,
 }
@@ -21,13 +20,12 @@ struct CanvasImodeStateInner<R: Runtime> {
 struct CanvasImodeState<R: Runtime>(Mutex<CanvasImodeStateInner<R>>);
 
 /// Extension trait for operations on canvas interaction mode.
-pub trait StatesExtCanvasImode<R: Runtime>: Manager<R> + EventsExt<R> {
+pub trait StatesExtCanvasImode<R: Runtime>: Manager<R> + Emitter<R> {
     /// Initialize state management for canvas interaction mode.
     ///
     /// The canvas is in sink mode by default.
     fn manage_canvas_imode(&self) {
         let inner = CanvasImodeStateInner {
-            canvas: None::<WebviewWindow<R>>,
             menu_items: None::<MenuItems<R>>,
         };
         self.manage(CanvasImodeState(Mutex::new(inner)));
@@ -36,24 +34,19 @@ pub trait StatesExtCanvasImode<R: Runtime>: Manager<R> + EventsExt<R> {
     fn post_manage_canvas_imode(&self, menu_items: MenuItems<R>) {
         let state = self.state::<CanvasImodeState<R>>();
         let mut state = state.0.lock().unwrap();
-        state.canvas = Some(
-            self.get_webview_window("canvas")
-                .expect("Canvas window not found"),
-        );
         state.menu_items = Some(menu_items);
     }
 
     fn set_canvas_imode(&self, mode: CanvasImode) -> Result<()> {
         let state = self.state::<CanvasImodeState<R>>();
         let state = state.0.lock().unwrap();
-        if state.canvas.is_none() || state.menu_items.is_none() {
+        if state.menu_items.is_none() {
             bail!(
                 "Canvas interaction mode state is not properly initialized; \
                  post_manage_canvas_imode must be called first"
             );
         }
-        // Safe to unwrap because we have already checked for None
-        let canvas = state.canvas.as_ref().unwrap();
+        let canvas = DeskulptWindow::Canvas.webview_window(self)?;
         let menu_items = state.menu_items.as_ref().unwrap();
 
         match mode {
@@ -75,7 +68,8 @@ pub trait StatesExtCanvasImode<R: Runtime>: Manager<R> + EventsExt<R> {
         menu_items.set_canvas_imode(mode)?;
 
         // Failure to emit toast is not critical so we consume the error
-        if let Err(e) = self.emit_show_toast_to_canvas(ShowToastPayload::Success(toast_message)) {
+        if let Err(e) = ShowToastEvent::Success(toast_message).emit_to(self, DeskulptWindow::Canvas)
+        {
             eprintln!("Failed to emit show-toast to canvas: {}", e);
         }
 

@@ -33,11 +33,8 @@ dist-ssr
 target/
 
 # Tauri generated files
-crates/deskulpt/gen/schemas
-
-# TS-RS generated files
-src/bindings
+crates/deskulpt/gen/schemas/
 
 # Docs
-docs/.vitepress/dist
-docs/.vitepress/cache
+docs/.vitepress/dist/
+docs/.vitepress/cache/

@@ -15,10 +15,11 @@ export default defineConfig([
     input: "src/jsx-runtime.js",
     output: {
       format: "esm",
-      file: "../../src/generated/jsx-runtime.js",
+      file: "../../src/gen/jsx-runtime.js",
+      banner: "/*! Auto-generated from packages/ui. DO NOT EDIT! */",
     },
     external: ["@emotion/react/jsx-runtime"],
-    plugins: [terser()],
+    plugins: [typescript(), terser({ format: { comments: "some" } })],
     onwarn,
   },
   // ESM build to be used internally
@@ -26,10 +27,11 @@ export default defineConfig([
     input: "src/index.ts",
     output: {
       format: "esm",
-      file: "../../src/generated/ui.js",
+      file: "../../src/gen/ui.js",
+      banner: "/*! Auto-generated from packages/ui. DO NOT EDIT! */",
     },
     external: ["@emotion/react", "@radix-ui/themes"],
-    plugins: [typescript(), terser()],
+    plugins: [typescript(), terser({ format: { comments: "some" } })],
     onwarn,
   },
   // ESM build for publishing

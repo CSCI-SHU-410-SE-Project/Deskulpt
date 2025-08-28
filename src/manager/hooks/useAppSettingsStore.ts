@@ -1,6 +1,7 @@
 import { create } from "zustand";
-import { Shortcuts, ShortcutsUpdate } from "../../types";
-import { commands, events } from "../../core";
+import { Shortcuts, ShortcutsUpdate } from "../../bindings/types";
+import { commands } from "../../core";
+import { SwitchThemeEventAPI } from "../../bindings/events";
 
 export const useAppSettingsStore = create(() => ({
   ...window.__DESKULPT_MANAGER_INTERNALS__.initialSettings.app,
@@ -11,7 +12,7 @@ export async function toggleTheme() {
   const newTheme = theme === "light" ? "dark" : "light";
 
   useAppSettingsStore.setState({ theme: newTheme });
-  await events.switchTheme.toCanvas({ theme: newTheme });
+  await SwitchThemeEventAPI.emitTo("canvas", newTheme);
 }
 
 export async function updateShortcut(update: ShortcutsUpdate) {

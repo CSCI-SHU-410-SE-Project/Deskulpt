@@ -1,6 +1,10 @@
 import { invoke } from "@tauri-apps/api/core";
-import { Settings, SettingsUpdate, WidgetConfig } from "../types";
-import { RenderWidgetsPayload } from "./events";
+import {
+  RenderWidgetsEvent,
+  Settings,
+  SettingsUpdate,
+  WidgetConfig,
+} from "../bindings/types";
 
 export const bundleWidget = (payload: {
   id: string;
@@ -8,7 +12,7 @@ export const bundleWidget = (payload: {
   apisBlobUrl: string;
 }) => invoke<string>("bundle_widget", payload);
 
-export const emitOnRenderReady = (payload: { payload: RenderWidgetsPayload }) =>
+export const emitOnRenderReady = (payload: { event: RenderWidgetsEvent }) =>
   invoke<void>("emit_on_render_ready", payload);
 
 export const exitApp = (payload: { settings: Settings }) =>

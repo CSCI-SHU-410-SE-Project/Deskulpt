@@ -1,11 +1,12 @@
 import { useEffect } from "react";
-import { commands, events } from "../../core";
+import { commands } from "../../core";
 import { useWidgetsStore } from "./useWidgetsStore";
 import { useAppSettingsStore } from "./useAppSettingsStore";
+import { ExitAppEventAPI } from "../../bindings/events";
 
 export function useExitAppListener() {
   useEffect(() => {
-    const unlisten = events.exitApp.on(() => {
+    const unlisten = ExitAppEventAPI.listen(() => {
       const settings = {
         app: useAppSettingsStore.getState(),
         widgets: Object.fromEntries(

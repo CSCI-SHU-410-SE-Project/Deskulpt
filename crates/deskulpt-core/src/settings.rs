@@ -18,6 +18,7 @@ pub trait ApplyUpdate<U> {
 /// Light/dark theme of the application.
 #[derive(Clone, Default, Deserialize, Serialize, ts_rs::TS)]
 #[serde(rename_all = "lowercase")]
+#[ts(export_to = "types.ts")]
 pub enum Theme {
     #[default]
     Light,
@@ -58,6 +59,7 @@ impl std::ops::Not for CanvasImode {
 /// a string parsable into [`Shortcut`](tauri_plugin_global_shortcut::Shortcut).
 #[derive(Clone, Default, Deserialize, Serialize, ts_rs::TS)]
 #[serde(rename_all = "camelCase")]
+#[ts(export_to = "types.ts")]
 pub struct Shortcuts {
     /// For toggling canvas interaction mode.
     #[serde(default)]
@@ -91,6 +93,7 @@ impl ApplyUpdate<ShortcutsUpdate> for Shortcuts {
 /// Application-wide settings.
 #[derive(Clone, Default, Deserialize, Serialize, ts_rs::TS)]
 #[serde(rename_all = "camelCase")]
+#[ts(export_to = "types.ts")]
 pub struct AppSettings {
     /// The application theme.
     #[serde(default)]
@@ -134,6 +137,7 @@ impl ApplyUpdate<AppSettingsUpdate> for AppSettings {
 /// configuration files and are managed internally by the application.
 #[derive(Clone, Default, Deserialize, Serialize, ts_rs::TS)]
 #[serde(rename_all = "camelCase")]
+#[ts(export_to = "types.ts")]
 pub struct WidgetSettings {
     /// The leftmost x-coordinate in pixels.
     #[serde(default)]
@@ -181,7 +185,7 @@ impl ApplyUpdate<WidgetSettingsUpdate> for WidgetSettings {
 /// Full settings of the application.
 #[derive(Clone, Default, Deserialize, Serialize, ts_rs::TS)]
 #[serde(rename_all = "camelCase")]
-#[ts(export)]
+#[ts(export, export_to = "types.ts")]
 pub struct Settings {
     /// Application-wide settings.
     #[serde(default)]

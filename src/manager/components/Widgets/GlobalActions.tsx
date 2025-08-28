@@ -1,9 +1,10 @@
 import { Flex, IconButton } from "@radix-ui/themes";
 import { memo, useCallback } from "react";
 import { LuFileScan, LuFolderOpen, LuRepeat } from "react-icons/lu";
-import { commands, events } from "../../../core";
+import { commands } from "../../../core";
 import { rescan, useWidgetsStore } from "../../hooks";
 import { toast } from "sonner";
+import { RenderWidgetsEventAPI } from "../../../bindings/events";
 
 interface GlobalActionsProps {
   length: number;
@@ -11,13 +12,12 @@ interface GlobalActionsProps {
 
 const GlobalActions = memo(({ length }: GlobalActionsProps) => {
   const refreshAction = useCallback(() => {
-    const payload = Object.entries(useWidgetsStore.getState().widgets).map(
+    const event = Object.entries(useWidgetsStore.getState().widgets).map(
       ([id, { settings }]) => ({ id, settings }),
     );
-    events.renderWidgets
-      .toCanvas(payload)
+    RenderWidgetsEventAPI.emitTo("canvas", event)
       .then(() => {
-        toast.success(`Refreshed ${payload.length} widgets.`);
+        toast.success(`Refreshed ${event.length} widgets.`);
       })
       .catch(console.error);
   }, []);

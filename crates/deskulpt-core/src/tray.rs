@@ -11,10 +11,10 @@ use tauri::tray::TrayIconBuilder;
 use tauri::{App, AppHandle, Runtime};
 use tokio::time::sleep;
 
-use crate::events::EventsExt;
+use crate::events::{DeskulptEvent, ExitAppEvent};
 use crate::settings::{CanvasImode, SettingsUpdate};
 use crate::states::StatesExtSettings;
-use crate::window::WindowExt;
+use crate::window::{DeskulptWindow, WindowExt};
 
 /// System tray menu items that may change at runtime.
 pub struct MenuItems<R: Runtime> {
@@ -117,7 +117,7 @@ fn on_menu_event<R: Runtime>(app_handle: &AppHandle<R>, event: MenuEvent) {
         "tray-exit" => {
             // Emit the "exit-app" event to the manager, which will invoke the
             // `exit_app` command to clean up and actually exit the application
-            if let Err(e) = app_handle.emit_exit_app_to_manager() {
+            if let Err(e) = ExitAppEvent.emit_to(app_handle, DeskulptWindow::Manager) {
                 eprintln!("Failed to emit exit-app to manager: {e}");
                 app_handle.exit(1); // Safeguard exit
             }
