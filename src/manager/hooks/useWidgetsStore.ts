@@ -1,9 +1,10 @@
 import { create } from "zustand";
 import { WidgetConfig, WidgetSettings } from "../../bindings/types";
-import { commands, events } from "../../core";
+import { commands } from "../../core";
 import {
   RemoveWidgetsEventAPI,
   RenderWidgetsEventAPI,
+  UpdateSettingsEventAPI,
 } from "../../bindings/events";
 
 const DEFAULT_WIDGET_SETTINGS: WidgetSettings = { x: 0, y: 0, opacity: 100 };
@@ -48,11 +49,7 @@ export async function rescan(initial: boolean = false) {
     }
   }
 
-  const event = widgetsArray.map(([id, { settings }]) => ({
-    id,
-    settings,
-    code: null,
-  }));
+  const event = widgetsArray.map(([id, { settings }]) => ({ id, settings }));
   if (initial) {
     await commands.emitOnRenderReady({ event });
   } else {
@@ -92,7 +89,9 @@ export function updateWidgetSettings(
   });
 
   if (emit) {
-    events.updateSettings.toCanvas({ id, settings }).catch(console.error);
+    UpdateSettingsEventAPI.emitTo("canvas", { id, ...settings }).catch(
+      console.error,
+    );
   }
 }
 

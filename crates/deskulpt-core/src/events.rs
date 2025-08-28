@@ -63,8 +63,10 @@ struct RenderWidgetsEventInner {
     /// The ID of the widget being re-rendered.
     id: String,
     /// If provided, update the settings of the widget.
+    #[ts(optional)]
     settings: Option<WidgetSettings>,
     /// If provided, update the code of the widget.
+    #[ts(optional)]
     code: Option<String>,
 }
 
@@ -92,6 +94,9 @@ pub struct RemoveWidgetsEvent(
 );
 
 /// Event for switching the app theme.
+///
+/// This event is emitted from the manager window to the canvas window when the
+/// theme is switched from the manager side.
 #[derive(Serialize, ts_rs::TS, DeskulptEvent)]
 #[ts(export, export_to = "types.ts")]
 pub struct SwitchThemeEvent(
@@ -99,10 +104,31 @@ pub struct SwitchThemeEvent(
     Theme,
 );
 
+/// Event for updating settings of a widget.
+///
+/// This event is emitted between the manager window and the canvas window to
+/// each other when widget settings are updated on one side.
+#[derive(Serialize, ts_rs::TS, DeskulptEvent)]
+#[ts(export, export_to = "types.ts")]
+pub struct UpdateSettingsEvent {
+    /// The ID of the widget being updated.
+    id: String,
+    /// [`WidgetSettings::x`](crate::settings::WidgetSettings::x)
+    #[ts(optional)]
+    x: Option<i32>,
+    /// [`WidgetSettings::y`](crate::settings::WidgetSettings::y)
+    #[ts(optional)]
+    y: Option<i32>,
+    /// [`WidgetSettings::opacity`](crate::settings::WidgetSettings::opacity)
+    #[ts(optional)]
+    opacity: Option<i32>,
+}
+
 register_deskulpt_events![
     ShowToastEvent,
     ExitAppEvent,
     RenderWidgetsEvent,
     RemoveWidgetsEvent,
     SwitchThemeEvent,
+    UpdateSettingsEvent,
 ];

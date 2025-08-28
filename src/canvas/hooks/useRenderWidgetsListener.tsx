@@ -39,7 +39,7 @@ export function useRenderWidgetsListener() {
           apisBlobUrl = URL.createObjectURL(apisBlob);
         }
 
-        if (code === null) {
+        if (code === undefined) {
           // If code is not provided, we need to bundle the widget
           try {
             code = await commands.bundleWidget({

@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { WidgetSettings } from "../../bindings/types";
 import { FC, createElement } from "react";
-import { events } from "../../core";
+import { UpdateSettingsEventAPI } from "../../bindings/events";
 import ErrorDisplay from "../components/ErrorDisplay";
 
 interface WidgetProps {
@@ -31,7 +31,7 @@ export function updateWidgetRender(
   widget: Widget,
   moduleBlobUrl: string,
   apisBlobUrl: string,
-  settings: WidgetSettings | null,
+  settings?: WidgetSettings,
 ) {
   useWidgetsStore.setState((state) => {
     // Settings are ignored if the widget is already in the store
@@ -53,7 +53,7 @@ export function updateWidgetRender(
     }
 
     // Settings are required if the widget is newly added
-    if (settings !== null) {
+    if (settings !== undefined) {
       return {
         widgets: {
           ...state.widgets,
@@ -71,7 +71,7 @@ export function updateWidgetRenderError(
   error: string,
   message: string,
   apisBlobUrl: string,
-  settings: WidgetSettings | null,
+  settings?: WidgetSettings,
 ) {
   useWidgetsStore.setState((state) => {
     // Settings are ignored if the widget is already in the store
@@ -92,7 +92,7 @@ export function updateWidgetRenderError(
     }
 
     // Settings are required if the widget is newly added
-    if (settings !== null) {
+    if (settings !== undefined) {
       return {
         widgets: {
           ...state.widgets,
@@ -131,7 +131,9 @@ export function updateWidgetSettings(
   });
 
   if (emit) {
-    events.updateSettings.toManager({ id, settings }).catch(console.error);
+    UpdateSettingsEventAPI.emitTo("manager", { id, ...settings }).catch(
+      console.error,
+    );
   }
 }
 

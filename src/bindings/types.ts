@@ -54,11 +54,11 @@ id: string,
 /**
  * If provided, update the settings of the widget.
  */
-settings: WidgetSettings | null, 
+settings?: WidgetSettings, 
 /**
  * If provided, update the code of the widget.
  */
-code: string | null, };
+code?: string, };
 
 /**
  * Full settings of the application.
@@ -99,6 +99,9 @@ export type ShowToastEvent = { "type": "SUCCESS", "content": string } | { "type"
 
 /**
  * Event for switching the app theme.
+ *
+ * This event is emitted from the manager window to the canvas window when the
+ * theme is switched from the manager side.
  */
 export type SwitchThemeEvent = Theme;
 
@@ -106,6 +109,30 @@ export type SwitchThemeEvent = Theme;
  * Light/dark theme of the application.
  */
 export type Theme = "light" | "dark";
+
+/**
+ * Event for updating settings of a widget.
+ *
+ * This event is emitted between the manager window and the canvas window to
+ * each other when widget settings are updated on one side.
+ */
+export type UpdateSettingsEvent = { 
+/**
+ * The ID of the widget being updated.
+ */
+id: string, 
+/**
+ * [`WidgetSettings::x`](crate::settings::WidgetSettings::x)
+ */
+x?: number, 
+/**
+ * [`WidgetSettings::y`](crate::settings::WidgetSettings::y)
+ */
+y?: number, 
+/**
+ * [`WidgetSettings::opacity`](crate::settings::WidgetSettings::opacity)
+ */
+opacity?: number, };
 
 /**
  * Full configuration of a Deskulpt widget.

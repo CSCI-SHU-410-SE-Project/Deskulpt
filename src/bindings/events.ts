@@ -17,3 +17,6 @@ export const RemoveWidgetsEventAPI = __makeEventAPI__<RemoveWidgetsEvent>("remov
 import { SwitchThemeEvent } from "./types";
 export const SwitchThemeEventAPI = __makeEventAPI__<SwitchThemeEvent>("switch-theme");
 
+import { UpdateSettingsEvent } from "./types";
+export const UpdateSettingsEventAPI = __makeEventAPI__<UpdateSettingsEvent>("update-settings");
+

@@ -12,12 +12,12 @@ interface GlobalActionsProps {
 
 const GlobalActions = memo(({ length }: GlobalActionsProps) => {
   const refreshAction = useCallback(() => {
-    const payload = Object.entries(useWidgetsStore.getState().widgets).map(
-      ([id, { settings }]) => ({ id, settings, code: null }),
+    const event = Object.entries(useWidgetsStore.getState().widgets).map(
+      ([id, { settings }]) => ({ id, settings }),
     );
-    RenderWidgetsEventAPI.emitTo("canvas", payload)
+    RenderWidgetsEventAPI.emitTo("canvas", event)
       .then(() => {
-        toast.success(`Refreshed ${payload.length} widgets.`);
+        toast.success(`Refreshed ${event.length} widgets.`);
       })
       .catch(console.error);
   }, []);
