@@ -40,7 +40,7 @@ jobs:
       - name: Check linting
         run: pnpm lint:check
 
-      - name: Regenerate auto-generate files
+      - name: Regenerate auto-generated files
         if: ${{ matrix.platform == 'ubuntu-latest' }}
         run: |
           pnpm build:packages

@@ -28,7 +28,7 @@
     "docs:preview": "pnpm -C docs preview",
     "docs:rs": "cargo doc --workspace --no-deps",
     "build:packages": "pnpm run --filter \"@deskulpt-test/*\" build",
-    "build:bindings": "cargo test -q -p deskulpt-core export_bindings"
+    "build:bindings": "cargo test -p deskulpt-core export_bindings"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^2.8.2",
