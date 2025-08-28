@@ -17,7 +17,10 @@ canvasImode: CanvasImode,
  */
 shortcuts: Shortcuts, };
 
-export type AppSettingsUpdate = { "field": "THEME", value: Theme, } | { "field": "CANVAS_IMODE", value: CanvasImode, } | { "field": "SHORTCUTS", value: ShortcutsUpdate, };
+/**
+ * An update to [`AppSettings`].
+ */
+export type AppSettingsUpdate = { "field": "THEME", "value": Theme } | { "field": "CANVAS_IMODE", "value": CanvasImode } | { "field": "SHORTCUTS", "value": ShortcutsUpdate };
 
 /**
  * Canvas interaction mode.
@@ -84,7 +87,14 @@ app: AppSettings,
  */
 widgets: { [key in string]?: WidgetSettings }, };
 
-export type SettingsUpdate = { "field": "APP", value: AppSettingsUpdate, } | { "field": "WIDGET", key: string, value: WidgetSettingsUpdate, };
+/**
+ * An update to [`Settings`].
+ */
+export type SettingsUpdate = { "field": "APP", "value": AppSettingsUpdate } | { "field": "WIDGET", "value": { 
+/**
+ * The ID of the widget to update.
+ */
+key: string, value: WidgetSettingsUpdate, } };
 
 /**
  * Keyboard shortcuts registered in the application.
@@ -102,7 +112,10 @@ toggleCanvasImode: string | null,
  */
 openManager: string | null, };
 
-export type ShortcutsUpdate = { "field": "TOGGLE_CANVAS_IMODE", value: string | null, } | { "field": "OPEN_MANAGER", value: string | null, };
+/**
+ * An update to [`Shortcuts`].
+ */
+export type ShortcutsUpdate = { "field": "TOGGLE_CANVAS_IMODE", "value": string | null } | { "field": "OPEN_MANAGER", "value": string | null };
 
 /**
  * Event for showing a toast notification.
@@ -198,4 +211,7 @@ y: number,
  */
 opacity: number, };
 
-export type WidgetSettingsUpdate = { "field": "X", value: number, } | { "field": "Y", value: number, } | { "field": "OPACITY", value: number, };
+/**
+ * An update to [`WidgetSettings`].
+ */
+export type WidgetSettingsUpdate = { "field": "X", "value": number } | { "field": "Y", "value": number } | { "field": "OPACITY", "value": number };

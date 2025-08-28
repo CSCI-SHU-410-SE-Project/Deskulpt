@@ -74,7 +74,7 @@ pub struct Shortcuts {
 
 /// An update to [`Shortcuts`].
 #[derive(Clone, Deserialize, ts_rs::TS)]
-#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+#[serde(tag = "field", content = "value", rename_all = "SCREAMING_SNAKE_CASE")]
 #[ts(export_to = "types.ts")]
 pub enum ShortcutsUpdate {
     /// An update to [`Shortcuts::toggle_canvas_imode`].
@@ -115,7 +115,7 @@ pub struct AppSettings {
 
 /// An update to [`AppSettings`].
 #[derive(Clone, Deserialize, ts_rs::TS)]
-#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+#[serde(tag = "field", content = "value", rename_all = "SCREAMING_SNAKE_CASE")]
 #[ts(export_to = "types.ts")]
 pub enum AppSettingsUpdate {
     /// An update to [`AppSettings::theme`].
@@ -168,7 +168,7 @@ fn default_opacity() -> i32 {
 
 /// An update to [`WidgetSettings`].
 #[derive(Clone, Deserialize, ts_rs::TS)]
-#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+#[serde(tag = "field", content = "value", rename_all = "SCREAMING_SNAKE_CASE")]
 #[ts(export_to = "types.ts")]
 pub enum WidgetSettingsUpdate {
     /// An update to [`WidgetSettings::x`].
@@ -214,17 +214,17 @@ pub struct Settings {
 
 /// An update to [`Settings`].
 #[derive(Clone, Deserialize, ts_rs::TS)]
-#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+#[serde(tag = "field", content = "value", rename_all = "SCREAMING_SNAKE_CASE")]
 #[ts(export, export_to = "types.ts")]
 pub enum SettingsUpdate {
     /// An update to [`Settings::app`].
     App(AppSettingsUpdate),
     /// An update to [`Settings::widgets`].
-    Widget(
+    Widget {
         /// The ID of the widget to update.
-        String,
-        WidgetSettingsUpdate,
-    ),
+        key: String,
+        value: WidgetSettingsUpdate,
+    },
 }
 
 impl ApplyUpdate<SettingsUpdate> for Settings {
@@ -233,7 +233,7 @@ impl ApplyUpdate<SettingsUpdate> for Settings {
             SettingsUpdate::App(value) => {
                 self.app.apply_update(value)?;
             },
-            SettingsUpdate::Widget(key, value) => {
+            SettingsUpdate::Widget { key, value } => {
                 self.widgets.entry(key).or_default().apply_update(value)?;
             },
         }
