@@ -3,7 +3,7 @@ use tauri::{command, AppHandle};
 use tokio::sync::Mutex;
 
 use super::error::{cmdbail, CmdResult};
-use crate::WidgetConfigMapStatesExt;
+use crate::StatesExtWidgetConfigMap;
 
 // TODO: Remove this temporary implementation
 static FS_PLUGIN: Lazy<Mutex<deskulpt_plugin_fs::FsPlugin>> =

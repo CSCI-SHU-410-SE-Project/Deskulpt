@@ -21,7 +21,7 @@ use crate::window::DeskulptWindow;
 struct InitialRenderState(Mutex<(bool, Option<RenderWidgetsEvent>)>);
 
 /// Extension trait for operations related to the initial render.
-pub trait InitialRenderStatesExt<R: Runtime>: Manager<R> + Emitter<R> {
+pub trait StatesExtInitialRender<R: Runtime>: Manager<R> + Emitter<R> {
     /// Initialize state management for the initial render.
     fn manage_initial_render(&self) {
         self.manage(InitialRenderState::default());
@@ -59,5 +59,5 @@ pub trait InitialRenderStatesExt<R: Runtime>: Manager<R> + Emitter<R> {
     }
 }
 
-impl<R: Runtime> InitialRenderStatesExt<R> for App<R> {}
-impl<R: Runtime> InitialRenderStatesExt<R> for AppHandle<R> {}
+impl<R: Runtime> StatesExtInitialRender<R> for App<R> {}
+impl<R: Runtime> StatesExtInitialRender<R> for AppHandle<R> {}

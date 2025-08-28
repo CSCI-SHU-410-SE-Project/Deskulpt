@@ -1,9 +1,9 @@
 use tauri::{command, AppHandle, Runtime};
 
 use super::error::CmdResult;
-use crate::states::InitialRenderStatesExt;
+use crate::states::StatesExtInitialRender;
 
-/// Wrapper of [`set_render_ready`](InitialRenderStatesExt::set_render_ready).
+/// Wrapper of [`set_render_ready`](StatesExtInitialRender::set_render_ready).
 ///
 /// ### Errors
 ///

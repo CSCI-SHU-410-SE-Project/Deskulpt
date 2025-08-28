@@ -62,7 +62,7 @@ impl<R: Runtime> CanvasImodeStateInner<R> {
 struct CanvasImodeState<R: Runtime>(Mutex<CanvasImodeStateInner<R>>);
 
 /// Extension trait for operations on canvas interaction mode.
-pub trait CanvasImodeStatesExt<R: Runtime>: Manager<R> + Emitter<R> {
+pub trait StatesExtCanvasImode<R: Runtime>: Manager<R> + Emitter<R> {
     /// Initialize state management for canvas interaction mode.
     ///
     /// The canvas is in sink mode by default.
@@ -117,5 +117,5 @@ pub trait CanvasImodeStatesExt<R: Runtime>: Manager<R> + Emitter<R> {
     }
 }
 
-impl<R: Runtime> CanvasImodeStatesExt<R> for App<R> {}
-impl<R: Runtime> CanvasImodeStatesExt<R> for AppHandle<R> {}
+impl<R: Runtime> StatesExtCanvasImode<R> for App<R> {}
+impl<R: Runtime> StatesExtCanvasImode<R> for AppHandle<R> {}

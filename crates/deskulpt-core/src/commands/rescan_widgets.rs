@@ -6,7 +6,7 @@ use tauri::{command, AppHandle, Runtime};
 use super::error::CmdResult;
 use crate::config::WidgetConfig;
 use crate::path::PathExt;
-use crate::states::WidgetConfigMapStatesExt;
+use crate::states::StatesExtWidgetConfigMap;
 
 /// Rescan the widgets directory and update the widget configuration map.
 ///

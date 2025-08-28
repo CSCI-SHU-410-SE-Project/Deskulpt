@@ -2,10 +2,10 @@ use tauri::{command, AppHandle, Runtime};
 
 use super::error::CmdResult;
 use crate::events::RenderWidgetsEvent;
-use crate::states::InitialRenderStatesExt;
+use crate::states::StatesExtInitialRender;
 
 /// Wrapper of
-/// [`emit_on_render_ready`](InitialRenderStatesExt::emit_on_render_ready).
+/// [`emit_on_render_ready`](StatesExtInitialRender::emit_on_render_ready).
 ///
 /// ### Errors
 ///
