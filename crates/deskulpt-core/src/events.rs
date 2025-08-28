@@ -63,9 +63,11 @@ struct RenderWidgetsEventInner {
     /// The ID of the widget being re-rendered.
     id: String,
     /// If provided, update the settings of the widget.
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[ts(optional)]
     settings: Option<WidgetSettings>,
     /// If provided, update the code of the widget.
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[ts(optional)]
     code: Option<String>,
 }
@@ -114,12 +116,15 @@ pub struct UpdateSettingsEvent {
     /// The ID of the widget being updated.
     id: String,
     /// [`WidgetSettings::x`](crate::settings::WidgetSettings::x)
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[ts(optional)]
     x: Option<i32>,
     /// [`WidgetSettings::y`](crate::settings::WidgetSettings::y)
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[ts(optional)]
     y: Option<i32>,
     /// [`WidgetSettings::opacity`](crate::settings::WidgetSettings::opacity)
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[ts(optional)]
     opacity: Option<i32>,
 }
