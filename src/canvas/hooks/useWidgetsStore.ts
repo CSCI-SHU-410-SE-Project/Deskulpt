@@ -1,7 +1,7 @@
 import { create } from "zustand";
-import { WidgetSettings } from "../../types";
+import { WidgetSettings } from "../../bindings/types";
 import { FC, createElement } from "react";
-import { events } from "../../core";
+import { UpdateSettingsEventAPI } from "../../bindings/events";
 import ErrorDisplay from "../components/ErrorDisplay";
 
 interface WidgetProps {
@@ -62,7 +62,7 @@ export function updateWidgetRender(
       };
     }
 
-    return {};
+    return state;
   });
 }
 
@@ -101,12 +101,15 @@ export function updateWidgetRenderError(
             Component: () =>
               createElement(ErrorDisplay, { id, error, message }),
             apisBlobUrl,
+            width: undefined,
+            height: undefined,
+            moduleBlobUrl: undefined,
           },
         },
       };
     }
 
-    return {};
+    return state;
   });
 }
 
@@ -124,11 +127,13 @@ export function updateWidgetSettings(
         },
       };
     }
-    return {};
+    return state;
   });
 
   if (emit) {
-    events.updateSettings.toManager({ id, settings }).catch(console.error);
+    UpdateSettingsEventAPI.emitTo("manager", { id, ...settings }).catch(
+      console.error,
+    );
   }
 }
 

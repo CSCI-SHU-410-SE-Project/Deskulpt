@@ -1,5 +1,5 @@
 import { Box, IconButton } from "@radix-ui/themes";
-import { Theme } from "../../types";
+import { Theme } from "../../bindings/types";
 import { MdOutlineDarkMode, MdOutlineLightMode } from "react-icons/md";
 import { toggleTheme } from "../hooks";
 

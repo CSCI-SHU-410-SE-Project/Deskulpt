@@ -1,13 +1,56 @@
 //! Deskulpt windows.
 mod script;
 
-use anyhow::{anyhow, Result};
+use anyhow::Result;
 use script::{CanvasInitJS, ManagerInitJS};
 use tauri::{
-    App, AppHandle, Manager, Runtime, WebviewUrl, WebviewWindowBuilder, Window, WindowEvent,
+    App, AppHandle, Manager, Runtime, WebviewUrl, WebviewWindow, WebviewWindowBuilder, Window,
+    WindowEvent,
 };
 
 use crate::settings::Settings;
+
+/// Deskulpt window enum.
+#[derive(ts_rs::TS)]
+#[ts(rename_all = "lowercase", export, export_to = "types.ts")]
+pub enum DeskulptWindow {
+    /// The manager window.
+    Manager,
+    /// The canvas window.
+    Canvas,
+}
+
+impl DeskulptWindow {
+    /// Get the label of the window.
+    pub fn label(&self) -> &str {
+        match self {
+            DeskulptWindow::Manager => "manager",
+            DeskulptWindow::Canvas => "canvas",
+        }
+    }
+
+    /// Get the URL of the window.
+    pub fn url(&self) -> WebviewUrl {
+        match self {
+            DeskulptWindow::Manager => WebviewUrl::App("manager/index.html".into()),
+            DeskulptWindow::Canvas => WebviewUrl::App("canvas/index.html".into()),
+        }
+    }
+
+    /// Retrieve the webview window instance.
+    ///
+    /// This method panics if the window is not found, but this should not
+    /// happen.
+    pub fn webview_window<R, M>(&self, manager: &M) -> WebviewWindow<R>
+    where
+        R: Runtime,
+        M: Manager<R> + ?Sized,
+    {
+        manager
+            .get_webview_window(self.label())
+            .unwrap_or_else(|| unreachable!("Window not found: {}", self.label()))
+    }
+}
 
 /// Extention trait for window-related operations.
 pub trait WindowExt<R: Runtime>: Manager<R> {
@@ -16,18 +59,21 @@ pub trait WindowExt<R: Runtime>: Manager<R> {
     where
         Self: Sized,
     {
-        let url = WebviewUrl::App("manager/index.html".into());
         let init_js = ManagerInitJS::generate(settings)?;
-        WebviewWindowBuilder::new(self, "manager", url)
-            .title("Deskulpt Manager")
-            .inner_size(800.0, 500.0)
-            .center()
-            .resizable(false)
-            .maximizable(false)
-            .minimizable(false)
-            .visible(false)
-            .initialization_script(&init_js)
-            .build()?;
+        WebviewWindowBuilder::new(
+            self,
+            DeskulptWindow::Manager.label(),
+            DeskulptWindow::Manager.url(),
+        )
+        .title("Deskulpt Manager")
+        .inner_size(800.0, 500.0)
+        .center()
+        .resizable(false)
+        .maximizable(false)
+        .minimizable(false)
+        .visible(false)
+        .initialization_script(&init_js)
+        .build()?;
 
         Ok(())
     }
@@ -37,20 +83,23 @@ pub trait WindowExt<R: Runtime>: Manager<R> {
     where
         Self: Sized,
     {
-        let url = WebviewUrl::App("canvas/index.html".into());
         let init_js = CanvasInitJS::generate(settings)?;
-        let canvas = WebviewWindowBuilder::new(self, "canvas", url)
-            .maximized(true)
-            .transparent(true)
-            .decorations(false)
-            .always_on_bottom(true)
-            // TODO: Remove when the following issue is fixed:
-            // https://github.com/tauri-apps/tauri/issues/9597
-            .visible(false)
-            // Unsupported on macOS; see below for activation policy
-            .skip_taskbar(true)
-            .initialization_script(&init_js)
-            .build()?;
+        let canvas = WebviewWindowBuilder::new(
+            self,
+            DeskulptWindow::Canvas.label(),
+            DeskulptWindow::Canvas.url(),
+        )
+        .maximized(true)
+        .transparent(true)
+        .decorations(false)
+        .always_on_bottom(true)
+        // TODO: Remove when the following issue is fixed:
+        // https://github.com/tauri-apps/tauri/issues/9597
+        .visible(false)
+        // Unsupported on macOS; see below for activation policy
+        .skip_taskbar(true)
+        .initialization_script(&init_js)
+        .build()?;
 
         #[cfg(target_os = "macos")]
         {
@@ -78,9 +127,7 @@ pub trait WindowExt<R: Runtime>: Manager<R> {
 
     /// Open the manager window.
     fn open_manager(&self) -> Result<()> {
-        let manager = self
-            .get_webview_window("manager")
-            .ok_or(anyhow!("Manager window not found"))?;
+        let manager = DeskulptWindow::Manager.webview_window(self);
         manager.show()?;
         manager.set_focus()?;
         Ok(())

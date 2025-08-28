@@ -1,6 +1,7 @@
 use tauri::{command, AppHandle, Runtime};
 
 use super::error::CmdResult;
+use crate::events::RenderWidgetsEvent;
 use crate::states::StatesExtInitialRender;
 
 /// Wrapper of
@@ -12,7 +13,7 @@ use crate::states::StatesExtInitialRender;
 #[command]
 pub async fn emit_on_render_ready<R: Runtime>(
     app_handle: AppHandle<R>,
-    payload: serde_json::Value,
+    event: RenderWidgetsEvent,
 ) -> CmdResult<()> {
-    Ok(app_handle.emit_on_render_ready(payload)?)
+    Ok(app_handle.emit_on_render_ready(event)?)
 }

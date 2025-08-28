@@ -1,11 +1,12 @@
 import { useEffect, useRef } from "react";
-import { commands, events } from "../../core";
+import { commands } from "../../core";
 import {
   updateWidgetRender,
   updateWidgetRenderError,
   useWidgetsStore,
 } from "./useWidgetsStore";
 import { stringifyError } from "../../utils/stringifyError";
+import { RenderWidgetsEventAPI } from "../../bindings/events";
 
 const BASE_URL = new URL(import.meta.url).origin;
 const RAW_APIS_URL = new URL("/gen/raw-apis.js", BASE_URL).href;
@@ -14,7 +15,7 @@ export function useRenderWidgetsListener() {
   const hasInited = useRef(false);
 
   useEffect(() => {
-    const unlisten = events.renderWidgets.on(async (event) => {
+    const unlisten = RenderWidgetsEventAPI.listen(async (event) => {
       const widgets = useWidgetsStore.getState().widgets;
 
       const promises = event.payload.map(async ({ id, settings, code }) => {

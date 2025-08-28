@@ -14,7 +14,8 @@ static SETTINGS_FILE: &str = "settings.json";
 /// Light/dark theme of the application.
 #[derive(Default, Deserialize, Serialize, ts_rs::TS)]
 #[serde(rename_all = "lowercase")]
-enum Theme {
+#[ts(export_to = "types.ts")]
+pub enum Theme {
     #[default]
     Light,
     Dark,
@@ -26,6 +27,7 @@ enum Theme {
 /// a string parsable into [`Shortcut`](tauri_plugin_global_shortcut::Shortcut).
 #[derive(Default, Deserialize, Serialize, ts_rs::TS)]
 #[serde(rename_all = "camelCase")]
+#[ts(export_to = "types.ts")]
 pub struct Shortcuts {
     /// For toggling canvas interaction mode.
     #[serde(default)]
@@ -38,6 +40,7 @@ pub struct Shortcuts {
 /// Application-wide settings.
 #[derive(Default, Deserialize, Serialize, ts_rs::TS)]
 #[serde(rename_all = "camelCase")]
+#[ts(export_to = "types.ts")]
 struct AppSettings {
     /// The application theme.
     #[serde(default)]
@@ -53,7 +56,8 @@ struct AppSettings {
 /// configuration files and are managed internally by the application.
 #[derive(Deserialize, Serialize, ts_rs::TS)]
 #[serde(rename_all = "camelCase")]
-struct WidgetSettings {
+#[ts(export_to = "types.ts")]
+pub struct WidgetSettings {
     /// The leftmost x-coordinate in pixels.
     #[serde(default)]
     x: i32,
@@ -72,7 +76,7 @@ fn default_opacity() -> i32 {
 /// Full settings of the application.
 #[derive(Default, Deserialize, Serialize, ts_rs::TS)]
 #[serde(rename_all = "camelCase")]
-#[ts(export)]
+#[ts(export, export_to = "types.ts")]
 pub struct Settings {
     /// Application-wide settings.
     #[serde(default)]
