@@ -4,9 +4,10 @@ use std::sync::Mutex;
 
 use anyhow::Result;
 use tauri::menu::MenuItem;
-use tauri::{App, AppHandle, Manager, Runtime, WebviewWindow};
+use tauri::{App, AppHandle, Emitter, Manager, Runtime, WebviewWindow};
 
-use crate::events::{EventsExt, ShowToastPayload};
+use crate::events::{DeskulptEvent, ShowToastEvent};
+use crate::window::DeskulptWindow;
 
 /// Canvas interaction mode.
 #[derive(Clone)]
@@ -61,7 +62,7 @@ impl<R: Runtime> CanvasImodeStateInner<R> {
 struct CanvasImodeState<R: Runtime>(Mutex<CanvasImodeStateInner<R>>);
 
 /// Extension trait for operations on canvas interaction mode.
-pub trait StatesExtCanvasImode<R: Runtime>: Manager<R> + EventsExt<R> {
+pub trait CanvasImodeStatesExt<R: Runtime>: Manager<R> + Emitter<R> {
     /// Initialize state management for canvas interaction mode.
     ///
     /// The canvas is in sink mode by default.
@@ -87,9 +88,7 @@ pub trait StatesExtCanvasImode<R: Runtime>: Manager<R> + EventsExt<R> {
     /// This will show a toast message on the canvas window indicating the new
     /// interaction mode.
     fn toggle_canvas_imode(&self) -> Result<()> {
-        let canvas = self
-            .get_webview_window("canvas")
-            .expect("Canvas window not found");
+        let canvas = DeskulptWindow::Canvas.webview_window(self);
 
         let state = self.state::<CanvasImodeState<R>>();
         let mut state = state.0.lock().unwrap();
@@ -109,7 +108,7 @@ pub trait StatesExtCanvasImode<R: Runtime>: Manager<R> + EventsExt<R> {
         };
 
         if let Err(e) =
-            self.emit_show_toast_to_canvas(ShowToastPayload::Success(toast_message.to_string()))
+            ShowToastEvent::Success(toast_message.to_string()).emit_to(self, DeskulptWindow::Canvas)
         {
             eprintln!("Failed to emit show-toast to canvas: {}", e);
         }
@@ -118,5 +117,5 @@ pub trait StatesExtCanvasImode<R: Runtime>: Manager<R> + EventsExt<R> {
     }
 }
 
-impl<R: Runtime> StatesExtCanvasImode<R> for App<R> {}
-impl<R: Runtime> StatesExtCanvasImode<R> for AppHandle<R> {}
+impl<R: Runtime> CanvasImodeStatesExt<R> for App<R> {}
+impl<R: Runtime> CanvasImodeStatesExt<R> for AppHandle<R> {}

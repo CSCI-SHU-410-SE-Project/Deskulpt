@@ -1,13 +1,5 @@
 import { EventCallback, emitTo, listen } from "@tauri-apps/api/event";
-import { Theme, WidgetSettings } from "../types";
-
-// -----------------------------------------------------------------------------
-// Backend => "exit-app" => Manager
-// -----------------------------------------------------------------------------
-
-export const exitApp = {
-  on: (handler: EventCallback<void>) => listen("exit-app", handler),
-};
+import { Theme, WidgetSettings } from "../bindings/types";
 
 // -----------------------------------------------------------------------------
 // Manager => "remove-widgets" => Canvas
@@ -22,40 +14,6 @@ export const removeWidgets = {
     listen("remove-widgets", handler),
   toCanvas: (payload: RemoveWidgetsPayload) =>
     emitTo("canvas", "remove-widgets", payload),
-};
-
-// -----------------------------------------------------------------------------
-// Manager => "render-widgets" => Canvas
-// -----------------------------------------------------------------------------
-
-export type RenderWidgetsPayload = {
-  id: string;
-  settings?: any;
-  code?: string;
-}[];
-
-export const renderWidgets = {
-  on: (handler: EventCallback<RenderWidgetsPayload>) =>
-    listen("render-widgets", handler),
-  toCanvas: (payload: RenderWidgetsPayload) =>
-    emitTo("canvas", "render-widgets", payload),
-};
-
-// -----------------------------------------------------------------------------
-// Backend => "show-toast" => Manager
-// -----------------------------------------------------------------------------
-
-export enum ShowToastPayloadType {
-  SUCCESS = "SUCCESS",
-  ERROR = "ERROR",
-}
-
-type Payload =
-  | { type: ShowToastPayloadType.SUCCESS; content: string }
-  | { type: ShowToastPayloadType.ERROR; content: string };
-
-export const showToast = {
-  on: (handler: EventCallback<Payload>) => listen("show-toast", handler),
 };
 
 // -----------------------------------------------------------------------------

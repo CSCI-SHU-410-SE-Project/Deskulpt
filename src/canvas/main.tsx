@@ -1,6 +1,7 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { DeepReadonly, Settings } from "../types";
+import { DeepReadonly } from "../types";
+import { Settings } from "../bindings/types";
 import { enforceOpenNewTab } from "../utils/enforceOpenNewTab";
 import App from "./App";
 import "@radix-ui/themes/styles.css";

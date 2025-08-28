@@ -1,0 +1,13 @@
+/*! Auto-generated bindings for Deskulpt events. DO NOT EDIT! */
+
+import { __makeEventAPI__ } from "../bindingsHelper";
+
+import { ShowToastEvent } from "./types";
+export const ShowToastEventAPI = __makeEventAPI__<ShowToastEvent>("show-toast");
+
+import { ExitAppEvent } from "./types";
+export const ExitAppEventAPI = __makeEventAPI__<ExitAppEvent>("exit-app");
+
+import { RenderWidgetsEvent } from "./types";
+export const RenderWidgetsEventAPI = __makeEventAPI__<RenderWidgetsEvent>("render-widgets");
+

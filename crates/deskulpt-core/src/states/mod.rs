@@ -5,8 +5,8 @@ mod initial_render;
 mod widget_config_map;
 
 #[doc(hidden)]
-pub use canvas_imode::StatesExtCanvasImode;
+pub use canvas_imode::CanvasImodeStatesExt;
 #[doc(hidden)]
-pub use initial_render::StatesExtInitialRender;
+pub use initial_render::InitialRenderStatesExt;
 #[doc(hidden)]
-pub use widget_config_map::StatesExtWidgetConfigMap;
+pub use widget_config_map::WidgetConfigMapStatesExt;

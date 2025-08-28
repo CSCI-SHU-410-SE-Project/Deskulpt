@@ -7,7 +7,7 @@
 mod bundler;
 pub mod commands;
 mod config;
-mod events;
+pub mod events;
 mod path;
 mod settings;
 mod shortcuts;
@@ -15,10 +15,9 @@ mod states;
 mod tray;
 mod window;
 
-pub use events::EventsExt;
 pub use path::PathExt;
 pub use settings::Settings;
 pub use shortcuts::ShortcutsExt;
-pub use states::{StatesExtCanvasImode, StatesExtInitialRender, StatesExtWidgetConfigMap};
+pub use states::{CanvasImodeStatesExt, InitialRenderStatesExt, WidgetConfigMapStatesExt};
 pub use tray::TrayExt;
 pub use window::{on_window_event, WindowExt};

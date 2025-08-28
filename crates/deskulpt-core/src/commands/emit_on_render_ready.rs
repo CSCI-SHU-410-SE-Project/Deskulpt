@@ -1,10 +1,11 @@
 use tauri::{command, AppHandle, Runtime};
 
 use super::error::CmdResult;
-use crate::states::StatesExtInitialRender;
+use crate::events::RenderWidgetsEvent;
+use crate::states::InitialRenderStatesExt;
 
 /// Wrapper of
-/// [`emit_on_render_ready`](StatesExtInitialRender::emit_on_render_ready).
+/// [`emit_on_render_ready`](InitialRenderStatesExt::emit_on_render_ready).
 ///
 /// ### Errors
 ///
@@ -12,7 +13,7 @@ use crate::states::StatesExtInitialRender;
 #[command]
 pub async fn emit_on_render_ready<R: Runtime>(
     app_handle: AppHandle<R>,
-    payload: serde_json::Value,
+    event: RenderWidgetsEvent,
 ) -> CmdResult<()> {
-    Ok(app_handle.emit_on_render_ready(payload)?)
+    Ok(app_handle.emit_on_render_ready(event)?)
 }

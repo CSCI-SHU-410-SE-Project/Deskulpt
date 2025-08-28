@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { Shortcuts } from "../../types";
+import { Shortcuts } from "../../bindings/types";
 import { commands, events } from "../../core";
 
 export const useAppSettingsStore = create(() => ({

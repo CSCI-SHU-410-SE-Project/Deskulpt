@@ -1,6 +1,7 @@
 import { create } from "zustand";
-import { WidgetConfig, WidgetSettings } from "../../types";
+import { WidgetConfig, WidgetSettings } from "../../bindings/types";
 import { commands, events } from "../../core";
+import { RenderWidgetsEventAPI } from "../../bindings/events";
 
 const DEFAULT_WIDGET_SETTINGS: WidgetSettings = { x: 0, y: 0, opacity: 100 };
 
@@ -44,11 +45,15 @@ export async function rescan(initial: boolean = false) {
     }
   }
 
-  const payload = widgetsArray.map(([id, { settings }]) => ({ id, settings }));
+  const event = widgetsArray.map(([id, { settings }]) => ({
+    id,
+    settings,
+    code: null,
+  }));
   if (initial) {
-    await commands.emitOnRenderReady({ payload });
+    await commands.emitOnRenderReady({ event });
   } else {
-    await events.renderWidgets.toCanvas(payload);
+    await RenderWidgetsEventAPI.emitTo("canvas", event);
   }
 
   // Sort widgets by their directory name

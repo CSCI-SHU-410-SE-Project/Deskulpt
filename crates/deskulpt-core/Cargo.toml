@@ -11,6 +11,7 @@ version    = { workspace = true }
 
 [dependencies]
 anyhow                       = { workspace = true }
+deskulpt-macros              = { workspace = true }
 dunce                        = { workspace = true }
 once_cell                    = { workspace = true }
 open                         = { workspace = true, features = ["shellexecute-on-windows"] }
@@ -27,7 +28,7 @@ tauri-plugin-global-shortcut = { workspace = true }
 tempfile                     = { workspace = true }
 thiserror                    = { workspace = true }
 tokio                        = { workspace = true }
-ts-rs                        = { workspace = true }
+ts-rs                        = { workspace = true, features = ["serde-json-impl"] }
 uuid                         = { workspace = true, features = ["v5"] }
 
 # TODO: Remove these when finalized

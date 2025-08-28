@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { WidgetSettings } from "../../types";
+import { WidgetSettings } from "../../bindings/types";
 import { FC, createElement } from "react";
 import { events } from "../../core";
 import ErrorDisplay from "../components/ErrorDisplay";
@@ -31,7 +31,7 @@ export function updateWidgetRender(
   widget: Widget,
   moduleBlobUrl: string,
   apisBlobUrl: string,
-  settings?: WidgetSettings,
+  settings: WidgetSettings | null,
 ) {
   useWidgetsStore.setState((state) => {
     // Settings are ignored if the widget is already in the store
@@ -53,7 +53,7 @@ export function updateWidgetRender(
     }
 
     // Settings are required if the widget is newly added
-    if (settings !== undefined) {
+    if (settings !== null) {
       return {
         widgets: {
           ...state.widgets,
@@ -62,7 +62,7 @@ export function updateWidgetRender(
       };
     }
 
-    return {};
+    return state;
   });
 }
 
@@ -71,7 +71,7 @@ export function updateWidgetRenderError(
   error: string,
   message: string,
   apisBlobUrl: string,
-  settings?: WidgetSettings,
+  settings: WidgetSettings | null,
 ) {
   useWidgetsStore.setState((state) => {
     // Settings are ignored if the widget is already in the store
@@ -92,7 +92,7 @@ export function updateWidgetRenderError(
     }
 
     // Settings are required if the widget is newly added
-    if (settings !== undefined) {
+    if (settings !== null) {
       return {
         widgets: {
           ...state.widgets,
@@ -101,12 +101,15 @@ export function updateWidgetRenderError(
             Component: () =>
               createElement(ErrorDisplay, { id, error, message }),
             apisBlobUrl,
+            width: undefined,
+            height: undefined,
+            moduleBlobUrl: undefined,
           },
         },
       };
     }
 
-    return {};
+    return state;
   });
 }
 
@@ -124,7 +127,7 @@ export function updateWidgetSettings(
         },
       };
     }
-    return {};
+    return state;
   });
 
   if (emit) {
