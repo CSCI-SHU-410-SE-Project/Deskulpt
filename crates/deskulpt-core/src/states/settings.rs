@@ -47,6 +47,19 @@ pub trait StatesExtSettings<R: Runtime>:
         state.0.write().unwrap()
     }
 
+    /// Update the settings.
+    ///
+    /// This function applies a series of updates to the settings in the order
+    /// they are provided. Even if some updates fail, the remaining updates will
+    /// still be applied and the errors will be accumulated and returned
+    /// altogether.
+    ///
+    /// For some settings, additional actions might be performed. These settings
+    /// will not be updated unless their corresponding actions are successful.
+    /// These include:
+    ///
+    /// - App.CanvasImode: Switch the canvas interaction mode.
+    /// - App.Shortcuts: Re-register the shortcut.
     fn update_settings<I>(&self, updates: I) -> Result<()>
     where
         Self: Sized,
@@ -55,7 +68,7 @@ pub trait StatesExtSettings<R: Runtime>:
         let mut settings = self.get_writable_settings();
         let mut errors = Vec::new();
         for update in updates {
-            if let Err(e) = update_settings_internal(self, &mut settings, update) {
+            if let Err(e) = update_settings_single(self, &mut settings, update) {
                 errors.push(e);
             }
         }
@@ -73,7 +86,10 @@ pub trait StatesExtSettings<R: Runtime>:
     }
 }
 
-fn update_settings_internal<R, S>(
+/// Helper for applying a single settings update.
+///
+/// Used by [`StatesExtSettings::update_settings`].
+fn update_settings_single<R, S>(
     state: &S,
     settings: &mut Settings,
     update: SettingsUpdate,
@@ -84,15 +100,11 @@ where
 {
     match update {
         // Canvas interaction mode
-        SettingsUpdate::App {
-            value: AppSettingsUpdate::CanvasImode { ref value },
-        } => {
-            state.set_canvas_imode(value.clone())?;
+        SettingsUpdate::App(AppSettingsUpdate::CanvasImode(ref value)) => {
+            state.switch_canvas_imode(value.clone())?;
         },
         // Keyboard shortcuts
-        SettingsUpdate::App {
-            value: AppSettingsUpdate::Shortcuts { ref value },
-        } => {
+        SettingsUpdate::App(AppSettingsUpdate::Shortcuts(ref value)) => {
             state.reregister_shortcut(&settings.app.shortcuts, value)?;
         },
         // Other settings does not involve additional state changes

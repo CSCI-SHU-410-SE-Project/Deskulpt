@@ -9,7 +9,7 @@ use crate::states::StatesExtInitialRender;
 ///
 /// ### Errors
 ///
-/// - Failed to emit the `render-widgets` event to the canvas.
+/// - Failed to emit [`RenderWidgetsEvent`] to the canvas.
 #[command]
 pub async fn emit_on_render_ready<R: Runtime>(
     app_handle: AppHandle<R>,

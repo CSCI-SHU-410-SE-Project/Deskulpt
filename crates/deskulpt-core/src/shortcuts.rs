@@ -23,17 +23,14 @@ pub trait ShortcutsExt<R: Runtime>: Manager<R> + GlobalShortcutExt<R> {
     ///
     /// If any shortcut fails to be registered, the initial settings will be
     /// modified to remove that shortcut. This is to prevent the application
-    /// from panicking only due to non-critical failures, and also sync this
-    /// information to the frontend.
+    /// from panicking only due to non-critical failures.
     fn init_shortcuts(&self, shortcuts: &mut Shortcuts) {
         let default_shortcuts = Shortcuts::default();
         paste! {
             $(
                 if let Err(e) = self.reregister_shortcut(
                     &default_shortcuts,
-                    &ShortcutsUpdate::[<$key:upper:camel>] {
-                        value: shortcuts.$key.clone()
-                    },
+                    &ShortcutsUpdate::[<$key:upper:camel>](shortcuts.$key.clone()),
                 ) {
                     eprintln!("{}: {}", stringify!($key), e);
                     shortcuts.$key = None;
@@ -58,7 +55,7 @@ pub trait ShortcutsExt<R: Runtime>: Manager<R> + GlobalShortcutExt<R> {
         paste! {
             match update {
                 $(
-                    ShortcutsUpdate::[<$key:upper:camel>] { value } => {
+                    ShortcutsUpdate::[<$key:upper:camel>](value) => {
                         if (*value == shortcuts.$key) {
                             return Ok(());
                         }

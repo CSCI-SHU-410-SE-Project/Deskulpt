@@ -11,7 +11,9 @@ use serde::{Deserialize, Serialize};
 /// The settings file name in the persistence directory.
 static SETTINGS_FILE: &str = "settings.json";
 
+/// Trait for applying updates.
 pub trait ApplyUpdate<U> {
+    /// Apply an update to self.
     fn apply_update(&mut self, u: U) -> Result<()>;
 }
 
@@ -70,21 +72,24 @@ pub struct Shortcuts {
     pub open_manager: Option<String>,
 }
 
+/// An update to [`Shortcuts`].
 #[derive(Clone, Deserialize, ts_rs::TS)]
-#[serde(tag = "field", rename_all = "SCREAMING_SNAKE_CASE")]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 #[ts(export_to = "types.ts")]
 pub enum ShortcutsUpdate {
-    ToggleCanvasImode { value: Option<String> },
-    OpenManager { value: Option<String> },
+    /// An update to [`Shortcuts::toggle_canvas_imode`].
+    ToggleCanvasImode(Option<String>),
+    /// An update to [`Shortcuts::open_manager`].
+    OpenManager(Option<String>),
 }
 
 impl ApplyUpdate<ShortcutsUpdate> for Shortcuts {
     fn apply_update(&mut self, u: ShortcutsUpdate) -> Result<()> {
         match u {
-            ShortcutsUpdate::ToggleCanvasImode { value } => {
+            ShortcutsUpdate::ToggleCanvasImode(value) => {
                 self.toggle_canvas_imode = value;
             },
-            ShortcutsUpdate::OpenManager { value } => {
+            ShortcutsUpdate::OpenManager(value) => {
                 self.open_manager = value;
             },
         }
@@ -108,25 +113,29 @@ pub struct AppSettings {
     pub shortcuts: Shortcuts,
 }
 
+/// An update to [`AppSettings`].
 #[derive(Clone, Deserialize, ts_rs::TS)]
-#[serde(tag = "field", rename_all = "SCREAMING_SNAKE_CASE")]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 #[ts(export_to = "types.ts")]
 pub enum AppSettingsUpdate {
-    Theme { value: Theme },
-    CanvasImode { value: CanvasImode },
-    Shortcuts { value: ShortcutsUpdate },
+    /// An update to [`AppSettings::theme`].
+    Theme(Theme),
+    /// An update to [`AppSettings::canvas_imode`].
+    CanvasImode(CanvasImode),
+    /// An update to [`AppSettings::shortcuts`].
+    Shortcuts(ShortcutsUpdate),
 }
 
 impl ApplyUpdate<AppSettingsUpdate> for AppSettings {
     fn apply_update(&mut self, u: AppSettingsUpdate) -> Result<()> {
         match u {
-            AppSettingsUpdate::Theme { value } => {
+            AppSettingsUpdate::Theme(value) => {
                 self.theme = value;
             },
-            AppSettingsUpdate::CanvasImode { value } => {
+            AppSettingsUpdate::CanvasImode(value) => {
                 self.canvas_imode = value;
             },
-            AppSettingsUpdate::Shortcuts { value } => {
+            AppSettingsUpdate::Shortcuts(value) => {
                 self.shortcuts.apply_update(value)?;
             },
         }
@@ -157,25 +166,29 @@ fn default_opacity() -> i32 {
     100
 }
 
+/// An update to [`WidgetSettings`].
 #[derive(Clone, Deserialize, ts_rs::TS)]
-#[serde(tag = "field", rename_all = "SCREAMING_SNAKE_CASE")]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 #[ts(export_to = "types.ts")]
 pub enum WidgetSettingsUpdate {
-    X { value: i32 },
-    Y { value: i32 },
-    Opacity { value: i32 },
+    /// An update to [`WidgetSettings::x`].
+    X(i32),
+    /// An update to [`WidgetSettings::y`].
+    Y(i32),
+    /// An update to [`WidgetSettings::opacity`].
+    Opacity(i32),
 }
 
 impl ApplyUpdate<WidgetSettingsUpdate> for WidgetSettings {
     fn apply_update(&mut self, u: WidgetSettingsUpdate) -> Result<()> {
         match u {
-            WidgetSettingsUpdate::X { value } => {
+            WidgetSettingsUpdate::X(value) => {
                 self.x = value;
             },
-            WidgetSettingsUpdate::Y { value } => {
+            WidgetSettingsUpdate::Y(value) => {
                 self.y = value;
             },
-            WidgetSettingsUpdate::Opacity { value } => {
+            WidgetSettingsUpdate::Opacity(value) => {
                 if !(0..=100).contains(&value) {
                     bail!("Opacity must be between 0 and 100; got {value}");
                 }
@@ -199,26 +212,28 @@ pub struct Settings {
     pub widgets: HashMap<String, WidgetSettings>,
 }
 
+/// An update to [`Settings`].
 #[derive(Clone, Deserialize, ts_rs::TS)]
-#[serde(tag = "field", rename_all = "SCREAMING_SNAKE_CASE")]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 #[ts(export, export_to = "types.ts")]
 pub enum SettingsUpdate {
-    App {
-        value: AppSettingsUpdate,
-    },
-    Widget {
-        key: String,
-        value: WidgetSettingsUpdate,
-    },
+    /// An update to [`Settings::app`].
+    App(AppSettingsUpdate),
+    /// An update to [`Settings::widgets`].
+    Widget(
+        /// The ID of the widget to update.
+        String,
+        WidgetSettingsUpdate,
+    ),
 }
 
 impl ApplyUpdate<SettingsUpdate> for Settings {
     fn apply_update(&mut self, u: SettingsUpdate) -> Result<()> {
         match u {
-            SettingsUpdate::App { value } => {
+            SettingsUpdate::App(value) => {
                 self.app.apply_update(value)?;
             },
-            SettingsUpdate::Widget { key, value } => {
+            SettingsUpdate::Widget(key, value) => {
                 self.widgets.entry(key).or_default().apply_update(value)?;
             },
         }
@@ -259,8 +274,6 @@ impl Settings {
 
 impl SettingsUpdate {
     pub fn canvas_imode(value: CanvasImode) -> Self {
-        SettingsUpdate::App {
-            value: AppSettingsUpdate::CanvasImode { value },
-        }
+        SettingsUpdate::App(AppSettingsUpdate::CanvasImode(value))
     }
 }

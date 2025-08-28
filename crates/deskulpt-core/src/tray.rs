@@ -18,25 +18,10 @@ use crate::window::{DeskulptWindow, WindowExt};
 
 /// System tray menu items that may change at runtime.
 pub struct MenuItems<R: Runtime> {
+    /// Check menu item for canvas interaction mode (sink).
     pub canvas_imode_sink: CheckMenuItem<R>,
+    /// Check menu item for canvas interaction mode (float).
     pub canvas_imode_float: CheckMenuItem<R>,
-}
-
-impl<R: Runtime> MenuItems<R> {
-    /// Update canvas interaction mode menu items according to the given mode.
-    pub fn set_canvas_imode(&self, mode: CanvasImode) -> Result<()> {
-        match mode {
-            CanvasImode::Float => {
-                self.canvas_imode_float.set_checked(true)?;
-                self.canvas_imode_sink.set_checked(false)?;
-            },
-            CanvasImode::Sink => {
-                self.canvas_imode_float.set_checked(false)?;
-                self.canvas_imode_sink.set_checked(true)?;
-            },
-        }
-        Ok(())
-    }
 }
 
 /// Extention trait for system tray-related operations.
@@ -115,10 +100,10 @@ fn on_menu_event<R: Runtime>(app_handle: &AppHandle<R>, event: MenuEvent) {
             }
         },
         "tray-exit" => {
-            // Emit the "exit-app" event to the manager, which will invoke the
+            // Emit an `ExitAppEvent` to the manager, which will invoke the
             // `exit_app` command to clean up and actually exit the application
             if let Err(e) = ExitAppEvent.emit_to(app_handle, DeskulptWindow::Manager) {
-                eprintln!("Failed to emit exit-app to manager: {e}");
+                eprintln!("Failed to emit ExitAppEvent to manager: {e}");
                 app_handle.exit(1); // Safeguard exit
             }
 
