@@ -38,10 +38,10 @@ impl WidgetBundlerBuilder {
 
     /// Build the Deskulpt widget bundler.
     pub fn build(self) -> WidgetBundler {
-        let jsx_runtime_url = self.base_url.clone() + "/generated/jsx-runtime.js";
-        let raw_apis_url = self.base_url.clone() + "/generated/raw-apis.js";
-        let react_url = self.base_url.clone() + "/generated/react.js";
-        let ui_url = self.base_url.clone() + "/generated/ui.js";
+        let jsx_runtime_url = self.base_url.clone() + "/gen/jsx-runtime.js";
+        let raw_apis_url = self.base_url.clone() + "/gen/raw-apis.js";
+        let react_url = self.base_url.clone() + "/gen/react.js";
+        let ui_url = self.base_url.clone() + "/gen/ui.js";
 
         let bundler_options = BundlerOptions {
             input: Some(vec![self.entry.into()]),

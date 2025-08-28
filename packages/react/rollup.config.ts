@@ -15,10 +15,11 @@ export default defineConfig([
     input: "src/index.ts",
     output: {
       format: "esm",
-      file: "../../src/generated/react.js",
+      file: "../../src/gen/react.js",
+      banner: "/*! Auto-generated from packages/react. DO NOT EDIT! */",
     },
     external: ["react"],
-    plugins: [typescript(), terser()],
+    plugins: [typescript(), terser({ format: { comments: "some" } })],
     onwarn,
   },
   // ESM build for publishing

@@ -36,7 +36,7 @@ impl<'a> CanvasInitJS<'a> {
     /// Generate JavaScript code for initializing the canvas window.
     pub fn generate(initial_settings: &'a Settings) -> Result<String> {
         let template = Self {
-            apis_wrapper: include_str!("../../generated/apis.wrapper.js"),
+            apis_wrapper: include_str!("../../gen/apis.wrapper.js"),
             initial_settings,
         };
         let serialized = template.render_default(&Default::default())?;

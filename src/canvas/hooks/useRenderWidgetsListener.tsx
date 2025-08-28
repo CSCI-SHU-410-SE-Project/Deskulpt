@@ -8,7 +8,7 @@ import {
 import { stringifyError } from "../../utils/stringifyError";
 
 const BASE_URL = new URL(import.meta.url).origin;
-const RAW_APIS_URL = new URL("/generated/raw-apis.js", BASE_URL).href;
+const RAW_APIS_URL = new URL("/gen/raw-apis.js", BASE_URL).href;
 
 export function useRenderWidgetsListener() {
   const hasInited = useRef(false);

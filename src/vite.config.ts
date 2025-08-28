@@ -26,16 +26,16 @@ export default defineConfig({
         manager: resolve(__dirname, "manager/index.html"),
         canvas: resolve(__dirname, "canvas/index.html"),
         // Make the scripts entrypoints so that they are preserved even if not imported
-        "generated/jsx-runtime": resolve(__dirname, "generated/jsx-runtime.js"),
-        "generated/raw-apis": resolve(__dirname, "generated/raw-apis.js"),
-        "generated/react": resolve(__dirname, "generated/react.js"),
-        "generated/ui": resolve(__dirname, "generated/ui.js"),
+        "gen/jsx-runtime": resolve(__dirname, "gen/jsx-runtime.js"),
+        "gen/raw-apis": resolve(__dirname, "gen/raw-apis.js"),
+        "gen/react": resolve(__dirname, "gen/react.js"),
+        "gen/ui": resolve(__dirname, "gen/ui.js"),
       },
       output: {
         // Make sure scripts are at the root of the build output so that their import
         // paths are consistent with in the dev server
         entryFileNames: ({ name }) =>
-          name.startsWith("generated/") ? "[name].js" : "assets/[name].js",
+          name.startsWith("gen/") ? "[name].js" : "assets/[name].js",
       },
       // Make sure exports of the scripts are preserved so that they can be imported
       // deterministically

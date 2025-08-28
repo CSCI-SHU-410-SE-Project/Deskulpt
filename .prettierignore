@@ -1,6 +1,6 @@
 pnpm-lock.yaml
 
 # Auto-generated files
-crates/deskulpt-core/generated/
-src/generated/
+crates/deskulpt-core/gen/
+src/gen/
 src/bindings/
