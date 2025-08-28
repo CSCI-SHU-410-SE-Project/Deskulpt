@@ -10,10 +10,13 @@ use tauri::{
 
 use crate::settings::Settings;
 
+/// Deskulpt window enum.
 #[derive(ts_rs::TS)]
 #[ts(rename_all = "lowercase", export, export_to = "types.ts")]
 pub enum DeskulptWindow {
+    /// The manager window.
     Manager,
+    /// The canvas window.
     Canvas,
 }
 
@@ -34,7 +37,7 @@ impl DeskulptWindow {
         }
     }
 
-    /// Get the webview window.
+    /// Retrieve the webview window instance.
     ///
     /// This method panics if the window is not found, but this should not
     /// happen.

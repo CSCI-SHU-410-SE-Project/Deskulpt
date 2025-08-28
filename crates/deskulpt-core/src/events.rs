@@ -1,4 +1,4 @@
-//! Event system for IPC between Deskulpt frontend and backend.
+//! Deskulpt core events.
 
 use anyhow::Result;
 use deskulpt_macros::{register_deskulpt_events, DeskulptEvent};
@@ -60,7 +60,7 @@ pub struct ExitAppEvent;
 #[derive(Serialize, Deserialize, ts_rs::TS)]
 #[ts(export_to = "types.ts")]
 struct RenderWidgetsEventInner {
-    /// The ID of the widget being rendered.
+    /// The ID of the widget being re-rendered.
     id: String,
     /// If provided, update the settings of the widget.
     settings: Option<WidgetSettings>,
@@ -68,12 +68,16 @@ struct RenderWidgetsEventInner {
     code: Option<String>,
 }
 
-/// Event for the initial render of the application.
+/// Event for re-rendering widgets.
 ///
-/// This event is emitted from the backend to the canvas window when we are sure
-/// that it is ready for the initial render.
+/// This event is mainly emitted from the manager window to the canvas window
+/// when settings or code of a widget needs to be re-rendered. It may also be
+/// emitted from the backend to the canvas window for the initial render.
 #[derive(Serialize, Deserialize, ts_rs::TS, DeskulptEvent)]
 #[ts(export, export_to = "types.ts")]
-pub struct RenderWidgetsEvent(Vec<RenderWidgetsEventInner>);
+pub struct RenderWidgetsEvent(
+    /// The list of widgets to be re-rendered.
+    Vec<RenderWidgetsEventInner>,
+);
 
 register_deskulpt_events![ShowToastEvent, ExitAppEvent, RenderWidgetsEvent];

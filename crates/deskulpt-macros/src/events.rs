@@ -1,9 +1,12 @@
+//! Internals of Deskulpt event-related macros.
+
 use heck::ToKebabCase;
 use proc_macro::TokenStream;
 use quote::quote;
 use syn::punctuated::Punctuated;
 use syn::{parse_macro_input, DeriveInput, Ident, Lit, Token};
 
+/// Token stream processor for the `#[derive(DeskulptEvent)]` macro.
 pub fn proc_derive_deskulpt_event(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
     let ident = input.ident.clone();
@@ -38,6 +41,7 @@ pub fn proc_derive_deskulpt_event(input: TokenStream) -> TokenStream {
     TokenStream::from(expanded)
 }
 
+/// Token stream processor for the `register_deskulpt_events!` macro.
 pub fn proc_register_deskulpt_events(input: TokenStream) -> TokenStream {
     let event_types =
         parse_macro_input!(input with Punctuated::<Ident, Token![,]>::parse_terminated);
