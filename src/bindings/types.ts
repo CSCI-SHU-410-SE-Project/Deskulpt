@@ -20,7 +20,19 @@ shortcuts: Shortcuts, };
 /**
  * An update to [`AppSettings`].
  */
-export type AppSettingsUpdate = { "field": "THEME", "value": Theme } | { "field": "CANVAS_IMODE", "value": CanvasImode } | { "field": "SHORTCUTS", "value": ShortcutsUpdate };
+export type AppSettingsUpdate = { 
+/**
+ * An update to [`AppSettings::theme`].
+ */
+theme?: Theme, 
+/**
+ * An update to [`AppSettings::canvas_imode`].
+ */
+canvasImode?: CanvasImode, 
+/**
+ * An update to [`AppSettings::shortcuts`].
+ */
+shortcuts?: ShortcutsUpdate, };
 
 /**
  * Canvas interaction mode.
@@ -85,16 +97,20 @@ app: AppSettings,
 /**
  * The mapping from widget IDs to their respective settings.
  */
-widgets: { [key in string]?: WidgetSettings }, };
+widgets: Record<string, WidgetSettings>, };
 
 /**
  * An update to [`Settings`].
  */
-export type SettingsUpdate = { "field": "APP", "value": AppSettingsUpdate } | { "field": "WIDGET", "value": { 
+export type SettingsUpdate = { 
 /**
- * The ID of the widget to update.
+ * An update to [`Settings::app`].
  */
-key: string, value: WidgetSettingsUpdate, } };
+app?: AppSettingsUpdate, 
+/**
+ * An update to [`Settings::widgets`] by widget ID.
+ */
+widgets?: Record<string, WidgetSettingsUpdate>, };
 
 /**
  * Keyboard shortcuts registered in the application.
@@ -115,7 +131,15 @@ openManager: string | null, };
 /**
  * An update to [`Shortcuts`].
  */
-export type ShortcutsUpdate = { "field": "toggleCanvasImode", "value": string | null } | { "field": "openManager", "value": string | null };
+export type ShortcutsUpdate = { 
+/**
+ * An update to [`Shortcuts::toggle_canvas_imode`].
+ */
+toggleCanvasImode?: string | null, 
+/**
+ * An update to [`Shortcuts::open_manager`].
+ */
+openManager?: string | null, };
 
 /**
  * Event for showing a toast notification.
@@ -141,26 +165,10 @@ export type Theme = "light" | "dark";
 /**
  * Event for updating settings of a widget.
  *
- * This event is emitted between the manager window and the canvas window to
- * each other when widget settings are updated on one side.
+ * This event is emitted from the backend to both the manager and canvas
+ * windows when any setting is updated.
  */
-export type UpdateSettingsEvent = { 
-/**
- * The ID of the widget being updated.
- */
-id: string, 
-/**
- * [`WidgetSettings::x`](crate::settings::WidgetSettings::x)
- */
-x?: number, 
-/**
- * [`WidgetSettings::y`](crate::settings::WidgetSettings::y)
- */
-y?: number, 
-/**
- * [`WidgetSettings::opacity`](crate::settings::WidgetSettings::opacity)
- */
-opacity?: number, };
+export type UpdateSettingsEvent = Settings;
 
 /**
  * Full configuration of a Deskulpt widget.
@@ -181,7 +189,7 @@ entry: string,
 /**
  * External dependencies of the widget as in `package.json`.
  */
-dependencies: { [key in string]?: string }, } } | { "type": "INVALID", "content": { 
+dependencies: Record<string, string>, } } | { "type": "INVALID", "content": { 
 /**
  * The directory name of the widget.
  */
@@ -214,4 +222,16 @@ opacity: number, };
 /**
  * An update to [`WidgetSettings`].
  */
-export type WidgetSettingsUpdate = { "field": "X", "value": number } | { "field": "Y", "value": number } | { "field": "OPACITY", "value": number };
+export type WidgetSettingsUpdate = { 
+/**
+ * An update to [`WidgetSettings::x`].
+ */
+x?: number, 
+/**
+ * An update to [`WidgetSettings::y`].
+ */
+y?: number, 
+/**
+ * An update to [`WidgetSettings::opacity`].
+ */
+opacity?: number, };

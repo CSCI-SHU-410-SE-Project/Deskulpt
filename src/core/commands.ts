@@ -26,5 +26,5 @@ export const rescanWidgets = () =>
 
 export const setRenderReady = () => invoke<void>("set_render_ready");
 
-export const updateSettings = (payload: { updates: SettingsUpdate[] }) =>
+export const updateSettings = (payload: { update: SettingsUpdate }) =>
   invoke<void>("update_settings", payload);

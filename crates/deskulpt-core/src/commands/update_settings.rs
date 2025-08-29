@@ -1,19 +1,27 @@
 use tauri::{command, AppHandle, Runtime};
 
 use super::error::CmdResult;
+use crate::events::{DeskulptEvent, UpdateSettingsEvent};
 use crate::settings::SettingsUpdate;
 use crate::states::StatesExtSettings;
 
-/// Wrapper of [`update_settings`](StatesExtSettings::update_settings).
+/// Update the settings.
+///
+/// See [`update_settings`](StatesExtSettings::update_settings) for details on
+/// how the settings are updated. An [`UpdateSettingsEvent`] is emitted with the
+/// updated settings, even if some or all updates fail.
 ///
 /// ### Errors
 ///
-/// - Any error that occurs while updating the settings.
+/// - Error emitting the [`UpdateSettingsEvent`].
+/// - Some or all updates failed.
 #[command]
 pub async fn update_settings<R: Runtime>(
     app_handle: AppHandle<R>,
-    updates: Vec<SettingsUpdate>,
+    update: SettingsUpdate,
 ) -> CmdResult<()> {
-    app_handle.update_settings(updates)?;
+    app_handle.update_settings(update)?;
+    let settings = app_handle.get_readable_settings().clone();
+    UpdateSettingsEvent(settings).emit(&app_handle)?;
     Ok(())
 }

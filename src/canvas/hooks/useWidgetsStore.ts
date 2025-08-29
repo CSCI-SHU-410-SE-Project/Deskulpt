@@ -1,7 +1,6 @@
 import { create } from "zustand";
 import { WidgetSettings } from "../../bindings/types";
 import { FC, createElement } from "react";
-import { UpdateSettingsEventAPI } from "../../bindings/events";
 import ErrorDisplay from "../components/ErrorDisplay";
 
 interface WidgetProps extends WidgetSettings {
@@ -110,28 +109,16 @@ export function updateWidgetRenderError(
   });
 }
 
-export function updateWidgetSettings(
-  id: string,
-  settings: Partial<WidgetSettings>,
-  emit: boolean = false,
-) {
+export function updateWidgetSettings(settings: Record<string, WidgetSettings>) {
   useWidgetsStore.setState((state) => {
-    if (id in state.widgets) {
-      return {
-        widgets: {
-          ...state.widgets,
-          [id]: { ...state.widgets[id], ...settings },
-        },
-      };
+    const updatedWidgets = { ...state.widgets };
+    for (const [id, newSettings] of Object.entries(settings)) {
+      if (id in updatedWidgets) {
+        updatedWidgets[id] = { ...updatedWidgets[id], ...newSettings };
+      }
     }
-    return state;
+    return { widgets: updatedWidgets };
   });
-
-  if (emit) {
-    UpdateSettingsEventAPI.emitTo("manager", { id, ...settings }).catch(
-      console.error,
-    );
-  }
 }
 
 export function removeWidgets(ids: string[]) {

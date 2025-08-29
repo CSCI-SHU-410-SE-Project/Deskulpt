@@ -5,23 +5,17 @@ use std::fs::{create_dir_all, File};
 use std::io::{BufReader, BufWriter};
 use std::path::Path;
 
-use anyhow::{bail, Result};
+use anyhow::Result;
 use serde::{Deserialize, Serialize};
 
 /// The settings file name in the persistence directory.
 static SETTINGS_FILE: &str = "settings.json";
 
-/// Trait for applying updates.
-pub trait ApplyUpdate<U> {
-    /// Apply an update to self.
-    fn apply_update(&mut self, u: U) -> Result<()>;
-}
-
 /// Light/dark theme of the application.
 #[derive(Clone, Default, Deserialize, Serialize, ts_rs::TS)]
 // Use lowercase to align with Radix UI theme appearance
 #[serde(rename_all = "lowercase")]
-#[ts(export_to = "types.ts")]
+#[ts(export, export_to = "types.ts")]
 pub enum Theme {
     #[default]
     Light,
@@ -31,7 +25,7 @@ pub enum Theme {
 /// Canvas interaction mode.
 #[derive(Clone, Debug, Default, PartialEq, Deserialize, Serialize, ts_rs::TS)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
-#[ts(export_to = "types.ts")]
+#[ts(export, export_to = "types.ts")]
 pub enum CanvasImode {
     /// Sink mode.
     ///
@@ -63,7 +57,7 @@ impl std::ops::Not for CanvasImode {
 /// a string parsable into [`Shortcut`](tauri_plugin_global_shortcut::Shortcut).
 #[derive(Clone, Default, Deserialize, Serialize, ts_rs::TS)]
 #[serde(rename_all = "camelCase")]
-#[ts(export_to = "types.ts")]
+#[ts(export, export_to = "types.ts")]
 pub struct Shortcuts {
     /// For toggling canvas interaction mode.
     #[serde(default)]
@@ -74,35 +68,24 @@ pub struct Shortcuts {
 }
 
 /// An update to [`Shortcuts`].
-#[derive(Clone, Deserialize, ts_rs::TS)]
-// Use camelCase so that the field can be used as key of Shortcuts in frontend
-#[serde(tag = "field", content = "value", rename_all = "camelCase")]
-#[ts(export_to = "types.ts")]
-pub enum ShortcutsUpdate {
+#[derive(Clone, Default, Deserialize, ts_rs::TS)]
+#[serde(rename_all = "camelCase")]
+#[ts(export, export_to = "types.ts")]
+pub struct ShortcutsUpdate {
     /// An update to [`Shortcuts::toggle_canvas_imode`].
-    ToggleCanvasImode(Option<String>),
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[ts(optional)]
+    pub toggle_canvas_imode: Option<Option<String>>,
     /// An update to [`Shortcuts::open_manager`].
-    OpenManager(Option<String>),
-}
-
-impl ApplyUpdate<ShortcutsUpdate> for Shortcuts {
-    fn apply_update(&mut self, u: ShortcutsUpdate) -> Result<()> {
-        match u {
-            ShortcutsUpdate::ToggleCanvasImode(value) => {
-                self.toggle_canvas_imode = value;
-            },
-            ShortcutsUpdate::OpenManager(value) => {
-                self.open_manager = value;
-            },
-        }
-        Ok(())
-    }
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[ts(optional)]
+    pub open_manager: Option<Option<String>>,
 }
 
 /// Application-wide settings.
 #[derive(Clone, Default, Deserialize, Serialize, ts_rs::TS)]
 #[serde(rename_all = "camelCase")]
-#[ts(export_to = "types.ts")]
+#[ts(export, export_to = "types.ts")]
 pub struct AppSettings {
     /// The application theme.
     #[serde(default)]
@@ -116,33 +99,22 @@ pub struct AppSettings {
 }
 
 /// An update to [`AppSettings`].
-#[derive(Clone, Deserialize, ts_rs::TS)]
-#[serde(tag = "field", content = "value", rename_all = "SCREAMING_SNAKE_CASE")]
-#[ts(export_to = "types.ts")]
-pub enum AppSettingsUpdate {
+#[derive(Clone, Default, Deserialize, ts_rs::TS)]
+#[serde(rename_all = "camelCase")]
+#[ts(export, export_to = "types.ts")]
+pub struct AppSettingsUpdate {
     /// An update to [`AppSettings::theme`].
-    Theme(Theme),
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[ts(optional)]
+    pub theme: Option<Theme>,
     /// An update to [`AppSettings::canvas_imode`].
-    CanvasImode(CanvasImode),
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[ts(optional)]
+    pub canvas_imode: Option<CanvasImode>,
     /// An update to [`AppSettings::shortcuts`].
-    Shortcuts(ShortcutsUpdate),
-}
-
-impl ApplyUpdate<AppSettingsUpdate> for AppSettings {
-    fn apply_update(&mut self, u: AppSettingsUpdate) -> Result<()> {
-        match u {
-            AppSettingsUpdate::Theme(value) => {
-                self.theme = value;
-            },
-            AppSettingsUpdate::CanvasImode(value) => {
-                self.canvas_imode = value;
-            },
-            AppSettingsUpdate::Shortcuts(value) => {
-                self.shortcuts.apply_update(value)?;
-            },
-        }
-        Ok(())
-    }
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[ts(optional)]
+    pub shortcuts: Option<ShortcutsUpdate>,
 }
 
 /// Per-widget settings.
@@ -151,7 +123,7 @@ impl ApplyUpdate<AppSettingsUpdate> for AppSettings {
 /// configuration files and are managed internally by the application.
 #[derive(Clone, Default, Deserialize, Serialize, ts_rs::TS)]
 #[serde(rename_all = "camelCase")]
-#[ts(export_to = "types.ts")]
+#[ts(export, export_to = "types.ts")]
 pub struct WidgetSettings {
     /// The leftmost x-coordinate in pixels.
     #[serde(default)]
@@ -169,36 +141,22 @@ fn default_opacity() -> i32 {
 }
 
 /// An update to [`WidgetSettings`].
-#[derive(Clone, Deserialize, ts_rs::TS)]
-#[serde(tag = "field", content = "value", rename_all = "SCREAMING_SNAKE_CASE")]
-#[ts(export_to = "types.ts")]
-pub enum WidgetSettingsUpdate {
+#[derive(Clone, Default, Deserialize, ts_rs::TS)]
+#[serde(rename_all = "camelCase")]
+#[ts(export, export_to = "types.ts")]
+pub struct WidgetSettingsUpdate {
     /// An update to [`WidgetSettings::x`].
-    X(i32),
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[ts(optional)]
+    pub x: Option<i32>,
     /// An update to [`WidgetSettings::y`].
-    Y(i32),
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[ts(optional)]
+    pub y: Option<i32>,
     /// An update to [`WidgetSettings::opacity`].
-    Opacity(i32),
-}
-
-impl ApplyUpdate<WidgetSettingsUpdate> for WidgetSettings {
-    fn apply_update(&mut self, u: WidgetSettingsUpdate) -> Result<()> {
-        match u {
-            WidgetSettingsUpdate::X(value) => {
-                self.x = value;
-            },
-            WidgetSettingsUpdate::Y(value) => {
-                self.y = value;
-            },
-            WidgetSettingsUpdate::Opacity(value) => {
-                if !(0..=100).contains(&value) {
-                    bail!("Opacity must be between 0 and 100; got {value}");
-                }
-                self.opacity = value;
-            },
-        }
-        Ok(())
-    }
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[ts(optional)]
+    pub opacity: Option<i32>,
 }
 
 /// Full settings of the application.
@@ -211,36 +169,8 @@ pub struct Settings {
     pub app: AppSettings,
     /// The mapping from widget IDs to their respective settings.
     #[serde(default)]
+    #[ts(type = "Record<string, WidgetSettings>")]
     pub widgets: HashMap<String, WidgetSettings>,
-}
-
-/// An update to [`Settings`].
-#[derive(Clone, Deserialize, ts_rs::TS)]
-#[serde(tag = "field", content = "value", rename_all = "SCREAMING_SNAKE_CASE")]
-#[ts(export, export_to = "types.ts")]
-pub enum SettingsUpdate {
-    /// An update to [`Settings::app`].
-    App(AppSettingsUpdate),
-    /// An update to [`Settings::widgets`].
-    Widget {
-        /// The ID of the widget to update.
-        key: String,
-        value: WidgetSettingsUpdate,
-    },
-}
-
-impl ApplyUpdate<SettingsUpdate> for Settings {
-    fn apply_update(&mut self, u: SettingsUpdate) -> Result<()> {
-        match u {
-            SettingsUpdate::App(value) => {
-                self.app.apply_update(value)?;
-            },
-            SettingsUpdate::Widget { key, value } => {
-                self.widgets.entry(key).or_default().apply_update(value)?;
-            },
-        }
-        Ok(())
-    }
 }
 
 impl Settings {
@@ -274,8 +204,17 @@ impl Settings {
     }
 }
 
-impl SettingsUpdate {
-    pub fn canvas_imode(value: CanvasImode) -> Self {
-        SettingsUpdate::App(AppSettingsUpdate::CanvasImode(value))
-    }
+/// An update to [`Settings`].
+#[derive(Clone, Default, Deserialize, ts_rs::TS)]
+#[serde(rename_all = "camelCase")]
+#[ts(export, export_to = "types.ts")]
+pub struct SettingsUpdate {
+    /// An update to [`Settings::app`].
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[ts(optional)]
+    pub app: Option<AppSettingsUpdate>,
+    /// An update to [`Settings::widgets`] by widget ID.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[ts(optional, type = "Record<string, WidgetSettingsUpdate>")]
+    pub widgets: Option<HashMap<String, WidgetSettingsUpdate>>,
 }

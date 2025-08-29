@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { ShortcutsUpdate } from "../../bindings/types";
+import { Shortcuts } from "../../bindings/types";
 import { commands } from "../../core";
 import { SwitchThemeEventAPI } from "../../bindings/events";
 
@@ -15,12 +15,15 @@ export async function toggleTheme() {
   await SwitchThemeEventAPI.emitTo("canvas", newTheme);
 }
 
-export async function updateShortcut(update: ShortcutsUpdate) {
+export async function updateShortcut(
+  key: keyof Shortcuts,
+  value: string | null,
+) {
   await commands.updateSettings({
-    updates: [{ field: "APP", value: { field: "SHORTCUTS", value: update } }],
+    update: { app: { shortcuts: { [key]: value } } },
   });
 
   useAppSettingsStore.setState((state) => ({
-    shortcuts: { ...state.shortcuts, [update.field]: update.value },
+    shortcuts: { ...state.shortcuts, [key]: value },
   }));
 }

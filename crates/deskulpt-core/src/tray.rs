@@ -12,7 +12,7 @@ use tauri::{App, AppHandle, Runtime};
 use tokio::time::sleep;
 
 use crate::events::{DeskulptEvent, ExitAppEvent};
-use crate::settings::{CanvasImode, SettingsUpdate};
+use crate::settings::{AppSettingsUpdate, CanvasImode, SettingsUpdate};
 use crate::states::StatesExtSettings;
 use crate::window::{DeskulptWindow, WindowExt};
 
@@ -81,17 +81,25 @@ impl<R: Runtime> TrayExt<R> for AppHandle<R> {}
 fn on_menu_event<R: Runtime>(app_handle: &AppHandle<R>, event: MenuEvent) {
     match event.id().as_ref() {
         "tray-canvas-imode-sink" => {
-            if let Err(e) =
-                app_handle.update_settings([SettingsUpdate::canvas_imode(CanvasImode::Sink)])
-            {
-                eprintln!("Error toggling canvas interaction mode: {e}");
+            if let Err(e) = app_handle.update_settings(SettingsUpdate {
+                app: Some(AppSettingsUpdate {
+                    canvas_imode: Some(CanvasImode::Sink),
+                    ..Default::default()
+                }),
+                ..Default::default()
+            }) {
+                eprintln!("Failed to toggle canvas interaction mode: {e}");
             }
         },
         "tray-canvas-imode-float" => {
-            if let Err(e) =
-                app_handle.update_settings([SettingsUpdate::canvas_imode(CanvasImode::Float)])
-            {
-                eprintln!("Error toggling canvas interaction mode: {e}");
+            if let Err(e) = app_handle.update_settings(SettingsUpdate {
+                app: Some(AppSettingsUpdate {
+                    canvas_imode: Some(CanvasImode::Float),
+                    ..Default::default()
+                }),
+                ..Default::default()
+            }) {
+                eprintln!("Failed to toggle canvas interaction mode: {e}");
             }
         },
         "tray-manage" => {

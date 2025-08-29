@@ -5,8 +5,9 @@ import ErrorDisplay from "./ErrorDisplay";
 import { stringifyError } from "../../utils/stringifyError";
 import { LuGripVertical } from "react-icons/lu";
 import { Box } from "@radix-ui/themes";
-import { updateWidgetSettings, useWidgetsStore } from "../hooks";
+import { useWidgetsStore } from "../hooks";
 import { css } from "@emotion/react";
+import { commands } from "../../core";
 
 const styles = {
   wrapper: css({
@@ -35,7 +36,11 @@ const WidgetContainer = memo(({ id }: WidgetContainerProps) => {
   const wrapperRef = useRef<HTMLDivElement>(null);
 
   const onStop = (_: DraggableEvent, data: DraggableData) => {
-    updateWidgetSettings(id, { x: x + data.x, y: y + data.y }, true);
+    commands
+      .updateSettings({
+        update: { widgets: { [id]: { x: x + data.x, y: y + data.y } } },
+      })
+      .catch(console.error);
   };
 
   return (

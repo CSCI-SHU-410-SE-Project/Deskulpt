@@ -40,7 +40,7 @@ pub trait StatesExtCanvasImode<R: Runtime>: Manager<R> + Emitter<R> {
     }
 
     /// Switch the canvas interaction mode.
-    fn switch_canvas_imode(&self, mode: CanvasImode) -> Result<()> {
+    fn switch_canvas_imode(&self, mode: &CanvasImode) -> Result<()> {
         let state = self.state::<CanvasImodeState<R>>();
         let state = state.0.lock().unwrap();
         if state.menu_items.is_none() {

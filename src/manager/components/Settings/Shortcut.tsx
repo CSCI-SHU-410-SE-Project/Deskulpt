@@ -126,7 +126,7 @@ const ShortcutAction = ({ shortcutKey }: Props) => {
   }, []);
 
   const confirmAction = useCallback(() => {
-    updateShortcut({ field: shortcutKey, value: value === "" ? null : value })
+    updateShortcut(shortcutKey, value === "" ? null : value)
       .then(() => {
         setPlaceholder(INITIAL_PLACEHOLDER);
         setIsValid(true);
