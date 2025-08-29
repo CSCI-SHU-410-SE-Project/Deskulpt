@@ -16,7 +16,7 @@ import {
 } from "react";
 import { FaEdit } from "react-icons/fa";
 import { MdClear } from "react-icons/md";
-import { Shortcuts, ShortcutsUpdate } from "../../../bindings/types";
+import { Shortcuts } from "../../../bindings/types";
 import { updateShortcut, useAppSettingsStore } from "../../hooks";
 import { toast } from "sonner";
 import { INVALID_KEYCODES, KEYCODES, MODIFIERS } from "./keyboard";
@@ -126,17 +126,7 @@ const ShortcutAction = ({ shortcutKey }: Props) => {
   }, []);
 
   const confirmAction = useCallback(() => {
-    let field: ShortcutsUpdate["field"];
-    switch (shortcutKey) {
-      case "toggleCanvasImode":
-        field = "TOGGLE_CANVAS_IMODE";
-        break;
-      case "openManager":
-        field = "OPEN_MANAGER";
-        break;
-    }
-
-    updateShortcut({ field, value: value === "" ? null : value })
+    updateShortcut({ field: shortcutKey, value: value === "" ? null : value })
       .then(() => {
         setPlaceholder(INITIAL_PLACEHOLDER);
         setIsValid(true);

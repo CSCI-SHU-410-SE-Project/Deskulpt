@@ -4,11 +4,8 @@ import { FC, createElement } from "react";
 import { UpdateSettingsEventAPI } from "../../bindings/events";
 import ErrorDisplay from "../components/ErrorDisplay";
 
-interface WidgetProps {
+interface WidgetProps extends WidgetSettings {
   id: string;
-  x: number;
-  y: number;
-  opacity: number;
 }
 
 interface Widget {

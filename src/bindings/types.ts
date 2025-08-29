@@ -115,7 +115,7 @@ openManager: string | null, };
 /**
  * An update to [`Shortcuts`].
  */
-export type ShortcutsUpdate = { "field": "TOGGLE_CANVAS_IMODE", "value": string | null } | { "field": "OPEN_MANAGER", "value": string | null };
+export type ShortcutsUpdate = { "field": "toggleCanvasImode", "value": string | null } | { "field": "openManager", "value": string | null };
 
 /**
  * Event for showing a toast notification.

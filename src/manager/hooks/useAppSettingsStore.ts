@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { Shortcuts, ShortcutsUpdate } from "../../bindings/types";
+import { ShortcutsUpdate } from "../../bindings/types";
 import { commands } from "../../core";
 import { SwitchThemeEventAPI } from "../../bindings/events";
 
@@ -20,17 +20,7 @@ export async function updateShortcut(update: ShortcutsUpdate) {
     updates: [{ field: "APP", value: { field: "SHORTCUTS", value: update } }],
   });
 
-  let key: keyof Shortcuts;
-  switch (update.field) {
-    case "TOGGLE_CANVAS_IMODE":
-      key = "toggleCanvasImode";
-      break;
-    case "OPEN_MANAGER":
-      key = "openManager";
-      break;
-  }
-
   useAppSettingsStore.setState((state) => ({
-    shortcuts: { ...state.shortcuts, [key]: update.value },
+    shortcuts: { ...state.shortcuts, [update.field]: update.value },
   }));
 }

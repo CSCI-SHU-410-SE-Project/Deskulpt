@@ -19,6 +19,7 @@ pub trait ApplyUpdate<U> {
 
 /// Light/dark theme of the application.
 #[derive(Clone, Default, Deserialize, Serialize, ts_rs::TS)]
+// Use lowercase to align with Radix UI theme appearance
 #[serde(rename_all = "lowercase")]
 #[ts(export_to = "types.ts")]
 pub enum Theme {
@@ -74,7 +75,8 @@ pub struct Shortcuts {
 
 /// An update to [`Shortcuts`].
 #[derive(Clone, Deserialize, ts_rs::TS)]
-#[serde(tag = "field", content = "value", rename_all = "SCREAMING_SNAKE_CASE")]
+// Use camelCase so that the field can be used as key of Shortcuts in frontend
+#[serde(tag = "field", content = "value", rename_all = "camelCase")]
 #[ts(export_to = "types.ts")]
 pub enum ShortcutsUpdate {
     /// An update to [`Shortcuts::toggle_canvas_imode`].
