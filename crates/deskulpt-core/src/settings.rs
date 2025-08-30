@@ -1,4 +1,4 @@
-//! Application and widget settings.
+//! Deskulpt settings.
 
 use std::collections::HashMap;
 use std::fs::{create_dir_all, File};
@@ -12,22 +12,52 @@ use serde::{Deserialize, Serialize};
 static SETTINGS_FILE: &str = "settings.json";
 
 /// Light/dark theme of the application.
-#[derive(Default, Deserialize, Serialize, ts_rs::TS)]
+#[derive(Clone, Default, Deserialize, Serialize, ts_rs::TS)]
+// Use lowercase to align with Radix UI theme appearance
 #[serde(rename_all = "lowercase")]
-#[ts(export_to = "types.ts")]
+#[ts(export, export_to = "types.ts")]
 pub enum Theme {
     #[default]
     Light,
     Dark,
 }
 
+/// Canvas interaction mode.
+#[derive(Clone, Debug, Default, PartialEq, Deserialize, Serialize, ts_rs::TS)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+#[ts(export, export_to = "types.ts")]
+pub enum CanvasImode {
+    /// Sink mode.
+    ///
+    /// The canvas is click-through. Widgets are not interactable. The desktop
+    /// is interactable.
+    #[default]
+    Sink,
+    /// Float mode.
+    ///
+    /// The canvas is not click-through. Widgets are interactable. The desktop
+    /// is not interactable.
+    Float,
+}
+
+impl std::ops::Not for CanvasImode {
+    type Output = Self;
+
+    fn not(self) -> Self::Output {
+        match self {
+            CanvasImode::Sink => CanvasImode::Float,
+            CanvasImode::Float => CanvasImode::Sink,
+        }
+    }
+}
+
 /// Keyboard shortcuts registered in the application.
 ///
 /// A keyboard shortcut being `None` means that it is disabled, otherwise it is
 /// a string parsable into [`Shortcut`](tauri_plugin_global_shortcut::Shortcut).
-#[derive(Default, Deserialize, Serialize, ts_rs::TS)]
+#[derive(Clone, Default, Deserialize, Serialize, ts_rs::TS)]
 #[serde(rename_all = "camelCase")]
-#[ts(export_to = "types.ts")]
+#[ts(export, export_to = "types.ts")]
 pub struct Shortcuts {
     /// For toggling canvas interaction mode.
     #[serde(default)]
@@ -37,53 +67,110 @@ pub struct Shortcuts {
     pub open_manager: Option<String>,
 }
 
-/// Application-wide settings.
-#[derive(Default, Deserialize, Serialize, ts_rs::TS)]
+/// An update to [`Shortcuts`].
+#[derive(Clone, Default, Deserialize, ts_rs::TS)]
 #[serde(rename_all = "camelCase")]
-#[ts(export_to = "types.ts")]
-struct AppSettings {
+#[ts(export, export_to = "types.ts")]
+pub struct ShortcutsUpdate {
+    /// An update to [`Shortcuts::toggle_canvas_imode`].
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[ts(optional)]
+    pub toggle_canvas_imode: Option<Option<String>>,
+    /// An update to [`Shortcuts::open_manager`].
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[ts(optional)]
+    pub open_manager: Option<Option<String>>,
+}
+
+/// Application-wide settings.
+#[derive(Clone, Default, Deserialize, Serialize, ts_rs::TS)]
+#[serde(rename_all = "camelCase")]
+#[ts(export, export_to = "types.ts")]
+pub struct AppSettings {
     /// The application theme.
     #[serde(default)]
-    theme: Theme,
+    pub theme: Theme,
+    /// Canvas interaction mode.
+    #[serde(default)]
+    pub canvas_imode: CanvasImode,
     /// The keyboard shortcuts.
     #[serde(default)]
-    shortcuts: Shortcuts,
+    pub shortcuts: Shortcuts,
+}
+
+/// An update to [`AppSettings`].
+#[derive(Clone, Default, Deserialize, ts_rs::TS)]
+#[serde(rename_all = "camelCase")]
+#[ts(export, export_to = "types.ts")]
+pub struct AppSettingsUpdate {
+    /// An update to [`AppSettings::theme`].
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[ts(optional)]
+    pub theme: Option<Theme>,
+    /// An update to [`AppSettings::canvas_imode`].
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[ts(optional)]
+    pub canvas_imode: Option<CanvasImode>,
+    /// An update to [`AppSettings::shortcuts`].
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[ts(optional)]
+    pub shortcuts: Option<ShortcutsUpdate>,
 }
 
 /// Per-widget settings.
 ///
 /// Different from widget configurations, these are independent of the widget
 /// configuration files and are managed internally by the application.
-#[derive(Deserialize, Serialize, ts_rs::TS)]
+#[derive(Clone, Default, Deserialize, Serialize, ts_rs::TS)]
 #[serde(rename_all = "camelCase")]
-#[ts(export_to = "types.ts")]
+#[ts(export, export_to = "types.ts")]
 pub struct WidgetSettings {
     /// The leftmost x-coordinate in pixels.
     #[serde(default)]
-    x: i32,
+    pub x: i32,
     /// The topmost y-coordinate in pixels.
     #[serde(default)]
-    y: i32,
+    pub y: i32,
     /// The opacity in percentage.
     #[serde(default = "default_opacity")]
-    opacity: i32,
+    pub opacity: i32,
 }
 
 fn default_opacity() -> i32 {
     100
 }
 
+/// An update to [`WidgetSettings`].
+#[derive(Clone, Default, Deserialize, ts_rs::TS)]
+#[serde(rename_all = "camelCase")]
+#[ts(export, export_to = "types.ts")]
+pub struct WidgetSettingsUpdate {
+    /// An update to [`WidgetSettings::x`].
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[ts(optional)]
+    pub x: Option<i32>,
+    /// An update to [`WidgetSettings::y`].
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[ts(optional)]
+    pub y: Option<i32>,
+    /// An update to [`WidgetSettings::opacity`].
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[ts(optional)]
+    pub opacity: Option<i32>,
+}
+
 /// Full settings of the application.
-#[derive(Default, Deserialize, Serialize, ts_rs::TS)]
+#[derive(Clone, Default, Deserialize, Serialize, ts_rs::TS)]
 #[serde(rename_all = "camelCase")]
 #[ts(export, export_to = "types.ts")]
 pub struct Settings {
     /// Application-wide settings.
     #[serde(default)]
-    app: AppSettings,
+    pub app: AppSettings,
     /// The mapping from widget IDs to their respective settings.
     #[serde(default)]
-    widgets: HashMap<String, WidgetSettings>,
+    #[ts(type = "Record<string, WidgetSettings>")]
+    pub widgets: HashMap<String, WidgetSettings>,
 }
 
 impl Settings {
@@ -115,9 +202,19 @@ impl Settings {
         serde_json::to_writer(writer, self)?;
         Ok(())
     }
+}
 
-    /// Get the mutable reference to the keyboard shortcuts.
-    pub fn shortcuts_mut(&mut self) -> &mut Shortcuts {
-        &mut self.app.shortcuts
-    }
+/// An update to [`Settings`].
+#[derive(Clone, Default, Deserialize, ts_rs::TS)]
+#[serde(rename_all = "camelCase")]
+#[ts(export, export_to = "types.ts")]
+pub struct SettingsUpdate {
+    /// An update to [`Settings::app`].
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[ts(optional)]
+    pub app: Option<AppSettingsUpdate>,
+    /// An update to [`Settings::widgets`] by widget ID.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[ts(optional, type = "Record<string, WidgetSettingsUpdate>")]
+    pub widgets: Option<HashMap<String, WidgetSettingsUpdate>>,
 }

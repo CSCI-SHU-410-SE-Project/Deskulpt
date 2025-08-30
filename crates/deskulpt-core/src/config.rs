@@ -70,6 +70,7 @@ pub enum WidgetConfig {
         /// Entry file of the widget source code.
         entry: String,
         /// External dependencies of the widget as in `package.json`.
+        #[ts(type = "Record<string, string>")]
         dependencies: HashMap<String, String>,
     },
     /// Invalid widget configuration.

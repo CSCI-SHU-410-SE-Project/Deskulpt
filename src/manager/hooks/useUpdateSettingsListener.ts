@@ -5,8 +5,8 @@ import { UpdateSettingsEventAPI } from "../../bindings/events";
 export function useUpdateSettingsListener() {
   useEffect(() => {
     const unlisten = UpdateSettingsEventAPI.listen((event) => {
-      const { id, ...settings } = event.payload;
-      updateWidgetSettings(id, settings);
+      const { widgets } = event.payload;
+      updateWidgetSettings(widgets);
     });
 
     return () => {

@@ -7,6 +7,7 @@ use tauri::{Emitter, Runtime};
 
 use crate::settings::{Theme, WidgetSettings};
 use crate::window::DeskulptWindow;
+use crate::Settings;
 
 /// Trait for all Deskulpt events.
 pub trait DeskulptEvent: Serialize {
@@ -58,7 +59,7 @@ pub struct ExitAppEvent;
 
 /// Inner structure for [`RenderWidgetsEvent`].
 #[derive(Serialize, Deserialize, ts_rs::TS)]
-#[ts(export_to = "types.ts")]
+#[ts(export, export_to = "types.ts")]
 struct RenderWidgetsEventInner {
     /// The ID of the widget being re-rendered.
     id: String,
@@ -108,26 +109,14 @@ pub struct SwitchThemeEvent(
 
 /// Event for updating settings of a widget.
 ///
-/// This event is emitted between the manager window and the canvas window to
-/// each other when widget settings are updated on one side.
+/// This event is emitted from the backend to both the manager and canvas
+/// windows when any setting is updated.
 #[derive(Serialize, ts_rs::TS, DeskulptEvent)]
 #[ts(export, export_to = "types.ts")]
-pub struct UpdateSettingsEvent {
-    /// The ID of the widget being updated.
-    id: String,
-    /// [`WidgetSettings::x`](crate::settings::WidgetSettings::x)
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[ts(optional)]
-    x: Option<i32>,
-    /// [`WidgetSettings::y`](crate::settings::WidgetSettings::y)
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[ts(optional)]
-    y: Option<i32>,
-    /// [`WidgetSettings::opacity`](crate::settings::WidgetSettings::opacity)
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[ts(optional)]
-    opacity: Option<i32>,
-}
+pub struct UpdateSettingsEvent(
+    /// The updated settings.
+    pub Settings,
+);
 
 register_deskulpt_events![
     ShowToastEvent,

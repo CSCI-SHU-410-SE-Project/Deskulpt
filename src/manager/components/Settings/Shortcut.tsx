@@ -126,7 +126,7 @@ const ShortcutAction = ({ shortcutKey }: Props) => {
   }, []);
 
   const confirmAction = useCallback(() => {
-    updateShortcut(shortcutKey, shortcut, value === "" ? null : value)
+    updateShortcut(shortcutKey, value === "" ? null : value)
       .then(() => {
         setPlaceholder(INITIAL_PLACEHOLDER);
         setIsValid(true);
@@ -135,7 +135,7 @@ const ShortcutAction = ({ shortcutKey }: Props) => {
       .catch(() => {
         toast.error("Failed to update shortcut.");
       });
-  }, [shortcutKey, shortcut, value]);
+  }, [shortcutKey, value]);
 
   const clearAction = useCallback(() => {
     if (inputRef.current === null) {

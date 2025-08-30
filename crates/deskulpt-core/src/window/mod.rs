@@ -8,7 +8,7 @@ use tauri::{
     WindowEvent,
 };
 
-use crate::settings::Settings;
+use crate::StatesExtSettings;
 
 /// Deskulpt window enum.
 #[derive(ts_rs::TS)]
@@ -53,13 +53,14 @@ impl DeskulptWindow {
 }
 
 /// Extention trait for window-related operations.
-pub trait WindowExt<R: Runtime>: Manager<R> {
+pub trait WindowExt<R: Runtime>: Manager<R> + StatesExtSettings<R> {
     /// Create the manager window.
-    fn create_manager(&mut self, settings: &Settings) -> Result<()>
+    fn create_manager(&mut self) -> Result<()>
     where
         Self: Sized,
     {
-        let init_js = ManagerInitJS::generate(settings)?;
+        let settings = self.get_readable_settings();
+        let init_js = ManagerInitJS::generate(&settings)?;
         WebviewWindowBuilder::new(
             self,
             DeskulptWindow::Manager.label(),
@@ -79,11 +80,12 @@ pub trait WindowExt<R: Runtime>: Manager<R> {
     }
 
     /// Create the canvas window.
-    fn create_canvas(&mut self, settings: &Settings) -> Result<()>
+    fn create_canvas(&mut self) -> Result<()>
     where
         Self: Sized,
     {
-        let init_js = CanvasInitJS::generate(settings)?;
+        let settings = self.get_readable_settings();
+        let init_js = CanvasInitJS::generate(&settings)?;
         let canvas = WebviewWindowBuilder::new(
             self,
             DeskulptWindow::Canvas.label(),

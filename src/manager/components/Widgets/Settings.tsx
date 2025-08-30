@@ -1,6 +1,7 @@
 import { Flex, Table } from "@radix-ui/themes";
 import { LiaTimesSolid } from "react-icons/lia";
-import { updateWidgetSettings, useWidgetsStore } from "../../hooks";
+import { useWidgetsStore } from "../../hooks";
+import { commands } from "../../../core";
 import { memo, useCallback } from "react";
 import IntegerInput from "../IntegerInput";
 import { css } from "@emotion/react";
@@ -17,7 +18,12 @@ const styles = {
 const X = ({ id }: SettingsProps) => {
   const x = useWidgetsStore((state) => state.widgets[id].settings.x);
   const onValueChange = useCallback(
-    (value: number) => updateWidgetSettings(id, { x: value }, true),
+    (value: number) =>
+      commands
+        .updateSettings({
+          update: { widgets: { [id]: { x: value } } },
+        })
+        .catch(console.error),
     [id],
   );
 
@@ -34,7 +40,12 @@ const X = ({ id }: SettingsProps) => {
 const Y = ({ id }: SettingsProps) => {
   const y = useWidgetsStore((state) => state.widgets[id].settings.y);
   const onValueChange = useCallback(
-    (value: number) => updateWidgetSettings(id, { y: value }, true),
+    (value: number) =>
+      commands
+        .updateSettings({
+          update: { widgets: { [id]: { y: value } } },
+        })
+        .catch(console.error),
     [id],
   );
 
@@ -53,7 +64,12 @@ const Opacity = ({ id }: SettingsProps) => {
     (state) => state.widgets[id].settings.opacity,
   );
   const onValueChange = useCallback(
-    (value: number) => updateWidgetSettings(id, { opacity: value }, true),
+    (value: number) =>
+      commands
+        .updateSettings({
+          update: { widgets: { [id]: { opacity: value } } },
+        })
+        .catch(console.error),
     [id],
   );
 

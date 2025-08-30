@@ -4,7 +4,6 @@ import { commands } from "../../core";
 import {
   RemoveWidgetsEventAPI,
   RenderWidgetsEventAPI,
-  UpdateSettingsEventAPI,
 } from "../../bindings/events";
 
 const DEFAULT_WIDGET_SETTINGS: WidgetSettings = { x: 0, y: 0, opacity: 100 };
@@ -68,31 +67,16 @@ export async function rescan(initial: boolean = false) {
   return widgetsArray.length;
 }
 
-export function updateWidgetSettings(
-  id: string,
-  settings: Partial<WidgetSettings>,
-  emit: boolean = false,
-) {
+export function updateWidgetSettings(settings: Record<string, WidgetSettings>) {
   useWidgetsStore.setState((state) => {
-    if (id in state.widgets) {
-      return {
-        widgets: {
-          ...state.widgets,
-          [id]: {
-            ...state.widgets[id],
-            settings: { ...state.widgets[id].settings, ...settings },
-          },
-        },
-      };
+    const updatedWidgets = { ...state.widgets };
+    for (const [id, newSettings] of Object.entries(settings)) {
+      if (id in updatedWidgets) {
+        updatedWidgets[id] = { ...updatedWidgets[id], settings: newSettings };
+      }
     }
-    return {};
+    return { widgets: updatedWidgets };
   });
-
-  if (emit) {
-    UpdateSettingsEventAPI.emitTo("canvas", { id, ...settings }).catch(
-      console.error,
-    );
-  }
 }
 
 export function removeWidgets(ids: string[]) {

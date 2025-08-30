@@ -17,11 +17,13 @@ export async function toggleTheme() {
 
 export async function updateShortcut(
   key: keyof Shortcuts,
-  oldShortcut: string | null,
-  newShortcut: string | null,
+  value: string | null,
 ) {
-  await commands.updateShortcut({ key, oldShortcut, newShortcut });
+  await commands.updateSettings({
+    update: { app: { shortcuts: { [key]: value } } },
+  });
+
   useAppSettingsStore.setState((state) => ({
-    shortcuts: { ...state.shortcuts, [key]: newShortcut },
+    shortcuts: { ...state.shortcuts, [key]: value },
   }));
 }

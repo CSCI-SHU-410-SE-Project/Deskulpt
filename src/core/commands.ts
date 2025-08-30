@@ -2,7 +2,7 @@ import { invoke } from "@tauri-apps/api/core";
 import {
   RenderWidgetsEvent,
   Settings,
-  Shortcuts,
+  SettingsUpdate,
   WidgetConfig,
 } from "../bindings/types";
 
@@ -26,8 +26,5 @@ export const rescanWidgets = () =>
 
 export const setRenderReady = () => invoke<void>("set_render_ready");
 
-export const updateShortcut = (payload: {
-  key: keyof Shortcuts;
-  oldShortcut: string | null;
-  newShortcut: string | null;
-}) => invoke<void>("update_shortcut", payload);
+export const updateSettings = (payload: { update: SettingsUpdate }) =>
+  invoke<void>("update_settings", payload);
