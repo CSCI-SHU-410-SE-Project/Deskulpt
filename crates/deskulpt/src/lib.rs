@@ -9,15 +9,45 @@ use deskulpt_core::{
     StatesExtWidgetConfigMap, TrayExt, WindowExt,
 };
 use tauri::image::Image;
-use tauri::{generate_context, generate_handler, include_image, Builder};
+use tauri::{generate_context, include_image, Builder, Wry};
+use tauri_specta::{collect_commands, collect_events};
 
 /// Image object for the Deskulpt icon.
 const DESKULPT_ICON: Image = include_image!("./icons/icon.png");
 
+/// Get the builder of bindings for Deskulpt commands and events.
+pub fn get_bindings_builder() -> tauri_specta::Builder {
+    tauri_specta::Builder::<Wry>::new()
+        .commands(collect_commands![
+            deskulpt_core::commands::bundle_widget::<Wry>,
+            deskulpt_core::commands::call_plugin::<Wry>,
+            deskulpt_core::commands::emit_on_render_ready::<Wry>,
+            deskulpt_core::commands::exit_app::<Wry>,
+            deskulpt_core::commands::open_widget::<Wry>,
+            deskulpt_core::commands::rescan_widgets::<Wry>,
+            deskulpt_core::commands::set_render_ready::<Wry>,
+            deskulpt_core::commands::update_shortcut::<Wry>,
+        ])
+        .events(collect_events![
+            deskulpt_core::events::ExitAppEvent,
+            deskulpt_core::events::RemoveWidgetsEvent,
+            deskulpt_core::events::RenderWidgetsEvent,
+            deskulpt_core::events::ShowToastEvent,
+            deskulpt_core::events::SwitchThemeEvent,
+            deskulpt_core::events::UpdateSettingsEvent,
+        ])
+        .typ::<deskulpt_core::DeskulptWindow>()
+}
+
 /// Entry point for the Deskulpt backend.
 pub fn run() {
+    let bindings_builder = get_bindings_builder();
+
     Builder::default()
-        .setup(|app| {
+        .invoke_handler(bindings_builder.invoke_handler())
+        .setup(move |app| {
+            bindings_builder.mount_events(app);
+
             app.init_widgets_dir()?;
             app.init_persist_dir()?;
 
@@ -47,16 +77,6 @@ pub fn run() {
             Ok(())
         })
         .on_window_event(deskulpt_core::on_window_event)
-        .invoke_handler(generate_handler![
-            deskulpt_core::commands::call_plugin,
-            deskulpt_core::commands::bundle_widget,
-            deskulpt_core::commands::emit_on_render_ready,
-            deskulpt_core::commands::exit_app,
-            deskulpt_core::commands::open_widget,
-            deskulpt_core::commands::rescan_widgets,
-            deskulpt_core::commands::set_render_ready,
-            deskulpt_core::commands::update_shortcut,
-        ])
         .plugin(tauri_plugin_clipboard_manager::init())
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())
         // Prevent the opener plugin from registering handler for click event

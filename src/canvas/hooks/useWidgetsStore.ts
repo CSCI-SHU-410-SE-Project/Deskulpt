@@ -1,7 +1,6 @@
 import { create } from "zustand";
-import { WidgetSettings } from "../../bindings/types";
+import { WidgetSettings, events } from "../../bindings";
 import { FC, createElement } from "react";
-import { UpdateSettingsEventAPI } from "../../bindings/events";
 import ErrorDisplay from "../components/ErrorDisplay";
 
 interface WidgetProps {
@@ -131,9 +130,9 @@ export function updateWidgetSettings(
   });
 
   if (emit) {
-    UpdateSettingsEventAPI.emitTo("manager", { id, ...settings }).catch(
-      console.error,
-    );
+    events.updateSettingsEvent
+      .emitTo("manager", { id, ...settings })
+      .catch(console.error);
   }
 }
 

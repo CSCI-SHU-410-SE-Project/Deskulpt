@@ -1,5 +1,5 @@
 use once_cell::sync::Lazy;
-use tauri::{command, AppHandle};
+use tauri::{command, AppHandle, Runtime};
 use tokio::sync::Mutex;
 
 use super::error::{cmdbail, CmdResult};
@@ -26,8 +26,9 @@ static SYS_PLUGIN: Lazy<Mutex<deskulpt_plugin_sys::SysPlugin>> =
 /// a temporary implementation), `app_handle` is using the default runtime but
 /// it should be a generic `R: Runtime` parameter in the final implementation.
 #[command]
-pub async fn call_plugin(
-    app_handle: AppHandle,
+#[specta::specta]
+pub async fn call_plugin<R: Runtime>(
+    app_handle: AppHandle<R>,
     plugin: String,
     command: String,
     id: String,

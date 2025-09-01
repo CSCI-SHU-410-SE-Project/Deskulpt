@@ -13,7 +13,6 @@ version    = { workspace = true }
 proc-macro = true
 
 [dependencies]
-heck  = { workspace = true }
 quote = { workspace = true }
 syn   = { workspace = true }
 

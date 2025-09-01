@@ -20,4 +20,4 @@ pub use settings::Settings;
 pub use shortcuts::ShortcutsExt;
 pub use states::{StatesExtCanvasImode, StatesExtInitialRender, StatesExtWidgetConfigMap};
 pub use tray::TrayExt;
-pub use window::{on_window_event, WindowExt};
+pub use window::{on_window_event, DeskulptWindow, WindowExt};

@@ -19,6 +19,7 @@ use crate::states::StatesExtWidgetConfigMap;
 /// - Error traversing the widgets directory.
 /// - Error inferring widget ID from the directory entry.
 #[command]
+#[specta::specta]
 pub async fn rescan_widgets<R: Runtime>(
     app_handle: AppHandle<R>,
 ) -> CmdResult<HashMap<String, WidgetConfig>> {

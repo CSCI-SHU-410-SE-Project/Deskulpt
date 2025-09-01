@@ -15,6 +15,7 @@ use crate::StatesExtWidgetConfigMap;
 /// - Failed to access the widgets directory.
 /// - Error opening the directory.
 #[command]
+#[specta::specta]
 pub async fn open_widget<R: Runtime>(
     app_handle: AppHandle<R>,
     id: Option<String>,

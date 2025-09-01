@@ -5,8 +5,9 @@ use std::sync::Mutex;
 use anyhow::Result;
 use tauri::menu::MenuItem;
 use tauri::{App, AppHandle, Emitter, Manager, Runtime, WebviewWindow};
+use tauri_specta::Event;
 
-use crate::events::{DeskulptEvent, ShowToastEvent};
+use crate::events::ShowToastEvent;
 use crate::window::DeskulptWindow;
 
 /// Canvas interaction mode.
@@ -87,7 +88,10 @@ pub trait StatesExtCanvasImode<R: Runtime>: Manager<R> + Emitter<R> {
     ///
     /// This will show a toast message on the canvas window indicating the new
     /// interaction mode.
-    fn toggle_canvas_imode(&self) -> Result<()> {
+    fn toggle_canvas_imode(&self) -> Result<()>
+    where
+        Self: Sized,
+    {
         let canvas = DeskulptWindow::Canvas.webview_window(self);
 
         let state = self.state::<CanvasImodeState<R>>();

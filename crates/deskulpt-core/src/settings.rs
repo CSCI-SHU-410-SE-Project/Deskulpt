@@ -12,9 +12,8 @@ use serde::{Deserialize, Serialize};
 static SETTINGS_FILE: &str = "settings.json";
 
 /// Light/dark theme of the application.
-#[derive(Default, Deserialize, Serialize, ts_rs::TS)]
+#[derive(Clone, Default, Deserialize, Serialize, specta::Type)]
 #[serde(rename_all = "lowercase")]
-#[ts(export_to = "types.ts")]
 pub enum Theme {
     #[default]
     Light,
@@ -25,48 +24,92 @@ pub enum Theme {
 ///
 /// A keyboard shortcut being `None` means that it is disabled, otherwise it is
 /// a string parsable into [`Shortcut`](tauri_plugin_global_shortcut::Shortcut).
-#[derive(Default, Deserialize, Serialize, ts_rs::TS)]
+#[derive(Default, Deserialize, Serialize, specta::Type)]
 #[serde(rename_all = "camelCase")]
-#[ts(export_to = "types.ts")]
 pub struct Shortcuts {
     /// For toggling canvas interaction mode.
-    #[serde(default)]
     pub toggle_canvas_imode: Option<String>,
     /// For opening the manager window.
-    #[serde(default)]
     pub open_manager: Option<String>,
 }
 
+#[derive(Default, Deserialize)]
+pub struct ShortcutsPersisted {
+    #[serde(default)]
+    toggle_canvas_imode: Option<String>,
+    #[serde(default)]
+    open_manager: Option<String>,
+}
+
+impl From<ShortcutsPersisted> for Shortcuts {
+    fn from(persisted: ShortcutsPersisted) -> Self {
+        Self {
+            toggle_canvas_imode: persisted.toggle_canvas_imode,
+            open_manager: persisted.open_manager,
+        }
+    }
+}
+
 /// Application-wide settings.
-#[derive(Default, Deserialize, Serialize, ts_rs::TS)]
+#[derive(Default, Deserialize, Serialize, specta::Type)]
 #[serde(rename_all = "camelCase")]
-#[ts(export_to = "types.ts")]
 struct AppSettings {
     /// The application theme.
-    #[serde(default)]
     theme: Theme,
     /// The keyboard shortcuts.
-    #[serde(default)]
     shortcuts: Shortcuts,
+}
+
+#[derive(Default, Deserialize)]
+struct AppSettingsPersisted {
+    #[serde(default)]
+    theme: Theme,
+    #[serde(default)]
+    shortcuts: ShortcutsPersisted,
+}
+
+impl From<AppSettingsPersisted> for AppSettings {
+    fn from(persisted: AppSettingsPersisted) -> Self {
+        Self {
+            theme: persisted.theme,
+            shortcuts: persisted.shortcuts.into(),
+        }
+    }
 }
 
 /// Per-widget settings.
 ///
 /// Different from widget configurations, these are independent of the widget
 /// configuration files and are managed internally by the application.
-#[derive(Deserialize, Serialize, ts_rs::TS)]
+#[derive(Clone, Deserialize, Serialize, specta::Type)]
 #[serde(rename_all = "camelCase")]
-#[ts(export_to = "types.ts")]
 pub struct WidgetSettings {
     /// The leftmost x-coordinate in pixels.
-    #[serde(default)]
     x: i32,
     /// The topmost y-coordinate in pixels.
-    #[serde(default)]
     y: i32,
     /// The opacity in percentage.
+    opacity: i32,
+}
+
+#[derive(Deserialize)]
+pub struct WidgetSettingsPersisted {
+    #[serde(default)]
+    x: i32,
+    #[serde(default)]
+    y: i32,
     #[serde(default = "default_opacity")]
     opacity: i32,
+}
+
+impl From<WidgetSettingsPersisted> for WidgetSettings {
+    fn from(persisted: WidgetSettingsPersisted) -> Self {
+        Self {
+            x: persisted.x,
+            y: persisted.y,
+            opacity: persisted.opacity,
+        }
+    }
 }
 
 fn default_opacity() -> i32 {
@@ -74,16 +117,34 @@ fn default_opacity() -> i32 {
 }
 
 /// Full settings of the application.
-#[derive(Default, Deserialize, Serialize, ts_rs::TS)]
+#[derive(Default, Deserialize, Serialize, specta::Type)]
 #[serde(rename_all = "camelCase")]
-#[ts(export, export_to = "types.ts")]
 pub struct Settings {
     /// Application-wide settings.
-    #[serde(default)]
     app: AppSettings,
     /// The mapping from widget IDs to their respective settings.
-    #[serde(default)]
     widgets: HashMap<String, WidgetSettings>,
+}
+
+#[derive(Deserialize)]
+pub struct SettingsPersisted {
+    #[serde(default)]
+    app: AppSettingsPersisted,
+    #[serde(default)]
+    widgets: HashMap<String, WidgetSettingsPersisted>,
+}
+
+impl From<SettingsPersisted> for Settings {
+    fn from(persisted: SettingsPersisted) -> Self {
+        Self {
+            app: persisted.app.into(),
+            widgets: persisted
+                .widgets
+                .into_iter()
+                .map(|(k, v)| (k, v.into()))
+                .collect(),
+        }
+    }
 }
 
 impl Settings {
@@ -97,8 +158,8 @@ impl Settings {
         }
         let file = File::open(settings_path)?;
         let reader = BufReader::new(file);
-        let settings: Settings = serde_json::from_reader(reader)?;
-        Ok(settings)
+        let settings: SettingsPersisted = serde_json::from_reader(reader)?;
+        Ok(settings.into())
     }
 
     /// Write the settings to the persistence directory.

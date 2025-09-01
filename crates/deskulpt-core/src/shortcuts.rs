@@ -19,7 +19,7 @@ macro_rules! impl_shortcuts {
     ($($key: ident => $listener: expr),* $(,)?) => {
         paste! {
             /// Keyboard shortcuts registered in the application.
-            #[derive(Deserialize)]
+            #[derive(Deserialize, specta::Type)]
             #[serde(rename_all = "camelCase")]
             pub enum ShortcutKey {
                 $(
