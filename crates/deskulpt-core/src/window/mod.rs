@@ -52,9 +52,9 @@ impl DeskulptWindow {
     }
 }
 
-impl Into<EventTarget> for DeskulptWindow {
-    fn into(self) -> EventTarget {
-        self.label().into()
+impl From<DeskulptWindow> for EventTarget {
+    fn from(window: DeskulptWindow) -> Self {
+        window.label().into()
     }
 }
 

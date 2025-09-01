@@ -1055,7 +1055,6 @@ name = "deskulpt-core"
 version = "0.0.1"
 dependencies = [
  "anyhow",
- "deskulpt-macros",
  "deskulpt-plugin",
  "deskulpt-plugin-fs",
  "deskulpt-plugin-sys",
@@ -1080,14 +1079,6 @@ dependencies = [
  "thiserror 2.0.9",
  "tokio",
  "uuid",
-]
-
-[[package]]
-name = "deskulpt-macros"
-version = "0.0.1"
-dependencies = [
- "quote",
- "syn 2.0.95",
 ]
 
 [[package]]
