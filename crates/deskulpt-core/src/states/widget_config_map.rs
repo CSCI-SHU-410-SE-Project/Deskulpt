@@ -8,14 +8,14 @@ use anyhow::{anyhow, Result};
 use tauri::{App, AppHandle, Manager, Runtime};
 
 use crate::config::WidgetConfig;
-use crate::PathExt;
+use crate::path::PathExt;
 
 /// Managed state for the widget configuration map.
 #[derive(Default)]
 struct WidgetConfigMapState(RwLock<HashMap<String, WidgetConfig>>);
 
 /// Extension trait for operations on widget configuration map state.
-pub trait StatesExtWidgetConfigMap<R: Runtime>: Manager<R> + PathExt<R> {
+pub trait WidgetConfigMapStateExt<R: Runtime>: Manager<R> + PathExt<R> {
     /// Initialize state management for the widget configuration map.
     fn manage_widget_config_map(&self) {
         self.manage(WidgetConfigMapState::default());
@@ -66,5 +66,5 @@ pub trait StatesExtWidgetConfigMap<R: Runtime>: Manager<R> + PathExt<R> {
     }
 }
 
-impl<R: Runtime> StatesExtWidgetConfigMap<R> for App<R> {}
-impl<R: Runtime> StatesExtWidgetConfigMap<R> for AppHandle<R> {}
+impl<R: Runtime> WidgetConfigMapStateExt<R> for App<R> {}
+impl<R: Runtime> WidgetConfigMapStateExt<R> for AppHandle<R> {}

@@ -4,10 +4,12 @@
     html_favicon_url = "https://github.com/CSCI-SHU-410-SE-Project/Deskulpt/raw/main/src/public/deskulpt.svg"
 )]
 
-use deskulpt_core::{
-    PathExt, Settings, ShortcutsExt, StatesExtCanvasImode, StatesExtInitialRender,
-    StatesExtWidgetConfigMap, TrayExt, WindowExt,
-};
+use deskulpt_core::path::PathExt;
+use deskulpt_core::settings::Settings;
+use deskulpt_core::shortcuts::ShortcutsExt;
+use deskulpt_core::states::{CanvasImodeStateExt, InitialRenderStateExt, WidgetConfigMapStateExt};
+use deskulpt_core::tray::TrayExt;
+use deskulpt_core::window::WindowExt;
 use tauri::image::Image;
 use tauri::{generate_context, include_image, Builder, Wry};
 use tauri_specta::{collect_commands, collect_events};
@@ -36,7 +38,7 @@ pub fn get_bindings_builder() -> tauri_specta::Builder {
             deskulpt_core::events::SwitchThemeEvent,
             deskulpt_core::events::UpdateSettingsEvent,
         ])
-        .typ::<deskulpt_core::DeskulptWindow>()
+        .typ::<deskulpt_core::window::DeskulptWindow>()
 }
 
 /// Entry point for the Deskulpt backend.
@@ -76,7 +78,7 @@ pub fn run() {
 
             Ok(())
         })
-        .on_window_event(deskulpt_core::on_window_event)
+        .on_window_event(deskulpt_core::window::on_window_event)
         .plugin(tauri_plugin_clipboard_manager::init())
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())
         // Prevent the opener plugin from registering handler for click event

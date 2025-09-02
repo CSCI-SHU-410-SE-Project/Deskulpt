@@ -9,6 +9,19 @@ use tauri_specta::Event;
 use crate::events::RenderWidgetsEvent;
 use crate::window::DeskulptWindow;
 
+/// Inner structure for [`InitialRenderState`].
+#[derive(Default)]
+struct InitialRenderStateInner {
+    /// Whether the canvas is ready to render widgets.
+    ready: bool,
+    /// Pending event to emit when the canvas is ready.
+    ///
+    /// If the manager window wants to emit a [`RenderWidgetsEvent`] to the
+    /// canvas window when it is not ready to render widgets yet, the message
+    /// will be stored in this field and emitted later when the canvas is ready.
+    pending: Option<RenderWidgetsEvent>,
+}
+
 /// Managed state for the initial render.
 ///
 /// The first parameter indicates whether the canvas is ready to render widgets,
@@ -19,10 +32,10 @@ use crate::window::DeskulptWindow;
 /// case, we need to store the payload and emit it later when the canvas is
 /// ready.
 #[derive(Default)]
-struct InitialRenderState(Mutex<(bool, Option<RenderWidgetsEvent>)>);
+struct InitialRenderState(Mutex<InitialRenderStateInner>);
 
 /// Extension trait for operations related to the initial render.
-pub trait StatesExtInitialRender<R: Runtime>: Manager<R> + Emitter<R> {
+pub trait InitialRenderStateExt<R: Runtime>: Manager<R> + Emitter<R> {
     /// Initialize state management for the initial render.
     fn manage_initial_render(&self) {
         self.manage(InitialRenderState::default());
@@ -30,23 +43,23 @@ pub trait StatesExtInitialRender<R: Runtime>: Manager<R> + Emitter<R> {
 
     /// Set the canvas as ready to render widgets.
     ///
-    /// If there is a pending payload, a `render-widgets` event will be emitted
+    /// If there is a pending payload, a [`RenderWidgetsEvent`] will be emitted
     /// to the canvas with that payload.
     fn set_render_ready(&self) -> Result<()>
     where
         Self: Sized,
     {
         let state = self.state::<InitialRenderState>();
-        let mut render_ready = state.0.lock().unwrap();
-        render_ready.0 = true;
+        let mut initial_render = state.0.lock().unwrap();
+        initial_render.ready = true;
 
-        if let Some(event) = render_ready.1.take() {
+        if let Some(event) = initial_render.pending.take() {
             event.emit_to(self, DeskulptWindow::Canvas)?;
         }
         Ok(())
     }
 
-    /// Emit a `render-widgets` event to the canvas when it is ready.
+    /// Emit a [`RenderWidgetsEvent`] to the canvas when it is ready.
     ///
     /// If the canvas is already ready to render widgets, emit the given payload
     /// to the canvas immediately. Otherwise, store the payload as pending so
@@ -56,10 +69,10 @@ pub trait StatesExtInitialRender<R: Runtime>: Manager<R> + Emitter<R> {
         Self: Sized,
     {
         let state = self.state::<InitialRenderState>();
-        let mut render_ready = state.0.lock().unwrap();
+        let mut initial_render = state.0.lock().unwrap();
 
-        if !render_ready.0 {
-            render_ready.1 = Some(event);
+        if !initial_render.ready {
+            initial_render.pending = Some(event);
             return Ok(());
         }
         event.emit_to(self, DeskulptWindow::Canvas)?;
@@ -67,5 +80,5 @@ pub trait StatesExtInitialRender<R: Runtime>: Manager<R> + Emitter<R> {
     }
 }
 
-impl<R: Runtime> StatesExtInitialRender<R> for App<R> {}
-impl<R: Runtime> StatesExtInitialRender<R> for AppHandle<R> {}
+impl<R: Runtime> InitialRenderStateExt<R> for App<R> {}
+impl<R: Runtime> InitialRenderStateExt<R> for AppHandle<R> {}

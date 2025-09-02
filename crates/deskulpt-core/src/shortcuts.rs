@@ -7,8 +7,8 @@ use tauri::{App, AppHandle, Manager, Runtime};
 use tauri_plugin_global_shortcut::{GlobalShortcutExt, ShortcutState};
 
 use crate::settings::Settings;
-use crate::states::StatesExtCanvasImode;
-use crate::WindowExt;
+use crate::states::CanvasImodeStateExt;
+use crate::window::WindowExt;
 
 /// Implement [`ShortcutKey`] and [`ShortcutsExt`] for the given shortcuts.
 ///
