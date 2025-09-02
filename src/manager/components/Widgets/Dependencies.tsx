@@ -17,7 +17,7 @@ interface DependenciesProps {
 
 const Dependencies = memo(({ dependencies }: DependenciesProps) => {
   const dependenciesArray =
-    dependencies !== undefined ? Object.entries(dependencies) : [];
+    dependencies === undefined ? [] : Object.entries(dependencies);
 
   return dependenciesArray.length > 0 ? (
     <Popover.Root>
