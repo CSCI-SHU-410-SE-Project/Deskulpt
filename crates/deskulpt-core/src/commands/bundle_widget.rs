@@ -5,7 +5,7 @@ use super::error::{cmderr, CmdResult};
 use crate::bundler::WidgetBundlerBuilder;
 use crate::config::WidgetConfig;
 use crate::path::PathExt;
-use crate::states::StatesExtWidgetConfigMap;
+use crate::states::WidgetConfigMapStateExt;
 
 /// Bundle a widget.
 ///

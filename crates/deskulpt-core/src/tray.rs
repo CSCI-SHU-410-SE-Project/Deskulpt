@@ -11,11 +11,11 @@ use tauri_specta::Event;
 use tokio::time::sleep;
 
 use crate::events::ExitAppEvent;
-use crate::states::StatesExtCanvasImode;
+use crate::states::CanvasImodeStateExt;
 use crate::window::{DeskulptWindow, WindowExt};
 
 /// Extention trait for system tray-related operations.
-pub trait TrayExt<R: Runtime>: StatesExtCanvasImode<R> {
+pub trait TrayExt<R: Runtime>: CanvasImodeStateExt<R> {
     /// Create the system tray.
     fn create_tray(&self, icon: Image) -> Result<()>
     where
@@ -69,10 +69,10 @@ fn on_menu_event<R: Runtime>(app_handle: &AppHandle<R>, event: MenuEvent) {
             }
         },
         "tray-exit" => {
-            // Emit the "exit-app" event to the manager, which will invoke the
-            // `exit_app` command to clean up and actually exit the application
+            // Emit the ExitAppEvent to the manager, which will invoke the
+            // exit_app command to clean up and actually exit the application
             if let Err(e) = ExitAppEvent.emit_to(app_handle, DeskulptWindow::Manager) {
-                eprintln!("Failed to emit exit-app to manager: {e}");
+                eprintln!("Failed to emit ExitAppEvent to manager: {e}");
                 app_handle.exit(1); // Safeguard exit
             }
 

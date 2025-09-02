@@ -63,7 +63,7 @@ impl<R: Runtime> CanvasImodeStateInner<R> {
 struct CanvasImodeState<R: Runtime>(Mutex<CanvasImodeStateInner<R>>);
 
 /// Extension trait for operations on canvas interaction mode.
-pub trait StatesExtCanvasImode<R: Runtime>: Manager<R> + Emitter<R> {
+pub trait CanvasImodeStateExt<R: Runtime>: Manager<R> + Emitter<R> {
     /// Initialize state management for canvas interaction mode.
     ///
     /// The canvas is in sink mode by default.
@@ -114,12 +114,12 @@ pub trait StatesExtCanvasImode<R: Runtime>: Manager<R> + Emitter<R> {
         if let Err(e) =
             ShowToastEvent::Success(toast_message.to_string()).emit_to(self, DeskulptWindow::Canvas)
         {
-            eprintln!("Failed to emit show-toast to canvas: {}", e);
+            eprintln!("Failed to emit ShowToastEvent to canvas: {}", e);
         }
 
         Ok(())
     }
 }
 
-impl<R: Runtime> StatesExtCanvasImode<R> for App<R> {}
-impl<R: Runtime> StatesExtCanvasImode<R> for AppHandle<R> {}
+impl<R: Runtime> CanvasImodeStateExt<R> for App<R> {}
+impl<R: Runtime> CanvasImodeStateExt<R> for AppHandle<R> {}

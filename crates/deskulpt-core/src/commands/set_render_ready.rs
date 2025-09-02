@@ -1,13 +1,14 @@
 use tauri::{command, AppHandle, Runtime};
 
 use super::error::CmdResult;
-use crate::states::StatesExtInitialRender;
+use crate::states::InitialRenderStateExt;
 
-/// Wrapper of [`set_render_ready`](StatesExtInitialRender::set_render_ready).
+/// Wrapper of [`set_render_ready`](InitialRenderStateExt::set_render_ready).
 ///
 /// ### Errors
 ///
-/// - Failed to emit the `render-widgets` event to the canvas.
+/// - Failed to emit the
+///   [`RenderWidgetsEvent`](crate::events::RenderWidgetsEvent) to the canvas.
 #[command]
 #[specta::specta]
 pub async fn set_render_ready<R: Runtime>(app_handle: AppHandle<R>) -> CmdResult<()> {

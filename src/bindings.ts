@@ -306,11 +306,11 @@ export const commands = {
 
   /**
    * Wrapper of
-   * [`emit_on_render_ready`](StatesExtInitialRender::emit_on_render_ready).
+   * [`emit_on_render_ready`](InitialRenderStateExt::emit_on_render_ready).
    * 
    * ### Errors
    * 
-   * - Failed to emit the `render-widgets` event to the canvas.
+   * - Failed to emit the [`RenderWidgetsEvent`] to the canvas.
    */
   emitOnRenderReady: (payload: {
     event: RenderWidgetsEvent,
@@ -358,11 +358,12 @@ export const commands = {
   rescanWidgets: () => invoke<{ [key in string]: WidgetConfig }>("rescan_widgets"),
 
   /**
-   * Wrapper of [`set_render_ready`](StatesExtInitialRender::set_render_ready).
+   * Wrapper of [`set_render_ready`](InitialRenderStateExt::set_render_ready).
    * 
    * ### Errors
    * 
-   * - Failed to emit the `render-widgets` event to the canvas.
+   * - Failed to emit the
+   * [`RenderWidgetsEvent`](crate::events::RenderWidgetsEvent) to the canvas.
    */
   setRenderReady: () => invoke<null>("set_render_ready"),
 
