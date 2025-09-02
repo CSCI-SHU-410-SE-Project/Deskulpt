@@ -43,7 +43,7 @@ const Trigger = memo(({ id, value }: TriggerProps) => {
             config.type === "INVALID" && styles.indicatorInvalid,
           ]}
         />
-        <Text>{config.content.dir}</Text>
+        <Text>{config.dir}</Text>
       </Flex>
     </Tabs.Trigger>
   );

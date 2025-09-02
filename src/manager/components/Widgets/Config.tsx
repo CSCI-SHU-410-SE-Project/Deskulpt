@@ -28,16 +28,18 @@ const Config = memo(({ id }: ConfigProps) => {
             <Table.Body>
               <Table.Row align="center">
                 <Table.RowHeaderCell>Name</Table.RowHeaderCell>
-                <Table.Cell>{config.content.name}</Table.Cell>
+                <Table.Cell>{config.deskulptConf.name}</Table.Cell>
               </Table.Row>
               <Table.Row align="center">
                 <Table.RowHeaderCell>Entry</Table.RowHeaderCell>
-                <Table.Cell>{config.content.entry}</Table.Cell>
+                <Table.Cell>{config.deskulptConf.entry}</Table.Cell>
               </Table.Row>
               <Table.Row align="center">
                 <Table.RowHeaderCell>Dependencies</Table.RowHeaderCell>
                 <Table.Cell>
-                  <Dependencies dependencies={config.content.dependencies} />
+                  <Dependencies
+                    dependencies={config.packageJson?.dependencies}
+                  />
                 </Table.Cell>
               </Table.Row>
             </Table.Body>
@@ -46,7 +48,7 @@ const Config = memo(({ id }: ConfigProps) => {
           <Box pl="2" m="0" asChild>
             <pre>
               <Code size="2" variant="ghost">
-                {config.content.error}
+                {config.error}
               </Code>
             </pre>
           </Box>
