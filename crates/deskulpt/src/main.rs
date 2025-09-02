@@ -9,6 +9,7 @@ mod export_bindings {
     use deskulpt_specta::TypeScript;
 
     #[test]
+    #[ignore]
     fn main() {
         deskulpt::get_bindings_builder()
             .export(TypeScript::default(), "../../src/bindings.ts")
