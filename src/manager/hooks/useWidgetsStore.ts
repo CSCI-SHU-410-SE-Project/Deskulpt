@@ -1,11 +1,5 @@
 import { create } from "zustand";
-import { WidgetConfig, WidgetSettings } from "../../bindings/types";
-import { commands } from "../../core";
-import {
-  RemoveWidgetsEventAPI,
-  RenderWidgetsEventAPI,
-  UpdateSettingsEventAPI,
-} from "../../bindings/events";
+import { WidgetConfig, WidgetSettings, commands, events } from "../../bindings";
 
 const DEFAULT_WIDGET_SETTINGS: WidgetSettings = { x: 0, y: 0, opacity: 100 };
 
@@ -45,7 +39,7 @@ export async function rescan(initial: boolean = false) {
       (id) => !(id in configs),
     );
     if (removedIds.length > 0) {
-      await RemoveWidgetsEventAPI.emitTo("canvas", removedIds);
+      await events.removeWidgetsEvent.emitTo("canvas", removedIds);
     }
   }
 
@@ -53,7 +47,7 @@ export async function rescan(initial: boolean = false) {
   if (initial) {
     await commands.emitOnRenderReady({ event });
   } else {
-    await RenderWidgetsEventAPI.emitTo("canvas", event);
+    await events.renderWidgetsEvent.emitTo("canvas", event);
   }
 
   // Sort widgets by their directory name
@@ -89,9 +83,9 @@ export function updateWidgetSettings(
   });
 
   if (emit) {
-    UpdateSettingsEventAPI.emitTo("canvas", { id, ...settings }).catch(
-      console.error,
-    );
+    events.updateSettingsEvent
+      .emitTo("canvas", { id, ...settings })
+      .catch(console.error);
   }
 }
 

@@ -1,10 +1,10 @@
 import { useEffect } from "react";
 import { removeWidgets } from "./useWidgetsStore";
-import { RemoveWidgetsEventAPI } from "../../bindings/events";
+import { events } from "../../bindings";
 
 export function useRemoveWidgetsListener() {
   useEffect(() => {
-    const unlisten = RemoveWidgetsEventAPI.listen((event) => {
+    const unlisten = events.removeWidgetsEvent.listen((event) => {
       removeWidgets(event.payload);
     });
 

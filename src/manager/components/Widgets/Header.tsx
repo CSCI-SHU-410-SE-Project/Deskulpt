@@ -1,10 +1,9 @@
 import { Badge, Button, Flex } from "@radix-ui/themes";
 import { memo, useCallback } from "react";
-import { commands } from "../../../core";
 import { toast } from "sonner";
 import { LuFolderOpen, LuRepeat } from "react-icons/lu";
 import { useWidgetsStore } from "../../hooks";
-import { RenderWidgetsEventAPI } from "../../../bindings/events";
+import { commands, events } from "../../../bindings";
 
 interface HeaderProps {
   id: string;
@@ -14,7 +13,7 @@ const Header = memo(({ id }: HeaderProps) => {
   const type = useWidgetsStore((state) => state.widgets[id].config.type);
 
   const refreshAction = useCallback(() => {
-    RenderWidgetsEventAPI.emitTo("canvas", [{ id }]).then(() => {
+    events.renderWidgetsEvent.emitTo("canvas", [{ id }]).then(() => {
       toast.success("Widget refreshed.");
     });
   }, [id]);

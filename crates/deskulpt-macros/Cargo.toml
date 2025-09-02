@@ -1,5 +1,5 @@
 [package]
-description = "Macros for the Deskulpt core."
+description = "Macros for the Deskulpt application."
 name        = "deskulpt-macros"
 
 authors    = { workspace = true }
@@ -13,7 +13,6 @@ version    = { workspace = true }
 proc-macro = true
 
 [dependencies]
-heck  = { workspace = true }
 quote = { workspace = true }
 syn   = { workspace = true }
 

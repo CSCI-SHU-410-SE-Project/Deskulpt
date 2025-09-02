@@ -16,6 +16,7 @@ use crate::states::StatesExtWidgetConfigMap;
 /// - Widget has a configuration error.
 /// - Error bundling the widget.
 #[command]
+#[specta::specta]
 pub async fn bundle_widget<R: Runtime>(
     app_handle: AppHandle<R>,
     id: String,

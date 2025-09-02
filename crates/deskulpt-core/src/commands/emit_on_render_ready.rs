@@ -11,6 +11,7 @@ use crate::states::StatesExtInitialRender;
 ///
 /// - Failed to emit the `render-widgets` event to the canvas.
 #[command]
+#[specta::specta]
 pub async fn emit_on_render_ready<R: Runtime>(
     app_handle: AppHandle<R>,
     event: RenderWidgetsEvent,

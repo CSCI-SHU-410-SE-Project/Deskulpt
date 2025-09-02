@@ -16,7 +16,7 @@ import {
 } from "react";
 import { FaEdit } from "react-icons/fa";
 import { MdClear } from "react-icons/md";
-import { Shortcuts } from "../../../bindings/types";
+import { Shortcuts } from "../../../bindings";
 import { updateShortcut, useAppSettingsStore } from "../../hooks";
 import { toast } from "sonner";
 import { INVALID_KEYCODES, KEYCODES, MODIFIERS } from "./keyboard";

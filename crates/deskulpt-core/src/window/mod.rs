@@ -4,15 +4,15 @@ mod script;
 use anyhow::Result;
 use script::{CanvasInitJS, ManagerInitJS};
 use tauri::{
-    App, AppHandle, Manager, Runtime, WebviewUrl, WebviewWindow, WebviewWindowBuilder, Window,
-    WindowEvent,
+    App, AppHandle, EventTarget, Manager, Runtime, WebviewUrl, WebviewWindow, WebviewWindowBuilder,
+    Window, WindowEvent,
 };
 
 use crate::settings::Settings;
 
 /// Deskulpt window enum.
-#[derive(ts_rs::TS)]
-#[ts(rename_all = "lowercase", export, export_to = "types.ts")]
+#[derive(specta::Type)]
+#[specta(rename_all = "lowercase")]
 pub enum DeskulptWindow {
     /// The manager window.
     Manager,
@@ -49,6 +49,12 @@ impl DeskulptWindow {
         manager
             .get_webview_window(self.label())
             .unwrap_or_else(|| unreachable!("Window not found: {}", self.label()))
+    }
+}
+
+impl From<DeskulptWindow> for EventTarget {
+    fn from(window: DeskulptWindow) -> Self {
+        window.label().into()
     }
 }
 

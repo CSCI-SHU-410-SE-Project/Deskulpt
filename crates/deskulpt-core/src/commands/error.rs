@@ -22,6 +22,22 @@ impl Serialize for CmdError {
     }
 }
 
+impl specta::Type for CmdError {
+    fn inline(
+        type_map: &mut specta::TypeCollection,
+        generics: specta::Generics,
+    ) -> specta::datatype::DataType {
+        <String as specta::Type>::inline(type_map, generics)
+    }
+
+    fn reference(
+        type_map: &mut specta::TypeCollection,
+        generics: &[specta::datatype::DataType],
+    ) -> specta::datatype::reference::Reference {
+        <String as specta::Type>::reference(type_map, generics)
+    }
+}
+
 /// The return type of all Deskulpt core commands.
 pub type CmdResult<T> = Result<T, CmdError>;
 

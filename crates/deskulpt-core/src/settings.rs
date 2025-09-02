@@ -2,19 +2,39 @@
 
 use std::collections::HashMap;
 use std::fs::{create_dir_all, File};
+use std::hash::Hash;
 use std::io::{BufReader, BufWriter};
 use std::path::Path;
 
 use anyhow::Result;
+use deskulpt_macros::Persisted;
 use serde::{Deserialize, Serialize};
+
+/// Helper trait for converting a persisted type into its original type.
+pub trait FromPersisted<T> {
+    /// Convert a persisted value into its original type.
+    fn from_persisted(value: T) -> Self;
+}
+
+impl<K, V, VP> FromPersisted<HashMap<K, VP>> for HashMap<K, V>
+where
+    V: FromPersisted<VP>,
+    K: Hash + Eq,
+{
+    fn from_persisted(value: HashMap<K, VP>) -> Self {
+        value
+            .into_iter()
+            .map(|(k, v)| (k, V::from_persisted(v)))
+            .collect()
+    }
+}
 
 /// The settings file name in the persistence directory.
 static SETTINGS_FILE: &str = "settings.json";
 
 /// Light/dark theme of the application.
-#[derive(Default, Deserialize, Serialize, ts_rs::TS)]
+#[derive(Clone, Default, Deserialize, Serialize, specta::Type)]
 #[serde(rename_all = "lowercase")]
-#[ts(export_to = "types.ts")]
 pub enum Theme {
     #[default]
     Light,
@@ -25,28 +45,23 @@ pub enum Theme {
 ///
 /// A keyboard shortcut being `None` means that it is disabled, otherwise it is
 /// a string parsable into [`Shortcut`](tauri_plugin_global_shortcut::Shortcut).
-#[derive(Default, Deserialize, Serialize, ts_rs::TS)]
+#[derive(Default, Deserialize, Serialize, specta::Type, Persisted)]
 #[serde(rename_all = "camelCase")]
-#[ts(export_to = "types.ts")]
 pub struct Shortcuts {
     /// For toggling canvas interaction mode.
-    #[serde(default)]
     pub toggle_canvas_imode: Option<String>,
     /// For opening the manager window.
-    #[serde(default)]
     pub open_manager: Option<String>,
 }
 
 /// Application-wide settings.
-#[derive(Default, Deserialize, Serialize, ts_rs::TS)]
+#[derive(Default, Deserialize, Serialize, specta::Type, Persisted)]
 #[serde(rename_all = "camelCase")]
-#[ts(export_to = "types.ts")]
-struct AppSettings {
+pub struct AppSettings {
     /// The application theme.
-    #[serde(default)]
     theme: Theme,
     /// The keyboard shortcuts.
-    #[serde(default)]
+    #[persisted(type = "ShortcutsPersisted")]
     shortcuts: Shortcuts,
 }
 
@@ -54,18 +69,15 @@ struct AppSettings {
 ///
 /// Different from widget configurations, these are independent of the widget
 /// configuration files and are managed internally by the application.
-#[derive(Deserialize, Serialize, ts_rs::TS)]
+#[derive(Clone, Deserialize, Serialize, specta::Type, Persisted)]
 #[serde(rename_all = "camelCase")]
-#[ts(export_to = "types.ts")]
 pub struct WidgetSettings {
     /// The leftmost x-coordinate in pixels.
-    #[serde(default)]
     x: i32,
     /// The topmost y-coordinate in pixels.
-    #[serde(default)]
     y: i32,
     /// The opacity in percentage.
-    #[serde(default = "default_opacity")]
+    #[persisted(default = "default_opacity")]
     opacity: i32,
 }
 
@@ -74,15 +86,13 @@ fn default_opacity() -> i32 {
 }
 
 /// Full settings of the application.
-#[derive(Default, Deserialize, Serialize, ts_rs::TS)]
+#[derive(Default, Deserialize, Serialize, specta::Type, Persisted)]
 #[serde(rename_all = "camelCase")]
-#[ts(export, export_to = "types.ts")]
 pub struct Settings {
     /// Application-wide settings.
-    #[serde(default)]
     app: AppSettings,
     /// The mapping from widget IDs to their respective settings.
-    #[serde(default)]
+    #[persisted(type = "HashMap<String, WidgetSettingsPersisted>")]
     widgets: HashMap<String, WidgetSettings>,
 }
 
@@ -97,8 +107,8 @@ impl Settings {
         }
         let file = File::open(settings_path)?;
         let reader = BufReader::new(file);
-        let settings: Settings = serde_json::from_reader(reader)?;
-        Ok(settings)
+        let settings: SettingsPersisted = serde_json::from_reader(reader)?;
+        Ok(settings.into())
     }
 
     /// Write the settings to the persistence directory.

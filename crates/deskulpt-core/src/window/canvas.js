@@ -11,6 +11,6 @@ Object.defineProperty(window, "__DESKULPT_CANVAS_INTERNALS__", {
 const props = window.__DESKULPT_CANVAS_INTERNALS__;
 Object.freeze(props);
 Object.freeze(props.initialSettings);
-Object.values(props.initialSettings.widgetSettingsMap).forEach((value) => {
+Object.values(props.initialSettings.widgets).forEach((value) => {
   Object.freeze(value);
 });

@@ -1,0 +1,25 @@
+[package]
+description = "Generate frontend bindings for Deskulpt with specta."
+name        = "deskulpt-specta"
+
+authors    = { workspace = true }
+edition    = { workspace = true }
+homepage   = { workspace = true }
+license    = { workspace = true }
+repository = { workspace = true }
+version    = { workspace = true }
+
+[dependencies]
+handlebars        = { workspace = true }
+heck              = { workspace = true }
+serde             = { workspace = true, features = ["derive"] }
+specta            = { workspace = true }
+specta-typescript = { workspace = true }
+tauri-specta      = { workspace = true, features = ["typescript"] }
+thiserror         = { workspace = true }
+
+# TODO: Remove when we no longer need to post-process the rendered template
+regex = { workspace = true }
+
+[package.metadata.docs.rs]
+rustdoc-args = ["--extend-css", "../rustdoc.css"]
