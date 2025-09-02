@@ -1,6 +1,7 @@
 pnpm-lock.yaml
+*.ts.hbs
 
 # Auto-generated files
 crates/deskulpt-core/gen/
 src/gen/
-src/bindings/
+src/bindings.ts

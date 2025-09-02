@@ -4,8 +4,9 @@ use std::sync::Mutex;
 
 use anyhow::Result;
 use tauri::{App, AppHandle, Emitter, Manager, Runtime};
+use tauri_specta::Event;
 
-use crate::events::{DeskulptEvent, RenderWidgetsEvent};
+use crate::events::RenderWidgetsEvent;
 use crate::window::DeskulptWindow;
 
 /// Managed state for the initial render.
@@ -31,7 +32,10 @@ pub trait StatesExtInitialRender<R: Runtime>: Manager<R> + Emitter<R> {
     ///
     /// If there is a pending payload, a `render-widgets` event will be emitted
     /// to the canvas with that payload.
-    fn set_render_ready(&self) -> Result<()> {
+    fn set_render_ready(&self) -> Result<()>
+    where
+        Self: Sized,
+    {
         let state = self.state::<InitialRenderState>();
         let mut render_ready = state.0.lock().unwrap();
         render_ready.0 = true;
@@ -47,7 +51,10 @@ pub trait StatesExtInitialRender<R: Runtime>: Manager<R> + Emitter<R> {
     /// If the canvas is already ready to render widgets, emit the given payload
     /// to the canvas immediately. Otherwise, store the payload as pending so
     /// that it can be emitted later when the canvas is ready.
-    fn emit_on_render_ready(&self, event: RenderWidgetsEvent) -> Result<()> {
+    fn emit_on_render_ready(&self, event: RenderWidgetsEvent) -> Result<()>
+    where
+        Self: Sized,
+    {
         let state = self.state::<InitialRenderState>();
         let mut render_ready = state.0.lock().unwrap();
 
@@ -55,7 +62,8 @@ pub trait StatesExtInitialRender<R: Runtime>: Manager<R> + Emitter<R> {
             render_ready.1 = Some(event);
             return Ok(());
         }
-        event.emit_to(self, DeskulptWindow::Canvas)
+        event.emit_to(self, DeskulptWindow::Canvas)?;
+        Ok(())
     }
 }
 

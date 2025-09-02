@@ -9,6 +9,7 @@ use crate::settings::Settings;
 /// application in the end. Prior to exiting, it will try to dump the settings
 /// for persistence, but failure to do so will not prevent exiting.
 #[command]
+#[specta::specta]
 pub async fn exit_app<R: Runtime>(app_handle: AppHandle<R>, settings: Settings) {
     if let Err(e) = (|| {
         let persist_dir = app_handle.persist_dir()?;

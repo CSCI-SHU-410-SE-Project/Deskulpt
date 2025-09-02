@@ -11,6 +11,7 @@ use crate::shortcuts::{ShortcutKey, ShortcutsExt};
 /// - The new shortcut needs to be registered but is already registered.
 /// - Error registering or unregistering shortcuts.
 #[command]
+#[specta::specta]
 pub async fn update_shortcut<R: Runtime>(
     app_handle: AppHandle<R>,
     key: ShortcutKey,
