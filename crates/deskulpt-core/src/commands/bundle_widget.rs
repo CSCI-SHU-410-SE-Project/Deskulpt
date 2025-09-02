@@ -30,10 +30,12 @@ pub async fn bundle_widget<R: Runtime>(
             .get(&id)
             .ok_or_else(|| cmderr!("Widget (id={}) does not exist", id))?
         {
-            WidgetConfig::Valid { dir, entry, .. } => {
+            WidgetConfig::Valid {
+                dir, deskulpt_conf, ..
+            } => {
                 let builder = WidgetBundlerBuilder::new(
                     widgets_dir.join(dir),
-                    entry.clone(),
+                    deskulpt_conf.entry.clone(),
                     base_url,
                     apis_blob_url,
                 );

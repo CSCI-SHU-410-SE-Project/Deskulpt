@@ -21,6 +21,25 @@ theme: Theme;
 shortcuts: Shortcuts }
 
 /**
+ * Deserialized `deskulpt.conf.json`.
+ */
+export type DeskulptConf = { 
+/**
+ * The name of the widget.
+ * 
+ * This is purely used for display purposes. It does not need to be related
+ * to the widget directory name, and it does not need to be unique.
+ */
+name: string; 
+/**
+ * The entry point of the widget.
+ * 
+ * This is the path to the file that exports the widget component. The path
+ * should be relative to the widget directory.
+ */
+entry: string }
+
+/**
  * Deskulpt window enum.
  */
 export type DeskulptWindow = 
@@ -42,6 +61,11 @@ export type DeskulptWindow =
 export type ExitAppEvent = null
 
 export type JsonValue = null | boolean | number | string | JsonValue[] | { [key in string]: JsonValue }
+
+/**
+ * Deserialized `package.json`.
+ */
+export type PackageJson = { dependencies?: { [key in string]: string } }
 
 /**
  * Event for removing widgets.
@@ -183,35 +207,11 @@ export type WidgetConfig =
 /**
  * Valid widget configuration.
  */
-{ type: "VALID"; content: { 
-/**
- * The directory name of the widget.
- */
-dir: string; 
-/**
- * Display name of the widget.
- */
-name: string; 
-/**
- * Entry file of the widget source code.
- */
-entry: string; 
-/**
- * External dependencies of the widget as in `package.json`.
- */
-dependencies: { [key in string]: string } } } | 
+{ type: "VALID"; dir: string; deskulptConf: DeskulptConf; packageJson: PackageJson | null } | 
 /**
  * Invalid widget configuration.
  */
-{ type: "INVALID"; content: { 
-/**
- * The directory name of the widget.
- */
-dir: string; 
-/**
- * Error message.
- */
-error: string } }
+{ type: "INVALID"; dir: string; error: string }
 
 /**
  * Per-widget settings.

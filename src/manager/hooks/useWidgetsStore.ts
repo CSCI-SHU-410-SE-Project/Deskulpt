@@ -54,7 +54,7 @@ export async function rescan(initial: boolean = false) {
   useWidgetsStore.setState({
     widgets: Object.fromEntries(
       widgetsArray.sort(([, a], [, b]) =>
-        a.config.content.dir.localeCompare(b.config.content.dir),
+        a.config.dir.localeCompare(b.config.dir),
       ),
     ),
   });

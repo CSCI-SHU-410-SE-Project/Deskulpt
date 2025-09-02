@@ -12,11 +12,12 @@ const styles = {
 };
 
 interface DependenciesProps {
-  dependencies: { [key in string]?: string };
+  dependencies?: Record<string, string>;
 }
 
 const Dependencies = memo(({ dependencies }: DependenciesProps) => {
-  const dependenciesArray = Object.entries(dependencies);
+  const dependenciesArray =
+    dependencies === undefined ? [] : Object.entries(dependencies);
 
   return dependenciesArray.length > 0 ? (
     <Popover.Root>

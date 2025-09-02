@@ -11,19 +11,33 @@ use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 /// Deserialized `deskulpt.conf.json`.
-#[derive(Clone, Deserialize, Serialize)]
-struct DeskulptConf {
-    name: String,
-    entry: String,
-    #[serde(default)]
+#[derive(Clone, Serialize, Deserialize, specta::Type)]
+#[serde(rename_all = "camelCase")]
+pub struct DeskulptConf {
+    /// The name of the widget.
+    ///
+    /// This is purely used for display purposes. It does not need to be related
+    /// to the widget directory name, and it does not need to be unique.
+    pub name: String,
+    /// The entry point of the widget.
+    ///
+    /// This is the path to the file that exports the widget component. The path
+    /// should be relative to the widget directory.
+    pub entry: String,
+    /// Whether to ignore the widget.
+    ///
+    /// If set to true, the widget will not be discovered by the application.
+    /// This is useful for temporarily disabling a widget without removing it.
+    #[serde(default, skip_serializing)]
     ignore: bool,
 }
 
 /// Deserialized `package.json`.
-#[derive(Deserialize)]
-struct PackageJson {
+#[derive(Clone, Default, Serialize, Deserialize, specta::Type)]
+#[serde(rename_all = "camelCase")]
+pub struct PackageJson {
     #[serde(default)]
-    dependencies: HashMap<String, String>,
+    pub dependencies: HashMap<String, String>,
 }
 
 /// Helper trait for loading configuration files from a directory.
@@ -56,20 +70,18 @@ impl LoadFromFile for PackageJson {
 }
 
 /// Full configuration of a Deskulpt widget.
-#[derive(Serialize, Clone, specta::Type)]
-#[serde(tag = "type", content = "content", rename_all = "SCREAMING_SNAKE_CASE")]
+#[derive(Clone, Serialize, specta::Type)]
+#[serde(tag = "type", rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum WidgetConfig {
     /// Valid widget configuration.
     #[serde(rename_all = "camelCase")]
     Valid {
         /// The directory name of the widget.
         dir: String,
-        /// Display name of the widget.
-        name: String,
-        /// Entry file of the widget source code.
-        entry: String,
-        /// External dependencies of the widget as in `package.json`.
-        dependencies: HashMap<String, String>,
+        /// The required `deskulpt.conf.json` configuration.
+        deskulpt_conf: DeskulptConf,
+        /// The optional `package.json` configuration.
+        package_json: Option<PackageJson>,
     },
     /// Invalid widget configuration.
     #[serde(rename_all = "camelCase")]
@@ -107,9 +119,8 @@ impl WidgetConfig {
             return None;
         }
 
-        let dependencies = match PackageJson::load(dir).context("Failed to load package.json") {
-            Ok(Some(package_json)) => package_json.dependencies,
-            Ok(None) => Default::default(),
+        let package_json = match PackageJson::load(dir).context("Failed to load package.json") {
+            Ok(package_json) => package_json,
             Err(e) => {
                 return Some(WidgetConfig::Invalid {
                     dir: dir_name.to_string(),
@@ -120,9 +131,8 @@ impl WidgetConfig {
 
         Some(WidgetConfig::Valid {
             dir: dir_name.to_string(),
-            name: deskulpt_conf.name,
-            entry: deskulpt_conf.entry,
-            dependencies,
+            deskulpt_conf,
+            package_json,
         })
     }
 
