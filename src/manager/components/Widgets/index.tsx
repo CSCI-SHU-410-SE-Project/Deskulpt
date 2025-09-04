@@ -1,4 +1,4 @@
-import { Flex, ScrollArea, Separator, Tabs } from "@radix-ui/themes";
+import { Flex, ScrollArea, Separator, Tabs, Text } from "@radix-ui/themes";
 import { useWidgetsStore } from "../../hooks";
 import { memo } from "react";
 import { useShallow } from "zustand/shallow";
@@ -35,21 +35,33 @@ const WidgetsTab = memo(() => {
             <GlobalActions length={ids.length} />
           </Flex>
         </Tabs.List>
-        {ids.map((id, index) => (
-          <Tabs.Content
-            key={id}
-            value={`tab${index}`}
+        {ids.length === 0 ? (
+          <Flex
+            direction="column"
+            align="center"
+            justify="center"
+            width="75%"
             css={styles.tabContent}
-            asChild
           >
-            <Flex height="100%" direction="column" pl="2" gap="2" width="75%">
-              <Header id={id} />
-              <Config id={id} />
-              <Separator size="4" />
-              <Settings id={id} />
-            </Flex>
-          </Tabs.Content>
-        ))}
+            <Text size="2">No widgets available</Text>
+          </Flex>
+        ) : (
+          ids.map((id, index) => (
+            <Tabs.Content
+              key={id}
+              value={`tab${index}`}
+              css={styles.tabContent}
+              asChild
+            >
+              <Flex height="100%" direction="column" pl="2" gap="2" width="75%">
+                <Header id={id} />
+                <Config id={id} />
+                <Separator size="4" />
+                <Settings id={id} />
+              </Flex>
+            </Tabs.Content>
+          ))
+        )}
       </Flex>
     </Tabs.Root>
   );
