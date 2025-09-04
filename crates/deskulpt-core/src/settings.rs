@@ -59,10 +59,10 @@ pub struct Shortcuts {
 #[serde(rename_all = "camelCase")]
 pub struct AppSettings {
     /// The application theme.
-    theme: Theme,
+    pub theme: Theme,
     /// The keyboard shortcuts.
     #[persisted(type = "ShortcutsPersisted")]
-    shortcuts: Shortcuts,
+    pub shortcuts: Shortcuts,
 }
 
 /// Per-widget settings.
@@ -73,12 +73,12 @@ pub struct AppSettings {
 #[serde(rename_all = "camelCase")]
 pub struct WidgetSettings {
     /// The leftmost x-coordinate in pixels.
-    x: i32,
+    pub x: i32,
     /// The topmost y-coordinate in pixels.
-    y: i32,
+    pub y: i32,
     /// The opacity in percentage.
     #[persisted(default = "default_opacity")]
-    opacity: i32,
+    pub opacity: i32,
 }
 
 fn default_opacity() -> i32 {
@@ -90,10 +90,11 @@ fn default_opacity() -> i32 {
 #[serde(rename_all = "camelCase")]
 pub struct Settings {
     /// Application-wide settings.
-    app: AppSettings,
+    #[persisted(type = "AppSettingsPersisted")]
+    pub app: AppSettings,
     /// The mapping from widget IDs to their respective settings.
     #[persisted(type = "HashMap<String, WidgetSettingsPersisted>")]
-    widgets: HashMap<String, WidgetSettings>,
+    pub widgets: HashMap<String, WidgetSettings>,
 }
 
 impl Settings {
@@ -122,12 +123,7 @@ impl Settings {
         }
         let file = File::create(persist_dir.join(SETTINGS_FILE))?;
         let writer = BufWriter::new(file);
-        serde_json::to_writer(writer, self)?;
+        serde_json::to_writer_pretty(writer, self)?;
         Ok(())
-    }
-
-    /// Get the mutable reference to the keyboard shortcuts.
-    pub fn shortcuts_mut(&mut self) -> &mut Shortcuts {
-        &mut self.app.shortcuts
     }
 }

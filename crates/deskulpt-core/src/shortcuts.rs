@@ -6,15 +6,15 @@ use serde::Deserialize;
 use tauri::{App, AppHandle, Manager, Runtime};
 use tauri_plugin_global_shortcut::{GlobalShortcutExt, ShortcutState};
 
-use crate::settings::Settings;
+use crate::settings::Shortcuts;
 use crate::states::CanvasImodeStateExt;
 use crate::window::WindowExt;
 
 /// Implement [`ShortcutKey`] and [`ShortcutsExt`] for the given shortcuts.
 ///
 /// This macro takes a list of `key => listener` pairs, where `key` corresponds
-/// to the keys of [`Shortcuts`](crate::settings::Shortcuts) and `listener` is
-/// the corresponding shortcut handler callback.
+/// to the keys of [`Shortcuts`] and `listener` is the corresponding shortcut
+/// handler callback.
 macro_rules! impl_shortcuts {
     ($($key: ident => $listener: expr),* $(,)?) => {
         paste! {
@@ -30,14 +30,10 @@ macro_rules! impl_shortcuts {
 
         /// Extension trait for keyboard shortcuts.
         pub trait ShortcutsExt<R: Runtime>: Manager<R> + GlobalShortcutExt<R> {
-            /// Initialize keyboard shortcuts according to the initial settings.
+            /// Initialize the given keyboard shortcuts.
             ///
-            /// If any shortcut fails to be registered, the initial settings will be
-            /// modified to remove that shortcut. This is to prevent the application
-            /// from panicking only due to non-critical failures, and also sync this
-            /// information to the frontend.
-            fn init_shortcuts(&self, settings: &mut Settings) {
-                let shortcuts = settings.shortcuts_mut();
+            /// If any shortcut fails to be registered, it will be changed to None.
+            fn init_shortcuts(&self, shortcuts: &mut Shortcuts) {
                 paste! {
                     $(
                         if let Err(e) = self.update_shortcut(
