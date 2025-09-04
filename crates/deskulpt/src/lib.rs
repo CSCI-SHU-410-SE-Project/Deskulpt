@@ -70,7 +70,7 @@ pub fn run() {
             #[cfg(target_os = "macos")]
             app.set_activation_policy(tauri::ActivationPolicy::Accessory);
 
-            app.init_shortcuts(&mut settings);
+            app.init_shortcuts(&mut settings.app.shortcuts);
 
             app.create_manager(&settings)?;
             app.create_canvas(&settings)?;
