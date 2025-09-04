@@ -8,6 +8,7 @@ use std::path::Path;
 
 use anyhow::Result;
 use deskulpt_macros::Persisted;
+use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
 /// Helper trait for converting a persisted type into its original type.
@@ -32,8 +33,11 @@ where
 /// The settings file name in the persistence directory.
 static SETTINGS_FILE: &str = "settings.json";
 
+/// The URL to the JSON schema file of the settings.
+static SETTINGS_SCHEMA_URL: &str = "https://csci-shu-410-se-project.github.io/settings-schema.json";
+
 /// Light/dark theme of the application.
-#[derive(Clone, Default, Deserialize, Serialize, specta::Type)]
+#[derive(Clone, Default, Deserialize, Serialize, JsonSchema, specta::Type)]
 #[serde(rename_all = "lowercase")]
 pub enum Theme {
     #[default]
@@ -45,7 +49,7 @@ pub enum Theme {
 ///
 /// A keyboard shortcut being `None` means that it is disabled, otherwise it is
 /// a string parsable into [`Shortcut`](tauri_plugin_global_shortcut::Shortcut).
-#[derive(Default, Deserialize, Serialize, specta::Type, Persisted)]
+#[derive(Default, Deserialize, Serialize, JsonSchema, specta::Type, Persisted)]
 #[serde(rename_all = "camelCase")]
 pub struct Shortcuts {
     /// For toggling canvas interaction mode.
@@ -55,7 +59,7 @@ pub struct Shortcuts {
 }
 
 /// Application-wide settings.
-#[derive(Default, Deserialize, Serialize, specta::Type, Persisted)]
+#[derive(Default, Deserialize, Serialize, JsonSchema, specta::Type, Persisted)]
 #[serde(rename_all = "camelCase")]
 pub struct AppSettings {
     /// The application theme.
@@ -69,7 +73,7 @@ pub struct AppSettings {
 ///
 /// Different from widget configurations, these are independent of the widget
 /// configuration files and are managed internally by the application.
-#[derive(Clone, Deserialize, Serialize, specta::Type, Persisted)]
+#[derive(Clone, Deserialize, Serialize, JsonSchema, specta::Type, Persisted)]
 #[serde(rename_all = "camelCase")]
 pub struct WidgetSettings {
     /// The leftmost x-coordinate in pixels.
@@ -85,8 +89,8 @@ fn default_opacity() -> i32 {
     100
 }
 
-/// Full settings of the application.
-#[derive(Default, Deserialize, Serialize, specta::Type, Persisted)]
+/// Full settings of the Deskulpt application.
+#[derive(Default, Deserialize, Serialize, JsonSchema, specta::Type, Persisted)]
 #[serde(rename_all = "camelCase")]
 pub struct Settings {
     /// Application-wide settings.
@@ -95,6 +99,31 @@ pub struct Settings {
     /// The mapping from widget IDs to their respective settings.
     #[persisted(type = "HashMap<String, WidgetSettingsPersisted>")]
     pub widgets: HashMap<String, WidgetSettings>,
+}
+
+/// Wrapper of [`Settings`] with additional metadata.
+#[derive(Serialize)]
+struct SettingsWithMeta<'a> {
+    /// The JSON schema URL `$schema`.
+    #[serde(rename = "$schema")]
+    schema: &'static str,
+    /// The settings.
+    ///
+    /// This field is borrowed because this struct is only for serialization
+    /// purposes and does not need ownership so as to avoid unnecessary cloning.
+    /// It is flattened in serialization.
+    #[serde(flatten)]
+    settings: &'a Settings,
+}
+
+impl<'a> SettingsWithMeta<'a> {
+    /// Wrap the borrowed settings with metadata.
+    fn new(settings: &'a Settings) -> Self {
+        Self {
+            schema: SETTINGS_SCHEMA_URL,
+            settings,
+        }
+    }
 }
 
 impl Settings {
@@ -123,7 +152,8 @@ impl Settings {
         }
         let file = File::create(persist_dir.join(SETTINGS_FILE))?;
         let writer = BufWriter::new(file);
-        serde_json::to_writer_pretty(writer, self)?;
+        let settings = SettingsWithMeta::new(self);
+        serde_json::to_writer_pretty(writer, &settings)?;
         Ok(())
     }
 }

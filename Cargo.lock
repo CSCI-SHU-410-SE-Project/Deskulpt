@@ -1040,6 +1040,7 @@ version = "0.0.1"
 dependencies = [
  "deskulpt-core",
  "deskulpt-specta",
+ "schemars 1.0.4",
  "serde_json",
  "specta",
  "tauri",
@@ -1068,6 +1069,7 @@ dependencies = [
  "path-clean",
  "rolldown",
  "rolldown_common",
+ "schemars 1.0.4",
  "serde",
  "serde_json",
  "serialize-to-javascript",
@@ -4448,6 +4450,26 @@ dependencies = [
 ]
 
 [[package]]
+name = "ref-cast"
+version = "1.0.24"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4a0ae411dbe946a674d89546582cea4ba2bb8defac896622d6496f14c23ba5cf"
+dependencies = [
+ "ref-cast-impl",
+]
+
+[[package]]
+name = "ref-cast-impl"
+version = "1.0.24"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1165225c21bff1f3bbce98f5a1f889949bc902d3575308cc7b0de30b4f6d27c7"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.95",
+]
+
+[[package]]
 name = "regex"
 version = "1.11.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4920,7 +4942,7 @@ checksum = "09c024468a378b7e36765cd36702b7a90cc3cba11654f6685c8f233408e89e92"
 dependencies = [
  "dyn-clone",
  "indexmap 1.9.3",
- "schemars_derive",
+ "schemars_derive 0.8.21",
  "serde",
  "serde_json",
  "url",
@@ -4928,10 +4950,35 @@ dependencies = [
 ]
 
 [[package]]
+name = "schemars"
+version = "1.0.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "82d20c4491bc164fa2f6c5d44565947a52ad80b9505d8e36f8d54c27c739fcd0"
+dependencies = [
+ "dyn-clone",
+ "ref-cast",
+ "schemars_derive 1.0.4",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "schemars_derive"
 version = "0.8.21"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b1eee588578aff73f856ab961cd2f79e36bc45d7ded33a7562adba4667aecc0e"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "serde_derive_internals",
+ "syn 2.0.95",
+]
+
+[[package]]
+name = "schemars_derive"
+version = "1.0.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "33d020396d1d138dc19f1165df7545479dcd58d93810dc5d646a16e55abefa80"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -5610,7 +5657,7 @@ dependencies = [
  "heck 0.5.0",
  "json-patch",
  "quote",
- "schemars",
+ "schemars 0.8.21",
  "semver",
  "serde",
  "serde_json",
@@ -5671,7 +5718,7 @@ dependencies = [
  "anyhow",
  "glob",
  "plist",
- "schemars",
+ "schemars 0.8.21",
  "serde",
  "serde_json",
  "tauri-utils",
@@ -5720,7 +5767,7 @@ dependencies = [
  "objc2-app-kit 0.3.1",
  "objc2-foundation 0.3.1",
  "open",
- "schemars",
+ "schemars 0.8.21",
  "serde",
  "serde_json",
  "tauri",
@@ -5831,7 +5878,7 @@ dependencies = [
  "proc-macro2",
  "quote",
  "regex",
- "schemars",
+ "schemars 0.8.21",
  "semver",
  "serde",
  "serde-untagged",
