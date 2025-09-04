@@ -110,7 +110,7 @@ settings?: WidgetSettings;
 code?: string }
 
 /**
- * Full settings of the application.
+ * Full settings of the Deskulpt application.
  */
 export type Settings = { 
 /**
