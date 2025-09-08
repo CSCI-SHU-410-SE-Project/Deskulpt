@@ -9,7 +9,6 @@ pub mod commands;
 mod config;
 pub mod events;
 pub mod path;
-mod persistence;
 mod settings;
 pub mod states;
 pub mod tray;
