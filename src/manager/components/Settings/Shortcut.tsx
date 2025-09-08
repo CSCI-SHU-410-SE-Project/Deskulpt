@@ -16,7 +16,7 @@ import {
 } from "react";
 import { FaEdit } from "react-icons/fa";
 import { MdClear } from "react-icons/md";
-import { Shortcuts } from "../../../bindings";
+import { ShortcutKey } from "../../../bindings";
 import { updateShortcut, useAppSettingsStore } from "../../hooks";
 import { toast } from "sonner";
 import { INVALID_KEYCODES, KEYCODES, MODIFIERS } from "./keyboard";
@@ -36,7 +36,7 @@ const styles = {
 };
 
 interface Props {
-  shortcutKey: keyof Shortcuts;
+  shortcutKey: ShortcutKey;
 }
 
 const ShortcutAction = ({ shortcutKey }: Props) => {
@@ -126,7 +126,7 @@ const ShortcutAction = ({ shortcutKey }: Props) => {
   }, []);
 
   const confirmAction = useCallback(() => {
-    updateShortcut(shortcutKey, shortcut, value === "" ? null : value)
+    updateShortcut(shortcutKey, value === "" ? undefined : value)
       .then(() => {
         setPlaceholder(INITIAL_PLACEHOLDER);
         setIsValid(true);
@@ -135,7 +135,7 @@ const ShortcutAction = ({ shortcutKey }: Props) => {
       .catch(() => {
         toast.error("Failed to update shortcut.");
       });
-  }, [shortcutKey, shortcut, value]);
+  }, [shortcutKey, value]);
 
   const clearAction = useCallback(() => {
     if (inputRef.current === null) {
@@ -149,7 +149,7 @@ const ShortcutAction = ({ shortcutKey }: Props) => {
 
   return (
     <Flex align="center" justify="end" gap="4">
-      {shortcut === null ? (
+      {shortcut === undefined ? (
         <Text color="gray">Disabled</Text>
       ) : (
         <Kbd size="3">{shortcut}</Kbd>

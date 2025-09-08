@@ -9,8 +9,12 @@ pub mod commands;
 mod config;
 pub mod events;
 pub mod path;
-pub mod settings;
-pub mod shortcuts;
+mod settings;
 pub mod states;
 pub mod tray;
 pub mod window;
+
+/// Re-exports for JSON schema generation.
+pub mod schema {
+    pub use crate::settings::Settings;
+}

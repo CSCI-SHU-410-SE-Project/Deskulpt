@@ -18,7 +18,7 @@ theme: Theme;
 /**
  * The keyboard shortcuts.
  */
-shortcuts: Shortcuts }
+shortcuts: Partial<{ [key in ShortcutKey]: string }> }
 
 /**
  * Deserialized `deskulpt.conf.json`.
@@ -123,25 +123,40 @@ app: AppSettings;
 widgets: { [key in string]: WidgetSettings } }
 
 /**
- * Keyboard shortcuts registered in the application.
+ * Message for updating settings.
  */
-export type ShortcutKey = "toggleCanvasImode" | "openManager"
+export type SettingsUpdate = 
+/**
+ * Update the theme.
+ */
+{ theme: Theme } | 
+/**
+ * Update a keyboard shortcut.
+ * 
+ * The first element is the shortcut key, and the second element is the new
+ * shortcut value. `None` means to remove the shortcut.
+ */
+{ shortcut: [ShortcutKey, string | null] } | 
+/**
+ * Update the settings of a widget.
+ * 
+ * The first element is the widget ID, and the second element is the new
+ * widget settings.
+ */
+{ widget: [string, WidgetSettings] }
 
 /**
- * Keyboard shortcuts registered in the application.
- * 
- * A keyboard shortcut being `None` means that it is disabled, otherwise it is
- * a string parsable into [`Shortcut`](tauri_plugin_global_shortcut::Shortcut).
+ * Types of keyboard shortcuts in the application.
  */
-export type Shortcuts = { 
+export type ShortcutKey = 
 /**
  * For toggling canvas interaction mode.
  */
-toggleCanvasImode: string | null; 
+"toggleCanvasImode" | 
 /**
  * For opening the manager window.
  */
-openManager: string | null }
+"openManager"
 
 /**
  * Event for showing a toast notification.
@@ -153,11 +168,11 @@ export type ShowToastEvent =
 /**
  * Show a [success](https://sonner.emilkowal.ski/toast#success) toast.
  */
-{ type: "SUCCESS"; content: string } | 
+{ type: "success"; content: string } | 
 /**
  * Show an [error](https://sonner.emilkowal.ski/toast#error) toast.
  */
-{ type: "ERROR"; content: string }
+{ type: "error"; content: string }
 
 /**
  * Event for switching the app theme.
@@ -207,11 +222,11 @@ export type WidgetConfig =
 /**
  * Valid widget configuration.
  */
-{ type: "VALID"; dir: string; deskulptConf: DeskulptConf; packageJson: PackageJson | null } | 
+{ type: "valid"; dir: string; deskulptConf: DeskulptConf; packageJson: PackageJson | null } | 
 /**
  * Invalid widget configuration.
  */
-{ type: "INVALID"; dir: string; error: string }
+{ type: "invalid"; dir: string; error: string }
 
 /**
  * Per-widget settings.
@@ -368,17 +383,17 @@ export const commands = {
   setRenderReady: () => invoke<null>("set_render_ready"),
 
   /**
-   * Wrapper of [`update_shortcut`](ShortcutsExt::update_shortcut).
+   * Update the settings.
+   * 
+   * This command updates the settings state in the backend. If an update has
+   * side effects, they will be applied prior to the update being committed. See
+   * [`SettingsStateExt`] for more information.
    * 
    * ### Errors
    * 
-   * - The old shortcut needs to be unregistered but is not registered.
-   * - The new shortcut needs to be registered but is already registered.
-   * - Error registering or unregistering shortcuts.
+   * - Failed to apply the side effects, if any.
    */
-  updateShortcut: (payload: {
-    key: ShortcutKey,
-    oldShortcut: string | null,
-    newShortcut: string | null,
-  }) => invoke<null>("update_shortcut", payload),
+  updateSettings: (payload: {
+    update: SettingsUpdate,
+  }) => invoke<null>("update_settings", payload),
 };

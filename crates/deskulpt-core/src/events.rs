@@ -53,7 +53,7 @@ pub struct RenderWidgetsEvent(
 /// This event is emitted from the backend to the canvas window when a toast
 /// notification needs to be displayed.
 #[derive(Clone, Serialize, Deserialize, specta::Type, Event)]
-#[serde(tag = "type", content = "content", rename_all = "SCREAMING_SNAKE_CASE")]
+#[serde(tag = "type", content = "content", rename_all = "camelCase")]
 pub enum ShowToastEvent {
     /// Show a [success](https://sonner.emilkowal.ski/toast#success) toast.
     Success(String),
