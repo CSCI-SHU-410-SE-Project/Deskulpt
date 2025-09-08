@@ -22,7 +22,7 @@ mod export_schema {
     use std::fs::File;
     use std::io::BufWriter;
 
-    use deskulpt_core::settings::Settings;
+    use deskulpt_core::schema::Settings;
     use schemars::schema_for;
 
     #[test]

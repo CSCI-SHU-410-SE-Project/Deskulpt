@@ -5,9 +5,9 @@
 )]
 
 use deskulpt_core::path::PathExt;
-use deskulpt_core::settings::Settings;
-use deskulpt_core::shortcuts::ShortcutsExt;
-use deskulpt_core::states::{CanvasImodeStateExt, InitialRenderStateExt, WidgetConfigMapStateExt};
+use deskulpt_core::states::{
+    CanvasImodeStateExt, InitialRenderStateExt, SettingsStateExt, WidgetConfigMapStateExt,
+};
 use deskulpt_core::tray::TrayExt;
 use deskulpt_core::window::WindowExt;
 use tauri::image::Image;
@@ -53,14 +53,7 @@ pub fn run() {
             app.init_widgets_dir()?;
             app.init_persist_dir()?;
 
-            let mut settings = match Settings::load(app.persist_dir()?) {
-                Ok(settings) => settings,
-                Err(e) => {
-                    eprintln!("Failed to load settings: {e}");
-                    Settings::default()
-                },
-            };
-
+            app.manage_settings();
             app.manage_initial_render();
             app.manage_widget_config_map();
             app.manage_canvas_imode();
@@ -70,10 +63,8 @@ pub fn run() {
             #[cfg(target_os = "macos")]
             app.set_activation_policy(tauri::ActivationPolicy::Accessory);
 
-            app.init_shortcuts(&mut settings.app.shortcuts);
-
-            app.create_manager(&settings)?;
-            app.create_canvas(&settings)?;
+            app.create_manager()?;
+            app.create_canvas()?;
             app.create_tray(DESKULPT_ICON)?;
 
             Ok(())

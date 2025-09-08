@@ -8,19 +8,6 @@ import * as tauriEvent from "@tauri-apps/api/event";
 // =============================================================================
 
 /**
- * Application-wide settings.
- */
-export type AppSettings = { 
-/**
- * The application theme.
- */
-theme: Theme; 
-/**
- * The keyboard shortcuts.
- */
-shortcuts: Shortcuts }
-
-/**
  * Deserialized `deskulpt.conf.json`.
  */
 export type DeskulptConf = { 
@@ -112,36 +99,33 @@ code?: string }
 /**
  * Full settings of the Deskulpt application.
  */
-export type Settings = { 
+export type Settings = 
 /**
  * Application-wide settings.
  */
-app: AppSettings; 
+({ 
+/**
+ * The application theme.
+ */
+theme: Theme; 
+/**
+ * The keyboard shortcuts.
+ */
+shortcuts: Partial<{ [key in ShortcutKey]: string }> }) & { 
 /**
  * The mapping from widget IDs to their respective settings.
  */
 widgets: { [key in string]: WidgetSettings } }
 
-/**
- * Keyboard shortcuts registered in the application.
- */
-export type ShortcutKey = "toggleCanvasImode" | "openManager"
-
-/**
- * Keyboard shortcuts registered in the application.
- * 
- * A keyboard shortcut being `None` means that it is disabled, otherwise it is
- * a string parsable into [`Shortcut`](tauri_plugin_global_shortcut::Shortcut).
- */
-export type Shortcuts = { 
+export type ShortcutKey = 
 /**
  * For toggling canvas interaction mode.
  */
-toggleCanvasImode: string | null; 
+"TOGGLE_CANVAS_IMODE" | 
 /**
  * For opening the manager window.
  */
-openManager: string | null }
+"OPEN_MANAGER"
 
 /**
  * Event for showing a toast notification.
@@ -378,7 +362,6 @@ export const commands = {
    */
   updateShortcut: (payload: {
     key: ShortcutKey,
-    oldShortcut: string | null,
-    newShortcut: string | null,
+    shortcut: string | null,
   }) => invoke<null>("update_shortcut", payload),
 };

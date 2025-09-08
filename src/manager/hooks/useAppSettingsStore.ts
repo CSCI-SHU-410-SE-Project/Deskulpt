@@ -1,8 +1,9 @@
 import { create } from "zustand";
-import { Shortcuts, commands, events } from "../../bindings";
+import { ShortcutKey, commands, events } from "../../bindings";
 
 export const useAppSettingsStore = create(() => ({
-  ...window.__DESKULPT_MANAGER_INTERNALS__.initialSettings.app,
+  theme: window.__DESKULPT_MANAGER_INTERNALS__.initialSettings.theme,
+  shortcuts: window.__DESKULPT_MANAGER_INTERNALS__.initialSettings.shortcuts,
 }));
 
 export async function toggleTheme() {
@@ -14,12 +15,11 @@ export async function toggleTheme() {
 }
 
 export async function updateShortcut(
-  key: keyof Shortcuts,
-  oldShortcut: string | null,
-  newShortcut: string | null,
+  key: ShortcutKey,
+  shortcut: string | null,
 ) {
-  await commands.updateShortcut({ key, oldShortcut, newShortcut });
+  await commands.updateShortcut({ key, shortcut });
   useAppSettingsStore.setState((state) => ({
-    shortcuts: { ...state.shortcuts, [key]: newShortcut },
+    shortcuts: { ...state.shortcuts, [key]: shortcut },
   }));
 }

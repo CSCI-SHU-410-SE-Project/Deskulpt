@@ -1,8 +1,7 @@
 //! Application and widget settings.
 
-use std::collections::HashMap;
+use std::collections::BTreeMap;
 use std::fs::{create_dir_all, File};
-use std::hash::Hash;
 use std::io::{BufReader, BufWriter};
 use std::path::Path;
 
@@ -11,24 +10,7 @@ use deskulpt_macros::Persisted;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
-/// Helper trait for converting a persisted type into its original type.
-pub trait FromPersisted<T> {
-    /// Convert a persisted value into its original type.
-    fn from_persisted(value: T) -> Self;
-}
-
-impl<K, V, VP> FromPersisted<HashMap<K, VP>> for HashMap<K, V>
-where
-    V: FromPersisted<VP>,
-    K: Hash + Eq,
-{
-    fn from_persisted(value: HashMap<K, VP>) -> Self {
-        value
-            .into_iter()
-            .map(|(k, v)| (k, V::from_persisted(v)))
-            .collect()
-    }
-}
+mod shortcuts;
 
 /// The settings file name in the persistence directory.
 static SETTINGS_FILE: &str = "settings.json";
@@ -45,17 +27,15 @@ pub enum Theme {
     Dark,
 }
 
-/// Keyboard shortcuts registered in the application.
-///
-/// A keyboard shortcut being `None` means that it is disabled, otherwise it is
-/// a string parsable into [`Shortcut`](tauri_plugin_global_shortcut::Shortcut).
-#[derive(Default, Deserialize, Serialize, JsonSchema, specta::Type, Persisted)]
-#[serde(rename_all = "camelCase")]
-pub struct Shortcuts {
+#[derive(
+    Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Deserialize, Serialize, JsonSchema, specta::Type,
+)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+pub enum ShortcutKey {
     /// For toggling canvas interaction mode.
-    pub toggle_canvas_imode: Option<String>,
+    ToggleCanvasImode,
     /// For opening the manager window.
-    pub open_manager: Option<String>,
+    OpenManager,
 }
 
 /// Application-wide settings.
@@ -65,8 +45,7 @@ pub struct AppSettings {
     /// The application theme.
     pub theme: Theme,
     /// The keyboard shortcuts.
-    #[persisted(type = "ShortcutsPersisted")]
-    pub shortcuts: Shortcuts,
+    pub shortcuts: BTreeMap<ShortcutKey, String>,
 }
 
 /// Per-widget settings.
@@ -95,10 +74,11 @@ fn default_opacity() -> i32 {
 pub struct Settings {
     /// Application-wide settings.
     #[persisted(type = "AppSettingsPersisted")]
+    #[serde(flatten)]
     pub app: AppSettings,
     /// The mapping from widget IDs to their respective settings.
-    #[persisted(type = "HashMap<String, WidgetSettingsPersisted>")]
-    pub widgets: HashMap<String, WidgetSettings>,
+    #[persisted(type = "BTreeMap<String, WidgetSettingsPersisted>")]
+    pub widgets: BTreeMap<String, WidgetSettings>,
 }
 
 /// Wrapper of [`Settings`] with additional metadata.
