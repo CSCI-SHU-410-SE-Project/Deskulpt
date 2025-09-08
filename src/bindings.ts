@@ -122,8 +122,32 @@ app: AppSettings;
  */
 widgets: { [key in string]: WidgetSettings } }
 
-export type SettingsUpdate = { theme: Theme } | { shortcut: [ShortcutKey, string | null] } | { widget: [string, WidgetSettings] }
+/**
+ * Message for updating settings.
+ */
+export type SettingsUpdate = 
+/**
+ * Update the theme.
+ */
+{ theme: Theme } | 
+/**
+ * Update a keyboard shortcut.
+ * 
+ * The first element is the shortcut key, and the second element is the new
+ * shortcut value. `None` means to remove the shortcut.
+ */
+{ shortcut: [ShortcutKey, string | null] } | 
+/**
+ * Update the settings of a widget.
+ * 
+ * The first element is the widget ID, and the second element is the new
+ * widget settings.
+ */
+{ widget: [string, WidgetSettings] }
 
+/**
+ * Types of keyboard shortcuts in the application.
+ */
 export type ShortcutKey = 
 /**
  * For toggling canvas interaction mode.
@@ -359,7 +383,15 @@ export const commands = {
   setRenderReady: () => invoke<null>("set_render_ready"),
 
   /**
-   * TODO(Charlie-XIAO)
+   * Update the settings.
+   * 
+   * This command updates the settings state in the backend. If an update has
+   * side effects, they will be applied prior to the update being committed. See
+   * [`SettingsStateExt`] for more information.
+   * 
+   * ### Errors
+   * 
+   * - Failed to apply the side effects, if any.
    */
   updateSettings: (payload: {
     update: SettingsUpdate,
