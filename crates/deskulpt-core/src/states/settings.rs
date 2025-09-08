@@ -11,14 +11,14 @@ struct SettingsState(RwLock<Settings>);
 
 pub trait SettingsStateExt<R: Runtime>: Manager<R> + PathExt<R> + GlobalShortcutExt<R> {
     fn manage_settings(&self) {
-        let settings = self
+        let mut settings = self
             .persist_dir()
             .and_then(Settings::load)
             .unwrap_or_else(|e| {
                 eprintln!("Failed to load settings: {e}");
                 Settings::default()
             });
-
+        settings.init_shortcuts(self.global_shortcut());
         self.manage(SettingsState(RwLock::new(settings)));
     }
 
@@ -39,8 +39,7 @@ pub trait SettingsStateExt<R: Runtime>: Manager<R> + PathExt<R> + GlobalShortcut
 
     fn update_settings_shortcut(&self, key: ShortcutKey, shortcut: Option<String>) -> Result<()> {
         let mut settings = self.get_settings_mut();
-        settings.update_shortcut(self.global_shortcut(), &key, shortcut)?;
-        Ok(())
+        settings.update_shortcut(self.global_shortcut(), key, shortcut)
     }
 
     fn update_settings_widget(&self, id: String, update: WidgetSettings) {

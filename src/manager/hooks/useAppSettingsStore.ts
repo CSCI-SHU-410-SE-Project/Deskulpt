@@ -14,11 +14,8 @@ export async function toggleTheme() {
   await events.switchThemeEvent.emitTo("canvas", newTheme);
 }
 
-export async function updateShortcut(
-  key: ShortcutKey,
-  shortcut: string | null,
-) {
-  await commands.updateShortcut({ key, shortcut });
+export async function updateShortcut(key: ShortcutKey, shortcut?: string) {
+  await commands.updateShortcut({ key, shortcut: shortcut ?? null });
   useAppSettingsStore.setState((state) => ({
     shortcuts: { ...state.shortcuts, [key]: shortcut },
   }));

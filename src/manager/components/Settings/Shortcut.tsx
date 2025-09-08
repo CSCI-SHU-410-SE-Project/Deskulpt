@@ -126,7 +126,7 @@ const ShortcutAction = ({ shortcutKey }: Props) => {
   }, []);
 
   const confirmAction = useCallback(() => {
-    updateShortcut(shortcutKey, value === "" ? null : value)
+    updateShortcut(shortcutKey, value === "" ? undefined : value)
       .then(() => {
         setPlaceholder(INITIAL_PLACEHOLDER);
         setIsValid(true);
@@ -149,7 +149,7 @@ const ShortcutAction = ({ shortcutKey }: Props) => {
 
   return (
     <Flex align="center" justify="end" gap="4">
-      {shortcut === null ? (
+      {shortcut === undefined ? (
         <Text color="gray">Disabled</Text>
       ) : (
         <Kbd size="3">{shortcut}</Kbd>
