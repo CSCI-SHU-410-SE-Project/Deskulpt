@@ -8,6 +8,19 @@ import * as tauriEvent from "@tauri-apps/api/event";
 // =============================================================================
 
 /**
+ * Application-wide settings.
+ */
+export type AppSettings = { 
+/**
+ * The application theme.
+ */
+theme: Theme; 
+/**
+ * The keyboard shortcuts.
+ */
+shortcuts: Partial<{ [key in ShortcutKey]: string }> }
+
+/**
  * Deserialized `deskulpt.conf.json`.
  */
 export type DeskulptConf = { 
@@ -99,33 +112,27 @@ code?: string }
 /**
  * Full settings of the Deskulpt application.
  */
-export type Settings = 
+export type Settings = { 
 /**
  * Application-wide settings.
  */
-({ 
-/**
- * The application theme.
- */
-theme: Theme; 
-/**
- * The keyboard shortcuts.
- */
-shortcuts: Partial<{ [key in ShortcutKey]: string }> }) & { 
+app: AppSettings; 
 /**
  * The mapping from widget IDs to their respective settings.
  */
 widgets: { [key in string]: WidgetSettings } }
 
+export type SettingsUpdate = { theme: Theme } | { shortcut: [ShortcutKey, string | null] } | { widget: [string, WidgetSettings] }
+
 export type ShortcutKey = 
 /**
  * For toggling canvas interaction mode.
  */
-"TOGGLE_CANVAS_IMODE" | 
+"toggleCanvasImode" | 
 /**
  * For opening the manager window.
  */
-"OPEN_MANAGER"
+"openManager"
 
 /**
  * Event for showing a toast notification.
@@ -137,11 +144,11 @@ export type ShowToastEvent =
 /**
  * Show a [success](https://sonner.emilkowal.ski/toast#success) toast.
  */
-{ type: "SUCCESS"; content: string } | 
+{ type: "success"; content: string } | 
 /**
  * Show an [error](https://sonner.emilkowal.ski/toast#error) toast.
  */
-{ type: "ERROR"; content: string }
+{ type: "error"; content: string }
 
 /**
  * Event for switching the app theme.
@@ -191,11 +198,11 @@ export type WidgetConfig =
 /**
  * Valid widget configuration.
  */
-{ type: "VALID"; dir: string; deskulptConf: DeskulptConf; packageJson: PackageJson | null } | 
+{ type: "valid"; dir: string; deskulptConf: DeskulptConf; packageJson: PackageJson | null } | 
 /**
  * Invalid widget configuration.
  */
-{ type: "INVALID"; dir: string; error: string }
+{ type: "invalid"; dir: string; error: string }
 
 /**
  * Per-widget settings.
@@ -352,16 +359,9 @@ export const commands = {
   setRenderReady: () => invoke<null>("set_render_ready"),
 
   /**
-   * Wrapper of [`update_shortcut`](ShortcutsExt::update_shortcut).
-   * 
-   * ### Errors
-   * 
-   * - The old shortcut needs to be unregistered but is not registered.
-   * - The new shortcut needs to be registered but is already registered.
-   * - Error registering or unregistering shortcuts.
+   * TODO(Charlie-XIAO)
    */
-  updateShortcut: (payload: {
-    key: ShortcutKey,
-    shortcut: string | null,
-  }) => invoke<null>("update_shortcut", payload),
+  updateSettings: (payload: {
+    update: SettingsUpdate,
+  }) => invoke<null>("update_settings", payload),
 };

@@ -12,7 +12,7 @@ use crate::states::SettingsStateExt;
 
 /// Deskulpt window enum.
 #[derive(specta::Type)]
-#[specta(rename_all = "lowercase")]
+#[specta(rename_all = "camelCase")]
 pub enum DeskulptWindow {
     /// The manager window.
     Manager,
@@ -75,6 +75,7 @@ pub trait WindowExt<R: Runtime>: Manager<R> + SettingsStateExt<R> {
         .resizable(false)
         .maximizable(false)
         .minimizable(false)
+        .visible(false)
         .initialization_script(&init_js)
         .build()?;
 

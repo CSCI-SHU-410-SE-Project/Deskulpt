@@ -7,7 +7,7 @@ export function useExitAppListener() {
   useEffect(() => {
     const unlisten = events.exitAppEvent.listen(() => {
       const settings = {
-        ...useAppSettingsStore.getState(),
+        app: useAppSettingsStore.getState(),
         widgets: Object.fromEntries(
           Object.entries(useWidgetsStore.getState().widgets).map(
             ([id, { settings }]) => [id, settings],

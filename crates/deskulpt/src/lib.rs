@@ -28,7 +28,7 @@ pub fn get_bindings_builder() -> tauri_specta::Builder {
             deskulpt_core::commands::open_widget::<Wry>,
             deskulpt_core::commands::rescan_widgets::<Wry>,
             deskulpt_core::commands::set_render_ready::<Wry>,
-            deskulpt_core::commands::update_shortcut::<Wry>,
+            deskulpt_core::commands::update_settings::<Wry>,
         ])
         .events(collect_events![
             deskulpt_core::events::ExitAppEvent,

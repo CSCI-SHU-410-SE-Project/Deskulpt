@@ -14,13 +14,13 @@ const Settings = memo(() => {
                 Toggle canvas interaction mode
               </Table.RowHeaderCell>
               <Table.Cell>
-                <Shortcut shortcutKey="TOGGLE_CANVAS_IMODE" />
+                <Shortcut shortcutKey="toggleCanvasImode" />
               </Table.Cell>
             </Table.Row>
             <Table.Row align="center">
               <Table.RowHeaderCell>Open manager</Table.RowHeaderCell>
               <Table.Cell>
-                <Shortcut shortcutKey="OPEN_MANAGER" />
+                <Shortcut shortcutKey="openManager" />
               </Table.Cell>
             </Table.Row>
           </SectionTable>

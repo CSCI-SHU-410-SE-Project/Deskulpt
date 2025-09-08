@@ -39,7 +39,8 @@ pub trait SettingsStateExt<R: Runtime>: Manager<R> + PathExt<R> + GlobalShortcut
 
     fn update_settings_shortcut(&self, key: ShortcutKey, shortcut: Option<String>) -> Result<()> {
         let mut settings = self.get_settings_mut();
-        settings.update_shortcut(self.global_shortcut(), key, shortcut)
+        settings.update_shortcut(self.global_shortcut(), key, shortcut)?;
+        Ok(())
     }
 
     fn update_settings_widget(&self, id: String, update: WidgetSettings) {

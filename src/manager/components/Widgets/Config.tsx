@@ -23,7 +23,7 @@ const Config = memo(({ id }: ConfigProps) => {
   return (
     <ScrollArea asChild>
       <Box height="200px" pr="3" pb="3">
-        {config.type === "VALID" ? (
+        {config.type === "valid" ? (
           <Table.Root size="1" layout="fixed" css={styles.table}>
             <Table.Body>
               <Table.Row align="center">

@@ -71,7 +71,7 @@ impl LoadFromFile for PackageJson {
 
 /// Full configuration of a Deskulpt widget.
 #[derive(Clone, Serialize, specta::Type)]
-#[serde(tag = "type", rename_all = "SCREAMING_SNAKE_CASE")]
+#[serde(tag = "type", rename_all = "camelCase")]
 pub enum WidgetConfig {
     /// Valid widget configuration.
     #[serde(rename_all = "camelCase")]

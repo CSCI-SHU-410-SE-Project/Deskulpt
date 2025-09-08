@@ -20,7 +20,7 @@ static SETTINGS_SCHEMA_URL: &str = "https://csci-shu-410-se-project.github.io/se
 
 /// Light/dark theme of the application.
 #[derive(Clone, Default, Deserialize, Serialize, JsonSchema, specta::Type)]
-#[serde(rename_all = "lowercase")]
+#[serde(rename_all = "camelCase")]
 pub enum Theme {
     #[default]
     Light,
@@ -30,7 +30,7 @@ pub enum Theme {
 #[derive(
     Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Deserialize, Serialize, JsonSchema, specta::Type,
 )]
-#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+#[serde(rename_all = "camelCase")]
 pub enum ShortcutKey {
     /// For toggling canvas interaction mode.
     ToggleCanvasImode,
@@ -39,7 +39,7 @@ pub enum ShortcutKey {
 }
 
 /// Application-wide settings.
-#[derive(Default, Deserialize, Serialize, JsonSchema, specta::Type, Persisted)]
+#[derive(Clone, Default, Deserialize, Serialize, JsonSchema, specta::Type, Persisted)]
 #[serde(rename_all = "camelCase")]
 pub struct AppSettings {
     /// The application theme.
@@ -69,12 +69,11 @@ fn default_opacity() -> i32 {
 }
 
 /// Full settings of the Deskulpt application.
-#[derive(Default, Deserialize, Serialize, JsonSchema, specta::Type, Persisted)]
+#[derive(Clone, Default, Deserialize, Serialize, JsonSchema, specta::Type, Persisted)]
 #[serde(rename_all = "camelCase")]
 pub struct Settings {
     /// Application-wide settings.
     #[persisted(type = "AppSettingsPersisted")]
-    #[serde(flatten)]
     pub app: AppSettings,
     /// The mapping from widget IDs to their respective settings.
     #[persisted(type = "BTreeMap<String, WidgetSettingsPersisted>")]

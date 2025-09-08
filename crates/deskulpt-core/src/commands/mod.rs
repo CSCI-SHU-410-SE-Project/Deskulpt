@@ -15,7 +15,7 @@ mod rescan_widgets;
 #[doc(hidden)]
 mod set_render_ready;
 #[doc(hidden)]
-mod update_shortcut;
+mod update_settings;
 
 mod error;
 
@@ -26,4 +26,4 @@ pub use exit_app::*;
 pub use open_widget::*;
 pub use rescan_widgets::*;
 pub use set_render_ready::*;
-pub use update_shortcut::*;
+pub use update_settings::*;

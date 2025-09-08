@@ -7,10 +7,10 @@ export function useShowToastListener() {
     const unlisten = events.showToastEvent.listen((event) => {
       const { type, content } = event.payload;
       switch (type) {
-        case "SUCCESS":
+        case "success":
           void toast.success(content);
           break;
-        case "ERROR":
+        case "error":
           void toast.error(content);
           break;
       }
