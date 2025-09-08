@@ -26,7 +26,8 @@ pub enum SettingsUpdate {
 /// Update the settings.
 ///
 /// This command updates the settings state in the backend. If an update has
-/// side effects, they will be applied prior to the update being committed.
+/// side effects, they will be applied prior to the update being committed. See
+/// [`SettingsStateExt`] for more information.
 ///
 /// ### Errors
 ///

@@ -18,6 +18,7 @@ pub enum Theme {
     Dark,
 }
 
+/// Types of keyboard shortcuts in the application.
 #[derive(
     Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Deserialize, Serialize, JsonSchema, specta::Type,
 )]

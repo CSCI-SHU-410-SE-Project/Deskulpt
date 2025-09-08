@@ -8,6 +8,11 @@ use super::{Settings, ShortcutKey};
 use crate::states::CanvasImodeStateExt;
 use crate::window::WindowExt;
 
+/// Helper function for re-registering a keyboard shortcut.
+///
+/// If the old and new shortcuts are the same, this is a no-op. Otherwise, the
+/// old shortcut will be unregistered and the new shortcut will be registered
+/// with the listener determined by the shortcut key.
 fn reregister_shortcut<R: Runtime>(
     gs: &GlobalShortcut<R>,
     key: &ShortcutKey,
@@ -47,6 +52,11 @@ fn reregister_shortcut<R: Runtime>(
 }
 
 impl Settings {
+    /// Initialize keyboard shortcuts.
+    ///
+    /// This method attempts to register all shortcuts defined in the settings.
+    /// If any registration fails, instead of bailing out, it will remove that
+    /// shortcut from the settings and silently continue.
     pub fn init_shortcuts<R: Runtime>(&mut self, gs: &GlobalShortcut<R>) {
         for (key, current) in self.app.shortcuts.clone() {
             if let Err(e) = reregister_shortcut(gs, &key, None, Some(&current)) {
@@ -56,6 +66,11 @@ impl Settings {
         }
     }
 
+    /// Update a keyboard shortcut.
+    ///
+    /// If the new shortcut is not `None`, the existing shortcut will be
+    /// replaced. Otherwise, the existing shortcut will be removed. The
+    /// involved shortcuts will be automatically unregistered or registered.
     pub fn update_shortcut<R: Runtime>(
         &mut self,
         gs: &GlobalShortcut<R>,
