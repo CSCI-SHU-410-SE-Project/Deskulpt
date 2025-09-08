@@ -1,7 +1,7 @@
 //! Deskulpt windows.
 mod script;
 
-use anyhow::Result;
+use anyhow::{anyhow, Result};
 use script::{CanvasInitJS, ManagerInitJS};
 use tauri::{
     App, AppHandle, EventTarget, Manager, Runtime, WebviewUrl, WebviewWindow, WebviewWindowBuilder,
@@ -38,17 +38,14 @@ impl DeskulptWindow {
     }
 
     /// Retrieve the webview window instance.
-    ///
-    /// This method panics if the window is not found, but this should not
-    /// happen.
-    pub fn webview_window<R, M>(&self, manager: &M) -> WebviewWindow<R>
+    pub fn webview_window<R, M>(&self, manager: &M) -> Result<WebviewWindow<R>>
     where
         R: Runtime,
         M: Manager<R> + ?Sized,
     {
         manager
             .get_webview_window(self.label())
-            .unwrap_or_else(|| unreachable!("Window not found: {}", self.label()))
+            .ok_or_else(|| anyhow!("Window not found: {}", self.label()))
     }
 }
 
@@ -61,11 +58,12 @@ impl From<DeskulptWindow> for EventTarget {
 /// Extention trait for window-related operations.
 pub trait WindowExt<R: Runtime>: Manager<R> + SettingsStateExt<R> {
     /// Create the manager window.
-    fn create_manager(&mut self) -> Result<()>
+    fn create_manager(&self) -> Result<()>
     where
         Self: Sized,
     {
-        let init_js = ManagerInitJS::generate(&self.get_settings())?;
+        let settings = self.get_settings();
+        let init_js = ManagerInitJS::generate(&settings)?;
         WebviewWindowBuilder::new(
             self,
             DeskulptWindow::Manager.label(),
@@ -77,7 +75,6 @@ pub trait WindowExt<R: Runtime>: Manager<R> + SettingsStateExt<R> {
         .resizable(false)
         .maximizable(false)
         .minimizable(false)
-        .visible(false)
         .initialization_script(&init_js)
         .build()?;
 
@@ -85,11 +82,12 @@ pub trait WindowExt<R: Runtime>: Manager<R> + SettingsStateExt<R> {
     }
 
     /// Create the canvas window.
-    fn create_canvas(&mut self) -> Result<()>
+    fn create_canvas(&self) -> Result<()>
     where
         Self: Sized,
     {
-        let init_js = CanvasInitJS::generate(&self.get_settings())?;
+        let settings = self.get_settings();
+        let init_js = CanvasInitJS::generate(&settings)?;
         let canvas = WebviewWindowBuilder::new(
             self,
             DeskulptWindow::Canvas.label(),
@@ -133,7 +131,7 @@ pub trait WindowExt<R: Runtime>: Manager<R> + SettingsStateExt<R> {
 
     /// Open the manager window.
     fn open_manager(&self) -> Result<()> {
-        let manager = DeskulptWindow::Manager.webview_window(self);
+        let manager = DeskulptWindow::Manager.webview_window(self)?;
         manager.show()?;
         manager.set_focus()?;
         Ok(())

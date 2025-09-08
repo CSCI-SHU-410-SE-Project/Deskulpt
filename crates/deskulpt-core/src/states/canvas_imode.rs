@@ -92,7 +92,7 @@ pub trait CanvasImodeStateExt<R: Runtime>: Manager<R> + Emitter<R> {
     where
         Self: Sized,
     {
-        let canvas = DeskulptWindow::Canvas.webview_window(self);
+        let canvas = DeskulptWindow::Canvas.webview_window(self)?;
 
         let state = self.state::<CanvasImodeState<R>>();
         let mut state = state.0.lock().unwrap();
