@@ -52,14 +52,6 @@ export type DeskulptWindow =
  */
 "canvas"
 
-/**
- * Event for exiting the application.
- * 
- * This event is emitted from the backend to the manager window when the
- * application needs to be closed for it to persist the states before exiting.
- */
-export type ExitAppEvent = null
-
 export type JsonValue = null | boolean | number | string | JsonValue[] | { [key in string]: JsonValue }
 
 /**
@@ -141,9 +133,9 @@ export type SettingsUpdate =
  * Update the settings of a widget.
  * 
  * The first element is the widget ID, and the second element is the new
- * widget settings.
+ * widget settings. If the widget ID does not exist, this is an error.
  */
-{ widget: [string, WidgetSettings] }
+{ widget: [string, WidgetSettingsUpdate] }
 
 /**
  * Types of keyboard shortcuts in the application.
@@ -175,45 +167,21 @@ export type ShowToastEvent =
 { type: "error"; content: string }
 
 /**
- * Event for switching the app theme.
- * 
- * This event is emitted from the manager window to the canvas window when the
- * theme is switched from the manager side.
- */
-export type SwitchThemeEvent = 
-/**
- * The theme to switch to.
- */
-Theme
-
-/**
  * Light/dark theme of the application.
  */
 export type Theme = "light" | "dark"
 
 /**
- * Event for updating settings of a widget.
+ * Event for updating settings.
  * 
- * This event is emitted between the manager window and the canvas window to
- * each other when widget settings are updated on one side.
+ * This event is emitted from the backend to the canvas and manager windows
+ * when settings are updated.
  */
-export type UpdateSettingsEvent = { 
+export type UpdateSettingsEvent = 
 /**
- * The ID of the widget being updated.
+ * The updated settings.
  */
-id: string; 
-/**
- * [`WidgetSettings::x`](crate::settings::WidgetSettings::x)
- */
-x?: number; 
-/**
- * [`WidgetSettings::y`](crate::settings::WidgetSettings::y)
- */
-y?: number; 
-/**
- * [`WidgetSettings::opacity`](crate::settings::WidgetSettings::opacity)
- */
-opacity?: number }
+Settings
 
 /**
  * Full configuration of a Deskulpt widget.
@@ -248,6 +216,23 @@ y: number;
  */
 opacity: number }
 
+/**
+ * Message for updating widget settings.
+ */
+export type WidgetSettingsUpdate = { 
+/**
+ * [`WidgetSettings::x`](crate::settings::WidgetSettings::x)
+ */
+x?: number; 
+/**
+ * [`WidgetSettings::y`](crate::settings::WidgetSettings::y)
+ */
+y?: number; 
+/**
+ * [`WidgetSettings::opacity`](crate::settings::WidgetSettings::opacity)
+ */
+opacity?: number }
+
 // =============================================================================
 // Events
 // =============================================================================
@@ -269,11 +254,9 @@ function makeEvent<T>(name: string) {
 }
 
 export const events = {
-  exitAppEvent: makeEvent<ExitAppEvent>("exit-app-event"),
   removeWidgetsEvent: makeEvent<RemoveWidgetsEvent>("remove-widgets-event"),
   renderWidgetsEvent: makeEvent<RenderWidgetsEvent>("render-widgets-event"),
   showToastEvent: makeEvent<ShowToastEvent>("show-toast-event"),
-  switchThemeEvent: makeEvent<SwitchThemeEvent>("switch-theme-event"),
   updateSettingsEvent: makeEvent<UpdateSettingsEvent>("update-settings-event"),
 };
 
@@ -330,17 +313,6 @@ export const commands = {
   emitOnRenderReady: (payload: {
     event: RenderWidgetsEvent,
   }) => invoke<null>("emit_on_render_ready", payload),
-
-  /**
-   * Exit the application with cleanup.
-   * 
-   * This command never returns an error; in other words it will always exit the
-   * application in the end. Prior to exiting, it will try to dump the settings
-   * for persistence, but failure to do so will not prevent exiting.
-   */
-  exitApp: (payload: {
-    settings: Settings,
-  }) => invoke<void>("exit_app", payload),
 
   /**
    * Open the widgets directory or a specific widget directory.

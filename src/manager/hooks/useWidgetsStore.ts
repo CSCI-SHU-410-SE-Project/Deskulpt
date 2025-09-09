@@ -1,15 +1,8 @@
 import { create } from "zustand";
-import { WidgetConfig, WidgetSettings, commands, events } from "../../bindings";
-
-const DEFAULT_WIDGET_SETTINGS: WidgetSettings = { x: 0, y: 0, opacity: 100 };
-
-interface WidgetState {
-  config: WidgetConfig;
-  settings: WidgetSettings;
-}
+import { WidgetConfig, commands, events } from "../../bindings";
 
 export const useWidgetsStore = create(() => ({
-  widgets: {} as Record<string, WidgetState>,
+  configs: {} as Record<string, WidgetConfig>,
 }));
 
 export async function rescan(initial: boolean = false) {
@@ -52,7 +45,7 @@ export async function rescan(initial: boolean = false) {
 
   // Sort widgets by their directory name
   useWidgetsStore.setState({
-    widgets: Object.fromEntries(
+    configs: Object.fromEntries(
       widgetsArray.sort(([, a], [, b]) =>
         a.config.dir.localeCompare(b.config.dir),
       ),
@@ -62,37 +55,10 @@ export async function rescan(initial: boolean = false) {
   return widgetsArray.length;
 }
 
-export function updateWidgetSettings(
-  id: string,
-  settings: Partial<WidgetSettings>,
-  emit: boolean = false,
-) {
-  useWidgetsStore.setState((state) => {
-    if (id in state.widgets) {
-      return {
-        widgets: {
-          ...state.widgets,
-          [id]: {
-            ...state.widgets[id],
-            settings: { ...state.widgets[id].settings, ...settings },
-          },
-        },
-      };
-    }
-    return {};
-  });
-
-  if (emit) {
-    events.updateSettingsEvent
-      .emitTo("canvas", { id, ...settings })
-      .catch(console.error);
-  }
-}
-
 export function removeWidgets(ids: string[]) {
   useWidgetsStore.setState((state) => ({
-    widgets: Object.fromEntries(
-      Object.entries(state.widgets).filter(([id]) => !ids.includes(id)),
+    configs: Object.fromEntries(
+      Object.entries(state.configs).filter(([id]) => !ids.includes(id)),
     ),
   }));
 }

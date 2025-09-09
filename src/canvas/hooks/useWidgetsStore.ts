@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { WidgetSettings, events } from "../../bindings";
+import { WidgetSettings } from "../../bindings";
 import { FC, createElement } from "react";
 import ErrorDisplay from "../components/ErrorDisplay";
 
@@ -16,7 +16,7 @@ interface Widget {
   height?: string;
 }
 
-interface WidgetState extends Widget, WidgetSettings {
+interface WidgetState extends Widget {
   apisBlobUrl: string;
   moduleBlobUrl?: string;
 }
@@ -110,30 +110,6 @@ export function updateWidgetRenderError(
 
     return state;
   });
-}
-
-export function updateWidgetSettings(
-  id: string,
-  settings: Partial<WidgetSettings>,
-  emit: boolean = false,
-) {
-  useWidgetsStore.setState((state) => {
-    if (id in state.widgets) {
-      return {
-        widgets: {
-          ...state.widgets,
-          [id]: { ...state.widgets[id], ...settings },
-        },
-      };
-    }
-    return state;
-  });
-
-  if (emit) {
-    events.updateSettingsEvent
-      .emitTo("manager", { id, ...settings })
-      .catch(console.error);
-  }
 }
 
 export function removeWidgets(ids: string[]) {

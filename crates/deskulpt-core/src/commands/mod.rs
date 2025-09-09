@@ -7,8 +7,6 @@ mod call_plugin;
 #[doc(hidden)]
 mod emit_on_render_ready;
 #[doc(hidden)]
-mod exit_app;
-#[doc(hidden)]
 mod open_widget;
 #[doc(hidden)]
 mod rescan_widgets;
@@ -22,7 +20,6 @@ mod error;
 pub use bundle_widget::*;
 pub use call_plugin::*;
 pub use emit_on_render_ready::*;
-pub use exit_app::*;
 pub use open_widget::*;
 pub use rescan_widgets::*;
 pub use set_render_ready::*;

@@ -16,8 +16,8 @@ import {
 } from "react";
 import { FaEdit } from "react-icons/fa";
 import { MdClear } from "react-icons/md";
-import { ShortcutKey } from "../../../bindings";
-import { updateShortcut, useAppSettingsStore } from "../../hooks";
+import { ShortcutKey, commands } from "../../../bindings";
+import { useSettingsStore } from "../../hooks";
 import { toast } from "sonner";
 import { INVALID_KEYCODES, KEYCODES, MODIFIERS } from "./keyboard";
 import { css } from "@emotion/react";
@@ -40,7 +40,9 @@ interface Props {
 }
 
 const ShortcutAction = ({ shortcutKey }: Props) => {
-  const shortcut = useAppSettingsStore((state) => state.shortcuts[shortcutKey]);
+  const shortcut = useSettingsStore(
+    (state) => state.settings.app.shortcuts[shortcutKey],
+  );
 
   const inputRef = useRef<HTMLInputElement>(null);
   const clearButtonRef = useRef<HTMLButtonElement>(null);
@@ -126,7 +128,10 @@ const ShortcutAction = ({ shortcutKey }: Props) => {
   }, []);
 
   const confirmAction = useCallback(() => {
-    updateShortcut(shortcutKey, value === "" ? undefined : value)
+    commands
+      .updateSettings({
+        update: { shortcut: [shortcutKey, value === "" ? null : value] },
+      })
       .then(() => {
         setPlaceholder(INITIAL_PLACEHOLDER);
         setIsValid(true);

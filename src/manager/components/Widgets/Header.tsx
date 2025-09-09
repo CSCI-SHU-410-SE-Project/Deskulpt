@@ -10,7 +10,7 @@ interface HeaderProps {
 }
 
 const Header = memo(({ id }: HeaderProps) => {
-  const type = useWidgetsStore((state) => state.widgets[id].config.type);
+  const type = useWidgetsStore((state) => state.configs[id].type);
 
   const refreshAction = useCallback(() => {
     events.renderWidgetsEvent.emitTo("canvas", [{ id }]).then(() => {

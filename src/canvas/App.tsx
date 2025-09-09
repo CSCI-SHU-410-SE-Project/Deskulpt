@@ -5,14 +5,15 @@ import { useShallow } from "zustand/shallow";
 import {
   useRemoveWidgetsListener,
   useRenderWidgetsListener,
+  useSettingsStore,
   useShowToastListener,
-  useTheme,
   useUpdateSettingsListener,
   useWidgetsStore,
 } from "./hooks";
 
 const App = () => {
-  const theme = useTheme();
+  const theme = useSettingsStore((state) => state.settings.app.theme);
+
   const ids = useWidgetsStore(
     useShallow((state) => Object.keys(state.widgets)),
   );

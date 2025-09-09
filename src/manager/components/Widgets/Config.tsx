@@ -18,7 +18,7 @@ interface ConfigProps {
 }
 
 const Config = memo(({ id }: ConfigProps) => {
-  const config = useWidgetsStore((state) => state.widgets[id].config);
+  const config = useWidgetsStore((state) => state.configs[id]);
 
   return (
     <ScrollArea asChild>

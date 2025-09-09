@@ -63,7 +63,7 @@ impl<R: Runtime> CanvasImodeStateInner<R> {
 struct CanvasImodeState<R: Runtime>(Mutex<CanvasImodeStateInner<R>>);
 
 /// Extension trait for operations on canvas interaction mode.
-pub trait CanvasImodeStateExt<R: Runtime>: Manager<R> + Emitter<R> {
+pub trait CanvasImodeStateExt<R: Runtime>: Manager<R> + Emitter<R> + Sized {
     /// Initialize state management for canvas interaction mode.
     ///
     /// The canvas is in sink mode by default.
@@ -88,10 +88,7 @@ pub trait CanvasImodeStateExt<R: Runtime>: Manager<R> + Emitter<R> {
     ///
     /// This will show a toast message on the canvas window indicating the new
     /// interaction mode.
-    fn toggle_canvas_imode(&self) -> Result<()>
-    where
-        Self: Sized,
-    {
+    fn toggle_canvas_imode(&self) -> Result<()> {
         let canvas = DeskulptWindow::Canvas.webview_window(self)?;
 
         let state = self.state::<CanvasImodeState<R>>();

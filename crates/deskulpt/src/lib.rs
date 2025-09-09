@@ -24,18 +24,15 @@ pub fn get_bindings_builder() -> tauri_specta::Builder {
             deskulpt_core::commands::bundle_widget::<Wry>,
             deskulpt_core::commands::call_plugin::<Wry>,
             deskulpt_core::commands::emit_on_render_ready::<Wry>,
-            deskulpt_core::commands::exit_app::<Wry>,
             deskulpt_core::commands::open_widget::<Wry>,
             deskulpt_core::commands::rescan_widgets::<Wry>,
             deskulpt_core::commands::set_render_ready::<Wry>,
             deskulpt_core::commands::update_settings::<Wry>,
         ])
         .events(collect_events![
-            deskulpt_core::events::ExitAppEvent,
             deskulpt_core::events::RemoveWidgetsEvent,
             deskulpt_core::events::RenderWidgetsEvent,
             deskulpt_core::events::ShowToastEvent,
-            deskulpt_core::events::SwitchThemeEvent,
             deskulpt_core::events::UpdateSettingsEvent,
         ])
         .typ::<deskulpt_core::window::DeskulptWindow>()
