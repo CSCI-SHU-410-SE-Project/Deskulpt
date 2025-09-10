@@ -1,22 +1,16 @@
 import { create } from "zustand";
-import { WidgetSettings, events } from "../../bindings";
+import { WidgetSettings } from "../../bindings";
 import { FC, createElement } from "react";
 import ErrorDisplay from "../components/ErrorDisplay";
 
-interface WidgetProps {
+interface WidgetProps extends WidgetSettings {
   id: string;
-  x: number;
-  y: number;
-  opacity: number;
 }
 
-interface Widget {
-  Component: FC<WidgetProps>;
-  width?: string;
-  height?: string;
-}
+type WidgetComponent = FC<WidgetProps>;
 
-interface WidgetState extends Widget, WidgetSettings {
+interface WidgetState {
+  Component: WidgetComponent;
   apisBlobUrl: string;
   moduleBlobUrl?: string;
 }
@@ -27,7 +21,7 @@ export const useWidgetsStore = create(() => ({
 
 export function updateWidgetRender(
   id: string,
-  widget: Widget,
+  Component: WidgetComponent,
   moduleBlobUrl: string,
   apisBlobUrl: string,
   settings?: WidgetSettings,
@@ -42,9 +36,7 @@ export function updateWidgetRender(
             ...state.widgets[id],
             // Not using spread syntax because undefined properties in the
             // widget need to override their previous values as well
-            Component: widget.Component,
-            width: widget.width,
-            height: widget.height,
+            Component,
             moduleBlobUrl,
           },
         },
@@ -56,7 +48,7 @@ export function updateWidgetRender(
       return {
         widgets: {
           ...state.widgets,
-          [id]: { ...widget, ...settings, apisBlobUrl, moduleBlobUrl },
+          [id]: { ...settings, Component, apisBlobUrl, moduleBlobUrl },
         },
       };
     }
@@ -110,30 +102,6 @@ export function updateWidgetRenderError(
 
     return state;
   });
-}
-
-export function updateWidgetSettings(
-  id: string,
-  settings: Partial<WidgetSettings>,
-  emit: boolean = false,
-) {
-  useWidgetsStore.setState((state) => {
-    if (id in state.widgets) {
-      return {
-        widgets: {
-          ...state.widgets,
-          [id]: { ...state.widgets[id], ...settings },
-        },
-      };
-    }
-    return state;
-  });
-
-  if (emit) {
-    events.updateSettingsEvent
-      .emitTo("manager", { id, ...settings })
-      .catch(console.error);
-  }
 }
 
 export function removeWidgets(ids: string[]) {

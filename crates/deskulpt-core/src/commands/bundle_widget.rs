@@ -3,9 +3,10 @@ use tauri::{command, AppHandle, Runtime};
 
 use super::error::{cmderr, CmdResult};
 use crate::bundler::WidgetBundlerBuilder;
-use crate::config::WidgetConfig;
+use crate::commands::error::cmdbail;
 use crate::path::PathExt;
-use crate::states::WidgetConfigMapStateExt;
+use crate::states::WidgetsStateExt;
+use crate::widgets::Widget;
 
 /// Bundle a widget.
 ///
@@ -25,25 +26,24 @@ pub async fn bundle_widget<R: Runtime>(
 ) -> CmdResult<String> {
     let widgets_dir = app_handle.widgets_dir()?;
 
-    let mut bundler = app_handle.with_widget_config_map(|config_map| {
-        match config_map
+    let mut bundler = {
+        let widgets = app_handle.get_widgets();
+        match widgets
             .get(&id)
             .ok_or_else(|| cmderr!("Widget (id={}) does not exist", id))?
         {
-            WidgetConfig::Valid {
-                dir, deskulpt_conf, ..
-            } => {
+            Widget::Valid(valid) => {
                 let builder = WidgetBundlerBuilder::new(
-                    widgets_dir.join(dir),
-                    deskulpt_conf.entry.clone(),
+                    widgets_dir.join(&valid.dir),
+                    valid.deskulpt_conf.entry.clone(),
                     base_url,
                     apis_blob_url,
                 );
-                Ok(builder.build())
+                builder.build()
             },
-            WidgetConfig::Invalid { error, .. } => Err(cmderr!(error.clone())),
+            Widget::Invalid(invalid) => cmdbail!(invalid.error.clone()),
         }
-    })?;
+    };
 
     let code = bundler
         .bundle()

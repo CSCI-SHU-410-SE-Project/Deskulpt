@@ -3,14 +3,7 @@
 use serde::{Deserialize, Serialize};
 use tauri_specta::Event;
 
-use crate::settings::{Theme, WidgetSettings};
-
-/// Event for exiting the application.
-///
-/// This event is emitted from the backend to the manager window when the
-/// application needs to be closed for it to persist the states before exiting.
-#[derive(Clone, Serialize, Deserialize, specta::Type, Event)]
-pub struct ExitAppEvent;
+use crate::settings::{Settings, WidgetSettings};
 
 /// Event for removing widgets.
 ///
@@ -61,34 +54,12 @@ pub enum ShowToastEvent {
     Error(String),
 }
 
-/// Event for switching the app theme.
+/// Event for updating settings.
 ///
-/// This event is emitted from the manager window to the canvas window when the
-/// theme is switched from the manager side.
+/// This event is emitted from the backend to the canvas and manager windows
+/// when settings are updated.
 #[derive(Clone, Serialize, Deserialize, specta::Type, Event)]
-pub struct SwitchThemeEvent(
-    /// The theme to switch to.
-    Theme,
+pub struct UpdateSettingsEvent(
+    /// The updated settings.
+    pub Settings,
 );
-
-/// Event for updating settings of a widget.
-///
-/// This event is emitted between the manager window and the canvas window to
-/// each other when widget settings are updated on one side.
-#[derive(Clone, Serialize, Deserialize, specta::Type, Event)]
-pub struct UpdateSettingsEvent {
-    /// The ID of the widget being updated.
-    id: String,
-    /// [`WidgetSettings::x`](crate::settings::WidgetSettings::x)
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    #[specta(type = i32)]
-    x: Option<i32>,
-    /// [`WidgetSettings::y`](crate::settings::WidgetSettings::y)
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    #[specta(type = i32)]
-    y: Option<i32>,
-    /// [`WidgetSettings::opacity`](crate::settings::WidgetSettings::opacity)
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    #[specta(type = i32)]
-    opacity: Option<i32>,
-}

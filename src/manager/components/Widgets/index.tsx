@@ -16,7 +16,7 @@ const styles = {
 
 const WidgetsTab = memo(() => {
   const ids = useWidgetsStore(
-    useShallow((state) => Object.keys(state.widgets)),
+    useShallow((state) => Object.keys(state.configs)),
   );
 
   return (

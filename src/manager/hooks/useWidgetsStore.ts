@@ -1,16 +1,8 @@
 import { create } from "zustand";
-import { WidgetConfig, WidgetSettings, commands, events } from "../../bindings";
+import { Widget, commands, events } from "../../bindings";
+import { useSettingsStore } from "./useSettingsStore";
 
-const DEFAULT_WIDGET_SETTINGS: WidgetSettings = { x: 0, y: 0, opacity: 100 };
-
-interface WidgetState {
-  config: WidgetConfig;
-  settings: WidgetSettings;
-}
-
-export const useWidgetsStore = create(() => ({
-  widgets: {} as Record<string, WidgetState>,
-}));
+export const useWidgetsStore = create<Record<string, Widget>>(() => ({}));
 
 export async function rescan(initial: boolean = false) {
   const configs = await commands.rescanWidgets();
@@ -19,19 +11,12 @@ export async function rescan(initial: boolean = false) {
   if (initial) {
     // Initial rescan assumes no widgets in the store
     widgetsArray = Object.entries(configs).map(([id, config]) => {
-      const settings =
-        window.__DESKULPT_MANAGER_INTERNALS__.initialSettings.widgets[id] ??
-        DEFAULT_WIDGET_SETTINGS;
-      return [id, { config, settings }] as const;
+      return [id, config] as const;
     });
   } else {
-    const currentWidgets = useWidgetsStore.getState().widgets;
+    const currentWidgets = useWidgetsStore.getState();
     widgetsArray = Object.entries(configs).map(([id, config]) => {
-      const settings =
-        currentWidgets[id]?.settings ??
-        window.__DESKULPT_MANAGER_INTERNALS__.initialSettings.widgets[id] ??
-        DEFAULT_WIDGET_SETTINGS;
-      return [id, { config, settings }] as const;
+      return [id, config] as const;
     });
 
     // Remove widgets that are no longer present
@@ -43,7 +28,11 @@ export async function rescan(initial: boolean = false) {
     }
   }
 
-  const event = widgetsArray.map(([id, { settings }]) => ({ id, settings }));
+  const widgetSettings = useSettingsStore.getState().widgets;
+  const event = widgetsArray.map(([id]) => ({
+    id,
+    settings: widgetSettings[id],
+  }));
   if (initial) {
     await commands.emitOnRenderReady({ event });
   } else {
@@ -51,48 +40,19 @@ export async function rescan(initial: boolean = false) {
   }
 
   // Sort widgets by their directory name
-  useWidgetsStore.setState({
-    widgets: Object.fromEntries(
-      widgetsArray.sort(([, a], [, b]) =>
-        a.config.dir.localeCompare(b.config.dir),
-      ),
+  useWidgetsStore.setState(
+    Object.fromEntries(
+      widgetsArray.sort(([, a], [, b]) => a.dir.localeCompare(b.dir)),
     ),
-  });
+  );
 
   return widgetsArray.length;
 }
 
-export function updateWidgetSettings(
-  id: string,
-  settings: Partial<WidgetSettings>,
-  emit: boolean = false,
-) {
-  useWidgetsStore.setState((state) => {
-    if (id in state.widgets) {
-      return {
-        widgets: {
-          ...state.widgets,
-          [id]: {
-            ...state.widgets[id],
-            settings: { ...state.widgets[id].settings, ...settings },
-          },
-        },
-      };
-    }
-    return {};
-  });
-
-  if (emit) {
-    events.updateSettingsEvent
-      .emitTo("canvas", { id, ...settings })
-      .catch(console.error);
-  }
-}
-
 export function removeWidgets(ids: string[]) {
-  useWidgetsStore.setState((state) => ({
-    widgets: Object.fromEntries(
-      Object.entries(state.widgets).filter(([id]) => !ids.includes(id)),
+  useWidgetsStore.setState((state) =>
+    Object.fromEntries(
+      Object.entries(state).filter(([id]) => !ids.includes(id)),
     ),
-  }));
+  );
 }

@@ -35,7 +35,7 @@ struct InitialRenderStateInner {
 struct InitialRenderState(Mutex<InitialRenderStateInner>);
 
 /// Extension trait for operations related to the initial render.
-pub trait InitialRenderStateExt<R: Runtime>: Manager<R> + Emitter<R> {
+pub trait InitialRenderStateExt<R: Runtime>: Manager<R> + Emitter<R> + Sized {
     /// Initialize state management for the initial render.
     fn manage_initial_render(&self) {
         self.manage(InitialRenderState::default());
@@ -45,10 +45,7 @@ pub trait InitialRenderStateExt<R: Runtime>: Manager<R> + Emitter<R> {
     ///
     /// If there is a pending payload, a [`RenderWidgetsEvent`] will be emitted
     /// to the canvas with that payload.
-    fn set_render_ready(&self) -> Result<()>
-    where
-        Self: Sized,
-    {
+    fn set_render_ready(&self) -> Result<()> {
         let state = self.state::<InitialRenderState>();
         let mut initial_render = state.0.lock().unwrap();
         initial_render.ready = true;
@@ -64,10 +61,7 @@ pub trait InitialRenderStateExt<R: Runtime>: Manager<R> + Emitter<R> {
     /// If the canvas is already ready to render widgets, emit the given payload
     /// to the canvas immediately. Otherwise, store the payload as pending so
     /// that it can be emitted later when the canvas is ready.
-    fn emit_on_render_ready(&self, event: RenderWidgetsEvent) -> Result<()>
-    where
-        Self: Sized,
-    {
+    fn emit_on_render_ready(&self, event: RenderWidgetsEvent) -> Result<()> {
         let state = self.state::<InitialRenderState>();
         let mut initial_render = state.0.lock().unwrap();
 

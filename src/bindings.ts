@@ -21,25 +21,6 @@ theme: Theme;
 shortcuts: Partial<{ [key in ShortcutKey]: string }> }
 
 /**
- * Deserialized `deskulpt.conf.json`.
- */
-export type DeskulptConf = { 
-/**
- * The name of the widget.
- * 
- * This is purely used for display purposes. It does not need to be related
- * to the widget directory name, and it does not need to be unique.
- */
-name: string; 
-/**
- * The entry point of the widget.
- * 
- * This is the path to the file that exports the widget component. The path
- * should be relative to the widget directory.
- */
-entry: string }
-
-/**
  * Deskulpt window enum.
  */
 export type DeskulptWindow = 
@@ -52,20 +33,17 @@ export type DeskulptWindow =
  */
 "canvas"
 
+export type InvalidWidget = { 
 /**
- * Event for exiting the application.
- * 
- * This event is emitted from the backend to the manager window when the
- * application needs to be closed for it to persist the states before exiting.
+ * The directory name of the widget.
  */
-export type ExitAppEvent = null
+dir: string; 
+/**
+ * The error message.
+ */
+error: string }
 
 export type JsonValue = null | boolean | number | string | JsonValue[] | { [key in string]: JsonValue }
-
-/**
- * Deserialized `package.json`.
- */
-export type PackageJson = { dependencies?: { [key in string]: string } }
 
 /**
  * Event for removing widgets.
@@ -141,9 +119,9 @@ export type SettingsUpdate =
  * Update the settings of a widget.
  * 
  * The first element is the widget ID, and the second element is the new
- * widget settings.
+ * widget settings. If the widget ID does not exist, this is an error.
  */
-{ widget: [string, WidgetSettings] }
+{ widget: [string, WidgetSettingsUpdate] }
 
 /**
  * Types of keyboard shortcuts in the application.
@@ -175,58 +153,59 @@ export type ShowToastEvent =
 { type: "error"; content: string }
 
 /**
- * Event for switching the app theme.
- * 
- * This event is emitted from the manager window to the canvas window when the
- * theme is switched from the manager side.
- */
-export type SwitchThemeEvent = 
-/**
- * The theme to switch to.
- */
-Theme
-
-/**
  * Light/dark theme of the application.
  */
 export type Theme = "light" | "dark"
 
 /**
- * Event for updating settings of a widget.
+ * Event for updating settings.
  * 
- * This event is emitted between the manager window and the canvas window to
- * each other when widget settings are updated on one side.
+ * This event is emitted from the backend to the canvas and manager windows
+ * when settings are updated.
  */
-export type UpdateSettingsEvent = { 
+export type UpdateSettingsEvent = 
 /**
- * The ID of the widget being updated.
+ * The updated settings.
  */
-id: string; 
-/**
- * [`WidgetSettings::x`](crate::settings::WidgetSettings::x)
- */
-x?: number; 
-/**
- * [`WidgetSettings::y`](crate::settings::WidgetSettings::y)
- */
-y?: number; 
-/**
- * [`WidgetSettings::opacity`](crate::settings::WidgetSettings::opacity)
- */
-opacity?: number }
+Settings
 
+export type ValidWidget = 
 /**
- * Full configuration of a Deskulpt widget.
+ * The required `deskulpt.conf.json` configuration.
  */
-export type WidgetConfig = 
+({ 
 /**
- * Valid widget configuration.
+ * The name of the widget.
+ * 
+ * This is purely used for display purposes. It does not need to be related
+ * to the widget directory name, and it does not need to be unique.
  */
-{ type: "valid"; dir: string; deskulptConf: DeskulptConf; packageJson: PackageJson | null } | 
+name: string; 
 /**
- * Invalid widget configuration.
+ * The entry point of the widget.
+ * 
+ * This is the path to the file that exports the widget component. The path
+ * should be relative to the widget directory.
  */
-{ type: "invalid"; dir: string; error: string }
+entry: string }) & 
+/**
+ * The optional `package.json` configuration.
+ */
+({ dependencies?: { [key in string]: string } }) & { 
+/**
+ * The directory name of the widget.
+ */
+dir: string }
+
+export type Widget = 
+/**
+ * A valid widget.
+ */
+({ type: "valid" } & ValidWidget) | 
+/**
+ * An invalid widget.
+ */
+({ type: "invalid" } & InvalidWidget)
 
 /**
  * Per-widget settings.
@@ -247,6 +226,23 @@ y: number;
  * The opacity in percentage.
  */
 opacity: number }
+
+/**
+ * Message for updating widget settings.
+ */
+export type WidgetSettingsUpdate = { 
+/**
+ * [`WidgetSettings::x`](crate::settings::WidgetSettings::x)
+ */
+x?: number; 
+/**
+ * [`WidgetSettings::y`](crate::settings::WidgetSettings::y)
+ */
+y?: number; 
+/**
+ * [`WidgetSettings::opacity`](crate::settings::WidgetSettings::opacity)
+ */
+opacity?: number }
 
 // =============================================================================
 // Events
@@ -269,11 +265,9 @@ function makeEvent<T>(name: string) {
 }
 
 export const events = {
-  exitAppEvent: makeEvent<ExitAppEvent>("exit-app-event"),
   removeWidgetsEvent: makeEvent<RemoveWidgetsEvent>("remove-widgets-event"),
   renderWidgetsEvent: makeEvent<RenderWidgetsEvent>("render-widgets-event"),
   showToastEvent: makeEvent<ShowToastEvent>("show-toast-event"),
-  switchThemeEvent: makeEvent<SwitchThemeEvent>("switch-theme-event"),
   updateSettingsEvent: makeEvent<UpdateSettingsEvent>("update-settings-event"),
 };
 
@@ -332,17 +326,6 @@ export const commands = {
   }) => invoke<null>("emit_on_render_ready", payload),
 
   /**
-   * Exit the application with cleanup.
-   * 
-   * This command never returns an error; in other words it will always exit the
-   * application in the end. Prior to exiting, it will try to dump the settings
-   * for persistence, but failure to do so will not prevent exiting.
-   */
-  exitApp: (payload: {
-    settings: Settings,
-  }) => invoke<void>("exit_app", payload),
-
-  /**
    * Open the widgets directory or a specific widget directory.
    * 
    * If the widget ID is provided, a specific widget directory will be opened.
@@ -370,7 +353,7 @@ export const commands = {
    * - Error traversing the widgets directory.
    * - Error inferring widget ID from the directory entry.
    */
-  rescanWidgets: () => invoke<{ [key in string]: WidgetConfig }>("rescan_widgets"),
+  rescanWidgets: () => invoke<{ [key in string]: Widget }>("rescan_widgets"),
 
   /**
    * Wrapper of [`set_render_ready`](InitialRenderStateExt::set_render_ready).

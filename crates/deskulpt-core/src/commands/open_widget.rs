@@ -2,7 +2,7 @@ use tauri::{command, AppHandle, Runtime};
 
 use super::error::CmdResult;
 use crate::path::PathExt;
-use crate::states::WidgetConfigMapStateExt;
+use crate::states::WidgetsStateExt;
 
 /// Open the widgets directory or a specific widget directory.
 ///
