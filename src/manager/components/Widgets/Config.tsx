@@ -18,7 +18,7 @@ interface ConfigProps {
 }
 
 const Config = memo(({ id }: ConfigProps) => {
-  const config = useWidgetsStore((state) => state.configs[id]);
+  const config = useWidgetsStore((state) => state[id]);
 
   return (
     <ScrollArea asChild>
@@ -28,18 +28,16 @@ const Config = memo(({ id }: ConfigProps) => {
             <Table.Body>
               <Table.Row align="center">
                 <Table.RowHeaderCell>Name</Table.RowHeaderCell>
-                <Table.Cell>{config.deskulptConf.name}</Table.Cell>
+                <Table.Cell>{config.name}</Table.Cell>
               </Table.Row>
               <Table.Row align="center">
                 <Table.RowHeaderCell>Entry</Table.RowHeaderCell>
-                <Table.Cell>{config.deskulptConf.entry}</Table.Cell>
+                <Table.Cell>{config.entry}</Table.Cell>
               </Table.Row>
               <Table.Row align="center">
                 <Table.RowHeaderCell>Dependencies</Table.RowHeaderCell>
                 <Table.Cell>
-                  <Dependencies
-                    dependencies={config.packageJson?.dependencies}
-                  />
+                  <Dependencies dependencies={config.dependencies} />
                 </Table.Cell>
               </Table.Row>
             </Table.Body>

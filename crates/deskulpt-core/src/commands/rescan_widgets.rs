@@ -1,12 +1,12 @@
-use std::collections::HashMap;
+use std::collections::BTreeMap;
 use std::fs::read_dir;
 
 use tauri::{command, AppHandle, Runtime};
 
 use super::error::CmdResult;
-use crate::config::WidgetConfig;
 use crate::path::PathExt;
-use crate::states::WidgetConfigMapStateExt;
+use crate::states::WidgetsStateExt;
+use crate::widgets::Widget;
 
 /// Rescan the widgets directory and update the widget configuration map.
 ///
@@ -22,9 +22,9 @@ use crate::states::WidgetConfigMapStateExt;
 #[specta::specta]
 pub async fn rescan_widgets<R: Runtime>(
     app_handle: AppHandle<R>,
-) -> CmdResult<HashMap<String, WidgetConfig>> {
+) -> CmdResult<BTreeMap<String, Widget>> {
     let widgets_dir = app_handle.widgets_dir()?;
-    let mut new_config_map = HashMap::new();
+    let mut widgets = BTreeMap::new();
 
     let entries = read_dir(widgets_dir)?;
     for entry in entries {
@@ -35,14 +35,13 @@ pub async fn rescan_widgets<R: Runtime>(
             continue; // Non-directory entries are not widgets, skip
         }
 
-        if let Some(widget_config) = WidgetConfig::load(&path) {
-            let id = widget_config.id();
-            new_config_map.insert(id, widget_config);
+        if let Some(widget) = Widget::load(&path) {
+            let id = widget.id();
+            widgets.insert(id, widget);
         }
     }
 
-    app_handle.with_widget_config_map_mut(|config_map| {
-        config_map.clone_from(&new_config_map);
-    });
-    Ok(new_config_map)
+    let mut old_widgets = app_handle.get_widgets_mut();
+    old_widgets.clone_from(&widgets);
+    Ok(widgets)
 }

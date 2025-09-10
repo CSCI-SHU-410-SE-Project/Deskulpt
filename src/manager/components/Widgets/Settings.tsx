@@ -16,7 +16,7 @@ const styles = {
 };
 
 const X = ({ id }: SettingsProps) => {
-  const x = useSettingsStore((state) => state.settings.widgets[id].x);
+  const x = useSettingsStore((state) => state.widgets[id].x);
   const onValueChange = useCallback(
     (value: number) =>
       commands.updateSettings({ update: { widget: [id, { x: value }] } }),
@@ -34,7 +34,7 @@ const X = ({ id }: SettingsProps) => {
 };
 
 const Y = ({ id }: SettingsProps) => {
-  const y = useSettingsStore((state) => state.settings.widgets[id].y);
+  const y = useSettingsStore((state) => state.widgets[id].y);
   const onValueChange = useCallback(
     (value: number) =>
       commands.updateSettings({ update: { widget: [id, { y: value }] } }),
@@ -52,9 +52,7 @@ const Y = ({ id }: SettingsProps) => {
 };
 
 const Opacity = ({ id }: SettingsProps) => {
-  const opacity = useSettingsStore(
-    (state) => state.settings.widgets[id].opacity,
-  );
+  const opacity = useSettingsStore((state) => state.widgets[id].opacity);
   const onValueChange = useCallback(
     (value: number) =>
       commands.updateSettings({ update: { widget: [id, { opacity: value }] } }),

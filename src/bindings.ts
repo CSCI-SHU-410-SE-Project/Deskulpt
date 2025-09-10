@@ -21,25 +21,6 @@ theme: Theme;
 shortcuts: Partial<{ [key in ShortcutKey]: string }> }
 
 /**
- * Deserialized `deskulpt.conf.json`.
- */
-export type DeskulptConf = { 
-/**
- * The name of the widget.
- * 
- * This is purely used for display purposes. It does not need to be related
- * to the widget directory name, and it does not need to be unique.
- */
-name: string; 
-/**
- * The entry point of the widget.
- * 
- * This is the path to the file that exports the widget component. The path
- * should be relative to the widget directory.
- */
-entry: string }
-
-/**
  * Deskulpt window enum.
  */
 export type DeskulptWindow = 
@@ -52,12 +33,17 @@ export type DeskulptWindow =
  */
 "canvas"
 
-export type JsonValue = null | boolean | number | string | JsonValue[] | { [key in string]: JsonValue }
-
+export type InvalidWidget = { 
 /**
- * Deserialized `package.json`.
+ * The directory name of the widget.
  */
-export type PackageJson = { dependencies?: { [key in string]: string } }
+dir: string; 
+/**
+ * The error message.
+ */
+error: string }
+
+export type JsonValue = null | boolean | number | string | JsonValue[] | { [key in string]: JsonValue }
 
 /**
  * Event for removing widgets.
@@ -183,18 +169,43 @@ export type UpdateSettingsEvent =
  */
 Settings
 
+export type ValidWidget = 
 /**
- * Full configuration of a Deskulpt widget.
+ * The required `deskulpt.conf.json` configuration.
  */
-export type WidgetConfig = 
+({ 
 /**
- * Valid widget configuration.
+ * The name of the widget.
+ * 
+ * This is purely used for display purposes. It does not need to be related
+ * to the widget directory name, and it does not need to be unique.
  */
-{ type: "valid"; dir: string; deskulptConf: DeskulptConf; packageJson: PackageJson | null } | 
+name: string; 
 /**
- * Invalid widget configuration.
+ * The entry point of the widget.
+ * 
+ * This is the path to the file that exports the widget component. The path
+ * should be relative to the widget directory.
  */
-{ type: "invalid"; dir: string; error: string }
+entry: string }) & 
+/**
+ * The optional `package.json` configuration.
+ */
+({ dependencies?: { [key in string]: string } }) & { 
+/**
+ * The directory name of the widget.
+ */
+dir: string }
+
+export type Widget = 
+/**
+ * A valid widget.
+ */
+({ type: "valid" } & ValidWidget) | 
+/**
+ * An invalid widget.
+ */
+({ type: "invalid" } & InvalidWidget)
 
 /**
  * Per-widget settings.
@@ -342,7 +353,7 @@ export const commands = {
    * - Error traversing the widgets directory.
    * - Error inferring widget ID from the directory entry.
    */
-  rescanWidgets: () => invoke<{ [key in string]: WidgetConfig }>("rescan_widgets"),
+  rescanWidgets: () => invoke<{ [key in string]: Widget }>("rescan_widgets"),
 
   /**
    * Wrapper of [`set_render_ready`](InitialRenderStateExt::set_render_ready).

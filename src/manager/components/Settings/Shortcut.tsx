@@ -41,7 +41,7 @@ interface Props {
 
 const ShortcutAction = ({ shortcutKey }: Props) => {
   const shortcut = useSettingsStore(
-    (state) => state.settings.app.shortcuts[shortcutKey],
+    (state) => state.app.shortcuts[shortcutKey],
   );
 
   const inputRef = useRef<HTMLInputElement>(null);

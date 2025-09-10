@@ -17,7 +17,7 @@ const tabs = [
 ];
 
 const App = () => {
-  const theme = useSettingsStore((state) => state.settings.app.theme);
+  const theme = useSettingsStore((state) => state.app.theme);
 
   useInitialRescan();
   useUpdateSettingsListener();

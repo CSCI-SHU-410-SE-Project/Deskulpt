@@ -1,9 +1,8 @@
 import { create } from "zustand";
-import { WidgetConfig, commands, events } from "../../bindings";
+import { Widget, commands, events } from "../../bindings";
+import { useSettingsStore } from "./useSettingsStore";
 
-export const useWidgetsStore = create(() => ({
-  configs: {} as Record<string, WidgetConfig>,
-}));
+export const useWidgetsStore = create<Record<string, Widget>>(() => ({}));
 
 export async function rescan(initial: boolean = false) {
   const configs = await commands.rescanWidgets();
@@ -12,19 +11,12 @@ export async function rescan(initial: boolean = false) {
   if (initial) {
     // Initial rescan assumes no widgets in the store
     widgetsArray = Object.entries(configs).map(([id, config]) => {
-      const settings =
-        window.__DESKULPT_MANAGER_INTERNALS__.initialSettings.widgets[id] ??
-        DEFAULT_WIDGET_SETTINGS;
-      return [id, { config, settings }] as const;
+      return [id, config] as const;
     });
   } else {
-    const currentWidgets = useWidgetsStore.getState().widgets;
+    const currentWidgets = useWidgetsStore.getState();
     widgetsArray = Object.entries(configs).map(([id, config]) => {
-      const settings =
-        currentWidgets[id]?.settings ??
-        window.__DESKULPT_MANAGER_INTERNALS__.initialSettings.widgets[id] ??
-        DEFAULT_WIDGET_SETTINGS;
-      return [id, { config, settings }] as const;
+      return [id, config] as const;
     });
 
     // Remove widgets that are no longer present
@@ -36,7 +28,11 @@ export async function rescan(initial: boolean = false) {
     }
   }
 
-  const event = widgetsArray.map(([id, { settings }]) => ({ id, settings }));
+  const widgetSettings = useSettingsStore.getState().widgets;
+  const event = widgetsArray.map(([id]) => ({
+    id,
+    settings: widgetSettings[id],
+  }));
   if (initial) {
     await commands.emitOnRenderReady({ event });
   } else {
@@ -44,21 +40,19 @@ export async function rescan(initial: boolean = false) {
   }
 
   // Sort widgets by their directory name
-  useWidgetsStore.setState({
-    configs: Object.fromEntries(
-      widgetsArray.sort(([, a], [, b]) =>
-        a.config.dir.localeCompare(b.config.dir),
-      ),
+  useWidgetsStore.setState(
+    Object.fromEntries(
+      widgetsArray.sort(([, a], [, b]) => a.dir.localeCompare(b.dir)),
     ),
-  });
+  );
 
   return widgetsArray.length;
 }
 
 export function removeWidgets(ids: string[]) {
-  useWidgetsStore.setState((state) => ({
-    configs: Object.fromEntries(
-      Object.entries(state.configs).filter(([id]) => !ids.includes(id)),
+  useWidgetsStore.setState((state) =>
+    Object.fromEntries(
+      Object.entries(state).filter(([id]) => !ids.includes(id)),
     ),
-  }));
+  );
 }

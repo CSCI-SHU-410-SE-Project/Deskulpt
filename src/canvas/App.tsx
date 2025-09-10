@@ -12,7 +12,7 @@ import {
 } from "./hooks";
 
 const App = () => {
-  const theme = useSettingsStore((state) => state.settings.app.theme);
+  const theme = useSettingsStore((state) => state.app.theme);
 
   const ids = useWidgetsStore(
     useShallow((state) => Object.keys(state.widgets)),
