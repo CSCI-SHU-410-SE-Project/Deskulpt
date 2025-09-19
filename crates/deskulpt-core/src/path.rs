@@ -55,6 +55,11 @@ pub trait PathExt<R: Runtime>: Manager<R> {
         Ok(widgets_dir)
     }
 
+    fn widget_dir(&self, id: &str) -> Result<PathBuf> {
+        let widgets_dir = self.widgets_dir()?;
+        Ok(widgets_dir.join(id))
+    }
+
     /// Initialize the persistence directory.
     ///
     /// This will create the persistence directory if it does not exist. It must

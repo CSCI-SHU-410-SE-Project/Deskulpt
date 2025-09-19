@@ -3,17 +3,21 @@
 use std::sync::{RwLock, RwLockReadGuard, RwLockWriteGuard};
 
 use anyhow::Result;
-use tauri::{App, AppHandle, Manager, Runtime};
+use tauri::{App, AppHandle, Emitter, Manager, Runtime};
 use tauri_plugin_global_shortcut::GlobalShortcutExt;
+use tauri_specta::Event;
 
+use crate::events::UpdateSettingsEvent;
 use crate::path::PathExt;
-use crate::settings::{Settings, ShortcutKey, Theme, WidgetSettings};
+use crate::settings::{Settings, ShortcutKey, Theme};
 
 /// Managed state for the settings.
 struct SettingsState(RwLock<Settings>);
 
 /// Extension trait for operations on the settings state.
-pub trait SettingsStateExt<R: Runtime>: Manager<R> + PathExt<R> + GlobalShortcutExt<R> {
+pub trait SettingsStateExt<R: Runtime>:
+    Manager<R> + Emitter<R> + PathExt<R> + GlobalShortcutExt<R> + Sized
+{
     /// Initialize state management for the settings.
     ///
     /// This will load the settings from the persistence directory and
@@ -61,9 +65,40 @@ pub trait SettingsStateExt<R: Runtime>: Manager<R> + PathExt<R> + GlobalShortcut
     }
 
     /// Update the settings of a widget.
-    fn update_settings_widget(&self, id: String, update: WidgetSettings) {
+    ///
+    /// If the widget ID does not exist, this returns an error. Otherwise it
+    /// updates only the fields that are not `None`.
+    fn update_settings_widget(
+        &self,
+        id: String,
+        x: Option<i32>,
+        y: Option<i32>,
+        opacity: Option<i32>,
+    ) -> Result<()> {
         let mut settings = self.get_settings_mut();
-        settings.widgets.insert(id, update);
+        let widget_settings = settings
+            .widgets
+            .get_mut(&id)
+            .ok_or_else(|| anyhow::anyhow!("Widget ID {id} does not exist"))?;
+
+        if let Some(x) = x {
+            widget_settings.x = x;
+        }
+        if let Some(y) = y {
+            widget_settings.y = y;
+        }
+        if let Some(opacity) = opacity {
+            widget_settings.opacity = opacity;
+        }
+
+        Ok(())
+    }
+
+    /// Emit an [`UpdateSettingsEvent`] with the current settings.
+    fn emit_update_settings_event(&self) -> Result<()> {
+        let settings = self.get_settings();
+        UpdateSettingsEvent(settings.clone()).emit(self)?;
+        Ok(())
     }
 }
 

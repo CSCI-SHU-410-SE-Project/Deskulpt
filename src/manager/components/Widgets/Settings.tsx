@@ -1,9 +1,10 @@
 import { Flex, Table } from "@radix-ui/themes";
 import { LiaTimesSolid } from "react-icons/lia";
-import { updateWidgetSettings, useWidgetsStore } from "../../hooks";
 import { memo, useCallback } from "react";
 import IntegerInput from "../IntegerInput";
 import { css } from "@emotion/react";
+import { commands } from "../../../bindings";
+import { useSettings } from "../../hooks/useStores";
 
 const styles = {
   table: css({
@@ -15,55 +16,59 @@ const styles = {
 };
 
 const X = ({ id }: SettingsProps) => {
-  const x = useWidgetsStore((state) => state.widgets[id].settings.x);
+  const x = useSettings((state) => state.widgets[id]?.x);
   const onValueChange = useCallback(
-    (value: number) => updateWidgetSettings(id, { x: value }, true),
+    (value: number) =>
+      commands.updateSettings({ update: { widget: [id, { x: value }] } }),
     [id],
   );
 
   return (
     <IntegerInput
-      value={x}
+      value={x ?? 0}
       min={0}
       onValueChange={onValueChange}
       width="60px"
+      disabled={x === undefined}
     />
   );
 };
 
 const Y = ({ id }: SettingsProps) => {
-  const y = useWidgetsStore((state) => state.widgets[id].settings.y);
+  const y = useSettings((state) => state.widgets[id]?.y);
   const onValueChange = useCallback(
-    (value: number) => updateWidgetSettings(id, { y: value }, true),
+    (value: number) =>
+      commands.updateSettings({ update: { widget: [id, { y: value }] } }),
     [id],
   );
 
   return (
     <IntegerInput
-      value={y}
+      value={y ?? 0}
       min={0}
       onValueChange={onValueChange}
       width="60px"
+      disabled={y === undefined}
     />
   );
 };
 
 const Opacity = ({ id }: SettingsProps) => {
-  const opacity = useWidgetsStore(
-    (state) => state.widgets[id].settings.opacity,
-  );
+  const opacity = useSettings((state) => state.widgets[id]?.opacity);
   const onValueChange = useCallback(
-    (value: number) => updateWidgetSettings(id, { opacity: value }, true),
+    (value: number) =>
+      commands.updateSettings({ update: { widget: [id, { opacity: value }] } }),
     [id],
   );
 
   return (
     <IntegerInput
-      value={opacity}
+      value={opacity ?? 0}
       min={0}
       max={100}
       onValueChange={onValueChange}
       width="60px"
+      disabled={opacity === undefined}
     />
   );
 };

@@ -1,26 +1,19 @@
 //! Deskulpt system tray.
 
-use std::time::Duration;
-
 use anyhow::Result;
 use tauri::image::Image;
 use tauri::menu::{MenuBuilder, MenuEvent, MenuItemBuilder};
 use tauri::tray::{MouseButton, MouseButtonState, TrayIcon, TrayIconBuilder, TrayIconEvent};
 use tauri::{App, AppHandle, Runtime};
-use tauri_specta::Event;
-use tokio::time::sleep;
 
-use crate::events::ExitAppEvent;
-use crate::states::CanvasImodeStateExt;
-use crate::window::{DeskulptWindow, WindowExt};
+use crate::path::PathExt;
+use crate::states::{CanvasImodeStateExt, SettingsStateExt};
+use crate::window::WindowExt;
 
 /// Extention trait for system tray-related operations.
-pub trait TrayExt<R: Runtime>: CanvasImodeStateExt<R> {
+pub trait TrayExt<R: Runtime>: CanvasImodeStateExt<R> + Sized {
     /// Create the system tray.
-    fn create_tray(&self, icon: Image) -> Result<()>
-    where
-        Self: Sized,
-    {
+    fn create_tray(&self, icon: Image) -> Result<()> {
         // Store the menu item for toggling canvas interaction mode
         let menu_item_toggle = MenuItemBuilder::with_id("tray-toggle", "Float").build(self)?;
         self.set_canvas_imode_menu_item(&menu_item_toggle);
@@ -69,19 +62,15 @@ fn on_menu_event<R: Runtime>(app_handle: &AppHandle<R>, event: MenuEvent) {
             }
         },
         "tray-exit" => {
-            // Emit the ExitAppEvent to the manager, which will invoke the
-            // exit_app command to clean up and actually exit the application
-            if let Err(e) = ExitAppEvent.emit_to(app_handle, DeskulptWindow::Manager) {
-                eprintln!("Failed to emit ExitAppEvent to manager: {e}");
-                app_handle.exit(1); // Safeguard exit
-            }
-
-            // Safeguard exit after 5 seconds if the normal exit procedure fails
-            let app_handle = app_handle.clone();
-            tauri::async_runtime::spawn(async move {
-                sleep(Duration::from_secs(5)).await;
+            if let Err(e) = app_handle
+                .persist_dir()
+                .and_then(|dir| app_handle.get_settings().dump(dir))
+            {
+                eprintln!("Failed to dump settings: {e}");
                 app_handle.exit(1);
-            });
+                return;
+            }
+            app_handle.exit(0);
         },
         _ => {},
     }

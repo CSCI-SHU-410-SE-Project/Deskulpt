@@ -5,8 +5,10 @@ import ErrorDisplay from "./ErrorDisplay";
 import { stringifyError } from "../../utils/stringifyError";
 import { LuGripVertical } from "react-icons/lu";
 import { Box } from "@radix-ui/themes";
-import { updateWidgetSettings, useWidgetsStore } from "../hooks";
 import { css } from "@emotion/react";
+import { commands } from "../../bindings";
+import { useWidgetsStore } from "../hooks/useWidgetsStore";
+import { useSettings } from "../hooks/useStores";
 
 const styles = {
   wrapper: css({
@@ -29,13 +31,21 @@ interface WidgetContainerProps {
 }
 
 const WidgetContainer = memo(({ id }: WidgetContainerProps) => {
-  const { Component, width, height, x, y, opacity } = useWidgetsStore(
-    (state) => state.widgets[id],
-  );
   const wrapperRef = useRef<HTMLDivElement>(null);
+  // The IDs are from object keys of the widgets store, so we can make the
+  // non-null assertion here
+  const { Component } = useWidgetsStore((state) => state[id]!);
+
+  const settings = useSettings((state) => state.widgets[id]);
+  if (settings === undefined) {
+    return null;
+  }
+  const { x, y, opacity } = settings;
 
   const onStop = (_: DraggableEvent, data: DraggableData) => {
-    updateWidgetSettings(id, { x: x + data.x, y: y + data.y }, true);
+    commands.updateSettings({
+      update: { widget: [id, { x: x + data.x, y: y + data.y }] },
+    });
   };
 
   return (
@@ -65,8 +75,8 @@ const WidgetContainer = memo(({ id }: WidgetContainerProps) => {
         </Box>
         <Box
           position="relative"
-          width={width ?? "300px"}
-          height={height ?? "150px"}
+          width="300px"
+          height="150px"
           css={styles.container}
           style={{ opacity: opacity / 100 }}
         >
