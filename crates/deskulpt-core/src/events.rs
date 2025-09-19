@@ -1,34 +1,12 @@
 //! Deskulpt core events.
 
+use std::collections::BTreeMap;
+
 use serde::{Deserialize, Serialize};
 use tauri_specta::Event;
 
-use crate::settings::{Settings, WidgetSettings};
-
-/// Event for removing widgets.
-///
-/// This event is emitted from the manager window to the canvas window when
-/// widgets need to be removed.
-#[derive(Clone, Serialize, Deserialize, specta::Type, Event)]
-pub struct RemoveWidgetsEvent(
-    /// The list of widget IDs to be removed.
-    Vec<String>,
-);
-
-/// Inner structure for [`RenderWidgetsEvent`].
-#[derive(Clone, Serialize, Deserialize, specta::Type, Event)]
-pub struct RenderWidgetsEventInner {
-    /// The ID of the widget being re-rendered.
-    id: String,
-    /// If provided, update the settings of the widget.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    #[specta(type = WidgetSettings)]
-    settings: Option<WidgetSettings>,
-    /// If provided, update the code of the widget.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    #[specta(type = String)]
-    code: Option<String>,
-}
+use crate::config::WidgetConfigRegistry;
+use crate::settings::Settings;
 
 /// Event for re-rendering widgets.
 ///
@@ -37,8 +15,8 @@ pub struct RenderWidgetsEventInner {
 /// emitted from the backend to the canvas window for the initial render.
 #[derive(Clone, Serialize, Deserialize, specta::Type, Event)]
 pub struct RenderWidgetsEvent(
-    /// The list of widgets to be re-rendered.
-    Vec<RenderWidgetsEventInner>,
+    /// The mapping from widget IDs to their respective bundled code.
+    BTreeMap<String, String>,
 );
 
 /// Event for showing a toast notification.
@@ -54,12 +32,22 @@ pub enum ShowToastEvent {
     Error(String),
 }
 
-/// Event for updating settings.
+/// Event for updating the settings.
 ///
-/// This event is emitted from the backend to the canvas and manager windows
-/// when settings are updated.
+/// This event is emitted from the backend to all windows when the settings are
+/// updated.
 #[derive(Clone, Serialize, Deserialize, specta::Type, Event)]
 pub struct UpdateSettingsEvent(
     /// The updated settings.
     pub Settings,
+);
+
+/// Event for updating the widget configuration registry.
+///
+/// This event is emitted from the backend to all windows when the widget
+/// configuration registry is updated.
+#[derive(Clone, Serialize, Deserialize, specta::Type, Event)]
+pub struct UpdateWidgetConfigRegistryEvent(
+    /// The updated widget configuration registry.
+    pub WidgetConfigRegistry,
 );

@@ -2,26 +2,15 @@ import WidgetContainer from "./components/WidgetContainer";
 import { Toaster } from "sonner";
 import { Theme as RadixTheme } from "@radix-ui/themes";
 import { useShallow } from "zustand/shallow";
-import {
-  useRemoveWidgetsListener,
-  useRenderWidgetsListener,
-  useSettingsStore,
-  useShowToastListener,
-  useUpdateSettingsListener,
-  useWidgetsStore,
-} from "./hooks";
+import { useSettings } from "./hooks/useStores";
+import { useWidgetsStore } from "./hooks/useWidgetsStore";
+import { useEventListeners } from "./hooks/useEventListeners";
 
 const App = () => {
-  const theme = useSettingsStore((state) => state.app.theme);
+  const theme = useSettings((state) => state.app.theme);
+  const ids = useWidgetsStore(useShallow((state) => Object.keys(state)));
 
-  const ids = useWidgetsStore(
-    useShallow((state) => Object.keys(state.widgets)),
-  );
-
-  useRemoveWidgetsListener();
-  useRenderWidgetsListener();
-  useShowToastListener();
-  useUpdateSettingsListener();
+  useEventListeners();
 
   return (
     <RadixTheme

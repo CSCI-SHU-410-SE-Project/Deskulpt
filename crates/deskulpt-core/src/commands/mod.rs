@@ -1,26 +1,23 @@
 //! Deskulpt core commands to be invoked by the frontend.
 
 #[doc(hidden)]
-mod bundle_widget;
+mod bundle_widgets;
 #[doc(hidden)]
 mod call_plugin;
 #[doc(hidden)]
-mod emit_on_render_ready;
+mod load_widgets;
 #[doc(hidden)]
 mod open_widget;
 #[doc(hidden)]
-mod rescan_widgets;
-#[doc(hidden)]
-mod set_render_ready;
-#[doc(hidden)]
 mod update_settings;
+#[doc(hidden)]
+mod window_ready;
 
 mod error;
 
-pub use bundle_widget::*;
+pub use bundle_widgets::*;
 pub use call_plugin::*;
-pub use emit_on_render_ready::*;
+pub use load_widgets::*;
 pub use open_widget::*;
-pub use rescan_widgets::*;
-pub use set_render_ready::*;
 pub use update_settings::*;
+pub use window_ready::*;

@@ -15,15 +15,15 @@ export function useRenderWidgetsListener() {
 
   useEffect(() => {
     const unlisten = events.renderWidgetsEvent.listen(async (event) => {
-      const widgets = useWidgetsStore.getState().widgets;
+      const state = useWidgetsStore.getState();
 
-      const promises = event.payload.map(async ({ id, settings, code }) => {
+      const promises = Object.entries(event.payload).map(async ([id, code]) => {
         let apisBlobUrl;
-        if (id in widgets) {
+        if (id in state) {
           // APIs blob URL can be reused because the contents are dependent only
           // on widget ID; the code blob URL will definitely change on re-render
           // so we revoke it here
-          const widget = widgets[id];
+          const widget = state[id]!; // We've checked id in state
           apisBlobUrl = widget.apisBlobUrl;
           if (widget.moduleBlobUrl !== undefined) {
             URL.revokeObjectURL(widget.moduleBlobUrl);
@@ -36,26 +36,6 @@ export function useRenderWidgetsListener() {
             type: "application/javascript",
           });
           apisBlobUrl = URL.createObjectURL(apisBlob);
-        }
-
-        if (code === undefined) {
-          // If code is not provided, we need to bundle the widget
-          try {
-            code = await commands.bundleWidget({
-              id,
-              baseUrl: BASE_URL,
-              apisBlobUrl,
-            });
-          } catch (error) {
-            updateWidgetRenderError(
-              id,
-              "Error bundling the widget",
-              stringifyError(error),
-              apisBlobUrl,
-              settings,
-            );
-            return;
-          }
         }
 
         const moduleBlob = new Blob([code], { type: "application/javascript" });
@@ -73,27 +53,19 @@ export function useRenderWidgetsListener() {
             "Error importing the widget module",
             stringifyError(error),
             apisBlobUrl,
-            settings,
           );
           return;
         }
 
-        updateWidgetRender(
-          id,
-          module.default,
-          moduleBlobUrl,
-          apisBlobUrl,
-          settings,
-        );
+        updateWidgetRender(id, module.default, moduleBlobUrl, apisBlobUrl);
       });
 
       await Promise.all(promises);
     });
 
     if (!hasInited.current) {
-      // Set the canvas as ready to render only once
       commands
-        .setRenderReady()
+        .windowReady()
         .then(() => {
           hasInited.current = true;
         })
@@ -101,6 +73,7 @@ export function useRenderWidgetsListener() {
     }
 
     return () => {
+      hasInited.current = false;
       unlisten.then((f) => f()).catch(console.error);
     };
   }, []);

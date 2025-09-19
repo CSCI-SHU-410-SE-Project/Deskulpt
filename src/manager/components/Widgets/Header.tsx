@@ -2,20 +2,23 @@ import { Badge, Button, Flex } from "@radix-ui/themes";
 import { memo, useCallback } from "react";
 import { toast } from "sonner";
 import { LuFolderOpen, LuRepeat } from "react-icons/lu";
-import { useWidgetsStore } from "../../hooks";
-import { commands, events } from "../../../bindings";
+import { commands } from "../../../bindings";
+import { useWidgetConfigRegistry } from "../../hooks/useStores";
 
 interface HeaderProps {
   id: string;
 }
 
 const Header = memo(({ id }: HeaderProps) => {
-  const type = useWidgetsStore((state) => state[id].type);
+  const type = useWidgetConfigRegistry((state) => state[id]?.type);
 
   const refreshAction = useCallback(() => {
-    events.renderWidgetsEvent.emitTo("canvas", [{ id }]).then(() => {
-      toast.success("Widget refreshed.");
-    });
+    commands
+      .bundleWidgets({ kind: { type: "single", content: id } })
+      .then(() => {
+        toast.success("TODO(Charlie-XIAO)");
+      })
+      .catch(console.error);
   }, [id]);
 
   const openAction = useCallback(() => {
@@ -24,7 +27,7 @@ const Header = memo(({ id }: HeaderProps) => {
 
   return (
     <Flex align="center" justify="between">
-      <Badge color={type === "valid" ? "gray" : "red"}>ID: {id}</Badge>
+      <Badge color={type === "ok" ? "gray" : "red"}>ID: {id}</Badge>
       <Flex align="center" gap="2">
         <Button
           title="Refresh this widget"

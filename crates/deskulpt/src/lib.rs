@@ -5,9 +5,7 @@
 )]
 
 use deskulpt_core::path::PathExt;
-use deskulpt_core::states::{
-    CanvasImodeStateExt, InitialRenderStateExt, SettingsStateExt, WidgetsStateExt,
-};
+use deskulpt_core::states::{CanvasImodeStateExt, SettingsStateExt, WidgetsStateExt};
 use deskulpt_core::tray::TrayExt;
 use deskulpt_core::window::WindowExt;
 use tauri::image::Image;
@@ -21,19 +19,18 @@ const DESKULPT_ICON: Image = include_image!("./icons/icon.png");
 pub fn get_bindings_builder() -> tauri_specta::Builder {
     tauri_specta::Builder::<Wry>::new()
         .commands(collect_commands![
-            deskulpt_core::commands::bundle_widget::<Wry>,
+            deskulpt_core::commands::bundle_widgets::<Wry>,
             deskulpt_core::commands::call_plugin::<Wry>,
-            deskulpt_core::commands::emit_on_render_ready::<Wry>,
+            deskulpt_core::commands::load_widgets::<Wry>,
             deskulpt_core::commands::open_widget::<Wry>,
-            deskulpt_core::commands::rescan_widgets::<Wry>,
-            deskulpt_core::commands::set_render_ready::<Wry>,
             deskulpt_core::commands::update_settings::<Wry>,
+            deskulpt_core::commands::window_ready::<Wry>,
         ])
         .events(collect_events![
-            deskulpt_core::events::RemoveWidgetsEvent,
             deskulpt_core::events::RenderWidgetsEvent,
             deskulpt_core::events::ShowToastEvent,
             deskulpt_core::events::UpdateSettingsEvent,
+            deskulpt_core::events::UpdateWidgetConfigRegistryEvent,
         ])
         .typ::<deskulpt_core::window::DeskulptWindow>()
 }
@@ -51,7 +48,6 @@ pub fn run() {
             app.init_persist_dir()?;
 
             app.manage_settings();
-            app.manage_initial_render();
             app.manage_widgets();
             app.manage_canvas_imode();
 

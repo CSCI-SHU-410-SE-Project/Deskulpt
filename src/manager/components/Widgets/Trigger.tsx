@@ -1,7 +1,7 @@
 import { Box, Flex, Tabs, Text } from "@radix-ui/themes";
-import { useWidgetsStore } from "../../hooks";
 import { memo } from "react";
 import { css } from "@emotion/react";
+import { useWidgetConfigRegistry } from "../../hooks/useStores";
 
 const styles = {
   trigger: css({
@@ -30,7 +30,7 @@ interface TriggerProps {
 }
 
 const Trigger = memo(({ id, value }: TriggerProps) => {
-  const config = useWidgetsStore((state) => state[id]);
+  const config = useWidgetConfigRegistry((state) => state[id]);
 
   return (
     <Tabs.Trigger value={value} css={styles.trigger}>
@@ -40,10 +40,10 @@ const Trigger = memo(({ id, value }: TriggerProps) => {
           height="6px"
           css={[
             styles.indicator,
-            config.type === "invalid" && styles.indicatorInvalid,
+            config?.type === "ok" && styles.indicatorInvalid,
           ]}
         />
-        <Text>{config.dir}</Text>
+        <Text>{id}</Text>
       </Flex>
     </Tabs.Trigger>
   );

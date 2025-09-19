@@ -20,6 +20,10 @@ theme: Theme;
  */
 shortcuts: Partial<{ [key in ShortcutKey]: string }> }
 
+export type BundleWidgetsKind = { type: "all" } | { type: "single"; content: string }
+
+export type BundleWidgetsResult = { type: "ok"; content: string } | { type: "err"; content: string }
+
 /**
  * Deskulpt window enum.
  */
@@ -33,29 +37,7 @@ export type DeskulptWindow =
  */
 "canvas"
 
-export type InvalidWidget = { 
-/**
- * The directory name of the widget.
- */
-dir: string; 
-/**
- * The error message.
- */
-error: string }
-
 export type JsonValue = null | boolean | number | string | JsonValue[] | { [key in string]: JsonValue }
-
-/**
- * Event for removing widgets.
- * 
- * This event is emitted from the manager window to the canvas window when
- * widgets need to be removed.
- */
-export type RemoveWidgetsEvent = 
-/**
- * The list of widget IDs to be removed.
- */
-string[]
 
 /**
  * Event for re-rendering widgets.
@@ -66,26 +48,9 @@ string[]
  */
 export type RenderWidgetsEvent = 
 /**
- * The list of widgets to be re-rendered.
+ * The mapping from widget IDs to their respective bundled code.
  */
-RenderWidgetsEventInner[]
-
-/**
- * Inner structure for [`RenderWidgetsEvent`].
- */
-export type RenderWidgetsEventInner = { 
-/**
- * The ID of the widget being re-rendered.
- */
-id: string; 
-/**
- * If provided, update the settings of the widget.
- */
-settings?: WidgetSettings; 
-/**
- * If provided, update the code of the widget.
- */
-code?: string }
+{ [key in string]: string }
 
 /**
  * Full settings of the Deskulpt application.
@@ -158,10 +123,10 @@ export type ShowToastEvent =
 export type Theme = "light" | "dark"
 
 /**
- * Event for updating settings.
+ * Event for updating the settings.
  * 
- * This event is emitted from the backend to the canvas and manager windows
- * when settings are updated.
+ * This event is emitted from the backend to all windows when the settings are
+ * updated.
  */
 export type UpdateSettingsEvent = 
 /**
@@ -169,43 +134,21 @@ export type UpdateSettingsEvent =
  */
 Settings
 
-export type ValidWidget = 
 /**
- * The required `deskulpt.conf.json` configuration.
- */
-({ 
-/**
- * The name of the widget.
+ * Event for updating the widget configuration registry.
  * 
- * This is purely used for display purposes. It does not need to be related
- * to the widget directory name, and it does not need to be unique.
+ * This event is emitted from the backend to all windows when the widget
+ * configuration registry is updated.
  */
-name: string; 
+export type UpdateWidgetConfigRegistryEvent = 
 /**
- * The entry point of the widget.
- * 
- * This is the path to the file that exports the widget component. The path
- * should be relative to the widget directory.
+ * The updated widget configuration registry.
  */
-entry: string }) & 
-/**
- * The optional `package.json` configuration.
- */
-({ dependencies?: { [key in string]: string } }) & { 
-/**
- * The directory name of the widget.
- */
-dir: string }
+WidgetConfigRegistry
 
-export type Widget = 
-/**
- * A valid widget.
- */
-({ type: "valid" } & ValidWidget) | 
-/**
- * An invalid widget.
- */
-({ type: "invalid" } & InvalidWidget)
+export type WidgetConfig = { type: "ok"; name: string; entry: string; dependencies: { [key in string]: string } } | { type: "err"; error: string }
+
+export type WidgetConfigRegistry = { [key in string]: WidgetConfig }
 
 /**
  * Per-widget settings.
@@ -265,10 +208,10 @@ function makeEvent<T>(name: string) {
 }
 
 export const events = {
-  removeWidgetsEvent: makeEvent<RemoveWidgetsEvent>("remove-widgets-event"),
   renderWidgetsEvent: makeEvent<RenderWidgetsEvent>("render-widgets-event"),
   showToastEvent: makeEvent<ShowToastEvent>("show-toast-event"),
   updateSettingsEvent: makeEvent<UpdateSettingsEvent>("update-settings-event"),
+  updateWidgetConfigRegistryEvent: makeEvent<UpdateWidgetConfigRegistryEvent>("update-widget-config-registry-event"),
 };
 
 // =============================================================================
@@ -277,20 +220,11 @@ export const events = {
 
 export const commands = {
   /**
-   * Bundle a widget.
-   * 
-   * ### Errors
-   * 
-   * - Failed to access the widgets directory.
-   * - Widget ID does not exist in the configuration map.
-   * - Widget has a configuration error.
-   * - Error bundling the widget.
+   * TODO(Charlie-XIAO)
    */
-  bundleWidget: (payload: {
-    id: string,
-    baseUrl: string,
-    apisBlobUrl: string,
-  }) => invoke<string>("bundle_widget", payload),
+  bundleWidgets: (payload: {
+    kind: BundleWidgetsKind,
+  }) => invoke<{ [key in string]: BundleWidgetsResult }>("bundle_widgets", payload),
 
   /**
    * Call a plugin command (🚧 TODO 🚧).
@@ -314,16 +248,20 @@ export const commands = {
   }) => invoke<JsonValue>("call_plugin", payload),
 
   /**
-   * Wrapper of
-   * [`emit_on_render_ready`](InitialRenderStateExt::emit_on_render_ready).
+   * Rescan the widgets directory.
+   * 
+   * This command scans the widgets directory for available widgets, loads them,
+   * and updates the application's widgets state accordingly. An
+   * [`UpdateWidgetsEvent`] is emitted to notify all windows of this update.
    * 
    * ### Errors
    * 
-   * - Failed to emit the [`RenderWidgetsEvent`] to the canvas.
+   * - Failed to access the widgets directory.
+   * - Error traversing the widgets directory.
+   * - Error inferring widget ID from the directory entry.
+   * - Failed to emit the event.
    */
-  emitOnRenderReady: (payload: {
-    event: RenderWidgetsEvent,
-  }) => invoke<null>("emit_on_render_ready", payload),
+  loadWidgets: () => invoke<null>("load_widgets"),
 
   /**
    * Open the widgets directory or a specific widget directory.
@@ -342,30 +280,6 @@ export const commands = {
   }) => invoke<null>("open_widget", payload),
 
   /**
-   * Rescan the widgets directory and update the widget configuration map.
-   * 
-   * This will update the widget configuration map state and return the updated
-   * configuration map as well.
-   * 
-   * ### Errors
-   * 
-   * - Failed to access the widgets directory.
-   * - Error traversing the widgets directory.
-   * - Error inferring widget ID from the directory entry.
-   */
-  rescanWidgets: () => invoke<{ [key in string]: Widget }>("rescan_widgets"),
-
-  /**
-   * Wrapper of [`set_render_ready`](InitialRenderStateExt::set_render_ready).
-   * 
-   * ### Errors
-   * 
-   * - Failed to emit the
-   * [`RenderWidgetsEvent`](crate::events::RenderWidgetsEvent) to the canvas.
-   */
-  setRenderReady: () => invoke<null>("set_render_ready"),
-
-  /**
    * Update the settings.
    * 
    * This command updates the settings state in the backend. If an update has
@@ -379,4 +293,9 @@ export const commands = {
   updateSettings: (payload: {
     update: SettingsUpdate,
   }) => invoke<null>("update_settings", payload),
+
+  /**
+   * TODO(Charlie-XIAO)
+   */
+  windowReady: () => invoke<null>("window_ready"),
 };

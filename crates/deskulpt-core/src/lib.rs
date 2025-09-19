@@ -6,13 +6,12 @@
 
 mod bundler;
 pub mod commands;
-// mod config;
+mod config;
 pub mod events;
 pub mod path;
 mod settings;
 pub mod states;
 pub mod tray;
-mod widgets;
 pub mod window;
 
 /// Re-exports for JSON schema generation.

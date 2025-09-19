@@ -1,10 +1,10 @@
 import { Flex, Table } from "@radix-ui/themes";
 import { LiaTimesSolid } from "react-icons/lia";
-import { useSettingsStore } from "../../hooks";
 import { memo, useCallback } from "react";
 import IntegerInput from "../IntegerInput";
 import { css } from "@emotion/react";
 import { commands } from "../../../bindings";
+import { useSettings } from "../../hooks/useStores";
 
 const styles = {
   table: css({
@@ -16,7 +16,7 @@ const styles = {
 };
 
 const X = ({ id }: SettingsProps) => {
-  const x = useSettingsStore((state) => state.widgets[id].x);
+  const x = useSettings((state) => state.widgets[id]?.x);
   const onValueChange = useCallback(
     (value: number) =>
       commands.updateSettings({ update: { widget: [id, { x: value }] } }),
@@ -25,16 +25,17 @@ const X = ({ id }: SettingsProps) => {
 
   return (
     <IntegerInput
-      value={x}
+      value={x ?? 0}
       min={0}
       onValueChange={onValueChange}
       width="60px"
+      disabled={x === undefined}
     />
   );
 };
 
 const Y = ({ id }: SettingsProps) => {
-  const y = useSettingsStore((state) => state.widgets[id].y);
+  const y = useSettings((state) => state.widgets[id]?.y);
   const onValueChange = useCallback(
     (value: number) =>
       commands.updateSettings({ update: { widget: [id, { y: value }] } }),
@@ -43,16 +44,17 @@ const Y = ({ id }: SettingsProps) => {
 
   return (
     <IntegerInput
-      value={y}
+      value={y ?? 0}
       min={0}
       onValueChange={onValueChange}
       width="60px"
+      disabled={y === undefined}
     />
   );
 };
 
 const Opacity = ({ id }: SettingsProps) => {
-  const opacity = useSettingsStore((state) => state.widgets[id].opacity);
+  const opacity = useSettings((state) => state.widgets[id]?.opacity);
   const onValueChange = useCallback(
     (value: number) =>
       commands.updateSettings({ update: { widget: [id, { opacity: value }] } }),
@@ -61,11 +63,12 @@ const Opacity = ({ id }: SettingsProps) => {
 
   return (
     <IntegerInput
-      value={opacity}
+      value={opacity ?? 0}
       min={0}
       max={100}
       onValueChange={onValueChange}
       width="60px"
+      disabled={opacity === undefined}
     />
   );
 };

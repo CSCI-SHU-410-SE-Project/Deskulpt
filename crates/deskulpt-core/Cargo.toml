@@ -13,6 +13,7 @@ version    = { workspace = true }
 anyhow                       = { workspace = true }
 deskulpt-macros              = { workspace = true }
 dunce                        = { workspace = true }
+futures                      = { workspace = true }
 once_cell                    = { workspace = true }
 open                         = { workspace = true, features = ["shellexecute-on-windows"] }
 oxc                          = { workspace = true }
@@ -31,7 +32,6 @@ tauri-specta                 = { workspace = true, features = ["derive"] }
 tempfile                     = { workspace = true }
 thiserror                    = { workspace = true }
 tokio                        = { workspace = true }
-uuid                         = { workspace = true, features = ["v5"] }
 
 # TODO: Remove these when finalized
 deskulpt-plugin     = { workspace = true } # maybe remove

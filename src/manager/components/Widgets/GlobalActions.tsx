@@ -1,9 +1,8 @@
 import { Flex, IconButton } from "@radix-ui/themes";
 import { memo, useCallback } from "react";
 import { LuFileScan, LuFolderOpen, LuRepeat } from "react-icons/lu";
-import { rescan, useSettingsStore, useWidgetsStore } from "../../hooks";
 import { toast } from "sonner";
-import { commands, events } from "../../../bindings";
+import { commands } from "../../../bindings";
 
 interface GlobalActionsProps {
   length: number;
@@ -11,24 +10,16 @@ interface GlobalActionsProps {
 
 const GlobalActions = memo(({ length }: GlobalActionsProps) => {
   const refreshAction = useCallback(() => {
-    const widgetSettings = useSettingsStore.getState().widgets;
-    const event = Object.keys(useWidgetsStore.getState().configs).map(
-      ([id]) => ({ id, settings: widgetSettings[id] }),
-    );
-    events.renderWidgetsEvent
-      .emitTo("canvas", event)
+    commands
+      .bundleWidgets({ kind: { type: "all" } })
       .then(() => {
-        toast.success(`Refreshed ${event.length} widgets.`);
+        toast.success("TODO(Charlie-XIAO)");
       })
       .catch(console.error);
   }, []);
 
   const rescanAction = useCallback(() => {
-    rescan()
-      .then((count) => {
-        toast.success(`${count} added.`);
-      })
-      .catch(console.error);
+    commands.loadWidgets().catch(console.error);
   }, []);
 
   const openAction = useCallback(() => {

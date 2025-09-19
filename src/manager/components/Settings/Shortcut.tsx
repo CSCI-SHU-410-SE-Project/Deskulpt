@@ -17,10 +17,10 @@ import {
 import { FaEdit } from "react-icons/fa";
 import { MdClear } from "react-icons/md";
 import { ShortcutKey, commands } from "../../../bindings";
-import { useSettingsStore } from "../../hooks";
 import { toast } from "sonner";
 import { INVALID_KEYCODES, KEYCODES, MODIFIERS } from "./keyboard";
 import { css } from "@emotion/react";
+import { useSettings } from "../../hooks/useStores";
 
 const INITIAL_PLACEHOLDER = "Shortcut disabled";
 
@@ -40,9 +40,7 @@ interface Props {
 }
 
 const ShortcutAction = ({ shortcutKey }: Props) => {
-  const shortcut = useSettingsStore(
-    (state) => state.app.shortcuts[shortcutKey],
-  );
+  const shortcut = useSettings((state) => state.app.shortcuts[shortcutKey]);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const clearButtonRef = useRef<HTMLButtonElement>(null);

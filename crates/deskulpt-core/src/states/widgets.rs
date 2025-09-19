@@ -1,53 +1,88 @@
 //! State management for the widgets.
 
-use std::collections::BTreeMap;
-use std::path::PathBuf;
-use std::sync::{RwLock, RwLockReadGuard, RwLockWriteGuard};
+use std::collections::HashMap;
+use std::sync::{Mutex, RwLock};
 
-use anyhow::{anyhow, Result};
-use tauri::{App, AppHandle, Manager, Runtime};
+use anyhow::{anyhow, Context, Result};
+use tauri::{App, AppHandle, Emitter, Manager, Runtime};
 
+use crate::bundler::{WidgetBundler, WidgetBundlerBuilder};
+use crate::config::{WidgetConfig, WidgetConfigRegistry};
 use crate::path::PathExt;
-use crate::widgets::Widget;
 
 /// Managed state for the widgets.
 #[derive(Default)]
-struct WidgetsState(RwLock<BTreeMap<String, Widget>>);
+struct WidgetsState {
+    configs: RwLock<WidgetConfigRegistry>,
+    /// Bundlers for valid widgets.
+    ///
+    /// To avoid deadlock, always lock `bundlers` before `configs` if both need
+    /// to be held. This order is because `configs` are accessed more frequently
+    /// than `bundlers` and it needs a smaller critical section.
+    bundlers: Mutex<HashMap<String, WidgetBundler>>,
+}
 
 /// Extension trait for operations on widgets state.
-pub trait WidgetsStateExt<R: Runtime>: Manager<R> + PathExt<R> {
+#[allow(async_fn_in_trait)]
+pub trait WidgetsStateExt<R: Runtime>: Manager<R> + Emitter<R> + PathExt<R> + Sized {
     /// Initialize state management for the widgets.
     fn manage_widgets(&self) {
         self.manage(WidgetsState::default());
     }
 
-    /// Get the directory of a widget by ID.
-    ///
-    /// This will error if the widgets directory cannot be accessed or if the
-    /// widget is not found in the collection.
-    fn widget_dir<S: AsRef<str>>(&self, id: S) -> Result<PathBuf> {
-        let widgets_dir = self.widgets_dir()?;
-        let id = id.as_ref();
-
+    fn set_widgets(&self, configs: WidgetConfigRegistry) -> Result<()> {
         let state = self.state::<WidgetsState>();
-        let widgets = state.0.read().unwrap();
-        let widget = widgets
-            .get(id)
-            .ok_or_else(|| anyhow!("Widget {id} not found in the collection"))?;
 
-        Ok(widgets_dir.join(widget.dir()))
+        let mut bundlers = state.bundlers.lock().unwrap();
+        bundlers.clear();
+        for (id, widget) in configs.0.iter() {
+            if let WidgetConfig::Ok { entry, .. } = widget {
+                let root = self.widget_dir(id)?;
+                let bundler = WidgetBundlerBuilder::new(root, entry.clone()).build();
+                bundlers.insert(id.to_string(), bundler);
+            }
+        }
+        // Hold the bundlers lock till after configs are updated for consistency
+
+        let mut write_guard = state.configs.write().unwrap();
+        *write_guard = configs.clone();
+        Ok(())
     }
 
-    /// Get an immutable reference to the widgets.
-    fn get_widgets(&self) -> RwLockReadGuard<'_, BTreeMap<String, Widget>> {
-        let state = self.state::<WidgetsState>().inner();
-        state.0.read().unwrap()
+    async fn bundle_widget(&self, id: &str) -> Result<String> {
+        let state = self.state::<WidgetsState>();
+        let bundler = {
+            let guard = state.bundlers.lock().unwrap();
+            guard
+                .get(id)
+                .cloned()
+                .ok_or_else(|| anyhow!("No bundler found for widget (id={id})"))?
+        };
+
+        bundler
+            .bundle()
+            .await
+            .with_context(|| format!("Failed to bundle widget (id={id})"))
     }
 
-    /// Get a mutable reference to the widgets.
-    fn get_widgets_mut(&self) -> RwLockWriteGuard<'_, BTreeMap<String, Widget>> {
-        let state = self.state::<WidgetsState>().inner();
-        state.0.write().unwrap()
+    async fn bundle_widgets(&self) -> Vec<(String, Result<String>)> {
+        let state = self.state::<WidgetsState>();
+        let bundlers = {
+            let guard = state.bundlers.lock().unwrap();
+            guard
+                .iter()
+                .map(|(k, v)| (k.clone(), v.clone()))
+                .collect::<Vec<_>>()
+        };
+
+        let futs = bundlers.iter().map(|(id, bundler)| async move {
+            let code = bundler
+                .bundle()
+                .await
+                .with_context(|| format!("Failed to bundle widget (id={id})"));
+            (id.clone(), code)
+        });
+        futures::future::join_all(futs).await
     }
 }
 
