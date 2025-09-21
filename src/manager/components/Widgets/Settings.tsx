@@ -16,7 +16,7 @@ const styles = {
 };
 
 const X = ({ id }: SettingsProps) => {
-  const x = useSettings((state) => state.widgets[id]?.x);
+  const x = useSettings((state) => state.widgets[id]?.x) ?? 0;
   const onValueChange = useCallback(
     (value: number) =>
       commands.updateSettings({ update: { widget: [id, { x: value }] } }),
@@ -25,17 +25,16 @@ const X = ({ id }: SettingsProps) => {
 
   return (
     <IntegerInput
-      value={x ?? 0}
+      value={x}
       min={0}
       onValueChange={onValueChange}
       width="60px"
-      disabled={x === undefined}
     />
   );
 };
 
 const Y = ({ id }: SettingsProps) => {
-  const y = useSettings((state) => state.widgets[id]?.y);
+  const y = useSettings((state) => state.widgets[id]?.y) ?? 0;
   const onValueChange = useCallback(
     (value: number) =>
       commands.updateSettings({ update: { widget: [id, { y: value }] } }),
@@ -44,17 +43,16 @@ const Y = ({ id }: SettingsProps) => {
 
   return (
     <IntegerInput
-      value={y ?? 0}
+      value={y}
       min={0}
       onValueChange={onValueChange}
       width="60px"
-      disabled={y === undefined}
     />
   );
 };
 
 const Opacity = ({ id }: SettingsProps) => {
-  const opacity = useSettings((state) => state.widgets[id]?.opacity);
+  const opacity = useSettings((state) => state.widgets[id]?.opacity) ?? 100;
   const onValueChange = useCallback(
     (value: number) =>
       commands.updateSettings({ update: { widget: [id, { opacity: value }] } }),
@@ -63,12 +61,11 @@ const Opacity = ({ id }: SettingsProps) => {
 
   return (
     <IntegerInput
-      value={opacity ?? 0}
-      min={0}
+      value={opacity}
+      min={1}
       max={100}
       onValueChange={onValueChange}
       width="60px"
-      disabled={opacity === undefined}
     />
   );
 };

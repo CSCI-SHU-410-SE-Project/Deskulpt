@@ -1,7 +1,9 @@
 use serde::Deserialize;
 use tauri::{command, AppHandle, Runtime};
+use tauri_specta::Event;
 
 use super::error::CmdResult;
+use crate::events::UpdateSettingsEvent;
 use crate::settings::{ShortcutKey, Theme};
 use crate::states::SettingsStateExt;
 
@@ -68,6 +70,7 @@ pub async fn update_settings<R: Runtime>(
         },
     }
 
-    app_handle.emit_update_settings_event()?;
+    let settings = app_handle.get_settings();
+    UpdateSettingsEvent(settings.clone()).emit(&app_handle)?;
     Ok(())
 }

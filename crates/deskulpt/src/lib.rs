@@ -5,7 +5,9 @@
 )]
 
 use deskulpt_core::path::PathExt;
-use deskulpt_core::states::{CanvasImodeStateExt, SettingsStateExt, WidgetsStateExt};
+use deskulpt_core::states::{
+    CanvasImodeStateExt, SettingsStateExt, SetupStateExt, WidgetsStateExt,
+};
 use deskulpt_core::tray::TrayExt;
 use deskulpt_core::window::WindowExt;
 use tauri::image::Image;
@@ -24,7 +26,7 @@ pub fn get_bindings_builder() -> tauri_specta::Builder {
             deskulpt_core::commands::load_widgets::<Wry>,
             deskulpt_core::commands::open_widget::<Wry>,
             deskulpt_core::commands::update_settings::<Wry>,
-            deskulpt_core::commands::window_ready::<Wry>,
+            deskulpt_core::commands::mark_setup::<Wry>,
         ])
         .events(collect_events![
             deskulpt_core::events::RenderWidgetsEvent,
@@ -50,6 +52,7 @@ pub fn run() {
             app.manage_settings();
             app.manage_widgets();
             app.manage_canvas_imode();
+            app.manage_setup();
 
             // Hide the application from the dock on macOS because skipping
             // taskbar is not applicable for macOS

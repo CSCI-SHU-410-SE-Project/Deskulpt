@@ -8,15 +8,11 @@ use tauri_specta::Event;
 use crate::config::WidgetConfigRegistry;
 use crate::settings::Settings;
 
-/// Event for re-rendering widgets.
-///
-/// This event is mainly emitted from the manager window to the canvas window
-/// when settings or code of a widget needs to be re-rendered. It may also be
-/// emitted from the backend to the canvas window for the initial render.
+/// TODO(Charlie-XIAO)
 #[derive(Clone, Serialize, Deserialize, specta::Type, Event)]
 pub struct RenderWidgetsEvent(
     /// The mapping from widget IDs to their respective bundled code.
-    BTreeMap<String, String>,
+    pub BTreeMap<String, String>,
 );
 
 /// Event for showing a toast notification.
@@ -44,8 +40,8 @@ pub struct UpdateSettingsEvent(
 
 /// Event for updating the widget configuration registry.
 ///
-/// This event is emitted from the backend to all windows when the widget
-/// configuration registry is updated.
+/// This event is emitted from the backend to the manager window when the
+/// widget configuration registry is updated.
 #[derive(Clone, Serialize, Deserialize, specta::Type, Event)]
 pub struct UpdateWidgetConfigRegistryEvent(
     /// The updated widget configuration registry.

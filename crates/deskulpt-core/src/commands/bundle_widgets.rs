@@ -1,10 +1,13 @@
-use std::collections::HashMap;
+use std::collections::BTreeMap;
 
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 use tauri::{command, AppHandle, Runtime};
+use tauri_specta::Event;
 
 use super::error::CmdResult;
-use crate::states::WidgetsStateExt;
+use crate::events::{RenderWidgetsEvent, UpdateSettingsEvent};
+use crate::states::{SettingsStateExt, WidgetsStateExt};
+use crate::window::DeskulptWindow;
 
 #[derive(Debug, Deserialize, specta::Type)]
 #[serde(tag = "type", content = "content", rename_all = "camelCase")]
@@ -13,39 +16,51 @@ pub enum BundleWidgetsKind {
     Single(String),
 }
 
-#[derive(Debug, Serialize, specta::Type)]
-#[serde(tag = "type", content = "content", rename_all = "camelCase")]
-pub enum BundleWidgetsResult {
-    Ok(String),
-    Err(String),
-}
-
-impl From<anyhow::Result<String>> for BundleWidgetsResult {
-    fn from(res: anyhow::Result<String>) -> Self {
-        match res {
-            Ok(code) => BundleWidgetsResult::Ok(code),
-            Err(e) => BundleWidgetsResult::Err(format!("{e:?}")),
-        }
-    }
-}
-
 /// TODO(Charlie-XIAO)
 #[command]
 #[specta::specta]
 pub async fn bundle_widgets<R: Runtime>(
     app_handle: AppHandle<R>,
     kind: BundleWidgetsKind,
-) -> CmdResult<HashMap<String, BundleWidgetsResult>> {
-    let results = match kind {
+) -> CmdResult<()> {
+    let widgets = match kind {
         BundleWidgetsKind::All => app_handle
             .bundle_widgets()
             .await
             .into_iter()
-            .map(|(id, res)| (id, res.into()))
+            .filter_map(|(id, res)| {
+                match res {
+                    Ok(code) => Some((id, code)),
+                    Err(e) => {
+                        // TODO(Charlie-XIAO)
+                        eprintln!("Failed to bundle widget {id}: {e:?}");
+                        None
+                    },
+                }
+            })
             .collect(),
-        BundleWidgetsKind::Single(id) => {
-            std::iter::once((id.clone(), app_handle.bundle_widget(&id).await.into())).collect()
+        BundleWidgetsKind::Single(id) => match app_handle.bundle_widget(&id).await {
+            Ok(code) => std::iter::once((id, code)).collect(),
+            Err(e) => {
+                // TODO(Charlie-XIAO)
+                eprintln!("Failed to bundle widget {id}: {e:?}");
+                BTreeMap::new()
+            },
         },
     };
-    Ok(results)
+
+    {
+        let mut settings = app_handle.get_settings_mut();
+        settings.widgets.retain(|id, _| widgets.contains_key(id));
+        for id in widgets.keys() {
+            settings
+                .widgets
+                .entry(id.clone())
+                .or_insert_with(Default::default);
+        }
+        UpdateSettingsEvent(settings.clone()).emit(&app_handle)?;
+    }
+
+    RenderWidgetsEvent(widgets).emit_to(&app_handle, DeskulptWindow::Canvas)?;
+    Ok(())
 }

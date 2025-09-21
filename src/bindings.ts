@@ -22,8 +22,6 @@ shortcuts: Partial<{ [key in ShortcutKey]: string }> }
 
 export type BundleWidgetsKind = { type: "all" } | { type: "single"; content: string }
 
-export type BundleWidgetsResult = { type: "ok"; content: string } | { type: "err"; content: string }
-
 /**
  * Deskulpt window enum.
  */
@@ -40,11 +38,7 @@ export type DeskulptWindow =
 export type JsonValue = null | boolean | number | string | JsonValue[] | { [key in string]: JsonValue }
 
 /**
- * Event for re-rendering widgets.
- * 
- * This event is mainly emitted from the manager window to the canvas window
- * when settings or code of a widget needs to be re-rendered. It may also be
- * emitted from the backend to the canvas window for the initial render.
+ * TODO(Charlie-XIAO)
  */
 export type RenderWidgetsEvent = 
 /**
@@ -87,6 +81,36 @@ export type SettingsUpdate =
  * widget settings. If the widget ID does not exist, this is an error.
  */
 { widget: [string, WidgetSettingsUpdate] }
+
+/**
+ * An application setup task.
+ */
+export type SetupTask = 
+/**
+ * Whether the canvas window is ready to listen to
+ * [`UpdateSettingsEvent`](crate::events::UpdateSettingsEvent).
+ */
+"canvasUpdateSettings" | 
+/**
+ * Whether the canvas window is ready to listen to
+ * [`RenderWidgetsEvent`](crate::events::RenderWidgetsEvent).
+ */
+"canvasRenderWidgets" | 
+/**
+ * Whether the canvas window is ready to listen to
+ * [`ShowToastEvent`](crate::events::ShowToastEvent).
+ */
+"canvasShowToast" | 
+/**
+ * Whether the manager window is ready to listen to
+ * [`UpdateSettingsEvent`](crate::events::UpdateSettingsEvent).
+ */
+"managerUpdateSettings" | 
+/**
+ * Whether the manager window is ready to listen to
+ * [`UpdateWidgetConfigRegistryEvent`](crate::events::UpdateWidgetConfigRegistryEvent).
+ */
+"managerUpdateWidgetConfigRegistry"
 
 /**
  * Types of keyboard shortcuts in the application.
@@ -137,8 +161,8 @@ Settings
 /**
  * Event for updating the widget configuration registry.
  * 
- * This event is emitted from the backend to all windows when the widget
- * configuration registry is updated.
+ * This event is emitted from the backend to the manager window when the
+ * widget configuration registry is updated.
  */
 export type UpdateWidgetConfigRegistryEvent = 
 /**
@@ -224,7 +248,7 @@ export const commands = {
    */
   bundleWidgets: (payload: {
     kind: BundleWidgetsKind,
-  }) => invoke<{ [key in string]: BundleWidgetsResult }>("bundle_widgets", payload),
+  }) => invoke<null>("bundle_widgets", payload),
 
   /**
    * Call a plugin command (🚧 TODO 🚧).
@@ -297,5 +321,7 @@ export const commands = {
   /**
    * TODO(Charlie-XIAO)
    */
-  windowReady: () => invoke<null>("window_ready"),
+  markSetup: (payload: {
+    task: SetupTask,
+  }) => invoke<null>("mark_setup", payload),
 };

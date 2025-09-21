@@ -19,7 +19,12 @@ const GlobalActions = memo(({ length }: GlobalActionsProps) => {
   }, []);
 
   const rescanAction = useCallback(() => {
-    commands.loadWidgets().catch(console.error);
+    commands
+      .loadWidgets()
+      .then(() => {
+        toast.success("TODO(Charlie-XIAO)");
+      })
+      .catch(console.error);
   }, []);
 
   const openAction = useCallback(() => {

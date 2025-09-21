@@ -5,9 +5,7 @@ use std::sync::{RwLock, RwLockReadGuard, RwLockWriteGuard};
 use anyhow::Result;
 use tauri::{App, AppHandle, Emitter, Manager, Runtime};
 use tauri_plugin_global_shortcut::GlobalShortcutExt;
-use tauri_specta::Event;
 
-use crate::events::UpdateSettingsEvent;
 use crate::path::PathExt;
 use crate::settings::{Settings, ShortcutKey, Theme};
 
@@ -91,13 +89,6 @@ pub trait SettingsStateExt<R: Runtime>:
             widget_settings.opacity = opacity;
         }
 
-        Ok(())
-    }
-
-    /// Emit an [`UpdateSettingsEvent`] with the current settings.
-    fn emit_update_settings_event(&self) -> Result<()> {
-        let settings = self.get_settings();
-        UpdateSettingsEvent(settings.clone()).emit(self)?;
         Ok(())
     }
 }

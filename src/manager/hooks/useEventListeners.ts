@@ -1,6 +1,6 @@
-import { useEffect } from "react";
 import { events } from "../../bindings";
 import { useSettings, useWidgetConfigRegistry } from "./useStores";
+import { useSetupEventListener } from "../../utils/useSetupEventListener";
 
 export function useEventListeners() {
   useUpdateSettingsListener();
@@ -8,25 +8,17 @@ export function useEventListeners() {
 }
 
 function useUpdateSettingsListener() {
-  useEffect(() => {
-    const unlisten = events.updateSettingsEvent.listen((event) => {
+  useSetupEventListener("managerUpdateSettings", () =>
+    events.updateSettingsEvent.listen((event) => {
       useSettings.setState(() => event.payload, true);
-    });
-
-    return () => {
-      unlisten.then((f) => f()).catch(console.error);
-    };
-  }, []);
+    }),
+  );
 }
 
 function useUpdateWidgetConfigRegistryListener() {
-  useEffect(() => {
-    const unlisten = events.updateWidgetConfigRegistryEvent.listen((event) => {
+  useSetupEventListener("managerUpdateWidgetConfigRegistry", () =>
+    events.updateWidgetConfigRegistryEvent.listen((event) => {
       useWidgetConfigRegistry.setState(() => event.payload, true);
-    });
-
-    return () => {
-      unlisten.then((f) => f()).catch(console.error);
-    };
-  }, []);
+    }),
+  );
 }

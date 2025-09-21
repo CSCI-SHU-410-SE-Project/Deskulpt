@@ -2,10 +2,12 @@ use tauri::{command, AppHandle, Runtime};
 use tauri_specta::Event;
 
 use super::error::CmdResult;
+use crate::commands::{bundle_widgets, BundleWidgetsKind};
 use crate::config::WidgetConfigRegistry;
 use crate::events::UpdateWidgetConfigRegistryEvent;
 use crate::path::PathExt;
 use crate::states::WidgetsStateExt;
+use crate::window::DeskulptWindow;
 
 /// Rescan the widgets directory.
 ///
@@ -25,6 +27,8 @@ pub async fn load_widgets<R: Runtime>(app_handle: AppHandle<R>) -> CmdResult<()>
     let registry = WidgetConfigRegistry::load(app_handle.widgets_dir()?)?;
     let event = UpdateWidgetConfigRegistryEvent(registry.clone());
     app_handle.set_widgets(registry)?;
-    event.emit(&app_handle)?;
+    event.emit_to(&app_handle, DeskulptWindow::Manager)?;
+
+    bundle_widgets(app_handle, BundleWidgetsKind::All).await?;
     Ok(())
 }
