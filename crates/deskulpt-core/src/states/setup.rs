@@ -46,7 +46,7 @@ pub trait SetupStateExt<R: Runtime>: Manager<R> + Emitter<R> + Sized {
             return None;
         }
         state.insert(task);
-        return Some(state.len() == 5);
+        Some(state.len() == 5)
     }
 }
 
