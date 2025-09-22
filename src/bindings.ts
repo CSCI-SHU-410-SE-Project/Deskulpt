@@ -276,7 +276,8 @@ export const commands = {
    * 
    * This command scans the widgets directory for available widgets, loads them,
    * and updates the application's widgets state accordingly. An
-   * [`UpdateWidgetsEvent`] is emitted to notify all windows of this update.
+   * [`UpdateWidgetsEvent`](crate::events::UpdateWidgetsEvent) is emitted to
+   * notify all windows of this update.
    * 
    * ### Errors
    * 
