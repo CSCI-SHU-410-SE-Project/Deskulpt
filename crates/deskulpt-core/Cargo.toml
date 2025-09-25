@@ -12,8 +12,8 @@ version    = { workspace = true }
 [dependencies]
 anyhow                       = { workspace = true }
 deskulpt-macros              = { workspace = true }
-either                       = { workspace = true }
 dunce                        = { workspace = true }
+either                       = { workspace = true }
 once_cell                    = { workspace = true }
 open                         = { workspace = true, features = ["shellexecute-on-windows"] }
 paste                        = { workspace = true }
