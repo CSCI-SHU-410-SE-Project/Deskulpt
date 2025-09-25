@@ -17,37 +17,30 @@ concurrency:
 
 jobs:
   ci-repo-check:
-    strategy:
-      fail-fast: false
-      matrix:
-        platform: [macos-latest, ubuntu-latest, windows-latest]
-    runs-on: ${{ matrix.platform }}
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
 
-      - uses: ./.github/actions/setup
+      - uses: ./.github/actions/setup-rust
         with:
-          platform: ${{ matrix.platform }}
-          format: ${{ matrix.platform == 'ubuntu-latest' }}
-          lint: true
+          platform: ubuntu-latest
+          cache-key: debug
+          tools: taplo
+          nightly-rustfmt: true
+
+      - uses: ./.github/actions/setup-node
 
       - name: Check formatting
-        if: ${{ matrix.platform == 'ubuntu-latest' }}
         run: pnpm format:check && taplo format --check --diff
 
-      - name: Check linting
-        run: pnpm lint:check
-
       - name: Regenerate auto-generated files
-        if: ${{ matrix.platform == 'ubuntu-latest' }}
         run: |
           pnpm build:packages
           pnpm build:bindings
 
       - name: Check that auto-generated files are up to date
-        if: ${{ matrix.platform == 'ubuntu-latest' }}
         shell: bash
         run: |
           set -euo pipefail
@@ -64,6 +57,28 @@ jobs:
             exit 1
           fi
 
+  ci-lint:
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [macos-latest, ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.platform }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - uses: ./.github/actions/setup-rust
+        with:
+          platform: ${{ matrix.platform }}
+          cache-key: debug
+          components: clippy
+
+      - uses: ./.github/actions/setup-node
+
+      - name: Lint codebase
+        run: pnpm lint:check
+
   ci-test:
     strategy:
       fail-fast: false
@@ -75,9 +90,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v5
 
-      - uses: ./.github/actions/setup
+      - uses: ./.github/actions/setup-rust
         with:
           platform: ${{ matrix.platform }}
+          cache-key: debug
+
+      - uses: ./.github/actions/setup-node
 
       - name: Run test suite
         run: pnpm test
@@ -86,16 +104,28 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform: [macos-latest, ubuntu-latest, windows-latest]
+        include:
+          - platform: macos-latest
+            target: aarch64-apple-darwin
+          - platform: macos-latest
+            target: x86_64-apple-darwin
+          - platform: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+          - platform: windows-latest
+            target: x86_64-pc-windows-msvc
     runs-on: ${{ matrix.platform }}
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
 
-      - uses: ./.github/actions/setup
+      - uses: ./.github/actions/setup-rust
         with:
           platform: ${{ matrix.platform }}
+          targets: ${{ matrix.target }}
+          cache-key: release-${{ matrix.target }}
+
+      - uses: ./.github/actions/setup-node
 
       - name: Build Deskulpt
         id: build-deskulpt
@@ -107,5 +137,5 @@ jobs:
         id: upload-artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: binaries-${{ matrix.platform }}
+          name: binaries-${{ matrix.platform }}-${{ matrix.target }}
           path: "${{ join(fromJSON(steps.build-deskulpt.outputs.artifactPaths), '\n') }}"
