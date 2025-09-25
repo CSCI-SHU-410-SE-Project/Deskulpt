@@ -1,5 +1,6 @@
 use std::collections::BTreeMap;
 
+use rolldown::Watcher;
 use serde::Deserialize;
 use tauri::{command, AppHandle, Runtime};
 use tauri_specta::Event;
@@ -9,10 +10,13 @@ use crate::events::{RenderWidgetsEvent, UpdateSettingsEvent};
 use crate::states::{SettingsStateExt, WidgetsStateExt};
 use crate::window::DeskulptWindow;
 
+/// Specifies which widgets to bundle.
 #[derive(Debug, Deserialize, specta::Type)]
 #[serde(tag = "type", content = "content", rename_all = "camelCase")]
 pub enum BundleWidgetsKind {
+    /// Bundle all widgets.
     All,
+    /// Bundle a single widget by its ID.
     Single(String),
 }
 
