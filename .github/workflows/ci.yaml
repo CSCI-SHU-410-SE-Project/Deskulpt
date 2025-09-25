@@ -17,11 +17,7 @@ concurrency:
 
 jobs:
   ci-repo-check:
-    strategy:
-      fail-fast: false
-      matrix:
-        platform: [macos-latest, ubuntu-latest, windows-latest]
-    runs-on: ${{ matrix.platform }}
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
@@ -29,29 +25,22 @@ jobs:
 
       - uses: ./.github/actions/setup-rust
         with:
-          platform: ${{ matrix.platform }}
+          platform: ubuntu-latest
           cache-key: debug
-          components: clippy
           tools: taplo
-          nightly-rustfmt: ${{ matrix.platform == 'ubuntu-latest' }}
+          nightly-rustfmt: true
 
       - uses: ./.github/actions/setup-node
 
       - name: Check formatting
-        if: ${{ matrix.platform == 'ubuntu-latest' }}
         run: pnpm format:check && taplo format --check --diff
 
-      - name: Check linting
-        run: pnpm lint:check
-
       - name: Regenerate auto-generated files
-        if: ${{ matrix.platform == 'ubuntu-latest' }}
         run: |
           pnpm build:packages
           pnpm build:bindings
 
       - name: Check that auto-generated files are up to date
-        if: ${{ matrix.platform == 'ubuntu-latest' }}
         shell: bash
         run: |
           set -euo pipefail
@@ -67,6 +56,28 @@ jobs:
             echo "  pnpm build:bindings"
             exit 1
           fi
+
+  ci-lint:
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [macos-latest, ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.platform }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - uses: ./.github/actions/setup-rust
+        with:
+          platform: ${{ matrix.platform }}
+          cache-key: debug
+          components: clippy
+
+      - uses: ./.github/actions/setup-node
+
+      - name: Lint codebase
+        run: pnpm lint:check
 
   ci-test:
     strategy:
@@ -126,5 +137,5 @@ jobs:
         id: upload-artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: binaries-${{ matrix.platform }}
+          name: binaries-${{ matrix.platform }}-${{ matrix.target }}
           path: "${{ join(fromJSON(steps.build-deskulpt.outputs.artifactPaths), '\n') }}"
