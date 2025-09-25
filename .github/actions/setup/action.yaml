@@ -16,6 +16,11 @@ inputs:
     type: string
     required: true
     default: ""
+  rust-cache-shared-key:
+    description: The shared-key for swatinem/rust-cache.
+    type: string
+    required: true
+    default: shared
   lint:
     description: Whether to do additional setup for linting.
     type: boolean
@@ -55,7 +60,7 @@ runs:
       uses: swatinem/rust-cache@v2
       with:
         workspaces: . -> target
-        shared-key: ${{ runner.os }}-${{ runner.arch }}
+        shared-key: ${{ inputs.rust-cache-shared-key }}
         cache-on-failure: true
 
     - name: Install pnpm
