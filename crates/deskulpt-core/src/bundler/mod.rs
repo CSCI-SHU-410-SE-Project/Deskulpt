@@ -7,9 +7,10 @@ use std::sync::Arc;
 
 use alias::AliasPlugin;
 use anyhow::{anyhow, bail, Result};
-use oxc::transformer::{JsxOptions, JsxRuntime};
+use either::Either;
 use rolldown::{
-    Bundler, BundlerOptions, OutputFormat, Platform, RawMinifyOptions, TransformOptions,
+    Bundler, BundlerOptions, BundlerTransformOptions, JsxOptions, OutputFormat, Platform,
+    RawMinifyOptions,
 };
 use rolldown_common::Output;
 
@@ -51,18 +52,14 @@ impl WidgetBundlerBuilder {
             minify: Some(RawMinifyOptions::Bool(true)),
             // Use automatic runtime for JSX transforms, which will refer to
             // `@deskulpt-test/emotion/jsx-runtime`
-            transform: Some(TransformOptions::new(
-                oxc::transformer::TransformOptions {
-                    jsx: JsxOptions {
-                        runtime: JsxRuntime::Automatic,
-                        import_source: Some("@deskulpt-test/emotion".to_string()),
-                        ..Default::default()
-                    },
+            transform: Some(BundlerTransformOptions {
+                jsx: Some(Either::Right(JsxOptions {
+                    runtime: Some("automatic".to_string()),
+                    import_source: Some("@deskulpt-test/emotion".to_string()),
                     ..Default::default()
-                },
-                Default::default(),
-                Default::default(),
-            )),
+                })),
+                ..Default::default()
+            }),
             // Externalize default dependencies available at runtime
             external: Some(
                 vec![
