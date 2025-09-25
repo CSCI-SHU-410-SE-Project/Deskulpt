@@ -1,6 +1,5 @@
 use std::collections::BTreeMap;
 
-use rolldown::Watcher;
 use serde::Deserialize;
 use tauri::{command, AppHandle, Runtime};
 use tauri_specta::Event;

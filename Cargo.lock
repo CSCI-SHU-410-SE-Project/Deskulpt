@@ -1075,8 +1075,9 @@ dependencies = [
  "deskulpt-plugin-fs",
  "deskulpt-plugin-sys",
  "dunce",
+ "either",
  "futures",
- "objc2 0.6.1",
+ "objc2 0.6.2",
  "once_cell",
  "open",
  "paste",
@@ -6652,6 +6653,7 @@ dependencies = [
  "getrandom 0.3.1",
  "js-sys",
  "serde",
+ "wasm-bindgen",
 ]
 
 [[package]]
