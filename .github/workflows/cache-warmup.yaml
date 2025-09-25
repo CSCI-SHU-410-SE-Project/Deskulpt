@@ -1,0 +1,72 @@
+name: Cache Warmup
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "crates/**"
+      - "Cargo.lock"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  cache-debug:
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.platform }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - uses: ./.github/actions/setup-rust
+        with:
+          platform: ${{ matrix.platform }}
+          cache-key: debug
+          save-cache: true
+
+      - uses: ./.github/actions/setup-node
+
+      - name: Populate Rust cache
+        shell: bash
+        run: |
+          cargo check
+          cargo test --no-run
+          cargo build
+
+  cache-release:
+    strategy:
+      matrix:
+        include:
+          - platform: macos-latest
+            target: aarch64-apple-darwin
+          - platform: macos-latest
+            target: x86_64-apple-darwin
+          - platform: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+          - platform: windows-latest
+            target: x86_64-pc-windows-msvc
+    runs-on: ${{ matrix.platform }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - uses: ./.github/actions/setup-rust
+        with:
+          platform: ${{ matrix.platform }}
+          targets: ${{ matrix.target }}
+          cache-key: release-${{ matrix.target }}
+          save-cache: true
+
+      - uses: ./.github/actions/setup-node
+
+      - name: Populate Rust cache
+        shell: bash
+        run: |
+          cargo build --release --target ${{ matrix.target }}

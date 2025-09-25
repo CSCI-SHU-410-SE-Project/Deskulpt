@@ -27,11 +27,15 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v5
 
-      - uses: ./.github/actions/setup
+      - uses: ./.github/actions/setup-rust
         with:
           platform: ${{ matrix.platform }}
-          format: ${{ matrix.platform == 'ubuntu-latest' }}
-          lint: true
+          cache-key: debug
+          components: clippy
+          tools: taplo
+          nightly-rustfmt: ${{ matrix.platform == 'ubuntu-latest' }}
+
+      - uses: ./.github/actions/setup-node
 
       - name: Check formatting
         if: ${{ matrix.platform == 'ubuntu-latest' }}
@@ -75,9 +79,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v5
 
-      - uses: ./.github/actions/setup
+      - uses: ./.github/actions/setup-rust
         with:
           platform: ${{ matrix.platform }}
+          cache-key: debug
+
+      - uses: ./.github/actions/setup-node
 
       - name: Run test suite
         run: pnpm test
@@ -86,16 +93,28 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform: [macos-latest, ubuntu-latest, windows-latest]
+        include:
+          - platform: macos-latest
+            target: aarch64-apple-darwin
+          - platform: macos-latest
+            target: x86_64-apple-darwin
+          - platform: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+          - platform: windows-latest
+            target: x86_64-pc-windows-msvc
     runs-on: ${{ matrix.platform }}
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
 
-      - uses: ./.github/actions/setup
+      - uses: ./.github/actions/setup-rust
         with:
           platform: ${{ matrix.platform }}
+          targets: ${{ matrix.target }}
+          cache-key: release-${{ matrix.target }}
+
+      - uses: ./.github/actions/setup-node
 
       - name: Build Deskulpt
         id: build-deskulpt
