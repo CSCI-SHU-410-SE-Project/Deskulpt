@@ -55,11 +55,13 @@ runs:
       uses: swatinem/rust-cache@v2
       with:
         workspaces: . -> target
+        shared-key: ${{ runner.os }}-${{ runner.arch }}
+        cache-on-failure: true
 
     - name: Install pnpm
       uses: pnpm/action-setup@v4
       with:
-        version: 10
+        version: latest
 
     - name: Node setup and cache
       uses: actions/setup-node@v4
