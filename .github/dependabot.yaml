@@ -7,9 +7,6 @@ updates:
       interval: weekly
     labels:
       - dependencies
-    ignore:
-      - dependency-name: "*"
-        update-types: ["version-update:semver-patch"]
     groups:
       rust:
         patterns:
@@ -22,9 +19,6 @@ updates:
       interval: weekly
     labels:
       - dependencies
-    ignore:
-      - dependency-name: "*"
-        update-types: ["version-update:semver-patch"]
     groups:
       node:
         patterns:
@@ -37,9 +31,6 @@ updates:
       interval: weekly
     labels:
       - dependencies
-    ignore:
-      - dependency-name: "*"
-        update-types: ["version-update:semver-patch"]
     groups:
       ci:
         patterns:

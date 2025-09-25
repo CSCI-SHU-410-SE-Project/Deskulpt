@@ -13,10 +13,10 @@ version    = { workspace = true }
 anyhow                       = { workspace = true }
 deskulpt-macros              = { workspace = true }
 dunce                        = { workspace = true }
+either                       = { workspace = true }
 futures                      = { workspace = true }
 once_cell                    = { workspace = true }
 open                         = { workspace = true, features = ["shellexecute-on-windows"] }
-oxc                          = { workspace = true }
 paste                        = { workspace = true }
 path-clean                   = { workspace = true }
 rolldown                     = { workspace = true }
