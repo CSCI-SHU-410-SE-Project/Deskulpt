@@ -56,7 +56,7 @@ function cleanDir(path: string) {
         case "ENOENT":
           return;
         case "ENOTDIR":
-          throw new Error(`'${path}' is not a directory`);
+          throw new Error(`'${path}' is not a directory`, { cause: err });
         default:
           throw err;
       }
