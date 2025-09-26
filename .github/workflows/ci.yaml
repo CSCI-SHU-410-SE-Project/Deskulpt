@@ -136,8 +136,8 @@ jobs:
       - name: Build Deskulpt
         id: build-deskulpt
         uses: tauri-apps/tauri-action@v0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          args: --target ${{ matrix.target }}
 
       - name: Upload build artifacts
         id: upload-artifacts
