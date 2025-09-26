@@ -1,5 +1,4 @@
 import { Flex, ScrollArea, Separator, Tabs, Text } from "@radix-ui/themes";
-import { useWidgetsStore } from "../../hooks";
 import { memo } from "react";
 import { useShallow } from "zustand/shallow";
 import Trigger from "./Trigger";
@@ -8,6 +7,7 @@ import Config from "./Config";
 import Settings from "./Settings";
 import Header from "./Header";
 import { css } from "@emotion/react";
+import { useWidgetConfigRegistry } from "../../hooks/useStores";
 
 const styles = {
   tabList: css({ width: "25%", height: "100%", boxShadow: "none" }),
@@ -15,8 +15,8 @@ const styles = {
 };
 
 const WidgetsTab = memo(() => {
-  const ids = useWidgetsStore(
-    useShallow((state) => Object.keys(state.widgets)),
+  const ids = useWidgetConfigRegistry(
+    useShallow((state) => Object.keys(state)),
   );
 
   return (

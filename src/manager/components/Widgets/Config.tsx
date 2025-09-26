@@ -1,8 +1,8 @@
 import { Box, Code, ScrollArea, Table } from "@radix-ui/themes";
-import { useWidgetsStore } from "../../hooks";
 import { memo } from "react";
 import Dependencies from "./Dependencies";
 import { css } from "@emotion/react";
+import { useWidgetConfigRegistry } from "../../hooks/useStores";
 
 const styles = {
   table: css({
@@ -18,28 +18,26 @@ interface ConfigProps {
 }
 
 const Config = memo(({ id }: ConfigProps) => {
-  const config = useWidgetsStore((state) => state.widgets[id].config);
+  const config = useWidgetConfigRegistry((state) => state[id]);
 
   return (
     <ScrollArea asChild>
       <Box height="200px" pr="3" pb="3">
-        {config.type === "valid" ? (
+        {config?.type === "ok" ? (
           <Table.Root size="1" layout="fixed" css={styles.table}>
             <Table.Body>
               <Table.Row align="center">
                 <Table.RowHeaderCell>Name</Table.RowHeaderCell>
-                <Table.Cell>{config.deskulptConf.name}</Table.Cell>
+                <Table.Cell>{config.name}</Table.Cell>
               </Table.Row>
               <Table.Row align="center">
                 <Table.RowHeaderCell>Entry</Table.RowHeaderCell>
-                <Table.Cell>{config.deskulptConf.entry}</Table.Cell>
+                <Table.Cell>{config.entry}</Table.Cell>
               </Table.Row>
               <Table.Row align="center">
                 <Table.RowHeaderCell>Dependencies</Table.RowHeaderCell>
                 <Table.Cell>
-                  <Dependencies
-                    dependencies={config.packageJson?.dependencies}
-                  />
+                  <Dependencies dependencies={config.dependencies} />
                 </Table.Cell>
               </Table.Row>
             </Table.Body>
@@ -48,7 +46,7 @@ const Config = memo(({ id }: ConfigProps) => {
           <Box pl="2" m="0" asChild>
             <pre>
               <Code size="2" variant="ghost">
-                {config.error}
+                {config?.error ?? "Widget not found."}
               </Code>
             </pre>
           </Box>

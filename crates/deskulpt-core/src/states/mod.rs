@@ -1,15 +1,15 @@
 //! Deskulpt runtime state management.
 
 mod canvas_imode;
-mod initial_render;
 mod settings;
-mod widget_config_map;
+mod setup;
+mod widgets;
 
 #[doc(hidden)]
-pub use canvas_imode::CanvasImodeStateExt;
+pub use canvas_imode::*;
 #[doc(hidden)]
-pub use initial_render::InitialRenderStateExt;
+pub use settings::*;
 #[doc(hidden)]
-pub use settings::SettingsStateExt;
+pub use setup::*;
 #[doc(hidden)]
-pub use widget_config_map::WidgetConfigMapStateExt;
+pub use widgets::*;

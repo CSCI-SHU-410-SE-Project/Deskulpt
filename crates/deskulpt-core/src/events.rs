@@ -1,51 +1,18 @@
 //! Deskulpt core events.
 
+use std::collections::BTreeMap;
+
 use serde::{Deserialize, Serialize};
 use tauri_specta::Event;
 
-use crate::settings::{Theme, WidgetSettings};
+use crate::config::WidgetConfigRegistry;
+use crate::settings::Settings;
 
-/// Event for exiting the application.
-///
-/// This event is emitted from the backend to the manager window when the
-/// application needs to be closed for it to persist the states before exiting.
-#[derive(Clone, Serialize, Deserialize, specta::Type, Event)]
-pub struct ExitAppEvent;
-
-/// Event for removing widgets.
-///
-/// This event is emitted from the manager window to the canvas window when
-/// widgets need to be removed.
-#[derive(Clone, Serialize, Deserialize, specta::Type, Event)]
-pub struct RemoveWidgetsEvent(
-    /// The list of widget IDs to be removed.
-    Vec<String>,
-);
-
-/// Inner structure for [`RenderWidgetsEvent`].
-#[derive(Clone, Serialize, Deserialize, specta::Type, Event)]
-pub struct RenderWidgetsEventInner {
-    /// The ID of the widget being re-rendered.
-    id: String,
-    /// If provided, update the settings of the widget.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    #[specta(type = WidgetSettings)]
-    settings: Option<WidgetSettings>,
-    /// If provided, update the code of the widget.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    #[specta(type = String)]
-    code: Option<String>,
-}
-
-/// Event for re-rendering widgets.
-///
-/// This event is mainly emitted from the manager window to the canvas window
-/// when settings or code of a widget needs to be re-rendered. It may also be
-/// emitted from the backend to the canvas window for the initial render.
+/// TODO(Charlie-XIAO)
 #[derive(Clone, Serialize, Deserialize, specta::Type, Event)]
 pub struct RenderWidgetsEvent(
-    /// The list of widgets to be re-rendered.
-    Vec<RenderWidgetsEventInner>,
+    /// The mapping from widget IDs to their respective bundled code.
+    pub BTreeMap<String, String>,
 );
 
 /// Event for showing a toast notification.
@@ -61,34 +28,22 @@ pub enum ShowToastEvent {
     Error(String),
 }
 
-/// Event for switching the app theme.
+/// Event for updating the settings.
 ///
-/// This event is emitted from the manager window to the canvas window when the
-/// theme is switched from the manager side.
+/// This event is emitted from the backend to all windows when the settings are
+/// updated.
 #[derive(Clone, Serialize, Deserialize, specta::Type, Event)]
-pub struct SwitchThemeEvent(
-    /// The theme to switch to.
-    Theme,
+pub struct UpdateSettingsEvent(
+    /// The updated settings.
+    pub Settings,
 );
 
-/// Event for updating settings of a widget.
+/// Event for updating the widget configuration registry.
 ///
-/// This event is emitted between the manager window and the canvas window to
-/// each other when widget settings are updated on one side.
+/// This event is emitted from the backend to the manager window when the
+/// widget configuration registry is updated.
 #[derive(Clone, Serialize, Deserialize, specta::Type, Event)]
-pub struct UpdateSettingsEvent {
-    /// The ID of the widget being updated.
-    id: String,
-    /// [`WidgetSettings::x`](crate::settings::WidgetSettings::x)
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    #[specta(type = i32)]
-    x: Option<i32>,
-    /// [`WidgetSettings::y`](crate::settings::WidgetSettings::y)
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    #[specta(type = i32)]
-    y: Option<i32>,
-    /// [`WidgetSettings::opacity`](crate::settings::WidgetSettings::opacity)
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    #[specta(type = i32)]
-    opacity: Option<i32>,
-}
+pub struct UpdateWidgetConfigRegistryEvent(
+    /// The updated widget configuration registry.
+    pub WidgetConfigRegistry,
+);
