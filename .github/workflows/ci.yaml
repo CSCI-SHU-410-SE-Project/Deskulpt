@@ -27,7 +27,7 @@ jobs:
         with:
           platform: ubuntu-latest
           cache-key: debug
-          tools: taplo
+          tools: taplo,cargo-shear
           nightly-rustfmt: true
 
       - uses: ./.github/actions/setup-node
@@ -39,6 +39,7 @@ jobs:
         run: |
           pnpm build:packages
           pnpm build:bindings
+          pnpm build:schema
 
       - name: Check that auto-generated files are up to date
         shell: bash
@@ -54,6 +55,7 @@ jobs:
             echo "To fix this issue, run the following commands and commit the changes:"
             echo "  pnpm build:packages"
             echo "  pnpm build:bindings"
+            echo "  pnpm build:schema"
             exit 1
           fi
 

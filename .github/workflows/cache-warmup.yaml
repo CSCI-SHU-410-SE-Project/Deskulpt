@@ -30,8 +30,6 @@ jobs:
           cache-key: debug
           save-cache: true
 
-      - uses: ./.github/actions/setup-node
-
       - name: Populate Rust cache
         shell: bash
         run: |
@@ -63,8 +61,6 @@ jobs:
           targets: ${{ matrix.target }}
           cache-key: release-${{ matrix.target }}
           save-cache: true
-
-      - uses: ./.github/actions/setup-node
 
       - name: Populate Rust cache
         shell: bash

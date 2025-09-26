@@ -38,4 +38,3 @@ crates/deskulpt/gen/schemas/
 # Docs
 docs/.vitepress/dist/
 docs/.vitepress/cache/
-docs/src/public/settings-schema.json
