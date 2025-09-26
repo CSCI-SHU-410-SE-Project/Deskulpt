@@ -8,9 +8,6 @@ on:
     branches:
       - main
 
-env:
-  RUST_BACKTRACE: 1
-
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -35,6 +32,8 @@ jobs:
         run: pnpm format:check
 
       - name: Regenerate auto-generated files
+        env:
+          RUST_BACKTRACE: 1
         run: |
           pnpm build:packages
           pnpm build:bindings
@@ -97,6 +96,8 @@ jobs:
       - uses: ./.github/actions/setup-node
 
       - name: Run test suite
+        env:
+          RUST_BACKTRACE: 1
         run: pnpm test
 
   ci-build:
