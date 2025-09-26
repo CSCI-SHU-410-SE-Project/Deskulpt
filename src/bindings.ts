@@ -20,7 +20,18 @@ theme: Theme;
  */
 shortcuts: Partial<{ [key in ShortcutKey]: string }> }
 
-export type BundleWidgetsKind = { type: "all" } | { type: "single"; content: string }
+/**
+ * Specifies which widgets to bundle.
+ */
+export type BundleWidgetsKind = 
+/**
+ * Bundle all widgets.
+ */
+{ type: "all" } | 
+/**
+ * Bundle a single widget by its ID.
+ */
+{ type: "single"; content: string }
 
 /**
  * Deskulpt window enum.
