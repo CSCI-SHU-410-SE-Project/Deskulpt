@@ -27,13 +27,12 @@ jobs:
         with:
           platform: ubuntu-latest
           cache-key: debug
-          tools: taplo
           nightly-rustfmt: true
 
       - uses: ./.github/actions/setup-node
 
       - name: Check formatting
-        run: pnpm format:check && taplo format --check --diff
+        run: pnpm format:check
 
       - name: Regenerate auto-generated files
         run: |
