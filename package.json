@@ -12,8 +12,6 @@
     "format:js:check": "prettier --check .",
     "format:rs": "cargo +nightly fmt",
     "format:rs:check": "cargo +nightly fmt -- --check",
-    "format:toml": "taplo format",
-    "format:toml:check": "taplo format --check",
     "lint": "pnpm lint:js && pnpm lint:rs",
     "lint:check": "pnpm lint:js:check && pnpm lint:rs:check",
     "lint:js": "oxlint --max-warnings=0 --fix .",
@@ -36,11 +34,18 @@
     "husky": "^9.1.6",
     "lint-staged": "^16.2.0",
     "oxlint": "^1.18.0",
-    "prettier": "^3.6.2"
+    "prettier": "^3.6.2",
+    "prettier-plugin-toml": "^2.0.6"
   },
-  "prettier": {},
+  "prettier": {
+    "plugins": [
+      "prettier-plugin-toml"
+    ],
+    "alignEntries": true,
+    "reorderKeys": true
+  },
   "lint-staged": {
-    "*.{js,jsx,ts,tsx,json,md,mdx,html,css,scss,yml,yaml}": "prettier --write",
+    "*.{js,jsx,ts,tsx,json,md,mdx,html,css,scss,yml,yaml,toml}": "prettier --write",
     "*.{js,jsx,ts,tsx}": "oxlint --fix",
     "*.rs": "rustfmt +nightly --"
   }
