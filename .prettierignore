@@ -5,3 +5,4 @@ pnpm-lock.yaml
 crates/deskulpt-core/gen/
 src/gen/
 src/bindings.ts
+docs/src/public/settings-schema.json

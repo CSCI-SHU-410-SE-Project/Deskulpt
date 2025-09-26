@@ -16,7 +16,10 @@
       }
     }
   },
-  "required": ["app", "widgets"],
+  "required": [
+    "app",
+    "widgets"
+  ],
   "$defs": {
     "AppSettings": {
       "description": "Application-wide settings.",
@@ -34,12 +37,18 @@
           }
         }
       },
-      "required": ["theme", "shortcuts"]
+      "required": [
+        "theme",
+        "shortcuts"
+      ]
     },
     "Theme": {
       "description": "Light/dark theme of the application.",
       "type": "string",
-      "enum": ["light", "dark"]
+      "enum": [
+        "light",
+        "dark"
+      ]
     },
     "WidgetSettings": {
       "description": "Per-widget settings.\n\nDifferent from widget configurations, these are independent of the widget\nconfiguration files and are managed internally by the application.",
@@ -61,7 +70,11 @@
           "format": "int32"
         }
       },
-      "required": ["x", "y", "opacity"]
+      "required": [
+        "x",
+        "y",
+        "opacity"
+      ]
     }
   }
 }
