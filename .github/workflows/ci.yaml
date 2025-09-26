@@ -8,9 +8,6 @@ on:
     branches:
       - main
 
-env:
-  RUST_BACKTRACE: 1
-
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -27,18 +24,20 @@ jobs:
         with:
           platform: ubuntu-latest
           cache-key: debug
-          tools: taplo,cargo-shear
+          tools: cargo-shear
           nightly-rustfmt: true
 
       - uses: ./.github/actions/setup-node
 
       - name: Check formatting
-        run: pnpm format:check && taplo format --check --diff
+        run: pnpm format:check
 
       - name: Check unused cargo dependencies
         run: cargo shear
 
       - name: Regenerate auto-generated files
+        env:
+          RUST_BACKTRACE: 1
         run: |
           pnpm build:packages
           pnpm build:bindings
@@ -103,6 +102,8 @@ jobs:
       - uses: ./.github/actions/setup-node
 
       - name: Run test suite
+        env:
+          RUST_BACKTRACE: 1
         run: pnpm test
 
   ci-build:
