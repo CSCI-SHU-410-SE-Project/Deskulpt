@@ -35,6 +35,9 @@ jobs:
       - name: Check formatting
         run: pnpm format:check && taplo format --check --diff
 
+      - name: Check unused cargo dependencies
+        run: cargo shear
+
       - name: Regenerate auto-generated files
         run: |
           pnpm build:packages
