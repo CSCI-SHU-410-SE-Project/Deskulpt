@@ -72,7 +72,6 @@ runs:
 
     - name: Install nightly rustfmt
       if: ${{ inputs.nightly-rustfmt }}
-      shell: bash
       run: |
         rustup toolchain install nightly --component rustfmt --profile minimal --no-self-update
 

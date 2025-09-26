@@ -31,7 +31,6 @@ jobs:
           save-cache: true
 
       - name: Populate Rust cache
-        shell: bash
         run: |
           cargo check
           cargo test --no-run
@@ -62,7 +61,7 @@ jobs:
           cache-key: release-${{ matrix.target }}
           save-cache: true
 
+      - uses: ./.github/actions/setup-node
+
       - name: Populate Rust cache
-        shell: bash
-        run: |
-          cargo build --release --target ${{ matrix.target }}
+        run: pnpm tauri build --target ${{ matrix.target }} --no-bundle
