@@ -4,9 +4,6 @@ on:
   push:
     branches:
       - main
-    paths:
-      - "crates/**"
-      - "Cargo.lock"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -30,10 +27,7 @@ jobs:
           cache-key: debug
           save-cache: true
 
-      - uses: ./.github/actions/setup-node
-
       - name: Populate Rust cache
-        shell: bash
         run: |
           cargo check
           cargo test --no-run
@@ -67,6 +61,4 @@ jobs:
       - uses: ./.github/actions/setup-node
 
       - name: Populate Rust cache
-        shell: bash
-        run: |
-          cargo build --release --target ${{ matrix.target }}
+        run: pnpm tauri build --target ${{ matrix.target }} --no-bundle

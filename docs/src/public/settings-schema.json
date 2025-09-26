@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Settings",
+  "description": "Full settings of the Deskulpt application.",
+  "type": "object",
+  "properties": {
+    "app": {
+      "description": "Application-wide settings.",
+      "$ref": "#/$defs/AppSettings"
+    },
+    "widgets": {
+      "description": "The mapping from widget IDs to their respective settings.",
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/$defs/WidgetSettings"
+      }
+    }
+  },
+  "required": [
+    "app",
+    "widgets"
+  ],
+  "$defs": {
+    "AppSettings": {
+      "description": "Application-wide settings.",
+      "type": "object",
+      "properties": {
+        "theme": {
+          "description": "The application theme.",
+          "$ref": "#/$defs/Theme"
+        },
+        "shortcuts": {
+          "description": "The keyboard shortcuts.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "theme",
+        "shortcuts"
+      ]
+    },
+    "Theme": {
+      "description": "Light/dark theme of the application.",
+      "type": "string",
+      "enum": [
+        "light",
+        "dark"
+      ]
+    },
+    "WidgetSettings": {
+      "description": "Per-widget settings.\n\nDifferent from widget configurations, these are independent of the widget\nconfiguration files and are managed internally by the application.",
+      "type": "object",
+      "properties": {
+        "x": {
+          "description": "The leftmost x-coordinate in pixels.",
+          "type": "integer",
+          "format": "int32"
+        },
+        "y": {
+          "description": "The topmost y-coordinate in pixels.",
+          "type": "integer",
+          "format": "int32"
+        },
+        "opacity": {
+          "description": "The opacity in percentage.",
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      "required": [
+        "x",
+        "y",
+        "opacity"
+      ]
+    }
+  }
+}
