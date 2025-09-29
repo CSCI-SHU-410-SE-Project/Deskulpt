@@ -1,5 +1,5 @@
 {
-  "name": "frontend",
+  "name": "deskulpt",
   "private": true,
   "type": "module",
   "scripts": {
@@ -9,26 +9,26 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@emotion/react": "^11.14.0",
-    "@radix-ui/themes": "^3.2.0",
-    "@tauri-apps/api": "^2.8.0",
-    "@tauri-apps/plugin-clipboard-manager": "^2.3.0",
-    "@tauri-apps/plugin-opener": "^2.5.0",
-    "react": "^19.1.1",
-    "react-dom": "^19.1.1",
-    "react-draggable": "^4.5.0",
-    "react-error-boundary": "^6.0.0",
-    "react-icons": "^5.5.0",
-    "sonner": "^2.0.7",
-    "zustand": "^5.0.8"
+    "@emotion/react": "catalog:",
+    "@radix-ui/themes": "catalog:",
+    "@tauri-apps/api": "catalog:",
+    "@tauri-apps/plugin-clipboard-manager": "catalog:",
+    "@tauri-apps/plugin-opener": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "react-draggable": "catalog:",
+    "react-error-boundary": "catalog:",
+    "react-icons": "catalog:",
+    "sonner": "catalog:",
+    "zustand": "catalog:"
   },
   "devDependencies": {
-    "@emotion/babel-plugin": "^11.13.5",
-    "@types/node": "^24.5.2",
-    "@types/react": "^19.1.13",
-    "@types/react-dom": "^19.1.9",
-    "@vitejs/plugin-react": "^5.0.3",
-    "typescript": "^5.9.2",
-    "vite": "^7.1.7"
+    "@emotion/babel-plugin": "catalog:",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "@vitejs/plugin-react": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:"
   }
 }
