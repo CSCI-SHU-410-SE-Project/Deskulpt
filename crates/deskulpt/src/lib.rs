@@ -70,6 +70,10 @@ pub fn run() {
             Ok(())
         })
         .on_window_event(deskulpt_core::window::on_window_event)
+        .register_asynchronous_uri_scheme_protocol(
+            "widgets",
+            deskulpt_core::widgets_protocol::widgets_protocol_handler,
+        )
         .plugin(tauri_plugin_clipboard_manager::init())
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())
         // Prevent the opener plugin from registering handler for click event

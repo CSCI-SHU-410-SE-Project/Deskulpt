@@ -103,11 +103,7 @@ id: string;
 /**
  * If provided, update the settings of the widget.
  */
-settings?: WidgetSettings; 
-/**
- * If provided, update the code of the widget.
- */
-code?: string }
+settings?: WidgetSettings }
 
 /**
  * Full settings of the Deskulpt application.
@@ -294,9 +290,7 @@ export const commands = {
    */
   bundleWidget: (payload: {
     id: string,
-    baseUrl: string,
-    apisBlobUrl: string,
-  }) => invoke<string>("bundle_widget", payload),
+  }) => invoke<null>("bundle_widget", payload),
 
   /**
    * Call a plugin command (🚧 TODO 🚧).

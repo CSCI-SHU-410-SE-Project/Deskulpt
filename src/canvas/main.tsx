@@ -9,6 +9,7 @@ import "@radix-ui/themes/styles.css";
 declare global {
   interface Window {
     readonly __DESKULPT_CANVAS_INTERNALS__: {
+      readonly os: string;
       readonly apisWrapper: string;
       readonly initialSettings: DeepReadonly<Settings>;
     };

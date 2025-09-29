@@ -14,10 +14,11 @@ anyhow                       = { workspace = true }
 deskulpt-macros              = { workspace = true }
 dunce                        = { workspace = true }
 either                       = { workspace = true }
+mime_guess                   = { workspace = true }
 once_cell                    = { workspace = true }
 open                         = { workspace = true, features = ["shellexecute-on-windows"] }
+path-clean                   = { workspace = true }
 rolldown                     = { workspace = true }
-rolldown_common              = { workspace = true }
 schemars                     = { workspace = true }
 serde                        = { workspace = true, features = ["derive"] }
 serde_json                   = { workspace = true }

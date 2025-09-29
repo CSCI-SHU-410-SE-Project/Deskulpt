@@ -11,14 +11,13 @@ interface WidgetProps {
 }
 
 interface Widget {
-  Component: FC<WidgetProps>;
+  component: FC<WidgetProps>;
   width?: string;
   height?: string;
 }
 
 interface WidgetState extends Widget, WidgetSettings {
   apisBlobUrl: string;
-  moduleBlobUrl?: string;
 }
 
 export const useWidgetsStore = create(() => ({
@@ -28,7 +27,6 @@ export const useWidgetsStore = create(() => ({
 export function updateWidgetRender(
   id: string,
   widget: Widget,
-  moduleBlobUrl: string,
   apisBlobUrl: string,
   settings?: WidgetSettings,
 ) {
@@ -42,10 +40,9 @@ export function updateWidgetRender(
             ...state.widgets[id],
             // Not using spread syntax because undefined properties in the
             // widget need to override their previous values as well
-            Component: widget.Component,
+            component: widget.component,
             width: widget.width,
             height: widget.height,
-            moduleBlobUrl,
           },
         },
       };
@@ -56,7 +53,7 @@ export function updateWidgetRender(
       return {
         widgets: {
           ...state.widgets,
-          [id]: { ...widget, ...settings, apisBlobUrl, moduleBlobUrl },
+          [id]: { ...widget, ...settings, apisBlobUrl },
         },
       };
     }
@@ -80,11 +77,10 @@ export function updateWidgetRenderError(
           ...state.widgets,
           [id]: {
             ...state.widgets[id],
-            Component: () =>
+            component: () =>
               createElement(ErrorDisplay, { id, error, message }),
             width: undefined,
             height: undefined,
-            moduleBlobUrl: undefined,
           },
         },
       };
@@ -97,12 +93,11 @@ export function updateWidgetRenderError(
           ...state.widgets,
           [id]: {
             ...settings,
-            Component: () =>
+            component: () =>
               createElement(ErrorDisplay, { id, error, message }),
             apisBlobUrl,
             width: undefined,
             height: undefined,
-            moduleBlobUrl: undefined,
           },
         },
       };
@@ -146,7 +141,6 @@ export function removeWidgets(ids: string[]) {
       return; // This should not happen but let us be safe
     }
     URL.revokeObjectURL(widget.apisBlobUrl);
-    widget.moduleBlobUrl && URL.revokeObjectURL(widget.moduleBlobUrl);
   });
 
   useWidgetsStore.setState((state) => ({
