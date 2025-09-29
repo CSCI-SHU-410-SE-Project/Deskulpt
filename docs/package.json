@@ -1,5 +1,5 @@
 {
-  "name": "deskulpt-docs",
+  "name": "@deskulpt/docs",
   "private": true,
   "type": "module",
   "scripts": {

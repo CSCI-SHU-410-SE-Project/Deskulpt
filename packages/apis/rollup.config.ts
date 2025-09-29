@@ -20,7 +20,7 @@ export default defineConfig([
       banner: "/*! Auto-generated from packages/apis. DO NOT EDIT! */",
     },
     external: ["@tauri-apps/api/core"],
-    plugins: [typescript(), terser({ format: { comments: "some" } })],
+    plugins: [typescript(), terser()],
     onwarn,
   },
   // ESM build of wrapped APIs, but with raw APIs externalized; essentially we replace
@@ -41,7 +41,7 @@ export default defineConfig([
         preventAssignment: true,
       }),
       typescript(),
-      terser({ format: { comments: "some" } }),
+      terser(),
     ],
     onwarn,
   },

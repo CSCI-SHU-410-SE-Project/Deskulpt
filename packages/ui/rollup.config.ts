@@ -19,7 +19,7 @@ export default defineConfig([
       banner: "/*! Auto-generated from packages/ui. DO NOT EDIT! */",
     },
     external: ["@emotion/react/jsx-runtime"],
-    plugins: [typescript(), terser({ format: { comments: "some" } })],
+    plugins: [typescript(), terser()],
     onwarn,
   },
   // ESM build to be used internally
@@ -31,7 +31,7 @@ export default defineConfig([
       banner: "/*! Auto-generated from packages/ui. DO NOT EDIT! */",
     },
     external: ["@emotion/react", "@radix-ui/themes"],
-    plugins: [typescript(), terser({ format: { comments: "some" } })],
+    plugins: [typescript(), terser()],
     onwarn,
   },
   // ESM build for publishing

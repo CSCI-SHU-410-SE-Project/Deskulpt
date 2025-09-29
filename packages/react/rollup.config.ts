@@ -19,7 +19,7 @@ export default defineConfig([
       banner: "/*! Auto-generated from packages/react. DO NOT EDIT! */",
     },
     external: ["react"],
-    plugins: [typescript(), terser({ format: { comments: "some" } })],
+    plugins: [typescript(), terser()],
     onwarn,
   },
   // ESM build for publishing
