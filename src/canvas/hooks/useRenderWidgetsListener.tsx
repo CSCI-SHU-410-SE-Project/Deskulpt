@@ -10,6 +10,12 @@ import { commands, events } from "../../bindings";
 const BASE_URL = new URL(import.meta.url).origin;
 const RAW_APIS_URL = new URL("/gen/raw-apis.js", BASE_URL).href;
 
+function getWidgetModuleUrl(id: string) {
+  return window.__DESKULPT_CANVAS_INTERNALS__.os === "windows"
+    ? `http://widgets.localhost/${id}`
+    : `widgets://localhost/${id}`;
+}
+
 export function useRenderWidgetsListener() {
   const hasInited = useRef(false);
 
@@ -17,7 +23,7 @@ export function useRenderWidgetsListener() {
     const unlisten = events.renderWidgetsEvent.listen(async (event) => {
       const widgets = useWidgetsStore.getState().widgets;
 
-      const promises = event.payload.map(async ({ id, settings, code }) => {
+      const promises = event.payload.map(async ({ id, settings }) => {
         let apisBlobUrl;
         if (id in widgets) {
           // APIs blob URL can be reused because the contents are dependent only
@@ -25,9 +31,6 @@ export function useRenderWidgetsListener() {
           // so we revoke it here
           const widget = widgets[id];
           apisBlobUrl = widget.apisBlobUrl;
-          if (widget.moduleBlobUrl !== undefined) {
-            URL.revokeObjectURL(widget.moduleBlobUrl);
-          }
         } else {
           const apisCode = window.__DESKULPT_CANVAS_INTERNALS__.apisWrapper
             .replace("__DESKULPT_WIDGET_ID__", id)
@@ -38,36 +41,26 @@ export function useRenderWidgetsListener() {
           apisBlobUrl = URL.createObjectURL(apisBlob);
         }
 
-        if (code === undefined) {
-          // If code is not provided, we need to bundle the widget
-          try {
-            code = await commands.bundleWidget({
-              id,
-              baseUrl: BASE_URL,
-              apisBlobUrl,
-            });
-          } catch (error) {
-            updateWidgetRenderError(
-              id,
-              "Error bundling the widget",
-              stringifyError(error),
-              apisBlobUrl,
-              settings,
-            );
-            return;
-          }
+        try {
+          await commands.bundleWidget({ id });
+        } catch (error) {
+          updateWidgetRenderError(
+            id,
+            "Error bundling the widget",
+            stringifyError(error),
+            apisBlobUrl,
+            settings,
+          );
+          return;
         }
 
-        const moduleBlob = new Blob([code], { type: "application/javascript" });
-        const moduleBlobUrl = URL.createObjectURL(moduleBlob);
         let module;
         try {
-          module = await import(/* @vite-ignore */ moduleBlobUrl);
+          module = await import(/* @vite-ignore */ getWidgetModuleUrl(id));
           if (module.default === undefined) {
             throw new Error("Missing default export");
           }
         } catch (error) {
-          URL.revokeObjectURL(moduleBlobUrl);
           updateWidgetRenderError(
             id,
             "Error importing the widget module",
@@ -78,13 +71,7 @@ export function useRenderWidgetsListener() {
           return;
         }
 
-        updateWidgetRender(
-          id,
-          module.default,
-          moduleBlobUrl,
-          apisBlobUrl,
-          settings,
-        );
+        updateWidgetRender(id, module.default, apisBlobUrl, settings);
       });
 
       await Promise.all(promises);

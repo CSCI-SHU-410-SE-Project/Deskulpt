@@ -17,6 +17,8 @@ pub struct ManagerInitJS<'a> {
 #[derive(Template)]
 #[default_template("canvas.js")]
 pub struct CanvasInitJS<'a> {
+    /// `window.__DESKULPT_CANVAS_INTERNALS__.os`
+    os: &'static str,
     /// `window.__DESKULPT_CANVAS_INTERNALS__.apisWrapper`
     apis_wrapper: &'static str,
     /// `window.__DESKULPT_CANVAS_INTERNALS__.initialSettings`
@@ -36,6 +38,7 @@ impl<'a> CanvasInitJS<'a> {
     /// Generate JavaScript code for initializing the canvas window.
     pub fn generate(initial_settings: &'a Settings) -> Result<String> {
         let template = Self {
+            os: std::env::consts::OS,
             apis_wrapper: include_str!("../../gen/apis.wrapper.js"),
             initial_settings,
         };

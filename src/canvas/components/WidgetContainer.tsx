@@ -29,9 +29,14 @@ interface WidgetContainerProps {
 }
 
 const WidgetContainer = memo(({ id }: WidgetContainerProps) => {
-  const { Component, width, height, x, y, opacity } = useWidgetsStore(
-    (state) => state.widgets[id],
-  );
+  const {
+    component: Component,
+    width,
+    height,
+    x,
+    y,
+    opacity,
+  } = useWidgetsStore((state) => state.widgets[id]);
   const wrapperRef = useRef<HTMLDivElement>(null);
 
   const onStop = (_: DraggableEvent, data: DraggableData) => {

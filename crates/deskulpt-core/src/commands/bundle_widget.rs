@@ -17,12 +17,7 @@ use crate::states::WidgetConfigMapStateExt;
 /// - Error bundling the widget.
 #[command]
 #[specta::specta]
-pub async fn bundle_widget<R: Runtime>(
-    app_handle: AppHandle<R>,
-    id: String,
-    base_url: String,
-    apis_blob_url: String,
-) -> CmdResult<String> {
+pub async fn bundle_widget<R: Runtime>(app_handle: AppHandle<R>, id: String) -> CmdResult<()> {
     let widgets_dir = app_handle.widgets_dir()?;
 
     let mut bundler = app_handle.with_widget_config_map(|config_map| {
@@ -33,21 +28,17 @@ pub async fn bundle_widget<R: Runtime>(
             WidgetConfig::Valid {
                 dir, deskulpt_conf, ..
             } => {
-                let builder = WidgetBundlerBuilder::new(
-                    widgets_dir.join(dir),
-                    deskulpt_conf.entry.clone(),
-                    base_url,
-                    apis_blob_url,
-                );
+                let builder =
+                    WidgetBundlerBuilder::new(widgets_dir.join(dir), deskulpt_conf.entry.clone());
                 Ok(builder.build())
             },
             WidgetConfig::Invalid { error, .. } => Err(cmderr!(error.clone())),
         }
     })?;
 
-    let code = bundler
-        .bundle()
+    bundler
+        .write()
         .await
         .context(format!("Failed to bundle widget (id={id})"))?;
-    Ok(code)
+    Ok(())
 }

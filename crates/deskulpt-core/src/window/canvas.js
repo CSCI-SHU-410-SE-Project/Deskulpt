@@ -1,5 +1,6 @@
 Object.defineProperty(window, "__DESKULPT_CANVAS_INTERNALS__", {
   value: {
+    os: __TEMPLATE_os__,
     apisWrapper: __TEMPLATE_apis_wrapper__,
     initialSettings: __TEMPLATE_initial_settings__,
   },

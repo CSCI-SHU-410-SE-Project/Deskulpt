@@ -12,6 +12,7 @@ pub mod path;
 mod settings;
 pub mod states;
 pub mod tray;
+pub mod widgets_protocol;
 pub mod window;
 
 /// Re-exports for JSON schema generation.
