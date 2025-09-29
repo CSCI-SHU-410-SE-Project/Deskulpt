@@ -56,12 +56,9 @@ impl From<DeskulptWindow> for EventTarget {
 }
 
 /// Extention trait for window-related operations.
-pub trait WindowExt<R: Runtime>: Manager<R> + SettingsStateExt<R> {
+pub trait WindowExt<R: Runtime>: Manager<R> + SettingsStateExt<R> + Sized {
     /// Create the manager window.
-    fn create_manager(&self) -> Result<()>
-    where
-        Self: Sized,
-    {
+    fn create_manager(&self) -> Result<()> {
         let settings = self.get_settings();
         let init_js = ManagerInitJS::generate(&settings)?;
         WebviewWindowBuilder::new(
@@ -83,10 +80,7 @@ pub trait WindowExt<R: Runtime>: Manager<R> + SettingsStateExt<R> {
     }
 
     /// Create the canvas window.
-    fn create_canvas(&self) -> Result<()>
-    where
-        Self: Sized,
-    {
+    fn create_canvas(&self) -> Result<()> {
         let settings = self.get_settings();
         let init_js = CanvasInitJS::generate(&settings)?;
         let canvas = WebviewWindowBuilder::new(

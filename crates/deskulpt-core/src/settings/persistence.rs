@@ -63,8 +63,8 @@ impl Settings {
     /// Read the settings from the persistence directory.
     ///
     /// Default settings will be returned if the settings file does not exist.
-    pub fn load<P: AsRef<Path>>(persist_dir: P) -> Result<Self> {
-        let settings_path = persist_dir.as_ref().join(SETTINGS_FILE);
+    pub fn load(persist_dir: &Path) -> Result<Self> {
+        let settings_path = persist_dir.join(SETTINGS_FILE);
         if !settings_path.exists() {
             return Ok(Default::default());
         }
@@ -75,11 +75,10 @@ impl Settings {
     }
 
     /// Write the settings to the persistence directory.
-    pub fn dump<P: AsRef<Path>>(&self, persist_dir: P) -> Result<()> {
+    pub fn dump(&self, persist_dir: &Path) -> Result<()> {
         // On certain platforms, File::create fails if intermediate directories
         // do not exist, in which case we need to manually create the directory;
         // see https://doc.rust-lang.org/std/fs/struct.File.html#method.create
-        let persist_dir = persist_dir.as_ref();
         if !persist_dir.exists() {
             create_dir_all(persist_dir)?;
         }

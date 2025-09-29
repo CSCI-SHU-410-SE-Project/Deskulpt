@@ -10,7 +10,7 @@ mod persistence;
 mod shortcuts;
 
 /// Light/dark theme of the application.
-#[derive(Clone, Default, Deserialize, Serialize, JsonSchema, specta::Type)]
+#[derive(Debug, Clone, Default, Deserialize, Serialize, JsonSchema, specta::Type)]
 #[serde(rename_all = "camelCase")]
 pub enum Theme {
     #[default]
@@ -31,7 +31,7 @@ pub enum ShortcutKey {
 }
 
 /// Application-wide settings.
-#[derive(Clone, Default, Deserialize, Serialize, JsonSchema, specta::Type, Persisted)]
+#[derive(Debug, Clone, Default, Deserialize, Serialize, JsonSchema, specta::Type, Persisted)]
 #[serde(rename_all = "camelCase")]
 pub struct AppSettings {
     /// The application theme.
@@ -44,7 +44,7 @@ pub struct AppSettings {
 ///
 /// Different from widget configurations, these are independent of the widget
 /// configuration files and are managed internally by the application.
-#[derive(Clone, Deserialize, Serialize, JsonSchema, specta::Type, Persisted)]
+#[derive(Debug, Clone, Deserialize, Serialize, JsonSchema, specta::Type, Persisted)]
 #[serde(rename_all = "camelCase")]
 pub struct WidgetSettings {
     /// The leftmost x-coordinate in pixels.
@@ -60,8 +60,18 @@ fn default_opacity() -> i32 {
     100
 }
 
+impl Default for WidgetSettings {
+    fn default() -> Self {
+        Self {
+            x: Default::default(),
+            y: Default::default(),
+            opacity: default_opacity(),
+        }
+    }
+}
+
 /// Full settings of the Deskulpt application.
-#[derive(Clone, Default, Deserialize, Serialize, JsonSchema, specta::Type, Persisted)]
+#[derive(Debug, Clone, Default, Deserialize, Serialize, JsonSchema, specta::Type, Persisted)]
 #[serde(rename_all = "camelCase")]
 pub struct Settings {
     /// Application-wide settings.

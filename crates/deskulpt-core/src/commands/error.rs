@@ -9,6 +9,8 @@ pub enum CmdError {
     Anyhow(#[from] anyhow::Error),
     #[error("I/O error: {0}")]
     Io(#[from] std::io::Error),
+    #[error("Tauri error: {0}")]
+    Tauri(#[from] tauri::Error),
     #[error("Global shortcut error: {0}")]
     TauriPluginGlobalShortcut(#[from] tauri_plugin_global_shortcut::Error),
 }
