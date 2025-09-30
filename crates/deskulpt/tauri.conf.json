@@ -3,10 +3,10 @@
   "version": "0.0.1",
   "identifier": "com.tauri.deskulpt",
   "build": {
-    "beforeDevCommand": "pnpm -C src dev",
-    "beforeBuildCommand": "pnpm -C src build",
+    "beforeDevCommand": "pnpm --filter deskulpt dev",
+    "beforeBuildCommand": "pnpm --filter deskulpt build",
     "devUrl": "http://localhost:1420",
-    "frontendDist": "../../src/dist"
+    "frontendDist": "../../packages/deskulpt/dist"
   },
   "app": {
     "macOSPrivateApi": true,

@@ -2,8 +2,8 @@
 
 <a href="https://csci-shu-410-se-project.github.io/">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://github.com/CSCI-SHU-410-SE-Project/Deskulpt/raw/main/src/public/deskulpt-wide-dark.svg" />
-    <img alt="Deskulpt" src="https://github.com/CSCI-SHU-410-SE-Project/Deskulpt/raw/main/src/public/deskulpt-wide.svg" width="300px" />
+    <source media="(prefers-color-scheme: dark)" srcset="https://github.com/CSCI-SHU-410-SE-Project/Deskulpt/raw/main/packages/deskulpt/public/deskulpt-wide-dark.svg" />
+    <img alt="Deskulpt" src="https://github.com/CSCI-SHU-410-SE-Project/Deskulpt/raw/main/packages/deskulpt/public/deskulpt-wide.svg" width="300px" />
   </picture>
 </a>
 
