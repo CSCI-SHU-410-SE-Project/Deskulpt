@@ -32,8 +32,8 @@ impl DeskulptWindow {
     /// Get the URL of the window.
     pub fn url(&self) -> WebviewUrl {
         match self {
-            DeskulptWindow::Manager => WebviewUrl::App("manager/index.html".into()),
-            DeskulptWindow::Canvas => WebviewUrl::App("canvas/index.html".into()),
+            DeskulptWindow::Manager => WebviewUrl::App("src/manager/index.html".into()),
+            DeskulptWindow::Canvas => WebviewUrl::App("src/canvas/index.html".into()),
         }
     }
 

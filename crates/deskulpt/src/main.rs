@@ -12,7 +12,7 @@ mod export_bindings {
     #[ignore]
     fn export_all() {
         deskulpt::get_bindings_builder()
-            .export(TypeScript::default(), "../../src/bindings.ts")
+            .export(TypeScript::default(), "../../packages/deskulpt/bindings.ts")
             .expect("Failed to export TypeScript bindings");
     }
 }

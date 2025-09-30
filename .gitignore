@@ -29,12 +29,8 @@ dist-ssr
 .env.test.local
 .env.production.local
 
-# Cargo generated files
+# Generated files
 target/
-
-# Tauri generated files
-crates/deskulpt/gen/schemas/
-
-# Docs
+crates/deskulpt/gen/
 docs/.vitepress/dist/
 docs/.vitepress/cache/

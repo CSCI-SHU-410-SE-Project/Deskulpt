@@ -3,8 +3,8 @@
   "ignorePatterns": [
     "**/dist/**",
     "crates/deskulpt-core/gen/**",
-    "src/gen/**",
-    "src/bindings.ts",
+    "packages/deskulpt/src/gen/**",
+    "packages/deskulpt/src/bindings.ts",
     "**/docs/**"
   ],
   "plugins": ["import", "oxc", "react", "typescript", "unicorn"],
