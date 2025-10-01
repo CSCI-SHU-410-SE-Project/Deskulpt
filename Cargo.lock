@@ -1054,6 +1054,7 @@ version = "0.0.1"
 dependencies = [
  "deskulpt-core",
  "deskulpt-specta",
+ "deskulpt-workspace",
  "schemars 1.0.4",
  "serde_json",
  "specta",
@@ -1152,6 +1153,10 @@ dependencies = [
  "tauri-specta",
  "thiserror 2.0.17",
 ]
+
+[[package]]
+name = "deskulpt-workspace"
+version = "0.0.1"
 
 [[package]]
 name = "digest"

@@ -20,8 +20,9 @@ tauri-plugin-opener            = { workspace = true }
 tauri-specta                   = { workspace = true }
 
 [dev-dependencies]
-deskulpt-specta = { workspace = true }
-schemars        = { workspace = true }
+deskulpt-specta    = { workspace = true }
+deskulpt-workspace = { workspace = true }
+schemars           = { workspace = true }
 
 [build-dependencies]
 tauri-build = { workspace = true, features = ["codegen"] }

@@ -14,7 +14,7 @@ mod export_bindings {
         deskulpt::get_bindings_builder()
             .export(
                 TypeScript::default(),
-                "../../packages/deskulpt/src/bindings.ts",
+                deskulpt_workspace::package_dir("deskulpt").join("src/bindings.ts"),
             )
             .expect("Failed to export TypeScript bindings");
     }
@@ -32,8 +32,8 @@ mod export_schema {
     #[ignore]
     fn export_settings() {
         let schema = schema_for!(Settings);
-        let file = File::create("../../docs/src/public/settings-schema.json")
-            .expect("Failed to create file");
+        let path = deskulpt_workspace::docs_dir().join("src/public/settings-schema.json");
+        let file = File::create(path).expect("Failed to create file");
         let writer = BufWriter::new(file);
         serde_json::to_writer_pretty(writer, &schema).expect("Failed to write schema");
     }
