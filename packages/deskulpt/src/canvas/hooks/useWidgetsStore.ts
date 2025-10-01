@@ -146,7 +146,9 @@ export function removeWidgets(ids: string[]) {
       return; // This should not happen but let us be safe
     }
     URL.revokeObjectURL(widget.apisBlobUrl);
-    widget.moduleBlobUrl && URL.revokeObjectURL(widget.moduleBlobUrl);
+    if (widget.moduleBlobUrl !== undefined) {
+      URL.revokeObjectURL(widget.moduleBlobUrl);
+    }
   });
 
   useWidgetsStore.setState((state) => ({
