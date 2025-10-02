@@ -4,7 +4,7 @@ import { events } from "../../bindings";
 
 export function useRemoveWidgetsListener() {
   useEffect(() => {
-    const unlisten = events.removeWidgetsEvent.listen((event) => {
+    const unlisten = events.removeWidgets.listen((event) => {
       removeWidgets(event.payload);
     });
 

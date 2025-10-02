@@ -14,7 +14,7 @@ const GlobalActions = memo(({ length }: GlobalActionsProps) => {
     const event = Object.entries(useWidgetsStore.getState().widgets).map(
       ([id, { settings }]) => ({ id, settings }),
     );
-    events.renderWidgetsEvent
+    events.renderWidgets
       .emitTo("canvas", event)
       .then(() => {
         toast.success(`Refreshed ${event.length} widgets.`);

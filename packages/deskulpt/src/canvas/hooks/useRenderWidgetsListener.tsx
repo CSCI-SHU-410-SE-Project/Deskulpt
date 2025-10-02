@@ -14,7 +14,7 @@ export function useRenderWidgetsListener() {
   const hasInited = useRef(false);
 
   useEffect(() => {
-    const unlisten = events.renderWidgetsEvent.listen(async (event) => {
+    const unlisten = events.renderWidgets.listen(async (event) => {
       const widgets = useWidgetsStore.getState().widgets;
 
       const promises = event.payload.map(async ({ id, settings, code }) => {

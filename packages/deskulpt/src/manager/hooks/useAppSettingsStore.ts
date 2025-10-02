@@ -10,7 +10,7 @@ export async function toggleTheme() {
   const newTheme = theme === "light" ? "dark" : "light";
 
   useAppSettingsStore.setState({ theme: newTheme });
-  await events.switchThemeEvent.emitTo("canvas", newTheme);
+  await events.switchTheme.emitTo("canvas", newTheme);
 }
 
 export async function updateShortcut(key: ShortcutKey, shortcut?: string) {
