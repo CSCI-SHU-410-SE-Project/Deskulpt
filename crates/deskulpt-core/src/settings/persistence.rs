@@ -1,6 +1,5 @@
 //! Utilities for persisting the settings.
 
-use std::collections::BTreeMap;
 use std::fs::{create_dir_all, File};
 use std::io::{BufReader, BufWriter};
 use std::path::Path;
@@ -8,7 +7,7 @@ use std::path::Path;
 use anyhow::Result;
 use serde::Serialize;
 
-use super::{Settings, SettingsPersisted};
+use super::Settings;
 
 /// The settings file name in the persistence directory.
 static SETTINGS_FILE: &str = "settings.json";
@@ -16,24 +15,6 @@ static SETTINGS_FILE: &str = "settings.json";
 /// The URL to the JSON schema file of the settings.
 static SETTINGS_SCHEMA_URL: &str = "https://csci-shu-410-se-project.github.io/settings-schema.json";
 
-/// Helper trait for converting a persisted type into its original type.
-pub trait FromPersisted<T> {
-    /// Convert a persisted value into its original type.
-    fn from_persisted(value: T) -> Self;
-}
-
-impl<K, V, VP> FromPersisted<BTreeMap<K, VP>> for BTreeMap<K, V>
-where
-    V: FromPersisted<VP>,
-    K: Ord,
-{
-    fn from_persisted(value: BTreeMap<K, VP>) -> Self {
-        value
-            .into_iter()
-            .map(|(k, v)| (k, V::from_persisted(v)))
-            .collect()
-    }
-}
 /// Wrapper of [`Settings`] with additional metadata.
 #[derive(Serialize)]
 struct SettingsWithMeta<'a> {
@@ -70,8 +51,8 @@ impl Settings {
         }
         let file = File::open(settings_path)?;
         let reader = BufReader::new(file);
-        let settings: SettingsPersisted = serde_json::from_reader(reader)?;
-        Ok(settings.into())
+        let settings: Settings = serde_json::from_reader(reader)?;
+        Ok(settings)
     }
 
     /// Write the settings to the persistence directory.

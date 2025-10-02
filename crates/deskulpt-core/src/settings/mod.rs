@@ -2,9 +2,9 @@
 
 use std::collections::BTreeMap;
 
-use deskulpt_macros::Persisted;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
+use serde_with::{serde_as, DefaultOnError, MapSkipError};
 
 mod persistence;
 mod shortcuts;
@@ -31,12 +31,15 @@ pub enum ShortcutKey {
 }
 
 /// Application-wide settings.
-#[derive(Clone, Default, Deserialize, Serialize, JsonSchema, specta::Type, Persisted)]
-#[serde(rename_all = "camelCase")]
+#[serde_as]
+#[derive(Clone, Default, Deserialize, Serialize, JsonSchema, specta::Type)]
+#[serde(rename_all = "camelCase", default)]
 pub struct AppSettings {
     /// The application theme.
+    #[serde_as(deserialize_as = "DefaultOnError")]
     pub theme: Theme,
     /// The keyboard shortcuts.
+    #[serde_as(deserialize_as = "MapSkipError<_, _>")]
     pub shortcuts: BTreeMap<ShortcutKey, String>,
 }
 
@@ -44,30 +47,36 @@ pub struct AppSettings {
 ///
 /// Different from widget configurations, these are independent of the widget
 /// configuration files and are managed internally by the application.
-#[derive(Clone, Deserialize, Serialize, JsonSchema, specta::Type, Persisted)]
-#[serde(rename_all = "camelCase")]
+#[derive(Clone, Deserialize, Serialize, JsonSchema, specta::Type)]
+#[serde(rename_all = "camelCase", default)]
 pub struct WidgetSettings {
     /// The leftmost x-coordinate in pixels.
     pub x: i32,
     /// The topmost y-coordinate in pixels.
     pub y: i32,
     /// The opacity in percentage.
-    #[persisted(default = "default_opacity")]
     pub opacity: i32,
 }
 
-fn default_opacity() -> i32 {
-    100
+impl Default for WidgetSettings {
+    fn default() -> Self {
+        Self {
+            x: 0,
+            y: 0,
+            opacity: 100,
+        }
+    }
 }
 
 /// Full settings of the Deskulpt application.
-#[derive(Clone, Default, Deserialize, Serialize, JsonSchema, specta::Type, Persisted)]
-#[serde(rename_all = "camelCase")]
+#[serde_as]
+#[derive(Clone, Default, Deserialize, Serialize, JsonSchema, specta::Type)]
+#[serde(rename_all = "camelCase", default)]
 pub struct Settings {
     /// Application-wide settings.
-    #[persisted(type = "AppSettingsPersisted")]
+    #[serde_as(deserialize_as = "DefaultOnError")]
     pub app: AppSettings,
     /// The mapping from widget IDs to their respective settings.
-    #[persisted(type = "BTreeMap<String, WidgetSettingsPersisted>")]
+    #[serde_as(deserialize_as = "MapSkipError<_, _>")]
     pub widgets: BTreeMap<String, WidgetSettings>,
 }
