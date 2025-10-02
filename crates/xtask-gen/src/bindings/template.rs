@@ -1,13 +1,11 @@
 //! Data for the bindings template.
 
+use anyhow::Result;
 use heck::ToLowerCamelCase;
 use serde::Serialize;
 use specta::datatype::{DataType, Function, FunctionResultVariant};
 use specta::TypeCollection;
 use specta_typescript::{datatype, export_named_datatype, js_doc, Typescript};
-use tauri_specta::ExportContext;
-
-use crate::error::Result;
 
 /// Data for an event in the bindings template.
 #[derive(Serialize)]
@@ -111,22 +109,22 @@ pub struct BindingsTemplate {
 
 impl BindingsTemplate {
     /// Create an instance from export context.
-    pub fn from(ts: &Typescript, cfg: &ExportContext) -> Result<Self> {
+    pub fn from(ts: &Typescript, cfg: &super::ExportContext) -> Result<Self> {
         Ok(Self {
             types: cfg
-                .type_map
+                .types
                 .into_iter()
-                .map(|(_, ndt)| Ok(export_named_datatype(ts, ndt, &cfg.type_map)?))
+                .map(|(_, ndt)| Ok(export_named_datatype(ts, ndt, &cfg.types)?))
                 .collect::<Result<Vec<_>>>()?,
             events: cfg
                 .events
                 .iter()
-                .map(|(name, ty)| BindingsTemplateEvent::from(ts, &cfg.type_map, name, ty))
+                .map(|(name, ty)| BindingsTemplateEvent::from(ts, &cfg.types, name, ty))
                 .collect::<Result<Vec<_>>>()?,
             commands: cfg
                 .commands
                 .iter()
-                .map(|function| BindingsTemplateCommand::from(ts, &cfg.type_map, function))
+                .map(|function| BindingsTemplateCommand::from(ts, &cfg.types, function))
                 .collect::<Result<Vec<_>>>()?,
         })
     }

@@ -1,9 +1,34 @@
 //! Deskulpt core events.
 
+use anyhow::Result;
+use deskulpt_macros::Event;
 use serde::{Deserialize, Serialize};
-use tauri_specta::Event;
+use tauri::{Emitter, Runtime};
 
 use crate::settings::{Theme, WidgetSettings};
+use crate::window::DeskulptWindow;
+
+pub trait Event: specta::Type + Serialize {
+    const NAME: &'static str;
+
+    fn emit<R, E>(&self, emitter: &E) -> Result<()>
+    where
+        R: Runtime,
+        E: Emitter<R>,
+    {
+        emitter.emit(Self::NAME, self)?;
+        Ok(())
+    }
+
+    fn emit_to<R, E>(&self, emitter: &E, window: DeskulptWindow) -> Result<()>
+    where
+        R: Runtime,
+        E: Emitter<R>,
+    {
+        emitter.emit_to(window, Self::NAME, self)?;
+        Ok(())
+    }
+}
 
 /// Event for exiting the application.
 ///
@@ -23,7 +48,7 @@ pub struct RemoveWidgetsEvent(
 );
 
 /// Inner structure for [`RenderWidgetsEvent`].
-#[derive(Clone, Serialize, Deserialize, specta::Type, Event)]
+#[derive(Clone, Serialize, Deserialize, specta::Type)]
 pub struct RenderWidgetsEventInner {
     /// The ID of the widget being re-rendered.
     id: String,

@@ -1,0 +1,24 @@
+[package]
+description = "[xtask] Code generation utilities for Deskulpt."
+name        = "xtask-gen"
+publish     = false
+
+authors    = { workspace = true }
+edition    = { workspace = true }
+homepage   = { workspace = true }
+license    = { workspace = true }
+repository = { workspace = true }
+version    = { workspace = true }
+
+[dependencies]
+anyhow             = { workspace = true }
+clap               = { workspace = true, features = ["derive"] }
+deskulpt-core      = { workspace = true }
+deskulpt-workspace = { workspace = true }
+handlebars         = { workspace = true }
+heck               = { workspace = true }
+regex              = { workspace = true }
+serde              = { workspace = true, features = ["derive"] }
+specta             = { workspace = true, features = ["function"] }
+specta-typescript  = { workspace = true }
+tauri              = { workspace = true }

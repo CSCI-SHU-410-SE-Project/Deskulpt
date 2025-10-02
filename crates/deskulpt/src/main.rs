@@ -5,22 +5,6 @@ fn main() {
 }
 
 #[cfg(test)]
-mod export_bindings {
-    use deskulpt_specta::TypeScript;
-
-    #[test]
-    #[ignore]
-    fn export_all() {
-        deskulpt::get_bindings_builder()
-            .export(
-                TypeScript::default(),
-                deskulpt_workspace::package_dir("deskulpt").join("src/bindings.ts"),
-            )
-            .expect("Failed to export TypeScript bindings");
-    }
-}
-
-#[cfg(test)]
 mod export_schema {
     use std::fs::File;
     use std::io::BufWriter;
