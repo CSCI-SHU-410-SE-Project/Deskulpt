@@ -44,6 +44,9 @@ impl Settings {
     /// Read the settings from the persistence directory.
     ///
     /// Default settings will be returned if the settings file does not exist.
+    /// Corrupted settings file will attempt to recover as much data as
+    /// possible, applying default values for the corrupted parts. However,
+    /// if the file is completely corrupted, an error might still be returned.
     pub fn load<P: AsRef<Path>>(persist_dir: P) -> Result<Self> {
         let settings_path = persist_dir.as_ref().join(SETTINGS_FILE);
         if !settings_path.exists() {

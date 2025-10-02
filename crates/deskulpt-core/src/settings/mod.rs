@@ -3,7 +3,7 @@
 use std::collections::BTreeMap;
 
 use schemars::JsonSchema;
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Deserializer, Serialize};
 use serde_with::{serde_as, DefaultOnError, MapSkipError};
 
 mod persistence;
@@ -47,15 +47,19 @@ pub struct AppSettings {
 ///
 /// Different from widget configurations, these are independent of the widget
 /// configuration files and are managed internally by the application.
+#[serde_as]
 #[derive(Clone, Deserialize, Serialize, JsonSchema, specta::Type)]
 #[serde(rename_all = "camelCase", default)]
 pub struct WidgetSettings {
     /// The leftmost x-coordinate in pixels.
+    #[serde_as(deserialize_as = "DefaultOnError")]
     pub x: i32,
     /// The topmost y-coordinate in pixels.
+    #[serde_as(deserialize_as = "DefaultOnError")]
     pub y: i32,
     /// The opacity in percentage.
-    pub opacity: i32,
+    #[serde(deserialize_with = "WidgetSettings::deserialize_opacity")]
+    pub opacity: u8,
 }
 
 impl Default for WidgetSettings {
@@ -64,6 +68,22 @@ impl Default for WidgetSettings {
             x: 0,
             y: 0,
             opacity: 100,
+        }
+    }
+}
+
+impl WidgetSettings {
+    /// Deserialization helper for opacity.
+    ///
+    /// On error deserializing this field, it will be set to default (100). If
+    /// the deserialized value is greater than 100, it will be clamped to 100.
+    fn deserialize_opacity<'de, D>(deserializer: D) -> Result<u8, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        match u8::deserialize(deserializer) {
+            Ok(opacity) => Ok(opacity.min(100)),
+            Err(_) => Ok(100),
         }
     }
 }
