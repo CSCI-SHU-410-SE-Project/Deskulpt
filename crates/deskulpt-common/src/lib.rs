@@ -4,11 +4,6 @@
     html_favicon_url = "https://github.com/CSCI-SHU-410-SE-Project/Deskulpt/raw/main/packages/deskulpt/public/deskulpt.svg"
 )]
 
-mod event;
-
-use proc_macro::TokenStream;
-
-#[proc_macro_derive(Event)]
-pub fn derive_event(input: TokenStream) -> TokenStream {
-    event::proc_derive_event(input)
-}
+pub mod bindings;
+pub mod event;
+pub mod window;

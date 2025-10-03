@@ -1,59 +1,14 @@
 //! Deskulpt windows.
 mod script;
 
-use anyhow::{anyhow, Result};
+use anyhow::Result;
+use deskulpt_common::window::DeskulptWindow;
 use script::{CanvasInitJS, ManagerInitJS};
 use tauri::{
-    App, AppHandle, EventTarget, Manager, Runtime, WebviewUrl, WebviewWindow, WebviewWindowBuilder,
-    Window, WindowEvent,
+    App, AppHandle, Manager, Runtime, WebviewUrl, WebviewWindowBuilder, Window, WindowEvent,
 };
 
 use crate::states::SettingsStateExt;
-
-/// Deskulpt window enum.
-#[derive(specta::Type)]
-#[specta(rename_all = "camelCase")]
-pub enum DeskulptWindow {
-    /// The manager window.
-    Manager,
-    /// The canvas window.
-    Canvas,
-}
-
-impl DeskulptWindow {
-    /// Get the label of the window.
-    pub fn label(&self) -> &str {
-        match self {
-            DeskulptWindow::Manager => "manager",
-            DeskulptWindow::Canvas => "canvas",
-        }
-    }
-
-    /// Get the URL of the window.
-    pub fn url(&self) -> WebviewUrl {
-        match self {
-            DeskulptWindow::Manager => WebviewUrl::App("src/manager/index.html".into()),
-            DeskulptWindow::Canvas => WebviewUrl::App("src/canvas/index.html".into()),
-        }
-    }
-
-    /// Retrieve the webview window instance.
-    pub fn webview_window<R, M>(&self, manager: &M) -> Result<WebviewWindow<R>>
-    where
-        R: Runtime,
-        M: Manager<R> + ?Sized,
-    {
-        manager
-            .get_webview_window(self.label())
-            .ok_or_else(|| anyhow!("Window not found: {}", self.label()))
-    }
-}
-
-impl From<DeskulptWindow> for EventTarget {
-    fn from(window: DeskulptWindow) -> Self {
-        window.label().into()
-    }
-}
 
 /// Extention trait for window-related operations.
 pub trait WindowExt<R: Runtime>: Manager<R> + SettingsStateExt<R> {
@@ -66,8 +21,8 @@ pub trait WindowExt<R: Runtime>: Manager<R> + SettingsStateExt<R> {
         let init_js = ManagerInitJS::generate(&settings)?;
         WebviewWindowBuilder::new(
             self,
-            DeskulptWindow::Manager.label(),
-            DeskulptWindow::Manager.url(),
+            DeskulptWindow::Manager,
+            WebviewUrl::App("src/manager/index.html".into()),
         )
         .title("Deskulpt Manager")
         .inner_size(800.0, 500.0)
@@ -91,8 +46,8 @@ pub trait WindowExt<R: Runtime>: Manager<R> + SettingsStateExt<R> {
         let init_js = CanvasInitJS::generate(&settings)?;
         let canvas = WebviewWindowBuilder::new(
             self,
-            DeskulptWindow::Canvas.label(),
-            DeskulptWindow::Canvas.url(),
+            DeskulptWindow::Canvas,
+            WebviewUrl::App("src/canvas/index.html".into()),
         )
         .maximized(true)
         .transparent(true)

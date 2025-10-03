@@ -6,6 +6,11 @@ use quote::quote;
 use syn::{parse_macro_input, DeriveInput, LitStr};
 
 /// Token stream processor for the `Event` derive macro.
+///
+/// This implements the `deskulpt_common::event::Event` trait for the struct,
+/// setting the `NAME` constant to the struct name without the `Event` suffix,
+/// converted to kebab-case. If the struct name does not end with `Event` or is
+/// just `Event`, a compilation error is returned.
 pub fn proc_derive_event(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
 
@@ -31,7 +36,7 @@ pub fn proc_derive_event(input: TokenStream) -> TokenStream {
     let lit = LitStr::new(&name, ident.span());
 
     let expanded = quote! {
-        impl #impl_generics crate::events::Event for #ident #ty_generics #where_clause {
+        impl #impl_generics ::deskulpt_common::event::Event for #ident #ty_generics #where_clause {
             const NAME: &'static str = #lit;
         }
     };

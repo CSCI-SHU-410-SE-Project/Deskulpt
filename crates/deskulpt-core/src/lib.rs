@@ -18,3 +18,24 @@ pub mod window;
 pub mod schema {
     pub use crate::settings::Settings;
 }
+
+#[doc(hidden)]
+pub fn configure_bindings_builder(builder: &mut deskulpt_common::bindings::BindingsBuilder) {
+    builder
+        .commands(deskulpt_common::bindings::collect_commands![
+            commands::bundle_widget::<tauri::Wry>,
+            commands::call_plugin::<tauri::Wry>,
+            commands::emit_on_render_ready::<tauri::Wry>,
+            commands::exit_app::<tauri::Wry>,
+            commands::open_widget::<tauri::Wry>,
+            commands::rescan_widgets::<tauri::Wry>,
+            commands::set_render_ready::<tauri::Wry>,
+            commands::update_settings::<tauri::Wry>,
+        ])
+        .event::<events::ExitAppEvent>()
+        .event::<events::RemoveWidgetsEvent>()
+        .event::<events::RenderWidgetsEvent>()
+        .event::<events::ShowToastEvent>()
+        .event::<events::SwitchThemeEvent>()
+        .event::<events::UpdateSettingsEvent>();
+}

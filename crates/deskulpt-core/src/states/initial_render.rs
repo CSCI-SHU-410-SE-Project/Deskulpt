@@ -3,10 +3,11 @@
 use std::sync::Mutex;
 
 use anyhow::Result;
+use deskulpt_common::event::Event;
+use deskulpt_common::window::DeskulptWindow;
 use tauri::{App, AppHandle, Emitter, Manager, Runtime};
 
-use crate::events::{Event, RenderWidgetsEvent};
-use crate::window::DeskulptWindow;
+use crate::events::RenderWidgetsEvent;
 
 /// Inner structure for [`InitialRenderState`].
 #[derive(Default)]

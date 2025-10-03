@@ -1,0 +1,20 @@
+[package]
+description = "Shared utilities for Deskulpt."
+name        = "deskulpt-common"
+
+authors    = { workspace = true }
+edition    = { workspace = true }
+homepage   = { workspace = true }
+license    = { workspace = true }
+repository = { workspace = true }
+version    = { workspace = true }
+
+[dependencies]
+anyhow          = { workspace = true }
+deskulpt-macros = { workspace = true }
+serde           = { workspace = true, features = ["derive"] }
+specta          = { workspace = true, features = ["function"] }
+tauri           = { workspace = true }
+
+[package.metadata.docs.rs]
+rustdoc-args = ["--extend-css", "../rustdoc.css"]

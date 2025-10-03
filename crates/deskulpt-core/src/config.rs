@@ -114,7 +114,7 @@ impl WidgetConfig {
                 },
             };
 
-        // Ignore widgets that are explcitly marked as such
+        // Ignore widgets that are explicitly marked as such
         if deskulpt_conf.ignore {
             return None;
         }

@@ -12,12 +12,12 @@ version    = { workspace = true }
 [dependencies]
 anyhow             = { workspace = true }
 clap               = { workspace = true, features = ["derive"] }
+deskulpt-common    = { workspace = true }
 deskulpt-core      = { workspace = true }
 deskulpt-workspace = { workspace = true }
 handlebars         = { workspace = true }
 heck               = { workspace = true }
 regex              = { workspace = true }
 serde              = { workspace = true, features = ["derive"] }
-specta             = { workspace = true, features = ["function"] }
+specta             = { workspace = true }
 specta-typescript  = { workspace = true }
-tauri              = { workspace = true }
