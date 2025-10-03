@@ -1,5 +1,7 @@
 //! Data for the bindings template.
 
+use std::collections::BTreeMap;
+
 use anyhow::Result;
 use heck::ToLowerCamelCase;
 use serde::Serialize;
@@ -64,7 +66,6 @@ pub struct BindingsTemplateCommand {
 }
 
 impl BindingsTemplateCommand {
-    /// Create an instance from function information.
     pub fn from(ts: &Typescript, tcl: &TypeCollection, function: &Function) -> Result<Self> {
         Ok(Self {
             key: function.name().to_lower_camel_case(),
@@ -109,22 +110,24 @@ pub struct BindingsTemplate {
 
 impl BindingsTemplate {
     /// Create an instance from export context.
-    pub fn from(ts: &Typescript, cfg: &super::ExportContext) -> Result<Self> {
+    pub fn from(
+        ts: Typescript,
+        types: TypeCollection,
+        events: BTreeMap<&'static str, DataType>,
+        commands: Vec<Function>,
+    ) -> Result<Self> {
         Ok(Self {
-            types: cfg
-                .types
+            types: types
                 .into_iter()
-                .map(|(_, ndt)| Ok(export_named_datatype(ts, ndt, &cfg.types)?))
+                .map(|(_, ndt)| Ok(export_named_datatype(&ts, ndt, &types)?))
                 .collect::<Result<Vec<_>>>()?,
-            events: cfg
-                .events
+            events: events
                 .iter()
-                .map(|(name, ty)| BindingsTemplateEvent::from(ts, &cfg.types, name, ty))
+                .map(|(name, ty)| BindingsTemplateEvent::from(&ts, &types, name, ty))
                 .collect::<Result<Vec<_>>>()?,
-            commands: cfg
-                .commands
+            commands: commands
                 .iter()
-                .map(|function| BindingsTemplateCommand::from(ts, &cfg.types, function))
+                .map(|function| BindingsTemplateCommand::from(&ts, &types, function))
                 .collect::<Result<Vec<_>>>()?,
         })
     }

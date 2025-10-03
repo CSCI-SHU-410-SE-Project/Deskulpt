@@ -7,15 +7,8 @@ use anyhow::Result;
 use deskulpt_core::events::Event;
 use handlebars::Handlebars;
 use regex::Regex;
-use specta::datatype::{DataType, Function};
 use specta::function::collect_functions;
 use specta::{NamedType, Type, TypeCollection};
-
-pub struct ExportContext {
-    pub commands: Vec<Function>,
-    pub events: BTreeMap<&'static str, DataType>,
-    pub types: TypeCollection,
-}
 
 pub fn run() -> Result<()> {
     let mut types = TypeCollection::default();
@@ -59,12 +52,12 @@ pub fn run() -> Result<()> {
     handlebars.register_helper("indent", Box::new(helpers::indent));
     handlebars.register_template_string("bindings", include_str!("template.ts.hbs"))?;
 
-    let ctx = ExportContext {
-        commands,
-        events,
+    let data = template::BindingsTemplate::from(
+        specta_typescript::Typescript::new(),
         types,
-    };
-    let data = template::BindingsTemplate::from(&specta_typescript::Typescript::new(), &ctx)?;
+        events,
+        commands,
+    )?;
     let rendered = handlebars.render("bindings", &data)?;
 
     // TODO: Remove when specta > 2.0.0-rc.22
