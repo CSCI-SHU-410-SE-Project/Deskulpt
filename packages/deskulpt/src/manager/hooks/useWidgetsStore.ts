@@ -39,7 +39,7 @@ export async function rescan(initial: boolean = false) {
       (id) => !(id in configs),
     );
     if (removedIds.length > 0) {
-      await events.removeWidgetsEvent.emitTo("canvas", removedIds);
+      await events.removeWidgets.emitTo("canvas", removedIds);
     }
   }
 
@@ -47,7 +47,7 @@ export async function rescan(initial: boolean = false) {
   if (initial) {
     await commands.emitOnRenderReady({ event });
   } else {
-    await events.renderWidgetsEvent.emitTo("canvas", event);
+    await events.renderWidgets.emitTo("canvas", event);
   }
 
   // Sort widgets by their directory name
@@ -83,7 +83,7 @@ export function updateWidgetSettings(
   });
 
   if (emit) {
-    events.updateSettingsEvent
+    events.updateSettings
       .emitTo("canvas", { id, ...settings })
       .catch(console.error);
   }

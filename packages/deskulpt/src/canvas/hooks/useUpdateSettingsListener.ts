@@ -4,7 +4,7 @@ import { events } from "../../bindings";
 
 export function useUpdateSettingsListener() {
   useEffect(() => {
-    const unlisten = events.updateSettingsEvent.listen((event) => {
+    const unlisten = events.updateSettings.listen((event) => {
       const { id, ...settings } = event.payload;
       updateWidgetSettings(id, settings);
     });

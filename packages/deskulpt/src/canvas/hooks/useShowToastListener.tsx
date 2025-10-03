@@ -4,7 +4,7 @@ import { events } from "../../bindings";
 
 export function useShowToastListener() {
   useEffect(() => {
-    const unlisten = events.showToastEvent.listen((event) => {
+    const unlisten = events.showToast.listen((event) => {
       const { type, content } = event.payload;
       switch (type) {
         case "success":

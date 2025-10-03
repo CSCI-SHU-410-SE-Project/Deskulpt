@@ -7,10 +7,9 @@ use tauri::image::Image;
 use tauri::menu::{MenuBuilder, MenuEvent, MenuItemBuilder};
 use tauri::tray::{MouseButton, MouseButtonState, TrayIcon, TrayIconBuilder, TrayIconEvent};
 use tauri::{App, AppHandle, Runtime};
-use tauri_specta::Event;
 use tokio::time::sleep;
 
-use crate::events::ExitAppEvent;
+use crate::events::{Event, ExitAppEvent};
 use crate::states::CanvasImodeStateExt;
 use crate::window::{DeskulptWindow, WindowExt};
 

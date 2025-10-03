@@ -7,7 +7,7 @@ export function useTheme() {
   );
 
   useEffect(() => {
-    const unlisten = events.switchThemeEvent.listen((event) => {
+    const unlisten = events.switchTheme.listen((event) => {
       setTheme(event.payload);
     });
 

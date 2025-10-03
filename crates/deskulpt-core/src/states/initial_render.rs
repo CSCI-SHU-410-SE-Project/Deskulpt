@@ -4,9 +4,8 @@ use std::sync::Mutex;
 
 use anyhow::Result;
 use tauri::{App, AppHandle, Emitter, Manager, Runtime};
-use tauri_specta::Event;
 
-use crate::events::RenderWidgetsEvent;
+use crate::events::{Event, RenderWidgetsEvent};
 use crate::window::DeskulptWindow;
 
 /// Inner structure for [`InitialRenderState`].

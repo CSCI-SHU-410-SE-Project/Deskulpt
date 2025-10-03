@@ -12,6 +12,7 @@ version    = "0.0.1"
 
 [workspace.dependencies]
 anyhow                         = "1.0.100"
+clap                           = "4.5.48"
 dunce                          = "1.0.5"
 either                         = "1.15.0"
 handlebars                     = "6.3.2"
@@ -36,7 +37,6 @@ tauri-build                    = "2.0.4"
 tauri-plugin-clipboard-manager = "2.3.0"
 tauri-plugin-global-shortcut   = "2.3.0"
 tauri-plugin-opener            = "2.5.0"
-tauri-specta                   = "2.0.0-rc.21"
 thiserror                      = "2.0.17"
 tokio                          = "1.47.1"
 uuid                           = "1.16.0"
@@ -46,7 +46,6 @@ deskulpt-core          = { version = "0.0.1", path = "crates/deskulpt-core" }
 deskulpt-macros        = { version = "0.0.1", path = "crates/deskulpt-macros" }
 deskulpt-plugin        = { version = "0.0.1", path = "crates/deskulpt-plugin" }
 deskulpt-plugin-macros = { version = "0.0.1", path = "crates/deskulpt-plugin-macros" }
-deskulpt-specta        = { version = "0.0.1", path = "crates/deskulpt-specta" }
 deskulpt-workspace     = { version = "0.0.1", path = "crates/deskulpt-workspace" }
 
 # TODO: Remove these since they will not be dependencies of other crates when finalized

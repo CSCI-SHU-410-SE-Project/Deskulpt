@@ -5,7 +5,7 @@ import { commands, events } from "../../bindings";
 
 export function useExitAppListener() {
   useEffect(() => {
-    const unlisten = events.exitAppEvent.listen(() => {
+    const unlisten = events.exitApp.listen(() => {
       const settings = {
         app: useAppSettingsStore.getState(),
         widgets: Object.fromEntries(

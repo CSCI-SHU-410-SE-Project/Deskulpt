@@ -5,9 +5,8 @@ use std::sync::Mutex;
 use anyhow::Result;
 use tauri::menu::MenuItem;
 use tauri::{App, AppHandle, Emitter, Manager, Runtime, WebviewWindow};
-use tauri_specta::Event;
 
-use crate::events::ShowToastEvent;
+use crate::events::{Event, ShowToastEvent};
 use crate::window::DeskulptWindow;
 
 /// Canvas interaction mode.

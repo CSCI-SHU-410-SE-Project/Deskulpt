@@ -12,15 +12,12 @@ version    = { workspace = true }
 [dependencies]
 deskulpt-core                  = { workspace = true }
 serde_json                     = { workspace = true }
-specta                         = { workspace = true }
 tauri                          = { workspace = true, features = ["macos-private-api"] }
 tauri-plugin-clipboard-manager = { workspace = true }
 tauri-plugin-global-shortcut   = { workspace = true }
 tauri-plugin-opener            = { workspace = true }
-tauri-specta                   = { workspace = true }
 
 [dev-dependencies]
-deskulpt-specta    = { workspace = true }
 deskulpt-workspace = { workspace = true }
 schemars           = { workspace = true }
 
@@ -29,8 +26,3 @@ tauri-build = { workspace = true, features = ["codegen"] }
 
 [package.metadata.docs.rs]
 rustdoc-args = ["--extend-css", "../rustdoc.css"]
-
-[package.metadata.cargo-shear]
-ignored = [
-  "specta", # Expanded from tauri_specta::collect_commands
-]

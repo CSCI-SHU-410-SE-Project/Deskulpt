@@ -130,7 +130,7 @@ export function updateWidgetSettings(
   });
 
   if (emit) {
-    events.updateSettingsEvent
+    events.updateSettings
       .emitTo("manager", { id, ...settings })
       .catch(console.error);
   }
