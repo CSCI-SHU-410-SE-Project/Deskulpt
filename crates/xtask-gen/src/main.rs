@@ -1,22 +1,26 @@
 mod bindings;
 
 use anyhow::Result;
-use clap::{Parser, ValueEnum};
+use clap::{Parser, Subcommand};
 
-#[derive(Debug, Clone, Parser, ValueEnum)]
-enum GenKind {
+#[derive(Debug, Subcommand)]
+enum Commands {
+    /// Generate Deskulpt frontend bindings.
     Bindings,
 }
 
+/// [XTASK] Code generation for Deskulpt.
 #[derive(Debug, Parser)]
+#[command(version, about, author, bin_name = "cargo gen")]
 struct Args {
-    kind: GenKind,
+    #[command(subcommand)]
+    command: Commands,
 }
 
 fn main() -> Result<()> {
     let args = Args::parse();
-    match args.kind {
-        GenKind::Bindings => bindings::run()?,
+    match args.command {
+        Commands::Bindings => bindings::run()?,
     }
     Ok(())
 }

@@ -8,9 +8,14 @@ use tauri::{Emitter, Runtime};
 use crate::settings::{Theme, WidgetSettings};
 use crate::window::DeskulptWindow;
 
+/// Trait for Deskulpt events.
+///
+/// This trait should be derived with [`Event`](deskulpt_macros::Event).
 pub trait Event: specta::Type + Serialize {
+    /// The name of the event.
     const NAME: &'static str;
 
+    /// Emit the event to all target.
     fn emit<R, E>(&self, emitter: &E) -> Result<()>
     where
         R: Runtime,
@@ -20,6 +25,7 @@ pub trait Event: specta::Type + Serialize {
         Ok(())
     }
 
+    /// Emit the event to the specified window.
     fn emit_to<R, E>(&self, emitter: &E, window: DeskulptWindow) -> Result<()>
     where
         R: Runtime,

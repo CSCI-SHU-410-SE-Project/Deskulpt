@@ -1,7 +1,6 @@
 [package]
-description = "[xtask] Code generation utilities for Deskulpt."
-name        = "xtask-gen"
-publish     = false
+name    = "xtask-gen"
+publish = false
 
 authors    = { workspace = true }
 edition    = { workspace = true }

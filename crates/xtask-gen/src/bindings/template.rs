@@ -1,86 +1,77 @@
-//! Data for the bindings template.
-
-use std::collections::BTreeMap;
-
 use anyhow::Result;
+use handlebars::{Context, Handlebars, Helper, HelperResult, Output, RenderContext};
 use heck::ToLowerCamelCase;
+use regex::Regex;
 use serde::Serialize;
 use specta::datatype::{DataType, Function, FunctionResultVariant};
 use specta::TypeCollection;
 use specta_typescript::{datatype, export_named_datatype, js_doc, Typescript};
 
-/// Data for an event in the bindings template.
-#[derive(Serialize)]
-pub struct BindingsTemplateEvent {
-    /// The key in the generated `events` object.
-    pub key: String,
-    /// The name of the event.
-    pub name: String,
-    /// The type representation of the event.
-    pub ty: String,
+/// Similar to [`export_named_datatype`] but for [`DataType`].
+fn export_datatype(ts: &Typescript, typ: &DataType, tcl: &TypeCollection) -> Result<String> {
+    Ok(datatype(
+        ts,
+        &FunctionResultVariant::Value(typ.clone()),
+        tcl,
+    )?)
 }
 
-impl BindingsTemplateEvent {
-    /// Create an instance from event name and type.
-    pub fn from(ts: &Typescript, tcl: &TypeCollection, name: &str, ty: &DataType) -> Result<Self> {
+/// Template data for an event.
+#[derive(Serialize)]
+struct EventTemplate {
+    key: String,
+    name: String,
+    ty: String,
+}
+
+impl EventTemplate {
+    fn from(ts: &Typescript, tcl: &TypeCollection, name: &str, ty: &DataType) -> Result<Self> {
         Ok(Self {
             key: name.to_lower_camel_case(),
             name: name.to_string(),
-            ty: datatype(ts, &FunctionResultVariant::Value(ty.clone()), tcl)?,
+            ty: export_datatype(ts, ty, tcl)?,
         })
     }
 }
 
-/// Data for an argument for a command in the bindings template.
+/// Template data for a command argument.
 #[derive(Serialize)]
-pub struct BindingsTemplateCommandArg {
-    /// The name of the argument.
-    pub name: String,
-    /// The type representation of the argument.
-    pub ty: String,
+struct CommandArgTemplate {
+    name: String,
+    ty: String,
 }
 
-impl BindingsTemplateCommandArg {
-    /// Create an instance from argument name and type.
-    pub fn from(ts: &Typescript, tcl: &TypeCollection, name: &str, ty: &DataType) -> Result<Self> {
+impl CommandArgTemplate {
+    fn from(ts: &Typescript, tcl: &TypeCollection, name: &str, ty: &DataType) -> Result<Self> {
         Ok(Self {
             name: name.to_lower_camel_case(),
-            ty: datatype(ts, &FunctionResultVariant::Value(ty.clone()), tcl)?,
+            ty: export_datatype(ts, ty, tcl)?,
         })
     }
 }
 
-/// Data for a command in the bindings template.
+/// Template data for a command.
 #[derive(Serialize)]
-pub struct BindingsTemplateCommand {
-    /// The key in the generated `commands` object.
-    pub key: String,
-    /// The name of the command.
-    pub name: String,
-    /// The command arguments.
-    pub args: Vec<BindingsTemplateCommandArg>,
-    /// The type representation of the return value.
-    pub ret_ty: String,
-    /// The docstring of the command.
-    pub doc: String,
+struct CommandTemplate {
+    key: String,
+    name: String,
+    args: Vec<CommandArgTemplate>,
+    ret_ty: String,
+    doc: String,
 }
 
-impl BindingsTemplateCommand {
-    pub fn from(ts: &Typescript, tcl: &TypeCollection, function: &Function) -> Result<Self> {
+impl CommandTemplate {
+    fn from(ts: &Typescript, tcl: &TypeCollection, function: &Function) -> Result<Self> {
         Ok(Self {
             key: function.name().to_lower_camel_case(),
             name: function.name().to_string(),
             args: function
                 .args()
-                .map(|(name, ty)| BindingsTemplateCommandArg::from(ts, tcl, name, ty))
+                .map(|(name, ty)| CommandArgTemplate::from(ts, tcl, name, ty))
                 .collect::<Result<Vec<_>>>()?,
             ret_ty: match function.result() {
-                Some(FunctionResultVariant::Value(t)) => {
-                    datatype(ts, &FunctionResultVariant::Value(t.clone()), tcl)?
-                },
-                Some(FunctionResultVariant::Result(t, _)) => {
-                    datatype(ts, &FunctionResultVariant::Value(t.clone()), tcl)?
-                },
+                Some(FunctionResultVariant::Value(t))
+                | Some(FunctionResultVariant::Result(t, _)) => export_datatype(ts, t, tcl)?,
                 None => "void".to_string(),
             },
             doc: {
@@ -97,38 +88,78 @@ impl BindingsTemplateCommand {
     }
 }
 
-/// Data for the bindings template.
+/// Full template data.
 #[derive(Serialize)]
-pub struct BindingsTemplate {
-    /// All types in the bindings.
-    pub types: Vec<String>,
-    /// All events in the bindings.
-    pub events: Vec<BindingsTemplateEvent>,
-    /// All commands in the bindings.
-    pub commands: Vec<BindingsTemplateCommand>,
+struct Template {
+    types: Vec<String>,
+    events: Vec<EventTemplate>,
+    commands: Vec<CommandTemplate>,
 }
 
-impl BindingsTemplate {
-    /// Create an instance from export context.
-    pub fn from(
-        ts: Typescript,
-        types: TypeCollection,
-        events: BTreeMap<&'static str, DataType>,
-        commands: Vec<Function>,
-    ) -> Result<Self> {
+impl Template {
+    fn from(ts: Typescript, builder: super::Builder) -> Result<Self> {
         Ok(Self {
-            types: types
+            types: builder
+                .types
                 .into_iter()
-                .map(|(_, ndt)| Ok(export_named_datatype(&ts, ndt, &types)?))
+                .map(|(_, ndt)| Ok(export_named_datatype(&ts, ndt, &builder.types)?))
                 .collect::<Result<Vec<_>>>()?,
-            events: events
+            events: builder
+                .events
                 .iter()
-                .map(|(name, ty)| BindingsTemplateEvent::from(&ts, &types, name, ty))
+                .map(|(name, ty)| EventTemplate::from(&ts, &builder.types, name, ty))
                 .collect::<Result<Vec<_>>>()?,
-            commands: commands
+            commands: builder
+                .commands
                 .iter()
-                .map(|function| BindingsTemplateCommand::from(&ts, &types, function))
+                .map(|function| CommandTemplate::from(&ts, &builder.types, function))
                 .collect::<Result<Vec<_>>>()?,
         })
     }
+}
+
+/// Handlebars helper to indent (multi-line) text by a given number of spaces.
+fn handlebars_indent_helper(
+    h: &Helper<'_>,
+    _: &Handlebars,
+    _: &Context,
+    _: &mut RenderContext<'_, '_>,
+    out: &mut dyn Output,
+) -> HelperResult {
+    let text = h
+        .param(0)
+        .and_then(|p| p.value().as_str())
+        .unwrap_or_default();
+    let spaces = h
+        .param(1)
+        .and_then(|p| p.value().as_u64())
+        .unwrap_or_default();
+
+    let pad = " ".repeat(spaces as usize);
+    for (i, line) in text.lines().enumerate() {
+        if i > 0 {
+            out.write("\n")?;
+        }
+        out.write(&pad)?;
+        out.write(line)?;
+    }
+
+    Ok(())
+}
+
+/// Render the bindings template.
+pub fn render(builder: super::Builder) -> Result<String> {
+    let mut hb = Handlebars::new();
+    hb.register_escape_fn(handlebars::no_escape);
+    hb.register_helper("indent", Box::new(handlebars_indent_helper));
+    hb.register_template_string("bindings", include_str!("template.ts.hbs"))?;
+
+    let data = Template::from(Typescript::new(), builder)?;
+    let output = hb.render("bindings", &data)?;
+
+    // TODO: Remove when specta > 2.0.0-rc.22
+    let re = Regex::new(r"Partial\s*<\s*(\{\s*\[\s*key\s+in\s+string\s*\][^}]*\})\s*>").unwrap();
+    let output = re.replace_all(&output, "$1").to_string();
+
+    Ok(output)
 }

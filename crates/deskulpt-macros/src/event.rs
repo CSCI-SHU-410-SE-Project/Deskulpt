@@ -1,8 +1,11 @@
+//! Internals for the `Event` derive macro.
+
 use heck::ToKebabCase;
 use proc_macro::TokenStream;
 use quote::quote;
 use syn::{parse_macro_input, DeriveInput, LitStr};
 
+/// Token stream processor for the `Event` derive macro.
 pub fn proc_derive_event(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
 
