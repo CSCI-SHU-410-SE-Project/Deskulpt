@@ -5,30 +5,10 @@
 )]
 
 mod event;
-mod persistence;
 
 use proc_macro::TokenStream;
 
 #[proc_macro_derive(Event)]
 pub fn derive_event(input: TokenStream) -> TokenStream {
     event::proc_derive_event(input)
-}
-
-/// Derive the persisted version of a struct.
-///
-/// For `MyStruct`, this will generate a `MyStructPersisted` struct like this:
-///
-/// - Derived: `Default`, `Deserialize`.
-/// - Struct-level `#[serde(...)]` attributes are preserved.
-/// - Each field has its original type, unless overridden via `#[persisted(type
-///   = "...")]`.
-/// - Each field is marked with `#[serde(default)]`, unless overridden via
-///   `#[persisted(default = "...")]`.
-/// - Field-level `#[serde(...)]` attributes are preserved. Note that they
-///   cannot contain `default`.
-/// - A `From<MyStructPersisted>` implementation for `MyStruct`.
-/// - A `FromPersisted<MyStructPersisted>` implementation for `MyStruct`.
-#[proc_macro_derive(Persisted, attributes(persisted))]
-pub fn derive_persisted(input: TokenStream) -> TokenStream {
-    persistence::proc_derive_persisted(input)
 }
