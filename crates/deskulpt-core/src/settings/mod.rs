@@ -76,8 +76,8 @@ impl Default for WidgetSettings {
 impl WidgetSettings {
     /// Deserialization helper for opacity.
     ///
-    /// On error deserializing this field, it will be set to default (100). If
-    /// the deserialized value is greater than 100, it will be clamped to 100.
+    /// On error deserializing this field, it will be set to default (100). The
+    /// deserialized value will be clamped to [1, 100].
     fn deserialize_opacity<'de, D>(deserializer: D) -> Result<u8, D::Error>
     where
         D: Deserializer<'de>,
