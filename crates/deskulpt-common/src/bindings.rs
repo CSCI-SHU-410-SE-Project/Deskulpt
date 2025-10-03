@@ -3,8 +3,6 @@
 use std::collections::BTreeMap;
 
 use specta::datatype::{DataType, Function};
-/// Used in [`BindingsBuilder::commands`].
-pub use specta::function::collect_functions as collect_commands;
 use specta::{NamedType, Type, TypeCollection};
 
 use crate::event::Event;
@@ -13,9 +11,12 @@ use crate::event::Event;
 ///
 /// A [`Bindings`] should always be constructed via a [`BindingsBuilder`].
 pub struct Bindings {
+    /// A specta type collection.
     pub types: TypeCollection,
+    /// A mapping from event names to their data types.
     pub events: BTreeMap<&'static str, DataType>,
-    pub commands: Vec<Function>,
+    /// A mapping from plugin names to their commands.
+    pub commands: BTreeMap<&'static str, Vec<Function>>,
 }
 
 /// Builder for a [`Bindings`] instance.
@@ -23,7 +24,7 @@ pub struct Bindings {
 pub struct BindingsBuilder {
     types: TypeCollection,
     events: BTreeMap<&'static str, DataType>,
-    commands: Option<fn(&mut TypeCollection) -> Vec<Function>>,
+    commands: BTreeMap<&'static str, fn(&mut TypeCollection) -> Vec<Function>>,
 }
 
 impl BindingsBuilder {
@@ -43,8 +44,12 @@ impl BindingsBuilder {
     /// Register commands in the collection.
     ///
     /// The argument should be obtained via the [`collect_commands!`] macro.
-    pub fn commands(&mut self, commands: fn(&mut TypeCollection) -> Vec<Function>) -> &mut Self {
-        self.commands = Some(commands);
+    pub fn commands(
+        &mut self,
+        plugin_name: &'static str,
+        commands: fn(&mut TypeCollection) -> Vec<Function>,
+    ) -> &mut Self {
+        self.commands.insert(plugin_name, commands);
         self
     }
 
@@ -52,8 +57,10 @@ impl BindingsBuilder {
     pub fn build(&mut self) -> Bindings {
         let commands = self
             .commands
-            .map(|f| f(&mut self.types))
-            .unwrap_or_default();
+            .iter_mut()
+            .map(|(k, f)| (*k, f(&mut self.types)))
+            .collect();
+
         Bindings {
             types: self.types.clone(),
             events: self.events.clone(),
@@ -61,3 +68,6 @@ impl BindingsBuilder {
         }
     }
 }
+
+/// Used in [`BindingsBuilder::commands`].
+pub use specta::function::collect_functions as collect_commands;

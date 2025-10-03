@@ -282,118 +282,120 @@ export const events = {
 // =============================================================================
 
 export const commands = {
-  /**
-   * Bundle a widget.
-   * 
-   * ### Errors
-   * 
-   * - Failed to access the widgets directory.
-   * - Widget ID does not exist in the configuration map.
-   * - Widget has a configuration error.
-   * - Error bundling the widget.
-   */
-  bundleWidget: (payload: {
-    id: string,
-    baseUrl: string,
-    apisBlobUrl: string,
-  }) => invoke<string>("bundle_widget", payload),
+  core: {
+    /**
+     * Bundle a widget.
+     * 
+     * ### Errors
+     * 
+     * - Failed to access the widgets directory.
+     * - Widget ID does not exist in the configuration map.
+     * - Widget has a configuration error.
+     * - Error bundling the widget.
+     */
+    bundleWidget: (payload: {
+      id: string,
+      baseUrl: string,
+      apisBlobUrl: string,
+    }) => invoke<string>("plugin:deskulpt-core|bundle_widget", payload),
 
-  /**
-   * Call a plugin command (🚧 TODO 🚧).
-   * 
-   * ### 🚧 TODO 🚧
-   * 
-   * The Deskulpt core should keep a state of the registered plugins and call the
-   * plugins dynamically. Also, instead of invoking the plugins directly, the
-   * Deskulpt core should not depend on any of the plugins and should use IPC to
-   * communicate with the plugins.
-   * 
-   * Also, in order to simplify the engine API for the plugin (because it is
-   * a temporary implementation), `app_handle` is using the default runtime but
-   * it should be a generic `R: Runtime` parameter in the final implementation.
-   */
-  callPlugin: (payload: {
-    plugin: string,
-    command: string,
-    id: string,
-    payload: JsonValue | null,
-  }) => invoke<JsonValue>("call_plugin", payload),
+    /**
+     * Call a plugin command (🚧 TODO 🚧).
+     * 
+     * ### 🚧 TODO 🚧
+     * 
+     * The Deskulpt core should keep a state of the registered plugins and call the
+     * plugins dynamically. Also, instead of invoking the plugins directly, the
+     * Deskulpt core should not depend on any of the plugins and should use IPC to
+     * communicate with the plugins.
+     * 
+     * Also, in order to simplify the engine API for the plugin (because it is
+     * a temporary implementation), `app_handle` is using the default runtime but
+     * it should be a generic `R: Runtime` parameter in the final implementation.
+     */
+    callPlugin: (payload: {
+      plugin: string,
+      command: string,
+      id: string,
+      payload: JsonValue | null,
+    }) => invoke<JsonValue>("plugin:deskulpt-core|call_plugin", payload),
 
-  /**
-   * Wrapper of
-   * [`emit_on_render_ready`](InitialRenderStateExt::emit_on_render_ready).
-   * 
-   * ### Errors
-   * 
-   * - Failed to emit the [`RenderWidgetsEvent`] to the canvas.
-   */
-  emitOnRenderReady: (payload: {
-    event: RenderWidgetsEvent,
-  }) => invoke<null>("emit_on_render_ready", payload),
+    /**
+     * Wrapper of
+     * [`emit_on_render_ready`](InitialRenderStateExt::emit_on_render_ready).
+     * 
+     * ### Errors
+     * 
+     * - Failed to emit the [`RenderWidgetsEvent`] to the canvas.
+     */
+    emitOnRenderReady: (payload: {
+      event: RenderWidgetsEvent,
+    }) => invoke<null>("plugin:deskulpt-core|emit_on_render_ready", payload),
 
-  /**
-   * Exit the application with cleanup.
-   * 
-   * This command never returns an error; in other words it will always exit the
-   * application in the end. Prior to exiting, it will try to dump the settings
-   * for persistence, but failure to do so will not prevent exiting.
-   */
-  exitApp: (payload: {
-    settings: Settings,
-  }) => invoke<void>("exit_app", payload),
+    /**
+     * Exit the application with cleanup.
+     * 
+     * This command never returns an error; in other words it will always exit the
+     * application in the end. Prior to exiting, it will try to dump the settings
+     * for persistence, but failure to do so will not prevent exiting.
+     */
+    exitApp: (payload: {
+      settings: Settings,
+    }) => invoke<void>("plugin:deskulpt-core|exit_app", payload),
 
-  /**
-   * Open the widgets directory or a specific widget directory.
-   * 
-   * If the widget ID is provided, a specific widget directory will be opened.
-   * Otherwise, the widgets directory will be opened.
-   * 
-   * ### Errors
-   * 
-   * - Widget ID is provided but does not exist in the collection.
-   * - Failed to access the widgets directory.
-   * - Error opening the directory.
-   */
-  openWidget: (payload: {
-    id: string | null,
-  }) => invoke<null>("open_widget", payload),
+    /**
+     * Open the widgets directory or a specific widget directory.
+     * 
+     * If the widget ID is provided, a specific widget directory will be opened.
+     * Otherwise, the widgets directory will be opened.
+     * 
+     * ### Errors
+     * 
+     * - Widget ID is provided but does not exist in the collection.
+     * - Failed to access the widgets directory.
+     * - Error opening the directory.
+     */
+    openWidget: (payload: {
+      id: string | null,
+    }) => invoke<null>("plugin:deskulpt-core|open_widget", payload),
 
-  /**
-   * Rescan the widgets directory and update the widget configuration map.
-   * 
-   * This will update the widget configuration map state and return the updated
-   * configuration map as well.
-   * 
-   * ### Errors
-   * 
-   * - Failed to access the widgets directory.
-   * - Error traversing the widgets directory.
-   * - Error inferring widget ID from the directory entry.
-   */
-  rescanWidgets: () => invoke<{ [key in string]: WidgetConfig }>("rescan_widgets"),
+    /**
+     * Rescan the widgets directory and update the widget configuration map.
+     * 
+     * This will update the widget configuration map state and return the updated
+     * configuration map as well.
+     * 
+     * ### Errors
+     * 
+     * - Failed to access the widgets directory.
+     * - Error traversing the widgets directory.
+     * - Error inferring widget ID from the directory entry.
+     */
+    rescanWidgets: () => invoke<{ [key in string]: WidgetConfig }>("plugin:deskulpt-core|rescan_widgets"),
 
-  /**
-   * Wrapper of [`set_render_ready`](InitialRenderStateExt::set_render_ready).
-   * 
-   * ### Errors
-   * 
-   * - Failed to emit the
-   * [`RenderWidgetsEvent`](crate::events::RenderWidgetsEvent) to the canvas.
-   */
-  setRenderReady: () => invoke<null>("set_render_ready"),
+    /**
+     * Wrapper of [`set_render_ready`](InitialRenderStateExt::set_render_ready).
+     * 
+     * ### Errors
+     * 
+     * - Failed to emit the
+     * [`RenderWidgetsEvent`](crate::events::RenderWidgetsEvent) to the canvas.
+     */
+    setRenderReady: () => invoke<null>("plugin:deskulpt-core|set_render_ready"),
 
-  /**
-   * Update the settings.
-   * 
-   * This command updates the settings state in the backend. If an update has
-   * side effects, they will be applied prior to the update being committed. See
-   * [`SettingsStateExt`] for more information.
-   * 
-   * ### Errors
-   * 
-   * - Failed to apply the side effects, if any.
-   */
-  updateSettings: (payload: {
-    update: SettingsUpdate,
-  }) => invoke<null>("update_settings", payload),
+    /**
+     * Update the settings.
+     * 
+     * This command updates the settings state in the backend. If an update has
+     * side effects, they will be applied prior to the update being committed. See
+     * [`SettingsStateExt`] for more information.
+     * 
+     * ### Errors
+     * 
+     * - Failed to apply the side effects, if any.
+     */
+    updateSettings: (payload: {
+      update: SettingsUpdate,
+    }) => invoke<null>("plugin:deskulpt-core|update_settings", payload),
+  },
 };

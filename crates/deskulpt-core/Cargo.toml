@@ -1,5 +1,6 @@
 [package]
 description = "Deskulpt backend core."
+links       = "deskulpt-core"
 name        = "deskulpt-core"
 
 authors    = { workspace = true }
@@ -42,6 +43,9 @@ deskulpt-plugin-sys = { workspace = true }
 
 [target."cfg(target_os = \"macos\")".dependencies]
 objc2 = { workspace = true }
+
+[build-dependencies]
+tauri-plugin = { workspace = true }
 
 [package.metadata.docs.rs]
 rustdoc-args = ["--extend-css", "../rustdoc.css"]

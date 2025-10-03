@@ -41,7 +41,7 @@ export function useRenderWidgetsListener() {
         if (code === undefined) {
           // If code is not provided, we need to bundle the widget
           try {
-            code = await commands.bundleWidget({
+            code = await commands.core.bundleWidget({
               id,
               baseUrl: BASE_URL,
               apisBlobUrl,
@@ -92,7 +92,7 @@ export function useRenderWidgetsListener() {
 
     if (!hasInited.current) {
       // Set the canvas as ready to render only once
-      commands
+      commands.core
         .setRenderReady()
         .then(() => {
           hasInited.current = true;

@@ -1,7 +1,7 @@
 import { invoke } from "@tauri-apps/api/core";
 
 function appendFile(id: string, payload: { path: string; content: string }) {
-  return invoke<void>("call_plugin", {
+  return invoke<void>("plugin:deskulpt-core|call_plugin", {
     plugin: "fs",
     command: "append_file",
     id,
@@ -10,7 +10,7 @@ function appendFile(id: string, payload: { path: string; content: string }) {
 }
 
 function createDir(id: string, payload: { path: string }) {
-  return invoke<void>("call_plugin", {
+  return invoke<void>("plugin:deskulpt-core|call_plugin", {
     plugin: "fs",
     command: "create_dir",
     id,
@@ -19,7 +19,7 @@ function createDir(id: string, payload: { path: string }) {
 }
 
 function exists(id: string, payload: { path: string }) {
-  return invoke<boolean>("call_plugin", {
+  return invoke<boolean>("plugin:deskulpt-core|call_plugin", {
     plugin: "fs",
     command: "exists",
     id,
@@ -28,7 +28,7 @@ function exists(id: string, payload: { path: string }) {
 }
 
 function isDir(id: string, payload: { path: string }) {
-  return invoke<boolean>("call_plugin", {
+  return invoke<boolean>("plugin:deskulpt-core|call_plugin", {
     plugin: "fs",
     command: "is_dir",
     id,
@@ -37,7 +37,7 @@ function isDir(id: string, payload: { path: string }) {
 }
 
 function isFile(id: string, payload: { path: string }) {
-  return invoke<boolean>("call_plugin", {
+  return invoke<boolean>("plugin:deskulpt-core|call_plugin", {
     plugin: "fs",
     command: "is_file",
     id,
@@ -46,7 +46,7 @@ function isFile(id: string, payload: { path: string }) {
 }
 
 function readFile(id: string, payload: { path: string }) {
-  return invoke<string>("call_plugin", {
+  return invoke<string>("plugin:deskulpt-core|call_plugin", {
     plugin: "fs",
     command: "read_file",
     id,
@@ -55,7 +55,7 @@ function readFile(id: string, payload: { path: string }) {
 }
 
 function removeDir(id: string, payload: { path: string }) {
-  return invoke<void>("call_plugin", {
+  return invoke<void>("plugin:deskulpt-core|call_plugin", {
     plugin: "fs",
     command: "remove_dir",
     id,
@@ -64,7 +64,7 @@ function removeDir(id: string, payload: { path: string }) {
 }
 
 function removeFile(id: string, payload: { path: string }) {
-  return invoke<void>("call_plugin", {
+  return invoke<void>("plugin:deskulpt-core|call_plugin", {
     plugin: "fs",
     command: "remove_file",
     id,
@@ -73,7 +73,7 @@ function removeFile(id: string, payload: { path: string }) {
 }
 
 function writeFile(id: string, payload: { path: string; content: string }) {
-  return invoke<void>("call_plugin", {
+  return invoke<void>("plugin:deskulpt-core|call_plugin", {
     plugin: "fs",
     command: "write_file",
     id,

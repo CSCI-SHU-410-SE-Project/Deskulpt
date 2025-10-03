@@ -36,11 +36,14 @@ interface GetSystemInfoOutputPayload {
 }
 
 function getSystemInfo(id: string) {
-  return invoke<GetSystemInfoOutputPayload>("call_plugin", {
-    plugin: "sys",
-    command: "get_system_info",
-    id,
-  });
+  return invoke<GetSystemInfoOutputPayload>(
+    "plugin:deskulpt-core|call_plugin",
+    {
+      plugin: "sys",
+      command: "get_system_info",
+      id,
+    },
+  );
 }
 
 export { getSystemInfo };

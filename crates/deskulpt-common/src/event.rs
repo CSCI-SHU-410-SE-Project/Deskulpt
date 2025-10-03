@@ -13,7 +13,7 @@ use crate::window::DeskulptWindow;
 /// This trait should be derived using the [`derive@Event`] macro.
 pub trait Event: specta::Type + Serialize {
     /// The name of the event.
-    const NAME: &'static str;
+    const NAME: &str;
 
     /// Emit the event to all target.
     fn emit<R, E>(&self, emitter: &E) -> Result<()>
