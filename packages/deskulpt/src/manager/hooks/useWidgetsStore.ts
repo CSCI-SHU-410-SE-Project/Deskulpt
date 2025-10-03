@@ -13,7 +13,7 @@ export const useWidgetsStore = create(() => ({
 }));
 
 export async function rescan(initial: boolean = false) {
-  const configs = await commands.rescanWidgets();
+  const configs = await commands.core.rescanWidgets();
 
   let widgetsArray;
   if (initial) {
@@ -45,7 +45,7 @@ export async function rescan(initial: boolean = false) {
 
   const event = widgetsArray.map(([id, { settings }]) => ({ id, settings }));
   if (initial) {
-    await commands.emitOnRenderReady({ event });
+    await commands.core.emitOnRenderReady({ event });
   } else {
     await events.renderWidgets.emitTo("canvas", event);
   }

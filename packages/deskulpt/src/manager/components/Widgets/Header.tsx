@@ -19,7 +19,7 @@ const Header = memo(({ id }: HeaderProps) => {
   }, [id]);
 
   const openAction = useCallback(() => {
-    commands.openWidget({ id }).catch(console.error);
+    commands.core.openWidget({ id }).catch(console.error);
   }, [id]);
 
   return (

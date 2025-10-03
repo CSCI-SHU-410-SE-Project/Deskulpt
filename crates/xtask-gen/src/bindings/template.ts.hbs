@@ -46,14 +46,18 @@ export const events = {
 
 export const commands = {
 {{#each commands}}
-{{indent doc 2}}
-  {{this.key}}: ({{#if this.args}}payload: {
+  {{@key}}: {
+{{#each this}}
+{{indent doc 4}}
+    {{this.key}}: ({{#if this.args}}payload: {
 {{#each this.args}}
-    {{this.name}}: {{this.ty}},
+      {{this.name}}: {{this.ty}},
 {{/each}}
-  }{{/if}}) => invoke<{{this.ret_ty}}>("{{this.name}}"{{#if this.args}}, payload{{/if}}),
+    }{{/if}}) => invoke<{{this.ret_ty}}>("{{#if this.plugin_name}}plugin:{{this.plugin_name}}|{{this.name}}{{else}}{{this.name}}{{/if}}"{{#if this.args}}, payload{{/if}}),
 {{#unless @last}}
 
 {{/unless}}
+{{/each}}
+  },
 {{/each}}
 };

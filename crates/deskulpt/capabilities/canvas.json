@@ -4,10 +4,10 @@
   "description": "Capabilities of the canvas window.",
   "windows": ["canvas"],
   "permissions": [
-    "allow-bundle-widget",
-    "allow-call-plugin",
-    "allow-set-render-ready",
-    "allow-update-settings",
+    "deskulpt-core:allow-bundle-widget",
+    "deskulpt-core:allow-call-plugin",
+    "deskulpt-core:allow-set-render-ready",
+    "deskulpt-core:allow-update-settings",
     "core:event:default",
     "opener:allow-open-url",
     "opener:allow-default-urls"

@@ -11,7 +11,7 @@ use deskulpt_core::states::{
 use deskulpt_core::tray::TrayExt;
 use deskulpt_core::window::WindowExt;
 use tauri::image::Image;
-use tauri::{generate_context, generate_handler, include_image, Builder};
+use tauri::{generate_context, include_image, Builder};
 
 /// Image object for the Deskulpt icon.
 const DESKULPT_ICON: Image = include_image!("./icons/icon.png");
@@ -39,16 +39,6 @@ pub fn run() {
 
             Ok(())
         })
-        .invoke_handler(generate_handler![
-            deskulpt_core::commands::bundle_widget,
-            deskulpt_core::commands::call_plugin,
-            deskulpt_core::commands::emit_on_render_ready,
-            deskulpt_core::commands::exit_app,
-            deskulpt_core::commands::open_widget,
-            deskulpt_core::commands::rescan_widgets,
-            deskulpt_core::commands::set_render_ready,
-            deskulpt_core::commands::update_settings,
-        ])
         .on_window_event(deskulpt_core::window::on_window_event)
         .plugin(tauri_plugin_clipboard_manager::init())
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())
@@ -59,6 +49,7 @@ pub fn run() {
                 .open_js_links_on_click(false)
                 .build(),
         )
+        .plugin(deskulpt_core::init())
         .run(generate_context!())
         .expect("Error running the Deskulpt application");
 }

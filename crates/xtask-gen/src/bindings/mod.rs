@@ -1,4 +1,6 @@
-use anyhow::Result;
+use std::collections::BTreeMap;
+
+use anyhow::{anyhow, Result};
 use deskulpt_common::bindings::{Bindings, BindingsBuilder};
 use handlebars::{Context, Handlebars, Helper, HelperResult, Output, RenderContext};
 use heck::ToLowerCamelCase;
@@ -56,16 +58,23 @@ impl CommandArgTemplate {
 struct CommandTemplate {
     key: String,
     name: String,
+    plugin_name: String,
     args: Vec<CommandArgTemplate>,
     ret_ty: String,
     doc: String,
 }
 
 impl CommandTemplate {
-    fn from(ts: &Typescript, tcl: &TypeCollection, function: &Function) -> Result<Self> {
+    fn from(
+        ts: &Typescript,
+        tcl: &TypeCollection,
+        plugin_name: &str,
+        function: &Function,
+    ) -> Result<Self> {
         Ok(Self {
             key: function.name().to_lower_camel_case(),
             name: function.name().to_string(),
+            plugin_name: plugin_name.to_string(),
             args: function
                 .args()
                 .map(|(name, ty)| CommandArgTemplate::from(ts, tcl, name, ty))
@@ -94,7 +103,7 @@ impl CommandTemplate {
 struct Template {
     types: Vec<String>,
     events: Vec<EventTemplate>,
-    commands: Vec<CommandTemplate>,
+    commands: BTreeMap<String, Vec<CommandTemplate>>,
 }
 
 impl Template {
@@ -113,8 +122,22 @@ impl Template {
             commands: bindings
                 .commands
                 .iter()
-                .map(|function| CommandTemplate::from(&ts, &bindings.types, function))
-                .collect::<Result<Vec<_>>>()?,
+                .map(|(plugin_name, functions)| {
+                    let fns = functions
+                        .iter()
+                        .map(|function| {
+                            CommandTemplate::from(&ts, &bindings.types, plugin_name, function)
+                        })
+                        .collect::<Result<Vec<_>>>()?;
+                    let key = plugin_name
+                        .strip_prefix("deskulpt-")
+                        .map(ToLowerCamelCase::to_lower_camel_case)
+                        .ok_or_else(|| {
+                            anyhow!("Plugin name must start with 'deskulpt-'; got '{plugin_name}'")
+                        })?;
+                    Ok((key, fns))
+                })
+                .collect::<Result<BTreeMap<_, _>>>()?,
         })
     }
 }

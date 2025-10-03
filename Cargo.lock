@@ -1228,6 +1228,7 @@ dependencies = [
  "serialize-to-javascript",
  "specta",
  "tauri",
+ "tauri-plugin",
  "tauri-plugin-global-shortcut",
  "thiserror 2.0.17",
  "tokio",
