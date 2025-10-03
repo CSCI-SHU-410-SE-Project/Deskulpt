@@ -6,20 +6,21 @@
   "properties": {
     "app": {
       "description": "Application-wide settings.",
-      "$ref": "#/$defs/AppSettings"
+      "$ref": "#/$defs/AppSettings",
+      "default": {
+        "theme": "light",
+        "shortcuts": {}
+      }
     },
     "widgets": {
       "description": "The mapping from widget IDs to their respective settings.",
       "type": "object",
       "additionalProperties": {
         "$ref": "#/$defs/WidgetSettings"
-      }
+      },
+      "default": {}
     }
   },
-  "required": [
-    "app",
-    "widgets"
-  ],
   "$defs": {
     "AppSettings": {
       "description": "Application-wide settings.",
@@ -27,20 +28,18 @@
       "properties": {
         "theme": {
           "description": "The application theme.",
-          "$ref": "#/$defs/Theme"
+          "$ref": "#/$defs/Theme",
+          "default": "light"
         },
         "shortcuts": {
           "description": "The keyboard shortcuts.",
           "type": "object",
           "additionalProperties": {
             "type": "string"
-          }
+          },
+          "default": {}
         }
-      },
-      "required": [
-        "theme",
-        "shortcuts"
-      ]
+      }
     },
     "Theme": {
       "description": "Light/dark theme of the application.",
@@ -57,24 +56,24 @@
         "x": {
           "description": "The leftmost x-coordinate in pixels.",
           "type": "integer",
-          "format": "int32"
+          "format": "int32",
+          "default": 0
         },
         "y": {
           "description": "The topmost y-coordinate in pixels.",
           "type": "integer",
-          "format": "int32"
+          "format": "int32",
+          "default": 0
         },
         "opacity": {
           "description": "The opacity in percentage.",
           "type": "integer",
-          "format": "int32"
+          "format": "uint8",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 100
         }
-      },
-      "required": [
-        "x",
-        "y",
-        "opacity"
-      ]
+      }
     }
   }
 }

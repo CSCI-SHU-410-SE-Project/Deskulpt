@@ -59,6 +59,7 @@ pub struct WidgetSettings {
     pub y: i32,
     /// The opacity in percentage.
     #[serde(deserialize_with = "WidgetSettings::deserialize_opacity")]
+    #[schemars(range(min = 1, max = 100))]
     pub opacity: u8,
 }
 
@@ -82,7 +83,7 @@ impl WidgetSettings {
         D: Deserializer<'de>,
     {
         match u8::deserialize(deserializer) {
-            Ok(opacity) => Ok(opacity.min(100)),
+            Ok(opacity) => Ok(opacity.clamp(1, 100)),
             Err(_) => Ok(100),
         }
     }
