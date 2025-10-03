@@ -3,15 +3,17 @@
 use std::time::Duration;
 
 use anyhow::Result;
+use deskulpt_common::event::Event;
+use deskulpt_common::window::DeskulptWindow;
 use tauri::image::Image;
 use tauri::menu::{MenuBuilder, MenuEvent, MenuItemBuilder};
 use tauri::tray::{MouseButton, MouseButtonState, TrayIcon, TrayIconBuilder, TrayIconEvent};
 use tauri::{App, AppHandle, Runtime};
 use tokio::time::sleep;
 
-use crate::events::{Event, ExitAppEvent};
+use crate::events::ExitAppEvent;
 use crate::states::CanvasImodeStateExt;
-use crate::window::{DeskulptWindow, WindowExt};
+use crate::window::WindowExt;
 
 /// Extention trait for system tray-related operations.
 pub trait TrayExt<R: Runtime>: CanvasImodeStateExt<R> {

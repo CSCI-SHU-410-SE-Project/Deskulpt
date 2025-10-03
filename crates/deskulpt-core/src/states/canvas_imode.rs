@@ -3,11 +3,12 @@
 use std::sync::Mutex;
 
 use anyhow::Result;
+use deskulpt_common::event::Event;
+use deskulpt_common::window::DeskulptWindow;
 use tauri::menu::MenuItem;
 use tauri::{App, AppHandle, Emitter, Manager, Runtime, WebviewWindow};
 
-use crate::events::{Event, ShowToastEvent};
-use crate::window::DeskulptWindow;
+use crate::events::ShowToastEvent;
 
 /// Canvas interaction mode.
 #[derive(Clone)]

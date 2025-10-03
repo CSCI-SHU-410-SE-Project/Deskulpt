@@ -1195,11 +1195,22 @@ dependencies = [
 ]
 
 [[package]]
-name = "deskulpt-core"
+name = "deskulpt-common"
 version = "0.0.1"
 dependencies = [
  "anyhow",
  "deskulpt-macros",
+ "serde",
+ "specta",
+ "tauri",
+]
+
+[[package]]
+name = "deskulpt-core"
+version = "0.0.1"
+dependencies = [
+ "anyhow",
+ "deskulpt-common",
  "deskulpt-plugin",
  "deskulpt-plugin-fs",
  "deskulpt-plugin-sys",
@@ -7933,6 +7944,7 @@ version = "0.0.1"
 dependencies = [
  "anyhow",
  "clap",
+ "deskulpt-common",
  "deskulpt-core",
  "deskulpt-workspace",
  "handlebars",
@@ -7941,7 +7953,6 @@ dependencies = [
  "serde",
  "specta",
  "specta-typescript",
- "tauri",
 ]
 
 [[package]]
