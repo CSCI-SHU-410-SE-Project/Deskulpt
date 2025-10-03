@@ -4,6 +4,7 @@ mod template;
 use std::collections::BTreeMap;
 
 use anyhow::Result;
+use deskulpt_core::events::Event;
 use handlebars::Handlebars;
 use regex::Regex;
 use specta::datatype::{DataType, Function};
@@ -33,21 +34,19 @@ pub fn run() -> Result<()> {
     let mut events = BTreeMap::new();
 
     macro_rules! add_event {
-        ($name:literal, $ty:path) => {
+        ($ty:path) => {
+            let name = <$ty as Event>::NAME;
             let dt = <$ty as Type>::reference(&mut types, &[]).inner;
-            events.insert($name, dt);
+            events.insert(name, dt);
         };
     }
 
-    add_event!("exit-app", deskulpt_core::events::ExitAppEvent);
-    add_event!("remove-widgets", deskulpt_core::events::RemoveWidgetsEvent);
-    add_event!("render-widgets", deskulpt_core::events::RenderWidgetsEvent);
-    add_event!("show-toast", deskulpt_core::events::ShowToastEvent);
-    add_event!("switch-theme", deskulpt_core::events::SwitchThemeEvent);
-    add_event!(
-        "update-settings",
-        deskulpt_core::events::UpdateSettingsEvent
-    );
+    add_event!(deskulpt_core::events::ExitAppEvent);
+    add_event!(deskulpt_core::events::RemoveWidgetsEvent);
+    add_event!(deskulpt_core::events::RenderWidgetsEvent);
+    add_event!(deskulpt_core::events::ShowToastEvent);
+    add_event!(deskulpt_core::events::SwitchThemeEvent);
+    add_event!(deskulpt_core::events::UpdateSettingsEvent);
 
     {
         type T = deskulpt_core::window::DeskulptWindow;
