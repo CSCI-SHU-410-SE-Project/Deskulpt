@@ -45,7 +45,7 @@ deskulpt-plugin-sys = { workspace = true }
 objc2 = { workspace = true }
 
 [build-dependencies]
-tauri-plugin = { workspace = true }
+deskulpt-build = { workspace = true }
 
 [package.metadata.docs.rs]
 rustdoc-args = ["--extend-css", "../rustdoc.css"]

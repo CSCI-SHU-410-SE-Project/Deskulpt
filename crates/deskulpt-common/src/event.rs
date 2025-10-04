@@ -1,8 +1,6 @@
 //! Common utilities for Deskulpt events.
 
 use anyhow::Result;
-/// Derive the [`Event`] trait for a struct.
-pub use deskulpt_macros::Event;
 use serde::Serialize;
 use tauri::{Emitter, Runtime};
 
@@ -35,3 +33,6 @@ pub trait Event: specta::Type + Serialize {
         Ok(())
     }
 }
+
+/// Derive the [`Event`] trait for a struct.
+pub use deskulpt_macros::Event;
