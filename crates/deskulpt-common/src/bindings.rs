@@ -89,6 +89,6 @@ macro_rules! __configure_bindings_builder {
 /// Configure a [`BindingsBuilder`] with the commands and events of this crate.
 ///
 /// The internals of this function are generated at build time, so one must
-/// configure the build script correctly.
+/// configure the build script correctly with `deskulpt-build`.
 #[doc(inline)]
 pub use __configure_bindings_builder as configure_bindings_builder;
