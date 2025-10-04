@@ -19,7 +19,7 @@ pub mod window;
 
 deskulpt_common::bindings::configure_bindings_builder!();
 
-/// Initialize the `deskulpt-core` plugin.
+/// Initialize the plugin.
 pub fn init<R: Runtime>() -> TauriPlugin<R> {
     deskulpt_common::init::init_builder!().build()
 }
