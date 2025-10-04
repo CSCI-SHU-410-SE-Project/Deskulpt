@@ -43,6 +43,7 @@ tokio                          = "1.47.1"
 uuid                           = "1.16.0"
 
 # Deskulpt crates
+deskulpt-build         = { version = "0.0.1", path = "crates/deskulpt-build" }
 deskulpt-common        = { version = "0.0.1", path = "crates/deskulpt-common" }
 deskulpt-core          = { version = "0.0.1", path = "crates/deskulpt-core" }
 deskulpt-macros        = { version = "0.0.1", path = "crates/deskulpt-macros" }

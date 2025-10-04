@@ -1,4 +1,4 @@
-//! Common utilities for Deskulpt bindings.
+//! Common utilities for declaring Deskulpt bindings.
 
 use std::collections::BTreeMap;
 
@@ -20,6 +20,9 @@ pub struct Bindings {
 }
 
 /// Builder for a [`Bindings`] instance.
+///
+/// This should never be constructed manually in bindings providers; instead,
+/// configure the build script and use [`configure_bindings_builder!`].
 #[derive(Default)]
 pub struct BindingsBuilder {
     types: TypeCollection,
@@ -70,4 +73,22 @@ impl BindingsBuilder {
 }
 
 /// Used in [`BindingsBuilder::commands`].
+///
+/// <div style="display: none;">
+#[doc(inline)]
 pub use specta::function::collect_functions as collect_commands;
+
+#[doc(hidden)]
+#[macro_export]
+macro_rules! __configure_bindings_builder {
+    () => {
+        include!(concat!(env!("OUT_DIR"), "/configure_bindings_builder.rs"));
+    };
+}
+
+/// Configure a [`BindingsBuilder`] with the commands and events of this crate.
+///
+/// The internals of this function are generated at build time, so one must
+/// configure the build script correctly with `deskulpt-build`.
+#[doc(inline)]
+pub use __configure_bindings_builder as configure_bindings_builder;

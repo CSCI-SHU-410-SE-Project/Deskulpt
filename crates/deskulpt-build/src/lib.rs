@@ -1,0 +1,121 @@
+#![doc = include_str!("../README.md")]
+#![doc(
+    html_logo_url = "https://github.com/CSCI-SHU-410-SE-Project/Deskulpt/raw/main/packages/deskulpt/public/deskulpt.svg",
+    html_favicon_url = "https://github.com/CSCI-SHU-410-SE-Project/Deskulpt/raw/main/packages/deskulpt/public/deskulpt.svg"
+)]
+
+use std::path::PathBuf;
+
+use anyhow::{anyhow, bail, Context, Result};
+use quote::{format_ident, quote};
+
+/// Builder for build-time configuration of Deskulpt.
+#[derive(Default)]
+pub struct Builder {
+    commands: &'static [&'static str],
+    events: &'static [&'static str],
+    commands_mod: Option<&'static str>,
+    events_mod: Option<&'static str>,
+}
+
+impl Builder {
+    /// Set the commands for the builder.
+    ///
+    /// These will be used for configuring the bindings builder and the Tauri
+    /// plugin builder, and for generating plugin initialization code.
+    pub fn commands(&mut self, commands: &'static [&'static str]) -> &mut Self {
+        self.commands = commands;
+        self
+    }
+
+    /// Set the events for the builder.
+    ///
+    /// These will be used for configuring the bindings builder.
+    pub fn events(&mut self, events: &'static [&'static str]) -> &mut Self {
+        self.events = events;
+        self
+    }
+
+    /// Set the module of the commands.
+    ///
+    /// If not set, defaults to `crate::commands`.
+    pub fn commands_mod(&mut self, module: &'static str) -> &mut Self {
+        self.commands_mod = Some(module);
+        self
+    }
+
+    /// Set the module of the events.
+    ///
+    /// If not set, defaults to `crate::events`.
+    pub fn events_mod(&mut self, module: &'static str) -> &mut Self {
+        self.events_mod = Some(module);
+        self
+    }
+
+    /// Run the build process, returning an error if it fails.
+    pub fn try_build(&self) -> Result<()> {
+        let name = env!("CARGO_PKG_NAME");
+        if !name.starts_with("deskulpt-") {
+            bail!("Plugin crate names must start with 'deskulpt-'; got '{name}'");
+        }
+
+        let commands_mod: syn::Path =
+            syn::parse_str(self.commands_mod.unwrap_or("crate::commands"))
+                .with_context(|| "Invalid commands_mod".to_string())?;
+        let events_mod: syn::Path = syn::parse_str(self.events_mod.unwrap_or("crate::events"))
+            .with_context(|| "Invalid events_mod".to_string())?;
+
+        let commands = self
+            .commands
+            .iter()
+            .map(|c| format_ident!("{c}"))
+            .collect::<Vec<_>>();
+        let events = self
+            .events
+            .iter()
+            .map(|e| format_ident!("{e}"))
+            .collect::<Vec<_>>();
+
+        let configure_bindings_builder = quote! {
+            #[doc(hidden)]
+            pub fn configure_bindings_builder(builder: &mut ::deskulpt_common::bindings::BindingsBuilder) {
+                builder
+                    .commands(
+                        env!("CARGO_PKG_NAME"),
+                        ::deskulpt_common::bindings::collect_commands![
+                            #( #commands_mod::#commands::<::tauri::Wry> ),*
+                        ],
+                    )
+                    #( .event::<#events_mod::#events>() )*;
+            }
+        };
+
+        let init_builder = quote! {
+            ::tauri::plugin::Builder::new(env!("CARGO_PKG_NAME"))
+                .invoke_handler(::tauri::generate_handler![
+                    #( #commands_mod::#commands ),*
+                ])
+        };
+
+        let out_dir = std::env::var("OUT_DIR").map_err(|_| anyhow!("OUT_DIR not set"))?;
+        let out_dir = PathBuf::from(out_dir);
+
+        std::fs::write(
+            out_dir.join("configure_bindings_builder.rs"),
+            configure_bindings_builder.to_string(),
+        )?;
+
+        std::fs::write(out_dir.join("init_builder.rs"), init_builder.to_string())?;
+
+        tauri_plugin::Builder::new(self.commands).try_build()?;
+        Ok(())
+    }
+
+    /// Same as [`Self::try_build`], but exits automatically on error.
+    pub fn build(&self) {
+        if let Err(error) = self.try_build() {
+            println!("{}: {error:#}", env!("CARGO_PKG_NAME"));
+            std::process::exit(1);
+        }
+    }
+}
