@@ -84,8 +84,8 @@ impl Builder {
         };
 
         let init_builder = quote! {
-            tauri::plugin::Builder::new(env!("CARGO_PKG_NAME"))
-                .invoke_handler(generate_handler![
+            ::tauri::plugin::Builder::new(env!("CARGO_PKG_NAME"))
+                .invoke_handler(::tauri::generate_handler![
                     #( #commands_mod::#commands ),*
                 ])
         };

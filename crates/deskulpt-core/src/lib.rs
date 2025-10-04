@@ -5,7 +5,7 @@
 )]
 
 use tauri::plugin::TauriPlugin;
-use tauri::{generate_handler, Runtime};
+use tauri::Runtime;
 
 mod bundler;
 mod commands;
