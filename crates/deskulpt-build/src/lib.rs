@@ -1,8 +1,15 @@
+#![doc = include_str!("../README.md")]
+#![doc(
+    html_logo_url = "https://github.com/CSCI-SHU-410-SE-Project/Deskulpt/raw/main/packages/deskulpt/public/deskulpt.svg",
+    html_favicon_url = "https://github.com/CSCI-SHU-410-SE-Project/Deskulpt/raw/main/packages/deskulpt/public/deskulpt.svg"
+)]
+
 use std::path::PathBuf;
 
 use anyhow::{anyhow, bail, Context, Result};
 use quote::{format_ident, quote};
 
+/// Builder for build-time configuration of Deskulpt.
 #[derive(Default)]
 pub struct Builder {
     commands: &'static [&'static str],
@@ -31,7 +38,7 @@ impl Builder {
 
     /// Set the module of the commands.
     ///
-    /// If not set, defaults to "crate::commands".
+    /// If not set, defaults to `crate::commands`.
     pub fn commands_mod(&mut self, module: &'static str) -> &mut Self {
         self.commands_mod = Some(module);
         self
@@ -39,14 +46,14 @@ impl Builder {
 
     /// Set the module of the events.
     ///
-    /// If not set, defaults to "crate::events".
+    /// If not set, defaults to `crate::events`.
     pub fn events_mod(&mut self, module: &'static str) -> &mut Self {
         self.events_mod = Some(module);
         self
     }
 
     /// Run the build process, returning an error if it fails.
-    fn try_build(&self) -> Result<()> {
+    pub fn try_build(&self) -> Result<()> {
         let name = env!("CARGO_PKG_NAME");
         if !name.starts_with("deskulpt-") {
             bail!("Plugin crate names must start with 'deskulpt-'; got '{name}'");
@@ -54,9 +61,9 @@ impl Builder {
 
         let commands_mod: syn::Path =
             syn::parse_str(self.commands_mod.unwrap_or("crate::commands"))
-                .with_context(|| format!("Invalid commands_mod"))?;
+                .with_context(|| "Invalid commands_mod".to_string())?;
         let events_mod: syn::Path = syn::parse_str(self.events_mod.unwrap_or("crate::events"))
-            .with_context(|| format!("Invalid events_mod"))?;
+            .with_context(|| "Invalid events_mod".to_string())?;
 
         let commands = self
             .commands
