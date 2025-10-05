@@ -40,6 +40,9 @@ inputs:
     type: string
     required: true
     default: ""
+    options:
+      - "" # Empty string never hits any cache, effectively disabling caching
+      - debug
 
   save-cache:
     description: Whether to save the cache.

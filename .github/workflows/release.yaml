@@ -34,7 +34,8 @@ jobs:
 
       - uses: ./.github/actions/setup-node
 
-      - uses: tauri-apps/tauri-action@v0
+      - name: Build Deskulpt
+        uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
