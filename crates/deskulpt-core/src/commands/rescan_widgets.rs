@@ -36,7 +36,10 @@ pub async fn rescan_widgets<R: Runtime>(
         }
 
         if let Some(widget_config) = WidgetConfig::load(&path) {
-            let id = widget_config.id();
+            // Since each widget must be at the top level of the widgets
+            // directory, the directory names must be unique and we can use
+            // them as widget IDs
+            let id = entry.file_name().to_string_lossy().to_string();
             new_config_map.insert(id, widget_config);
         }
     }

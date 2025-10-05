@@ -40,10 +40,10 @@ const Trigger = memo(({ id, value }: TriggerProps) => {
           height="6px"
           css={[
             styles.indicator,
-            config.type === "invalid" && styles.indicatorInvalid,
+            config.type === "err" && styles.indicatorInvalid,
           ]}
         />
-        <Text>{config.dir}</Text>
+        <Text>{id}</Text>
       </Flex>
     </Tabs.Trigger>
   );

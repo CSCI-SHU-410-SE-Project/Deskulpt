@@ -1,10 +1,8 @@
 //! State management for the widget configuration map.
 
 use std::collections::HashMap;
-use std::path::PathBuf;
 use std::sync::RwLock;
 
-use anyhow::{anyhow, Result};
 use tauri::{App, AppHandle, Manager, Runtime};
 
 use crate::config::WidgetConfig;
@@ -19,23 +17,6 @@ pub trait WidgetConfigMapStateExt<R: Runtime>: Manager<R> + PathExt<R> {
     /// Initialize state management for the widget configuration map.
     fn manage_widget_config_map(&self) {
         self.manage(WidgetConfigMapState::default());
-    }
-
-    /// Get the directory of a widget by ID.
-    ///
-    /// This will error if the widgets directory cannot be accessed or if the
-    /// widget is not found in the collection.
-    fn widget_dir<S: AsRef<str>>(&self, id: S) -> Result<PathBuf> {
-        let widgets_dir = self.widgets_dir()?;
-        let id = id.as_ref();
-
-        let state = self.state::<WidgetConfigMapState>();
-        let widget_config_map = state.0.read().unwrap();
-        let widget_config = widget_config_map
-            .get(id)
-            .ok_or_else(|| anyhow!("Widget {id} not found in the collection"))?;
-
-        Ok(widgets_dir.join(widget_config.dir()))
     }
 
     /// Provide reference to the widget configuration map within a closure.

@@ -23,23 +23,21 @@ const Config = memo(({ id }: ConfigProps) => {
   return (
     <ScrollArea asChild>
       <Box height="200px" pr="3" pb="3">
-        {config.type === "valid" ? (
+        {config.type === "ok" ? (
           <Table.Root size="1" layout="fixed" css={styles.table}>
             <Table.Body>
               <Table.Row align="center">
                 <Table.RowHeaderCell>Name</Table.RowHeaderCell>
-                <Table.Cell>{config.deskulptConf.name}</Table.Cell>
+                <Table.Cell>{config.name}</Table.Cell>
               </Table.Row>
               <Table.Row align="center">
                 <Table.RowHeaderCell>Entry</Table.RowHeaderCell>
-                <Table.Cell>{config.deskulptConf.entry}</Table.Cell>
+                <Table.Cell>{config.entry}</Table.Cell>
               </Table.Row>
               <Table.Row align="center">
                 <Table.RowHeaderCell>Dependencies</Table.RowHeaderCell>
                 <Table.Cell>
-                  <Dependencies
-                    dependencies={config.packageJson?.dependencies}
-                  />
+                  <Dependencies dependencies={config.dependencies} />
                 </Table.Cell>
               </Table.Row>
             </Table.Body>

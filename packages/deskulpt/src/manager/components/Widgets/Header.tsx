@@ -24,7 +24,7 @@ const Header = memo(({ id }: HeaderProps) => {
 
   return (
     <Flex align="center" justify="between">
-      <Badge color={type === "valid" ? "gray" : "red"}>ID: {id}</Badge>
+      <Badge color={type === "ok" ? "gray" : "red"}>ID: {id}</Badge>
       <Flex align="center" gap="2">
         <Button
           title="Refresh this widget"

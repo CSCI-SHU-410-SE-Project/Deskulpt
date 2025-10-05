@@ -53,9 +53,7 @@ export async function rescan(initial: boolean = false) {
   // Sort widgets by their directory name
   useWidgetsStore.setState({
     widgets: Object.fromEntries(
-      widgetsArray.toSorted(([, a], [, b]) =>
-        a.config.dir.localeCompare(b.config.dir),
-      ),
+      widgetsArray.toSorted(([a], [b]) => a.localeCompare(b)),
     ),
   });
 

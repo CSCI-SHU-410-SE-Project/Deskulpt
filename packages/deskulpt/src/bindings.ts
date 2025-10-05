@@ -21,25 +21,6 @@ theme: Theme;
 shortcuts: Partial<{ [key in ShortcutKey]: string }> }
 
 /**
- * Deserialized `deskulpt.conf.json`.
- */
-export type DeskulptConf = { 
-/**
- * The name of the widget.
- * 
- * This is purely used for display purposes. It does not need to be related
- * to the widget directory name, and it does not need to be unique.
- */
-name: string; 
-/**
- * The entry point of the widget.
- * 
- * This is the path to the file that exports the widget component. The path
- * should be relative to the widget directory.
- */
-entry: string }
-
-/**
  * Deskulpt window enum.
  */
 export type DeskulptWindow = 
@@ -61,11 +42,6 @@ export type DeskulptWindow =
 export type ExitAppEvent = null
 
 export type JsonValue = null | boolean | number | string | JsonValue[] | { [key in string]: JsonValue }
-
-/**
- * Deserialized `package.json`.
- */
-export type PackageJson = { dependencies?: { [key in string]: string } }
 
 /**
  * Event for removing widgets.
@@ -220,13 +196,13 @@ opacity?: number }
  */
 export type WidgetConfig = 
 /**
- * Valid widget configuration.
+ * Valid configuration of a widget.
  */
-{ type: "valid"; dir: string; deskulptConf: DeskulptConf; packageJson: PackageJson | null } | 
+{ type: "ok"; name: string; entry: string; dependencies: { [key in string]: string } } | 
 /**
- * Invalid widget configuration.
+ * Error information if a widget failed to load.
  */
-{ type: "invalid"; dir: string; error: string }
+{ type: "err"; error: string }
 
 /**
  * Per-widget settings.
