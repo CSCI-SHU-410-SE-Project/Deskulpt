@@ -13,9 +13,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # Prechecks should be kept cheap and platform-independent; they block the CI
-  # pipeline if they fail
-  ci-precheck:
+  # Cheap OS-agnostic checks
+  ci-hygiene:
     runs-on: ubuntu-latest
 
     steps:
@@ -63,10 +62,8 @@ jobs:
             exit 1
           fi
 
-  # Checks that do not fit into precheck, either because they are too expensive
-  # or because they are platform-dependent; they do not block the CI pipeline
-  ci-check:
-    needs: [ci-precheck]
+  # Platform-dependent checks
+  ci-verify:
     strategy:
       fail-fast: false
       matrix:
@@ -94,7 +91,6 @@ jobs:
         run: pnpm test
 
   ci-build:
-    needs: [ci-precheck]
     strategy:
       fail-fast: false
       matrix:
@@ -135,7 +131,7 @@ jobs:
           path: "${{ join(fromJSON(steps.build-deskulpt.outputs.artifactPaths), '\n') }}"
 
   ci-conclude:
-    needs: [ci-precheck, ci-check, ci-build]
+    needs: [ci-hygiene, ci-verify, ci-build]
     runs-on: ubuntu-latest
 
     steps:
