@@ -13,7 +13,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # Prechecks should be kept cheap and platform-agnostic; they block the CI
+  # Prechecks should be kept cheap and platform-independent; they block the CI
   # pipeline if they fail
   ci-precheck:
     runs-on: ubuntu-latest
@@ -64,7 +64,7 @@ jobs:
           fi
 
   # Checks that do not fit into precheck, either because they are too expensive
-  # or because they are platform-specific; they do not block the CI pipeline
+  # or because they are platform-dependent; they do not block the CI pipeline
   ci-check:
     needs: [ci-precheck]
     strategy:
