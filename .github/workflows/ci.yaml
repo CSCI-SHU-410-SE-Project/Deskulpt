@@ -14,6 +14,27 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  ci-commit-markers:
+    runs-on: ubuntu-latest
+    outputs:
+      ci-build-marker: ${{ steps.check-commit-markers.outputs.ci-build-marker }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Check commit markers
+        id: check-commit-markers
+        shell: bash
+        run: |
+          commit_message=$(git log -1 --pretty=%B)
+
+          if [[ "${{ github.event_name }}" == "pull_request" ]] || [[ "$commit_message" =~ \[ci-build\] ]]; then
+            echo "ci-build-marker=true" >> $GITHUB_OUTPUT
+          else
+            echo "ci-build-marker=false" >> $GITHUB_OUTPUT
+          fi
+
   ci-hygiene:
     runs-on: ubuntu-latest
 
@@ -95,7 +116,8 @@ jobs:
         run: pnpm test
 
   ci-build:
-    if: github.event_name != 'pull_request' || contains(github.event.head_commit.message, '[ci-build]')
+    needs: [ci-commit-markers]
+    if: needs.ci-commit-markers.outputs.ci-build-marker == 'true'
     strategy:
       fail-fast: false
       matrix:
