@@ -30,8 +30,8 @@ jobs:
       - name: Populate Rust cache
         run: |
           cargo check
-          cargo test --no-run
           cargo build
+          cargo test --no-run
 
   cache-release:
     strategy:

@@ -13,7 +13,9 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  ci-repo-check:
+  # Prechecks should be kept cheap and platform-agnostic; they block the CI
+  # pipeline if they fail
+  ci-precheck:
     runs-on: ubuntu-latest
 
     steps:
@@ -35,17 +37,17 @@ jobs:
       - name: Check unused cargo dependencies
         run: cargo shear
 
-      - name: Regenerate auto-generated files
+      - name: Check that auto-generated files are up-to-date
         env:
           RUST_BACKTRACE: 1
+        shell: bash
         run: |
+          # Re-generate auto-generated files
           pnpm build:packages
           pnpm build:schema
           cargo gen bindings
 
-      - name: Check that auto-generated files are up to date
-        shell: bash
-        run: |
+          # Check that there are no uncommitted changes
           set -euo pipefail
           if [ -n "$(git status --porcelain)" ]; then
             echo "::error::Auto-generated files are out of date"
@@ -61,7 +63,10 @@ jobs:
             exit 1
           fi
 
-  ci-lint:
+  # Checks that do not fit into precheck, either because they are too expensive
+  # or because they are platform-specific; they do not block the CI pipeline
+  ci-check:
+    needs: [ci-precheck]
     strategy:
       fail-fast: false
       matrix:
@@ -80,26 +85,8 @@ jobs:
 
       - uses: ./.github/actions/setup-node
 
-      - name: Lint codebase
+      - name: Check linting
         run: pnpm lint:check
-
-  ci-test:
-    strategy:
-      fail-fast: false
-      matrix:
-        platform: [macos-latest, ubuntu-latest, windows-latest]
-    runs-on: ${{ matrix.platform }}
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v5
-
-      - uses: ./.github/actions/setup-rust
-        with:
-          platform: ${{ matrix.platform }}
-          cache-key: debug
-
-      - uses: ./.github/actions/setup-node
 
       - name: Run test suite
         env:
@@ -107,6 +94,7 @@ jobs:
         run: pnpm test
 
   ci-build:
+    needs: [ci-precheck]
     strategy:
       fail-fast: false
       matrix:
@@ -145,3 +133,12 @@ jobs:
         with:
           name: binaries-${{ matrix.platform }}-${{ matrix.target }}
           path: "${{ join(fromJSON(steps.build-deskulpt.outputs.artifactPaths), '\n') }}"
+
+  ci-conclude:
+    needs: [ci-precheck, ci-check, ci-build]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Conclude
+        shell: bash
+        run: echo "✅ CI pipeline completed successfully!"
