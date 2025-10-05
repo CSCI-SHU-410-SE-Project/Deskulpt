@@ -31,11 +31,11 @@ jobs:
         with:
           platform: ${{ matrix.platform }}
           targets: ${{ matrix.target }}
-          cache-key: release-${{ matrix.target }}
 
       - uses: ./.github/actions/setup-node
 
-      - uses: tauri-apps/tauri-action@v0
+      - name: Build Deskulpt
+        uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -44,17 +44,3 @@ jobs:
           releaseName: "Deskulpt v__VERSION__"
           releaseDraft: true
           prerelease: false
-          releaseBody: |
-            ## Download Deskulpt v__VERSION__
-
-            | Platform              | Format        | Download                                                                                                                                                      |
-            |-----------------------|---------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------|
-            | Linux                 | RPM package   | [Deskulpt-__VERSION__-1.x86_64.rpm](https://github.com/CSCI-SHU-410-SE-Project/Deskulpt/releases/download/v__VERSION__/Deskulpt-__VERSION__-1.x86_64.rpm)     |
-            | Linux                 | DEB package   | [Deskulpt___VERSION___amd64.deb](https://github.com/CSCI-SHU-410-SE-Project/Deskulpt/releases/download/v__VERSION__/Deskulpt___VERSION___amd64.deb)           |
-            | Linux                 | AppImage      | [Deskulpt___VERSION___amd64.AppImage](https://github.com/CSCI-SHU-410-SE-Project/Deskulpt/releases/download/v__VERSION__/Deskulpt___VERSION___amd64.AppImage) |
-            | macOS (Apple Silicon) | DMG installer | [Deskulpt___VERSION___aarch64.dmg](https://github.com/CSCI-SHU-410-SE-Project/Deskulpt/releases/download/v__VERSION__/Deskulpt___VERSION___aarch64.dmg)       |
-            | macOS (Apple Silicon) | Tarball       | [Deskulpt_aarch64.app.tar.gz](https://github.com/CSCI-SHU-410-SE-Project/Deskulpt/releases/download/v__VERSION__/Deskulpt_aarch64.app.tar.gz)                 |
-            | macOS (Intel)         | DMG installer | [Deskulpt___VERSION___x64.dmg](https://github.com/CSCI-SHU-410-SE-Project/Deskulpt/releases/download/v__VERSION__/Deskulpt___VERSION___x64.dmg)               |
-            | macOS (Intel)         | Tarball       | [Deskulpt_x64.app.tar.gz](https://github.com/CSCI-SHU-410-SE-Project/Deskulpt/releases/download/v__VERSION__/Deskulpt_x64.app.tar.gz)                         |
-            | Windows               | MSI installer | [Deskulpt___VERSION___x64_en-US.msi](https://github.com/CSCI-SHU-410-SE-Project/Deskulpt/releases/download/v__VERSION__/Deskulpt___VERSION___x64_en-US.msi)   |
-            | Windows               | EXE installer | [Deskulpt___VERSION___x64-setup.exe](https://github.com/CSCI-SHU-410-SE-Project/Deskulpt/releases/download/v__VERSION__/Deskulpt___VERSION___x64-setup.exe)   |

@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -32,33 +33,3 @@ jobs:
           cargo check
           cargo build
           cargo test --no-run
-
-  cache-release:
-    strategy:
-      matrix:
-        include:
-          - platform: macos-latest
-            target: aarch64-apple-darwin
-          - platform: macos-latest
-            target: x86_64-apple-darwin
-          - platform: ubuntu-latest
-            target: x86_64-unknown-linux-gnu
-          - platform: windows-latest
-            target: x86_64-pc-windows-msvc
-    runs-on: ${{ matrix.platform }}
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v5
-
-      - uses: ./.github/actions/setup-rust
-        with:
-          platform: ${{ matrix.platform }}
-          targets: ${{ matrix.target }}
-          cache-key: release-${{ matrix.target }}
-          save-cache: true
-
-      - uses: ./.github/actions/setup-node
-
-      - name: Populate Rust cache
-        run: pnpm tauri build --target ${{ matrix.target }} --no-bundle

@@ -7,13 +7,13 @@ on:
   pull_request:
     branches:
       - main
+  workflow_dispatch:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  # Cheap OS-agnostic checks
   ci-hygiene:
     runs-on: ubuntu-latest
 
@@ -62,7 +62,6 @@ jobs:
             exit 1
           fi
 
-  # Platform-dependent checks
   ci-verify:
     strategy:
       fail-fast: false
@@ -85,12 +84,18 @@ jobs:
       - name: Check linting
         run: pnpm lint:check
 
-      - name: Run test suite
+      - name: Check build
+        run: |
+          pnpm --filter deskulpt build
+          cargo build -p deskulpt --bins
+
+      - name: Check tests
         env:
           RUST_BACKTRACE: 1
         run: pnpm test
 
   ci-build:
+    if: github.event_name != 'pull_request' || contains(github.event.head_commit.message, '[ci-build]')
     strategy:
       fail-fast: false
       matrix:
@@ -113,7 +118,6 @@ jobs:
         with:
           platform: ${{ matrix.platform }}
           targets: ${{ matrix.target }}
-          cache-key: release-${{ matrix.target }}
 
       - uses: ./.github/actions/setup-node
 
@@ -131,7 +135,7 @@ jobs:
           path: "${{ join(fromJSON(steps.build-deskulpt.outputs.artifactPaths), '\n') }}"
 
   ci-conclude:
-    needs: [ci-hygiene, ci-verify, ci-build]
+    needs: [ci-hygiene, ci-verify]
     runs-on: ubuntu-latest
 
     steps:

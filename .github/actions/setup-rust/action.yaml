@@ -40,6 +40,9 @@ inputs:
     type: string
     required: true
     default: ""
+    options:
+      - "" # Empty string never hits any cache, effectively disabling caching
+      - debug
 
   save-cache:
     description: Whether to save the cache.
@@ -64,11 +67,12 @@ runs:
         targets: ${{ inputs.targets }}
 
     - name: Setup cache
-      uses: swatinem/rust-cache@v2
+      uses: Swatinem/rust-cache@v2
       with:
         workspaces: . -> target
         shared-key: ${{ inputs.cache-key }}
         save-if: ${{ inputs.save-cache == 'true' }}
+        cache-bin: false
 
     - name: Install nightly rustfmt
       if: ${{ inputs.nightly-rustfmt }}
