@@ -1242,7 +1242,6 @@ dependencies = [
  "tauri-plugin-global-shortcut",
  "thiserror 2.0.17",
  "tokio",
- "uuid",
 ]
 
 [[package]]
@@ -5466,12 +5465,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "sha1_smol"
-version = "1.0.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bbfa15b3dddfee50a0fff136974b3e1bde555604ba463834a7eb7deb6417705d"
-
-[[package]]
 name = "sha2"
 version = "0.10.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -6794,7 +6787,6 @@ dependencies = [
  "getrandom 0.3.1",
  "js-sys",
  "serde",
- "sha1_smol",
  "wasm-bindgen",
 ]
 

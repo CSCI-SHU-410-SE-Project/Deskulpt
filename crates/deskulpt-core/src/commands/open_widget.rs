@@ -2,7 +2,6 @@ use tauri::{command, AppHandle, Runtime};
 
 use super::error::CmdResult;
 use crate::path::PathExt;
-use crate::states::WidgetConfigMapStateExt;
 
 /// Open the widgets directory or a specific widget directory.
 ///
@@ -23,7 +22,7 @@ pub async fn open_widget<R: Runtime>(
     let widgets_dir = app_handle.widgets_dir()?;
 
     if let Some(id) = id {
-        let widget_dir = app_handle.widget_dir(id)?;
+        let widget_dir = app_handle.widget_dir(&id)?;
         open::that_detached(widget_dir)?;
     } else {
         open::that_detached(widgets_dir)?;

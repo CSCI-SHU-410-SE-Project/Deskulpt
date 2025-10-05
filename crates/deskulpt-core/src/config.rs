@@ -8,10 +8,9 @@ use std::path::Path;
 use anyhow::{Context, Result};
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
-use uuid::Uuid;
 
 /// Deserialized `deskulpt.conf.json`.
-#[derive(Clone, Serialize, Deserialize, specta::Type)]
+#[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct DeskulptConf {
     /// The name of the widget.
@@ -33,7 +32,7 @@ pub struct DeskulptConf {
 }
 
 /// Deserialized `package.json`.
-#[derive(Clone, Default, Serialize, Deserialize, specta::Type)]
+#[derive(Debug, Default, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct PackageJson {
     #[serde(default)]
@@ -70,25 +69,23 @@ impl LoadFromFile for PackageJson {
 }
 
 /// Full configuration of a Deskulpt widget.
-#[derive(Clone, Serialize, specta::Type)]
+#[derive(Debug, Clone, Serialize, specta::Type)]
 #[serde(tag = "type", rename_all = "camelCase")]
 pub enum WidgetConfig {
-    /// Valid widget configuration.
+    /// Valid configuration of a widget.
     #[serde(rename_all = "camelCase")]
-    Valid {
-        /// The directory name of the widget.
-        dir: String,
-        /// The required `deskulpt.conf.json` configuration.
-        deskulpt_conf: DeskulptConf,
-        /// The optional `package.json` configuration.
-        package_json: Option<PackageJson>,
+    Ok {
+        /// The name of the widget.
+        name: String,
+        /// The entry point of the widget.
+        entry: String,
+        /// The dependencies of the widget.
+        dependencies: HashMap<String, String>,
     },
-    /// Invalid widget configuration.
+    /// Error information if a widget failed to load.
     #[serde(rename_all = "camelCase")]
-    Invalid {
-        /// The directory name of the widget.
-        dir: String,
-        /// Error message.
+    Err {
+        /// The error message.
         error: String,
     },
 }
@@ -100,15 +97,13 @@ impl WidgetConfig {
     /// directory, or if the widget is explicitly marked as ignored.
     pub fn load<P: AsRef<Path>>(dir: P) -> Option<Self> {
         let dir = dir.as_ref();
-        let dir_name = dir.file_name()?.to_string_lossy();
 
         let deskulpt_conf =
             match DeskulptConf::load(dir).context("Failed to load deskulpt.conf.json") {
                 Ok(Some(deskulpt_conf)) => deskulpt_conf,
                 Ok(None) => return None,
                 Err(e) => {
-                    return Some(WidgetConfig::Invalid {
-                        dir: dir_name.to_string(),
+                    return Some(WidgetConfig::Err {
                         error: format!("{e:?}"),
                     })
                 },
@@ -120,36 +115,18 @@ impl WidgetConfig {
         }
 
         let package_json = match PackageJson::load(dir).context("Failed to load package.json") {
-            Ok(package_json) => package_json,
+            Ok(package_json) => package_json.unwrap_or_default(),
             Err(e) => {
-                return Some(WidgetConfig::Invalid {
-                    dir: dir_name.to_string(),
+                return Some(WidgetConfig::Err {
                     error: format!("{e:?}"),
                 })
             },
         };
 
-        Some(WidgetConfig::Valid {
-            dir: dir_name.to_string(),
-            deskulpt_conf,
-            package_json,
+        Some(WidgetConfig::Ok {
+            name: deskulpt_conf.name,
+            entry: deskulpt_conf.entry,
+            dependencies: package_json.dependencies,
         })
-    }
-
-    /// Get the directory of the widget inside the widgets directory.
-    pub fn dir(&self) -> &str {
-        match self {
-            WidgetConfig::Valid { dir, .. } => dir,
-            WidgetConfig::Invalid { dir, .. } => dir,
-        }
-    }
-
-    /// Get the widget ID.
-    ///
-    /// This ID is derived from the widget directory name using UUID v5. It is
-    /// deterministic for the same directory name.
-    pub fn id(&self) -> String {
-        let dir_encoded = self.dir().as_bytes();
-        Uuid::new_v5(&Uuid::NAMESPACE_URL, dir_encoded).to_string()
     }
 }
