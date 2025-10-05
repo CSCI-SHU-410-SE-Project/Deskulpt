@@ -94,15 +94,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - platform: macos-latest
-            target: aarch64-apple-darwin
-          - platform: macos-latest
-            target: x86_64-apple-darwin
-          - platform: ubuntu-latest
-            target: x86_64-unknown-linux-gnu
-          - platform: windows-latest
-            target: x86_64-pc-windows-msvc
+        platform: [macos-latest, ubuntu-latest, windows-latest]
     runs-on: ${{ matrix.platform }}
 
     steps:
@@ -112,22 +104,19 @@ jobs:
       - uses: ./.github/actions/setup-rust
         with:
           platform: ${{ matrix.platform }}
-          targets: ${{ matrix.target }}
-          cache-key: release-${{ matrix.target }}
+          cache-key: release
 
       - uses: ./.github/actions/setup-node
 
       - name: Build Deskulpt
         id: build-deskulpt
         uses: tauri-apps/tauri-action@v0
-        with:
-          args: --target ${{ matrix.target }}
 
       - name: Upload build artifacts
         id: upload-artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: binaries-${{ matrix.platform }}-${{ matrix.target }}
+          name: binaries-${{ matrix.platform }}
           path: "${{ join(fromJSON(steps.build-deskulpt.outputs.artifactPaths), '\n') }}"
 
   ci-conclude:
