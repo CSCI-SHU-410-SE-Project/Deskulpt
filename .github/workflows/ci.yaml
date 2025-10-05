@@ -13,8 +13,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # Prechecks should be kept cheap and platform-independent; they block the CI
-  # pipeline if they fail
+  # Prechecks should be kept cheap, platform-independent, and runnable on Linux
+  # without the Tauri dependencies; they block the CI pipeline if they fail
   ci-precheck:
     runs-on: ubuntu-latest
 
@@ -28,6 +28,7 @@ jobs:
           cache-key: debug
           tools: cargo-shear
           nightly-rustfmt: true
+          tauri-deps: false
 
       - uses: ./.github/actions/setup-node
 

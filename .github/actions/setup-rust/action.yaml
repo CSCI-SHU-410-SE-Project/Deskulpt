@@ -35,6 +35,12 @@ inputs:
     required: true
     default: false
 
+  tauri-deps:
+    description: Whether to install Tauri dependencies for Linux.
+    type: boolean
+    required: true
+    default: true
+
   cache-key:
     description: The cache key.
     type: string
@@ -50,8 +56,8 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: Install Linux dependencies
-      if: inputs.platform == 'ubuntu-latest'
+    - name: Install Tauri dependencies
+      if: inputs.platform == 'ubuntu-latest' && inputs.tauri-deps == 'true'
       shell: bash
       run: |
         sudo apt-get update
