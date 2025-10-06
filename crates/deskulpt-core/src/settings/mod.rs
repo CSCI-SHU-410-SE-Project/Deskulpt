@@ -10,7 +10,7 @@ mod persistence;
 mod shortcuts;
 
 /// Light/dark theme of the application.
-#[derive(Clone, Default, Deserialize, Serialize, JsonSchema, specta::Type)]
+#[derive(Debug, Clone, Default, Deserialize, Serialize, JsonSchema, specta::Type)]
 #[serde(rename_all = "camelCase")]
 pub enum Theme {
     #[default]
@@ -20,7 +20,7 @@ pub enum Theme {
 
 /// Types of keyboard shortcuts in the application.
 #[derive(
-    Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Deserialize, Serialize, JsonSchema, specta::Type,
+    Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Deserialize, Serialize, JsonSchema, specta::Type,
 )]
 #[serde(rename_all = "camelCase")]
 pub enum ShortcutKey {
@@ -32,7 +32,7 @@ pub enum ShortcutKey {
 
 /// Application-wide settings.
 #[serde_as]
-#[derive(Clone, Default, Deserialize, Serialize, JsonSchema, specta::Type)]
+#[derive(Debug, Clone, Default, Deserialize, Serialize, JsonSchema, specta::Type)]
 #[serde(rename_all = "camelCase", default)]
 pub struct AppSettings {
     /// The application theme.
@@ -48,7 +48,7 @@ pub struct AppSettings {
 /// Different from widget configurations, these are independent of the widget
 /// configuration files and are managed internally by the application.
 #[serde_as]
-#[derive(Clone, Deserialize, Serialize, JsonSchema, specta::Type)]
+#[derive(Debug, Clone, Deserialize, Serialize, JsonSchema, specta::Type)]
 #[serde(rename_all = "camelCase", default)]
 pub struct WidgetSettings {
     /// The leftmost x-coordinate in pixels.
@@ -57,6 +57,12 @@ pub struct WidgetSettings {
     /// The topmost y-coordinate in pixels.
     #[serde_as(deserialize_as = "DefaultOnError")]
     pub y: i32,
+    /// The width in pixels.
+    #[serde_as(deserialize_as = "DefaultOnError")]
+    pub width: u32,
+    /// The height in pixels.
+    #[serde_as(deserialize_as = "DefaultOnError")]
+    pub height: u32,
     /// The opacity in percentage.
     #[serde(deserialize_with = "WidgetSettings::deserialize_opacity")]
     #[schemars(range(min = 1, max = 100))]
@@ -68,6 +74,8 @@ impl Default for WidgetSettings {
         Self {
             x: 0,
             y: 0,
+            width: 300,
+            height: 200,
             opacity: 100,
         }
     }
@@ -91,7 +99,7 @@ impl WidgetSettings {
 
 /// Full settings of the Deskulpt application.
 #[serde_as]
-#[derive(Clone, Default, Deserialize, Serialize, JsonSchema, specta::Type)]
+#[derive(Debug, Clone, Default, Deserialize, Serialize, JsonSchema, specta::Type)]
 #[serde(rename_all = "camelCase", default)]
 pub struct Settings {
     /// Application-wide settings.

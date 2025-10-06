@@ -1,5 +1,6 @@
-import { memo, useRef } from "react";
+import { memo, useCallback, useEffect, useRef, useState } from "react";
 import Draggable, { DraggableData, DraggableEvent } from "react-draggable";
+import { Resizable, ResizeCallback } from "re-resizable";
 import { ErrorBoundary } from "react-error-boundary";
 import ErrorDisplay from "./ErrorDisplay";
 import { stringifyError } from "../../utils/stringifyError";
@@ -29,29 +30,71 @@ interface WidgetContainerProps {
 }
 
 const WidgetContainer = memo(({ id }: WidgetContainerProps) => {
-  const { Component, width, height, x, y, opacity } = useWidgetsStore(
-    (state) => state.widgets[id],
-  );
-  const wrapperRef = useRef<HTMLDivElement>(null);
+  const draggableRef = useRef<HTMLDivElement>(null);
 
-  const onStop = (_: DraggableEvent, data: DraggableData) => {
-    updateWidgetSettings(id, { x: x + data.x, y: y + data.y }, true);
-  };
+  const {
+    component: Widget,
+    opacity,
+    ...settings
+  } = useWidgetsStore((state) => state.widgets[id]);
+
+  // Local state to avoid jittery movement during dragging and resizing
+  const [x, setX] = useState(settings.x);
+  const [y, setY] = useState(settings.y);
+  const [width, setWidth] = useState(settings.width);
+  const [height, setHeight] = useState(settings.height);
+
+  useEffect(() => {
+    setX(settings.x);
+  }, [settings.x]);
+
+  useEffect(() => {
+    setY(settings.y);
+  }, [settings.y]);
+
+  useEffect(() => {
+    setWidth(settings.width);
+  }, [settings.width]);
+
+  useEffect(() => {
+    setHeight(settings.height);
+  }, [settings.height]);
+
+  const onDragStop = useCallback(
+    (_: DraggableEvent, data: DraggableData) => {
+      setX(data.x);
+      setY(data.y);
+      updateWidgetSettings(id, { x: data.x, y: data.y }, true);
+    },
+    [id],
+  );
+
+  const onResizeStop: ResizeCallback = useCallback(
+    (_, __, ___, delta) => {
+      setWidth(width + delta.width);
+      setHeight(height + delta.height);
+      updateWidgetSettings(
+        id,
+        { width: width + delta.width, height: height + delta.height },
+        true,
+      );
+    },
+    [id, width, height],
+  );
 
   return (
     <Draggable
-      nodeRef={wrapperRef}
-      onStop={onStop}
+      nodeRef={draggableRef}
+      position={{ x, y }}
+      onStop={onDragStop}
       bounds="body"
       handle=".handle"
-      position={{ x: 0, y: 0 }}
     >
       <Box
-        ref={wrapperRef}
+        ref={draggableRef}
         overflow="hidden"
         position="absolute"
         css={styles.wrapper}
-        style={{ left: x, top: y }}
       >
         <Box
           className="handle"
@@ -63,15 +106,14 @@ const WidgetContainer = memo(({ id }: WidgetContainerProps) => {
         >
           <LuGripVertical size={20} />
         </Box>
-        <Box
-          position="relative"
-          width={width ?? "300px"}
-          height={height ?? "150px"}
+        <Resizable
+          size={{ width, height }}
+          onResizeStop={onResizeStop}
           css={styles.container}
           style={{ opacity: opacity / 100 }}
         >
           <ErrorBoundary
-            resetKeys={[Component]}
+            resetKeys={[Widget]}
             fallbackRender={({ error }) => (
               <ErrorDisplay
                 id={id}
@@ -80,9 +122,16 @@ const WidgetContainer = memo(({ id }: WidgetContainerProps) => {
               />
             )}
           >
-            <Component id={id} x={x} y={y} opacity={opacity} />
+            <Widget
+              id={id}
+              x={x}
+              y={y}
+              width={width}
+              height={height}
+              opacity={opacity}
+            />
           </ErrorBoundary>
-        </Box>
+        </Resizable>
       </Box>
     </Draggable>
   );

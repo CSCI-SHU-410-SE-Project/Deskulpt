@@ -1,7 +1,13 @@
 import { create } from "zustand";
 import { WidgetConfig, WidgetSettings, commands, events } from "../../bindings";
 
-const DEFAULT_WIDGET_SETTINGS: WidgetSettings = { x: 0, y: 0, opacity: 100 };
+const DEFAULT_WIDGET_SETTINGS: WidgetSettings = {
+  x: 0,
+  y: 0,
+  width: 300,
+  height: 200,
+  opacity: 100,
+};
 
 interface WidgetState {
   config: WidgetConfig;

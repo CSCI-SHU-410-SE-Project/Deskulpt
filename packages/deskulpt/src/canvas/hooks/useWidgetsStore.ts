@@ -3,20 +3,12 @@ import { WidgetSettings, events } from "../../bindings";
 import { FC, createElement } from "react";
 import ErrorDisplay from "../components/ErrorDisplay";
 
-interface WidgetProps {
+interface WidgetProps extends WidgetSettings {
   id: string;
-  x: number;
-  y: number;
-  opacity: number;
 }
 
-interface Widget {
-  Component: FC<WidgetProps>;
-  width?: string;
-  height?: string;
-}
-
-interface WidgetState extends Widget, WidgetSettings {
+interface WidgetState extends WidgetSettings {
+  component: FC<WidgetProps>;
   apisBlobUrl: string;
   moduleBlobUrl?: string;
 }
@@ -27,7 +19,7 @@ export const useWidgetsStore = create(() => ({
 
 export function updateWidgetRender(
   id: string,
-  widget: Widget,
+  component: FC<WidgetProps>,
   moduleBlobUrl: string,
   apisBlobUrl: string,
   settings?: WidgetSettings,
@@ -40,12 +32,9 @@ export function updateWidgetRender(
           ...state.widgets,
           [id]: {
             ...state.widgets[id],
-            // Not using spread syntax because undefined properties in the
-            // widget need to override their previous values as well
-            Component: widget.Component,
-            width: widget.width,
-            height: widget.height,
+            component,
             moduleBlobUrl,
+            apisBlobUrl,
           },
         },
       };
@@ -56,7 +45,7 @@ export function updateWidgetRender(
       return {
         widgets: {
           ...state.widgets,
-          [id]: { ...widget, ...settings, apisBlobUrl, moduleBlobUrl },
+          [id]: { ...settings, component, moduleBlobUrl, apisBlobUrl },
         },
       };
     }
@@ -80,11 +69,10 @@ export function updateWidgetRenderError(
           ...state.widgets,
           [id]: {
             ...state.widgets[id],
-            Component: () =>
+            component: () =>
               createElement(ErrorDisplay, { id, error, message }),
-            width: undefined,
-            height: undefined,
             moduleBlobUrl: undefined,
+            apisBlobUrl,
           },
         },
       };
@@ -97,12 +85,10 @@ export function updateWidgetRenderError(
           ...state.widgets,
           [id]: {
             ...settings,
-            Component: () =>
+            component: () =>
               createElement(ErrorDisplay, { id, error, message }),
-            apisBlobUrl,
-            width: undefined,
-            height: undefined,
             moduleBlobUrl: undefined,
+            apisBlobUrl,
           },
         },
       };
