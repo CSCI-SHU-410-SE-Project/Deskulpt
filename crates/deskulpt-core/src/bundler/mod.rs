@@ -20,29 +20,21 @@ pub struct WidgetBundlerBuilder {
     root: PathBuf,
     /// Entry file relative to the widget directory.
     entry: String,
-    /// The base URL to resolve local path imports.
-    base_url: String,
-    /// URL to the widget APIs blob.
-    apis_blob_url: String,
 }
 
 impl WidgetBundlerBuilder {
     /// Create a new widget bundler builder instance.
-    pub fn new(root: PathBuf, entry: String, base_url: String, apis_blob_url: String) -> Self {
-        Self {
-            root,
-            entry,
-            base_url,
-            apis_blob_url,
-        }
+    pub fn new(root: PathBuf, entry: String) -> Self {
+        Self { root, entry }
     }
 
     /// Build the Deskulpt widget bundler.
     pub fn build(self) -> WidgetBundler {
-        let jsx_runtime_url = self.base_url.clone() + "/gen/jsx-runtime.js";
-        let raw_apis_url = self.base_url.clone() + "/gen/raw-apis.js";
-        let react_url = self.base_url.clone() + "/gen/react.js";
-        let ui_url = self.base_url.clone() + "/gen/ui.js";
+        const JSX_RUNTIME_URL: &str = "__DESKULPT_BASE_URL__/gen/jsx-runtime.js";
+        const RAW_APIS_URL: &str = "__DESKULPT_BASE_URL__/gen/raw-apis.js";
+        const REACT_URL: &str = "__DESKULPT_BASE_URL__/gen/react.js";
+        const UI_URL: &str = "__DESKULPT_BASE_URL__/gen/ui.js";
+        const APIS_BLOB_URL: &str = "__DESKULPT_APIS_BLOB_URL__";
 
         let bundler_options = BundlerOptions {
             input: Some(vec![self.entry.into()]),
@@ -63,11 +55,11 @@ impl WidgetBundlerBuilder {
             // Externalize default dependencies available at runtime
             external: Some(
                 vec![
-                    jsx_runtime_url.clone(),
-                    raw_apis_url.clone(),
-                    react_url.clone(),
-                    ui_url.clone(),
-                    self.apis_blob_url.clone(),
+                    JSX_RUNTIME_URL.to_string(),
+                    RAW_APIS_URL.to_string(),
+                    REACT_URL.to_string(),
+                    UI_URL.to_string(),
+                    APIS_BLOB_URL.to_string(),
                 ]
                 .into(),
             ),
@@ -79,12 +71,15 @@ impl WidgetBundlerBuilder {
             [
                 (
                     "@deskulpt-test/emotion/jsx-runtime".to_string(),
-                    jsx_runtime_url,
+                    JSX_RUNTIME_URL.to_string(),
                 ),
-                ("@deskulpt-test/raw-apis".to_string(), raw_apis_url),
-                ("@deskulpt-test/react".to_string(), react_url),
-                ("@deskulpt-test/ui".to_string(), ui_url),
-                ("@deskulpt-test/apis".to_string(), self.apis_blob_url),
+                (
+                    "@deskulpt-test/raw-apis".to_string(),
+                    RAW_APIS_URL.to_string(),
+                ),
+                ("@deskulpt-test/react".to_string(), REACT_URL.to_string()),
+                ("@deskulpt-test/ui".to_string(), UI_URL.to_string()),
+                ("@deskulpt-test/apis".to_string(), APIS_BLOB_URL.to_string()),
             ]
             .into(),
         );

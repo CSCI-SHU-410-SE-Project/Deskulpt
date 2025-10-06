@@ -79,11 +79,7 @@ id: string;
 /**
  * If provided, update the settings of the widget.
  */
-settings?: WidgetSettings; 
-/**
- * If provided, update the code of the widget.
- */
-code?: string }
+settings?: WidgetSettings }
 
 /**
  * Full settings of the Deskulpt application.
@@ -271,8 +267,6 @@ export const commands = {
      */
     bundleWidget: (payload: {
       id: string,
-      baseUrl: string,
-      apisBlobUrl: string,
     }) => invoke<string>("plugin:deskulpt-core|bundle_widget", payload),
 
     /**
