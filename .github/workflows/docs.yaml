@@ -36,7 +36,7 @@ jobs:
 
       - name: Build rustdoc
         run: |
-          pnpm docs:rs
+          cargo docs
           rm -f target/doc/.lock
           cp -r target/doc/ docs/.vitepress/dist/rustdoc/
 
