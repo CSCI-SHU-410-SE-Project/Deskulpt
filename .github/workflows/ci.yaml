@@ -22,6 +22,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
       - name: Check commit markers
         id: check-commit-markers
@@ -30,17 +32,16 @@ jobs:
           commit_message=$(git log -1 --pretty=%B)
           echo "$commit_message"
 
-          if [[ "${{ github.event_name }}" == "pull_request" ]] || [[ "$commit_message" =~ \[ci-build\] ]]; then
-            echo "[ci-build] marker detected"
+          if [[ "${{ github.event_name }}" != "pull_request" ]]; then
+            echo "ci-build-marker=true: triggered by ${{ github.event_name }}"
+            echo "ci-build-marker=true" >> $GITHUB_OUTPUT
+          elif [[ "$commit_message" =~ \[ci-build\] ]]; then
+            echo "ci-build-marker=true: [ci-build] marker detected in commit message"
             echo "ci-build-marker=true" >> $GITHUB_OUTPUT
           else
+            echo "ci-build-marker=false: no [ci-build] marker in pull request"
             echo "ci-build-marker=false" >> $GITHUB_OUTPUT
           fi
-
-      - name: Summarize commit markers
-        shell: bash
-        run: |
-          echo "ci-build-marker: ${{ steps.check-commit-markers.outputs.ci-build-marker }}"
 
   ci-hygiene:
     runs-on: ubuntu-latest
