@@ -216,6 +216,14 @@ x: number;
  */
 y: number; 
 /**
+ * The width in pixels.
+ */
+width: number; 
+/**
+ * The height in pixels.
+ */
+height: number; 
+/**
  * The opacity in percentage.
  */
 opacity: number }

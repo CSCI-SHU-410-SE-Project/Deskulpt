@@ -65,6 +65,20 @@
           "format": "int32",
           "default": 0
         },
+        "width": {
+          "description": "The width in pixels.",
+          "type": "integer",
+          "format": "uint32",
+          "minimum": 0,
+          "default": 300
+        },
+        "height": {
+          "description": "The height in pixels.",
+          "type": "integer",
+          "format": "uint32",
+          "minimum": 0,
+          "default": 200
+        },
         "opacity": {
           "description": "The opacity in percentage.",
           "type": "integer",

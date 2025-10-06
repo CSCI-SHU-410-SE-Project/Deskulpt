@@ -48,6 +48,40 @@ const Y = ({ id }: SettingsProps) => {
   );
 };
 
+const Width = ({ id }: SettingsProps) => {
+  const width = useWidgetsStore((state) => state.widgets[id].settings.width);
+  const onValueChange = useCallback(
+    (value: number) => updateWidgetSettings(id, { width: value }, true),
+    [id],
+  );
+
+  return (
+    <IntegerInput
+      value={width}
+      min={0}
+      onValueChange={onValueChange}
+      width="60px"
+    />
+  );
+};
+
+const Height = ({ id }: SettingsProps) => {
+  const height = useWidgetsStore((state) => state.widgets[id].settings.height);
+  const onValueChange = useCallback(
+    (value: number) => updateWidgetSettings(id, { height: value }, true),
+    [id],
+  );
+
+  return (
+    <IntegerInput
+      value={height}
+      min={0}
+      onValueChange={onValueChange}
+      width="60px"
+    />
+  );
+};
+
 const Opacity = ({ id }: SettingsProps) => {
   const opacity = useWidgetsStore(
     (state) => state.widgets[id].settings.opacity,
@@ -60,7 +94,7 @@ const Opacity = ({ id }: SettingsProps) => {
   return (
     <IntegerInput
       value={opacity}
-      min={0}
+      min={1}
       max={100}
       onValueChange={onValueChange}
       width="60px"
@@ -87,6 +121,16 @@ const Settings = memo(({ id }: SettingsProps) => {
               <X id={id} />
               <LiaTimesSolid size={12} color="var(--gray-11)" />
               <Y id={id} />
+            </Flex>
+          </Table.Cell>
+        </Table.Row>
+        <Table.Row align="center">
+          <Table.RowHeaderCell>Size (px)</Table.RowHeaderCell>
+          <Table.Cell>
+            <Flex gap="1" align="center">
+              <Width id={id} />
+              <LiaTimesSolid size={12} color="var(--gray-11)" />
+              <Height id={id} />
             </Flex>
           </Table.Cell>
         </Table.Row>

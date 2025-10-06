@@ -16,6 +16,7 @@ catalog:
   "@types/react": ^19.2.0
   "@types/react-dom": ^19.2.0
   "@vitejs/plugin-react": ^5.0.4
+  re-resizable: ^6.11.2
   react: ^19.2.0
   react-dom: ^19.2.0
   react-draggable: ^4.5.0
