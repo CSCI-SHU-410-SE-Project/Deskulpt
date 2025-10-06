@@ -35,6 +35,11 @@ jobs:
             echo "ci-build-marker=false" >> $GITHUB_OUTPUT
           fi
 
+      - name: Summarize commit markers
+        shell: bash
+        run: |
+          echo "ci-build-marker: ${{ steps.check-commit-markers.outputs.ci-build-marker }}"
+
   ci-hygiene:
     runs-on: ubuntu-latest
 
@@ -58,8 +63,6 @@ jobs:
         run: cargo shear
 
       - name: Check that auto-generated files are up-to-date
-        env:
-          RUST_BACKTRACE: 1
         shell: bash
         run: |
           # Re-generate auto-generated files
@@ -108,7 +111,7 @@ jobs:
       - name: Check build
         run: |
           pnpm --filter deskulpt build
-          cargo build -p deskulpt --bins
+          cargo build --bin deskulpt
 
       - name: Check tests
         env:

@@ -30,6 +30,6 @@ jobs:
 
       - name: Populate Rust cache
         run: |
-          cargo check
-          cargo build
-          cargo test --no-run
+          cargo build --workspace
+          cargo check --workspace
+          cargo test --workspace --no-run
