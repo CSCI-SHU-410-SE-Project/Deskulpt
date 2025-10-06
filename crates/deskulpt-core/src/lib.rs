@@ -24,7 +24,7 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
     deskulpt_common::init::init_builder!().build()
 }
 
-/// Re-exports for JSON schema generation.
+#[doc(hidden)]
 pub mod schema {
     pub use crate::settings::Settings;
 }

@@ -181,7 +181,7 @@ pub fn run() -> Result<()> {
     let mut hb = Handlebars::new();
     hb.register_escape_fn(handlebars::no_escape);
     hb.register_helper("indent", Box::new(handlebars_indent_helper));
-    hb.register_template_string("bindings", include_str!("template.ts.hbs"))?;
+    hb.register_template_string("bindings", include_str!("bindings.ts.hbs"))?;
 
     let data = Template::from(Typescript::new(), &bindings)?;
     let output = hb.render("bindings", &data)?;
@@ -192,6 +192,7 @@ pub fn run() -> Result<()> {
 
     let path = deskulpt_workspace::package_dir("deskulpt").join("src/bindings.ts");
     std::fs::write(&path, output)?;
+    println!("✅ Generated: {}", path.display());
 
     Ok(())
 }

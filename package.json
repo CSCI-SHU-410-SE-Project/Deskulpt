@@ -25,8 +25,7 @@
     "docs:build": "pnpm --filter @deskulpt/docs build",
     "docs:preview": "pnpm --filter @deskulpt/docs preview",
     "docs:rs": "cargo doc --workspace --no-deps --exclude xtask-gen",
-    "build:packages": "pnpm run --sequential --filter @deskulpt-test/* build",
-    "build:schema": "cargo test --bin deskulpt export_schema -- --ignored"
+    "build:packages": "pnpm run --sequential --filter @deskulpt-test/* build"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^2.8.4",
