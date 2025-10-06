@@ -18,6 +18,8 @@ deskulpt-workspace = { workspace = true }
 handlebars         = { workspace = true }
 heck               = { workspace = true }
 regex              = { workspace = true }
+schemars           = { workspace = true }
 serde              = { workspace = true, features = ["derive"] }
+serde_json         = { workspace = true }
 specta             = { workspace = true }
 specta-typescript  = { workspace = true }

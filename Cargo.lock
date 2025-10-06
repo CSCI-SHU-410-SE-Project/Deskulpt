@@ -1184,9 +1184,6 @@ name = "deskulpt"
 version = "0.0.1"
 dependencies = [
  "deskulpt-core",
- "deskulpt-workspace",
- "schemars 1.0.4",
- "serde_json",
  "tauri",
  "tauri-build",
  "tauri-plugin-clipboard-manager",
@@ -7953,7 +7950,9 @@ dependencies = [
  "handlebars",
  "heck 0.5.0",
  "regex",
+ "schemars 1.0.4",
  "serde",
+ "serde_json",
  "specta",
  "specta-typescript",
 ]

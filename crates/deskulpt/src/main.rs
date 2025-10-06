@@ -3,22 +3,3 @@
 fn main() {
     deskulpt::run()
 }
-
-#[cfg(test)]
-mod export_schema {
-    use std::fs::File;
-    use std::io::BufWriter;
-
-    use deskulpt_core::schema::Settings;
-    use schemars::schema_for;
-
-    #[test]
-    #[ignore]
-    fn export_settings() {
-        let schema = schema_for!(Settings);
-        let path = deskulpt_workspace::docs_dir().join("src/public/settings-schema.json");
-        let file = File::create(path).expect("Failed to create file");
-        let writer = BufWriter::new(file);
-        serde_json::to_writer_pretty(writer, &schema).expect("Failed to write schema");
-    }
-}

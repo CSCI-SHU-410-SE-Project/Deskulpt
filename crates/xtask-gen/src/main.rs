@@ -1,4 +1,5 @@
 mod bindings;
+mod schema;
 
 use anyhow::Result;
 use clap::{Parser, Subcommand};
@@ -7,6 +8,8 @@ use clap::{Parser, Subcommand};
 enum Commands {
     /// Generate Deskulpt frontend bindings.
     Bindings,
+    /// Generate JSON schemas.
+    Schema,
 }
 
 /// [XTASK] Code generation for Deskulpt.
@@ -21,6 +24,7 @@ fn main() -> Result<()> {
     let args = Args::parse();
     match args.command {
         Commands::Bindings => bindings::run()?,
+        Commands::Schema => schema::run()?,
     }
     Ok(())
 }
