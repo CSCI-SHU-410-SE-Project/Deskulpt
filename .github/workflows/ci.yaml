@@ -28,8 +28,10 @@ jobs:
         shell: bash
         run: |
           commit_message=$(git log -1 --pretty=%B)
+          echo "$commit_message"
 
           if [[ "${{ github.event_name }}" == "pull_request" ]] || [[ "$commit_message" =~ \[ci-build\] ]]; then
+            echo "[ci-build] marker detected"
             echo "ci-build-marker=true" >> $GITHUB_OUTPUT
           else
             echo "ci-build-marker=false" >> $GITHUB_OUTPUT
