@@ -14,6 +14,39 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  ci-commit-markers:
+    runs-on: ubuntu-latest
+    outputs:
+      ci-build-marker: ${{ steps.check-commit-markers.outputs.ci-build-marker }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+      - name: Check commit markers
+        id: check-commit-markers
+        shell: bash
+        run: |
+          commit_message=$(git log -1 --pretty=%B)
+          echo "::group::Commit message"
+          echo "$commit_message"
+          echo "::endgroup::"
+
+          echo "::group::Commit markers"
+          if [[ "${{ github.event_name }}" != "pull_request" ]]; then
+            echo "ci-build-marker=true: triggered by ${{ github.event_name }}"
+            echo "ci-build-marker=true" >> $GITHUB_OUTPUT
+          elif [[ "$commit_message" =~ \[ci-build\] ]]; then
+            echo "ci-build-marker=true: [ci-build] marker detected in commit message"
+            echo "ci-build-marker=true" >> $GITHUB_OUTPUT
+          else
+            echo "ci-build-marker=false"
+            echo "ci-build-marker=false" >> $GITHUB_OUTPUT
+          fi
+          echo "::endgroup::"
+
   ci-hygiene:
     runs-on: ubuntu-latest
 
@@ -37,8 +70,6 @@ jobs:
         run: cargo shear
 
       - name: Check that auto-generated files are up-to-date
-        env:
-          RUST_BACKTRACE: 1
         shell: bash
         run: |
           # Re-generate auto-generated files
@@ -87,7 +118,7 @@ jobs:
       - name: Check build
         run: |
           pnpm --filter deskulpt build
-          cargo build -p deskulpt --bins
+          cargo build --bin deskulpt
 
       - name: Check tests
         env:
@@ -95,7 +126,8 @@ jobs:
         run: pnpm test
 
   ci-build:
-    if: github.event_name != 'pull_request' || contains(github.event.head_commit.message, '[ci-build]')
+    needs: [ci-commit-markers]
+    if: needs.ci-commit-markers.outputs.ci-build-marker == 'true'
     strategy:
       fail-fast: false
       matrix:
