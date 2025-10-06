@@ -115,6 +115,9 @@ jobs:
       - name: Check linting
         run: pnpm lint:check
 
+      # We do not use Tauri CLI here because it adds the tauri/custom-protocol
+      # feature flag which causes cache misses and longer build times; instead,
+      # a plain `cargo build` is sufficient for CI verification
       - name: Check build
         run: |
           pnpm --filter deskulpt build
