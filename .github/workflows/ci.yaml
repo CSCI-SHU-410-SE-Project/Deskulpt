@@ -30,8 +30,11 @@ jobs:
         shell: bash
         run: |
           commit_message=$(git log -1 --pretty=%B)
+          echo "::group::Commit message"
           echo "$commit_message"
+          echo "::endgroup::"
 
+          echo "::group::Commit markers"
           if [[ "${{ github.event_name }}" != "pull_request" ]]; then
             echo "ci-build-marker=true: triggered by ${{ github.event_name }}"
             echo "ci-build-marker=true" >> $GITHUB_OUTPUT
@@ -39,9 +42,10 @@ jobs:
             echo "ci-build-marker=true: [ci-build] marker detected in commit message"
             echo "ci-build-marker=true" >> $GITHUB_OUTPUT
           else
-            echo "ci-build-marker=false: no [ci-build] marker in pull request"
+            echo "ci-build-marker=false"
             echo "ci-build-marker=false" >> $GITHUB_OUTPUT
           fi
+          echo "::endgroup::"
 
   ci-hygiene:
     runs-on: ubuntu-latest
