@@ -17,7 +17,7 @@ export function useRenderWidgetsListener() {
     const unlisten = events.renderWidgets.listen(async (event) => {
       const widgets = useWidgetsStore.getState().widgets;
 
-      const promises = event.payload.map(async ({ id, settings, code }) => {
+      const promises = event.payload.map(async ({ id, settings }) => {
         let apisBlobUrl;
         if (id in widgets) {
           // APIs blob URL can be reused because the contents are dependent only
@@ -30,35 +30,34 @@ export function useRenderWidgetsListener() {
           }
         } else {
           const apisCode = window.__DESKULPT_CANVAS_INTERNALS__.apisWrapper
-            .replace("__DESKULPT_WIDGET_ID__", id)
-            .replace("__RAW_APIS_URL__", RAW_APIS_URL);
+            .replaceAll("__DESKULPT_WIDGET_ID__", id)
+            .replaceAll("__RAW_APIS_URL__", RAW_APIS_URL);
           const apisBlob = new Blob([apisCode], {
             type: "application/javascript",
           });
           apisBlobUrl = URL.createObjectURL(apisBlob);
         }
 
-        if (code === undefined) {
-          // If code is not provided, we need to bundle the widget
-          try {
-            code = await commands.core.bundleWidget({
-              id,
-              baseUrl: BASE_URL,
-              apisBlobUrl,
-            });
-          } catch (error) {
-            updateWidgetRenderError(
-              id,
-              "Error bundling the widget",
-              stringifyError(error),
-              apisBlobUrl,
-              settings,
-            );
-            return;
-          }
+        let code;
+        try {
+          code = await commands.core.bundleWidget({ id });
+        } catch (error) {
+          updateWidgetRenderError(
+            id,
+            "Error bundling the widget",
+            stringifyError(error),
+            apisBlobUrl,
+            settings,
+          );
+          return;
         }
 
-        const moduleBlob = new Blob([code], { type: "application/javascript" });
+        let moduleCode = code
+          .replaceAll("__DESKULPT_BASE_URL__", BASE_URL)
+          .replaceAll("__DESKULPT_APIS_BLOB_URL__", apisBlobUrl);
+        const moduleBlob = new Blob([moduleCode], {
+          type: "application/javascript",
+        });
         const moduleBlobUrl = URL.createObjectURL(moduleBlob);
         let module;
         try {

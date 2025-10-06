@@ -31,10 +31,6 @@ pub struct RenderWidgetsEventInner {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[specta(type = WidgetSettings)]
     settings: Option<WidgetSettings>,
-    /// If provided, update the code of the widget.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    #[specta(type = String)]
-    code: Option<String>,
 }
 
 /// Event for re-rendering widgets.
