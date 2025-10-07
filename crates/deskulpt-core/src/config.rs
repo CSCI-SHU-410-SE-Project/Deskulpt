@@ -95,9 +95,7 @@ impl WidgetConfig {
     ///
     /// This returns `None` if the directory is not considered a widget
     /// directory, or if the widget is explicitly marked as ignored.
-    pub fn load<P: AsRef<Path>>(dir: P) -> Option<Self> {
-        let dir = dir.as_ref();
-
+    pub fn load(dir: &Path) -> Option<Self> {
         let deskulpt_conf =
             match DeskulptConf::load(dir).context("Failed to load deskulpt.conf.json") {
                 Ok(Some(deskulpt_conf)) => deskulpt_conf,
