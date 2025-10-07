@@ -1,3 +1,5 @@
+//! Common utilities for initializing internal Tauri plugins for Deskulpt.
+
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __init_builder {
@@ -6,7 +8,7 @@ macro_rules! __init_builder {
     };
 }
 
-/// Initialize a [`tauri::plugin::Builder`].
+/// Initialize a `tauri::plugin::Builder`.
 ///
 /// The builder has its name automatically set to the crate name, and its
 /// invoke handler set to the commands specified in the build script. It can be

@@ -33,7 +33,7 @@ impl EngineInterface {
     /// This method is a temporary implementation. The final implementation
     /// should use IPC to communicate with the Deskulpt core to get the widget
     /// directory.
-    pub fn widget_dir<S: AsRef<str>>(&self, id: S) -> Result<PathBuf> {
-        (self.widget_dir_fn)(id.as_ref())
+    pub fn widget_dir(&self, id: &str) -> Result<PathBuf> {
+        (self.widget_dir_fn)(id)
     }
 }
