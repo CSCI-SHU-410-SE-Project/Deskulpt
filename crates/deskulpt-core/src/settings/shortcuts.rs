@@ -58,10 +58,10 @@ impl Settings {
     /// If any registration fails, instead of bailing out, it will remove that
     /// shortcut from the settings and silently continue.
     pub fn init_shortcuts<R: Runtime>(&mut self, gs: &GlobalShortcut<R>) {
-        for (key, current) in self.app.shortcuts.clone() {
+        for (key, current) in self.shortcuts.clone() {
             if let Err(e) = reregister_shortcut(gs, &key, None, Some(&current)) {
                 eprintln!("Failed to register shortcut for {key:?}: {e}");
-                self.app.shortcuts.remove(&key);
+                self.shortcuts.remove(&key);
             }
         }
     }
@@ -80,14 +80,14 @@ impl Settings {
         reregister_shortcut(
             gs,
             &key,
-            self.app.shortcuts.get(&key).map(|s| s.as_str()),
+            self.shortcuts.get(&key).map(|s| s.as_str()),
             new.as_deref(),
         )?;
 
         if let Some(shortcut) = new {
-            self.app.shortcuts.insert(key, shortcut);
+            self.shortcuts.insert(key, shortcut);
         } else {
-            self.app.shortcuts.remove(&key);
+            self.shortcuts.remove(&key);
         }
 
         Ok(())

@@ -46,7 +46,7 @@ pub trait SettingsStateExt<R: Runtime>: Manager<R> + PathExt<R> + GlobalShortcut
     /// Update the theme.
     fn update_settings_theme(&self, theme: Theme) {
         let mut settings = self.get_settings_mut();
-        settings.app.theme = theme;
+        settings.theme = theme;
     }
 
     /// Update a shortcut.

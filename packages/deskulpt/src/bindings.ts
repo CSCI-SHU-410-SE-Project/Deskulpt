@@ -8,19 +8,6 @@ import * as tauriEvent from "@tauri-apps/api/event";
 // =============================================================================
 
 /**
- * Application-wide settings.
- */
-export type AppSettings = { 
-/**
- * The application theme.
- */
-theme: Theme; 
-/**
- * The keyboard shortcuts.
- */
-shortcuts: Partial<{ [key in ShortcutKey]: string }> }
-
-/**
  * Deskulpt window enum.
  */
 export type DeskulptWindow = 
@@ -86,9 +73,13 @@ settings?: WidgetSettings }
  */
 export type Settings = { 
 /**
- * Application-wide settings.
+ * The application theme.
  */
-app: AppSettings; 
+theme: Theme; 
+/**
+ * The keyboard shortcuts.
+ */
+shortcuts: Partial<{ [key in ShortcutKey]: string }>; 
 /**
  * The mapping from widget IDs to their respective settings.
  */
