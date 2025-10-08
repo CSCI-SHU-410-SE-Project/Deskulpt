@@ -14,9 +14,7 @@ export async function toggleTheme() {
 }
 
 export async function updateShortcut(key: ShortcutKey, shortcut?: string) {
-  await commands.core.updateSettings({
-    update: { shortcut: [key, shortcut ?? null] },
-  });
+  await commands.core.updateSettings({ shortcut: [key, shortcut ?? null] });
   useAppSettingsStore.setState((state) => ({
     shortcuts: { ...state.shortcuts, [key]: shortcut },
   }));
