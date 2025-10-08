@@ -4,13 +4,18 @@
   "description": "Full settings of the Deskulpt application.",
   "type": "object",
   "properties": {
-    "app": {
-      "description": "Application-wide settings.",
-      "$ref": "#/$defs/AppSettings",
-      "default": {
-        "theme": "light",
-        "shortcuts": {}
-      }
+    "theme": {
+      "description": "The application theme.",
+      "$ref": "#/$defs/Theme",
+      "default": "light"
+    },
+    "shortcuts": {
+      "description": "The keyboard shortcuts.",
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      },
+      "default": {}
     },
     "widgets": {
       "description": "The mapping from widget IDs to their respective settings.",
@@ -22,25 +27,6 @@
     }
   },
   "$defs": {
-    "AppSettings": {
-      "description": "Application-wide settings.",
-      "type": "object",
-      "properties": {
-        "theme": {
-          "description": "The application theme.",
-          "$ref": "#/$defs/Theme",
-          "default": "light"
-        },
-        "shortcuts": {
-          "description": "The keyboard shortcuts.",
-          "type": "object",
-          "additionalProperties": {
-            "type": "string"
-          },
-          "default": {}
-        }
-      }
-    },
     "Theme": {
       "description": "Light/dark theme of the application.",
       "type": "string",
