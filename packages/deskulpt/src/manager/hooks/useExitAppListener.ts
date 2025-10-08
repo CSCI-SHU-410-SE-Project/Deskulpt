@@ -14,7 +14,7 @@ export function useExitAppListener() {
           ),
         ),
       };
-      commands.core.exitApp({ settings }).catch(console.error);
+      commands.core.exitApp(settings).catch(console.error);
     });
 
     return () => {

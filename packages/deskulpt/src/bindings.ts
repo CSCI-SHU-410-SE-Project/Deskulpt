@@ -273,9 +273,11 @@ export const commands = {
      * - Widget has a configuration error.
      * - Error bundling the widget.
      */
-    bundleWidget: (payload: {
+    bundleWidget: (
       id: string,
-    }) => invoke<string>("plugin:deskulpt-core|bundle_widget", payload),
+    ) => invoke<string>("plugin:deskulpt-core|bundle_widget", {
+      id,
+    }),
 
     /**
      * Call a plugin command (🚧 TODO 🚧).
@@ -291,12 +293,17 @@ export const commands = {
      * a temporary implementation), `app_handle` is using the default runtime but
      * it should be a generic `R: Runtime` parameter in the final implementation.
      */
-    callPlugin: (payload: {
+    callPlugin: (
       plugin: string,
       command: string,
       id: string,
       payload: JsonValue | null,
-    }) => invoke<JsonValue>("plugin:deskulpt-core|call_plugin", payload),
+    ) => invoke<JsonValue>("plugin:deskulpt-core|call_plugin", {
+      plugin,
+      command,
+      id,
+      payload,
+    }),
 
     /**
      * Wrapper of
@@ -306,9 +313,11 @@ export const commands = {
      * 
      * - Failed to emit the [`RenderWidgetsEvent`] to the canvas.
      */
-    emitOnRenderReady: (payload: {
+    emitOnRenderReady: (
       event: RenderWidgetsEvent,
-    }) => invoke<null>("plugin:deskulpt-core|emit_on_render_ready", payload),
+    ) => invoke<null>("plugin:deskulpt-core|emit_on_render_ready", {
+      event,
+    }),
 
     /**
      * Exit the application with cleanup.
@@ -317,9 +326,11 @@ export const commands = {
      * application in the end. Prior to exiting, it will try to dump the settings
      * for persistence, but failure to do so will not prevent exiting.
      */
-    exitApp: (payload: {
+    exitApp: (
       settings: Settings,
-    }) => invoke<void>("plugin:deskulpt-core|exit_app", payload),
+    ) => invoke<void>("plugin:deskulpt-core|exit_app", {
+      settings,
+    }),
 
     /**
      * Open the widgets directory or a specific widget directory.
@@ -333,9 +344,11 @@ export const commands = {
      * - Failed to access the widgets directory.
      * - Error opening the directory.
      */
-    openWidget: (payload: {
+    openWidget: (
       id: string | null,
-    }) => invoke<null>("plugin:deskulpt-core|open_widget", payload),
+    ) => invoke<null>("plugin:deskulpt-core|open_widget", {
+      id,
+    }),
 
     /**
      * Rescan the widgets directory and update the widget configuration map.
@@ -372,8 +385,10 @@ export const commands = {
      * 
      * - Failed to apply the side effects, if any.
      */
-    updateSettings: (payload: {
+    updateSettings: (
       update: SettingsUpdate,
-    }) => invoke<null>("plugin:deskulpt-core|update_settings", payload),
+    ) => invoke<null>("plugin:deskulpt-core|update_settings", {
+      update,
+    }),
   },
 };

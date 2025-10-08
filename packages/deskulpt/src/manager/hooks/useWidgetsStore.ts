@@ -51,7 +51,7 @@ export async function rescan(initial: boolean = false) {
 
   const event = widgetsArray.map(([id, { settings }]) => ({ id, settings }));
   if (initial) {
-    await commands.core.emitOnRenderReady({ event });
+    await commands.core.emitOnRenderReady(event);
   } else {
     await events.renderWidgets.emitTo("canvas", event);
   }
