@@ -3,7 +3,7 @@ import { events } from "../../bindings";
 
 export function useTheme() {
   const [theme, setTheme] = useState(
-    window.__DESKULPT_CANVAS_INTERNALS__.initialSettings.app.theme,
+    window.__DESKULPT_CANVAS_INTERNALS__.initialSettings.theme,
   );
 
   useEffect(() => {

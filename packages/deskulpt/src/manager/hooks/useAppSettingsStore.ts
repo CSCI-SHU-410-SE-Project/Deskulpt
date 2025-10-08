@@ -2,7 +2,8 @@ import { create } from "zustand";
 import { ShortcutKey, commands, events } from "../../bindings";
 
 export const useAppSettingsStore = create(() => ({
-  ...window.__DESKULPT_MANAGER_INTERNALS__.initialSettings.app,
+  theme: window.__DESKULPT_MANAGER_INTERNALS__.initialSettings.theme,
+  shortcuts: window.__DESKULPT_MANAGER_INTERNALS__.initialSettings.shortcuts,
 }));
 
 export async function toggleTheme() {
