@@ -30,19 +30,6 @@ pub enum ShortcutKey {
     OpenManager,
 }
 
-/// Application-wide settings.
-#[serde_as]
-#[derive(Debug, Clone, Default, Deserialize, Serialize, JsonSchema, specta::Type)]
-#[serde(rename_all = "camelCase", default)]
-pub struct AppSettings {
-    /// The application theme.
-    #[serde_as(deserialize_as = "DefaultOnError")]
-    pub theme: Theme,
-    /// The keyboard shortcuts.
-    #[serde_as(deserialize_as = "MapSkipError<_, _>")]
-    pub shortcuts: BTreeMap<ShortcutKey, String>,
-}
-
 /// Per-widget settings.
 ///
 /// Different from widget configurations, these are independent of the widget
@@ -102,9 +89,12 @@ impl WidgetSettings {
 #[derive(Debug, Clone, Default, Deserialize, Serialize, JsonSchema, specta::Type)]
 #[serde(rename_all = "camelCase", default)]
 pub struct Settings {
-    /// Application-wide settings.
+    /// The application theme.
     #[serde_as(deserialize_as = "DefaultOnError")]
-    pub app: AppSettings,
+    pub theme: Theme,
+    /// The keyboard shortcuts.
+    #[serde_as(deserialize_as = "MapSkipError<_, _>")]
+    pub shortcuts: BTreeMap<ShortcutKey, String>,
     /// The mapping from widget IDs to their respective settings.
     #[serde_as(deserialize_as = "MapSkipError<_, _>")]
     pub widgets: BTreeMap<String, WidgetSettings>,
