@@ -10,6 +10,7 @@ use tauri::Runtime;
 mod bundler;
 mod commands;
 mod config;
+pub mod dependencies;
 pub mod events;
 pub mod path;
 mod settings;

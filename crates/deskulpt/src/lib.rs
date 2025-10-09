@@ -6,7 +6,8 @@
 
 use deskulpt_core::path::PathExt;
 use deskulpt_core::states::{
-    CanvasImodeStateExt, InitialRenderStateExt, SettingsStateExt, WidgetConfigMapStateExt,
+    CanvasImodeStateExt, InitialRenderStateExt, PackageManagerStateExt, SettingsStateExt,
+    WidgetConfigMapStateExt,
 };
 use deskulpt_core::tray::TrayExt;
 use deskulpt_core::window::WindowExt;
@@ -23,6 +24,7 @@ pub fn run() {
             app.init_widgets_dir()?;
             app.init_persist_dir()?;
 
+            app.manage_package_manager()?;
             app.manage_settings();
             app.manage_initial_render();
             app.manage_widget_config_map();
