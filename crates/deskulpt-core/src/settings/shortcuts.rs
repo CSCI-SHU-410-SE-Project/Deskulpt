@@ -74,20 +74,20 @@ impl Settings {
     pub fn update_shortcut<R: Runtime>(
         &mut self,
         gs: &GlobalShortcut<R>,
-        key: ShortcutKey,
+        key: &ShortcutKey,
         new: Option<String>,
     ) -> Result<()> {
         reregister_shortcut(
             gs,
-            &key,
-            self.shortcuts.get(&key).map(|s| s.as_str()),
+            key,
+            self.shortcuts.get(key).map(|s| s.as_str()),
             new.as_deref(),
         )?;
 
         if let Some(shortcut) = new {
-            self.shortcuts.insert(key, shortcut);
+            self.shortcuts.insert(key.clone(), shortcut);
         } else {
-            self.shortcuts.remove(&key);
+            self.shortcuts.remove(key);
         }
 
         Ok(())

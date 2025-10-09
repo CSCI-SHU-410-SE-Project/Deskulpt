@@ -11,11 +11,9 @@ fn main() {
             "update_settings",
         ])
         .events(&[
-            "ExitAppEvent",
             "RemoveWidgetsEvent",
             "RenderWidgetsEvent",
             "ShowToastEvent",
-            "SwitchThemeEvent",
             "UpdateSettingsEvent",
         ])
         .build();

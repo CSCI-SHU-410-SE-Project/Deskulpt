@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { WidgetSettings, events } from "../../bindings";
+import { WidgetSettings } from "../../bindings";
 import { FC, createElement } from "react";
 import ErrorDisplay from "../components/ErrorDisplay";
 
@@ -7,50 +7,30 @@ interface WidgetProps extends WidgetSettings {
   id: string;
 }
 
-interface WidgetState extends WidgetSettings {
+interface WidgetState {
   component: FC<WidgetProps>;
   apisBlobUrl: string;
   moduleBlobUrl?: string;
 }
 
-export const useWidgetsStore = create(() => ({
-  widgets: {} as Record<string, WidgetState>,
-}));
+export const useWidgetsStore = create<Record<string, WidgetState>>(() => ({}));
 
 export function updateWidgetRender(
   id: string,
   component: FC<WidgetProps>,
   moduleBlobUrl: string,
   apisBlobUrl: string,
-  settings?: WidgetSettings,
 ) {
   useWidgetsStore.setState((state) => {
-    // Settings are ignored if the widget is already in the store
-    if (id in state.widgets) {
-      return {
-        widgets: {
-          ...state.widgets,
-          [id]: {
-            ...state.widgets[id],
-            component,
-            moduleBlobUrl,
-            apisBlobUrl,
-          },
-        },
-      };
-    }
-
-    // Settings are required if the widget is newly added
-    if (settings !== undefined) {
-      return {
-        widgets: {
-          ...state.widgets,
-          [id]: { ...settings, component, moduleBlobUrl, apisBlobUrl },
-        },
-      };
-    }
-
-    return state;
+    return {
+      ...state,
+      [id]: {
+        ...state[id],
+        component,
+        moduleBlobUrl,
+        apisBlobUrl,
+      },
+    };
   });
 }
 
@@ -59,71 +39,32 @@ export function updateWidgetRenderError(
   error: string,
   message: string,
   apisBlobUrl: string,
-  settings?: WidgetSettings,
 ) {
   useWidgetsStore.setState((state) => {
-    // Settings are ignored if the widget is already in the store
-    if (id in state.widgets) {
-      return {
-        widgets: {
-          ...state.widgets,
-          [id]: {
-            ...state.widgets[id],
-            component: () =>
-              createElement(ErrorDisplay, { id, error, message }),
-            moduleBlobUrl: undefined,
-            apisBlobUrl,
-          },
-        },
-      };
-    }
-
-    // Settings are required if the widget is newly added
-    if (settings !== undefined) {
-      return {
-        widgets: {
-          ...state.widgets,
-          [id]: {
-            ...settings,
-            component: () =>
-              createElement(ErrorDisplay, { id, error, message }),
-            moduleBlobUrl: undefined,
-            apisBlobUrl,
-          },
-        },
-      };
-    }
-
-    return state;
+    return {
+      ...state,
+      [id]: {
+        ...state[id],
+        component: () => createElement(ErrorDisplay, { id, error, message }),
+        moduleBlobUrl: undefined,
+        apisBlobUrl,
+      },
+    };
   });
 }
 
 export function updateWidgetSettings(
   id: string,
   settings: Partial<WidgetSettings>,
-  emit: boolean = false,
 ) {
-  useWidgetsStore.setState((state) => {
-    if (id in state.widgets) {
-      return {
-        widgets: {
-          ...state.widgets,
-          [id]: { ...state.widgets[id], ...settings },
-        },
-      };
-    }
-    return state;
-  });
-
-  if (emit) {
-    events.updateSettings
-      .emitTo("manager", { id, ...settings })
-      .catch(console.error);
-  }
+  useWidgetsStore.setState((state) => ({
+    ...state,
+    [id]: { ...state[id], ...settings },
+  }));
 }
 
 export function removeWidgets(ids: string[]) {
-  const widgets = useWidgetsStore.getState().widgets;
+  const widgets = useWidgetsStore.getState();
 
   // Revoke object URLs for the widgets being removed
   ids.forEach((id) => {
@@ -137,9 +78,9 @@ export function removeWidgets(ids: string[]) {
     }
   });
 
-  useWidgetsStore.setState((state) => ({
-    widgets: Object.fromEntries(
-      Object.entries(state.widgets).filter(([id]) => !ids.includes(id)),
+  useWidgetsStore.setState((state) =>
+    Object.fromEntries(
+      Object.entries(state).filter(([id]) => !ids.includes(id)),
     ),
-  }));
+  );
 }

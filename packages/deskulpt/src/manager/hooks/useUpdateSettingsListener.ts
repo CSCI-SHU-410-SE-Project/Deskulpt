@@ -1,12 +1,11 @@
 import { useEffect } from "react";
-import { updateWidgetSettings } from "./useWidgetsStore";
 import { events } from "../../bindings";
+import { useSettingsStore } from "./useSettingsStore";
 
 export function useUpdateSettingsListener() {
   useEffect(() => {
     const unlisten = events.updateSettings.listen((event) => {
-      const { id, ...settings } = event.payload;
-      updateWidgetSettings(id, settings);
+      useSettingsStore.setState(() => event.payload, true);
     });
 
     return () => {

@@ -1,18 +1,13 @@
 //! Deskulpt system tray.
 
-use std::time::Duration;
-
 use anyhow::Result;
-use deskulpt_common::event::Event;
-use deskulpt_common::window::DeskulptWindow;
 use tauri::image::Image;
 use tauri::menu::{MenuBuilder, MenuEvent, MenuItemBuilder};
 use tauri::tray::{MouseButton, MouseButtonState, TrayIcon, TrayIconBuilder, TrayIconEvent};
 use tauri::{App, AppHandle, Runtime};
-use tokio::time::sleep;
 
-use crate::events::ExitAppEvent;
-use crate::states::CanvasImodeStateExt;
+use crate::path::PathExt;
+use crate::states::{CanvasImodeStateExt, SettingsStateExt};
 use crate::window::WindowExt;
 
 /// Extention trait for system tray-related operations.
@@ -70,19 +65,15 @@ fn on_menu_event<R: Runtime>(app_handle: &AppHandle<R>, event: MenuEvent) {
             }
         },
         "tray-exit" => {
-            // Emit the ExitAppEvent to the manager, which will invoke the
-            // exit_app command to clean up and actually exit the application
-            if let Err(e) = ExitAppEvent.emit_to(app_handle, DeskulptWindow::Manager) {
-                eprintln!("Failed to emit ExitAppEvent to manager: {e}");
-                app_handle.exit(1); // Safeguard exit
-            }
-
-            // Safeguard exit after 5 seconds if the normal exit procedure fails
-            let app_handle = app_handle.clone();
-            tauri::async_runtime::spawn(async move {
-                sleep(Duration::from_secs(5)).await;
+            if let Err(e) = app_handle
+                .persist_dir()
+                .and_then(|dir| app_handle.get_settings().dump(dir))
+            {
+                eprintln!("Failed to dump settings before exit: {e}");
                 app_handle.exit(1);
-            });
+                return;
+            }
+            app_handle.exit(0);
         },
         _ => {},
     }

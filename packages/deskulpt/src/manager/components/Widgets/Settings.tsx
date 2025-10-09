@@ -1,9 +1,10 @@
 import { Flex, Table } from "@radix-ui/themes";
 import { LiaTimesSolid } from "react-icons/lia";
-import { updateWidgetSettings, useWidgetsStore } from "../../hooks";
+import { useSettingsStore } from "../../hooks";
 import { memo, useCallback } from "react";
 import IntegerInput from "../IntegerInput";
 import { css } from "@emotion/react";
+import { commands } from "../../../bindings";
 
 const styles = {
   table: css({
@@ -15,9 +16,10 @@ const styles = {
 };
 
 const X = ({ id }: SettingsProps) => {
-  const x = useWidgetsStore((state) => state.widgets[id].settings.x);
+  const x = useSettingsStore((state) => state.widgets[id].x);
   const onValueChange = useCallback(
-    (value: number) => updateWidgetSettings(id, { x: value }, true),
+    (value: number) =>
+      commands.core.updateSettings({ widgets: { [id]: { x: value } } }),
     [id],
   );
 
@@ -32,9 +34,10 @@ const X = ({ id }: SettingsProps) => {
 };
 
 const Y = ({ id }: SettingsProps) => {
-  const y = useWidgetsStore((state) => state.widgets[id].settings.y);
+  const y = useSettingsStore((state) => state.widgets[id].y);
   const onValueChange = useCallback(
-    (value: number) => updateWidgetSettings(id, { y: value }, true),
+    (value: number) =>
+      commands.core.updateSettings({ widgets: { [id]: { y: value } } }),
     [id],
   );
 
@@ -49,9 +52,10 @@ const Y = ({ id }: SettingsProps) => {
 };
 
 const Width = ({ id }: SettingsProps) => {
-  const width = useWidgetsStore((state) => state.widgets[id].settings.width);
+  const width = useSettingsStore((state) => state.widgets[id].width);
   const onValueChange = useCallback(
-    (value: number) => updateWidgetSettings(id, { width: value }, true),
+    (value: number) =>
+      commands.core.updateSettings({ widgets: { [id]: { width: value } } }),
     [id],
   );
 
@@ -66,9 +70,10 @@ const Width = ({ id }: SettingsProps) => {
 };
 
 const Height = ({ id }: SettingsProps) => {
-  const height = useWidgetsStore((state) => state.widgets[id].settings.height);
+  const height = useSettingsStore((state) => state.widgets[id].height);
   const onValueChange = useCallback(
-    (value: number) => updateWidgetSettings(id, { height: value }, true),
+    (value: number) =>
+      commands.core.updateSettings({ widgets: { [id]: { height: value } } }),
     [id],
   );
 
@@ -83,11 +88,10 @@ const Height = ({ id }: SettingsProps) => {
 };
 
 const Opacity = ({ id }: SettingsProps) => {
-  const opacity = useWidgetsStore(
-    (state) => state.widgets[id].settings.opacity,
-  );
+  const opacity = useSettingsStore((state) => state.widgets[id].opacity);
   const onValueChange = useCallback(
-    (value: number) => updateWidgetSettings(id, { opacity: value }, true),
+    (value: number) =>
+      commands.core.updateSettings({ widgets: { [id]: { opacity: value } } }),
     [id],
   );
 
@@ -104,6 +108,8 @@ const Opacity = ({ id }: SettingsProps) => {
 
 X.displayName = "Settings.X";
 Y.displayName = "Settings.Y";
+Width.displayName = "Settings.Width";
+Height.displayName = "Settings.Height";
 Opacity.displayName = "Settings.Opacity";
 
 interface SettingsProps {

@@ -84,6 +84,27 @@ impl WidgetSettings {
     }
 }
 
+/// A patch for partial updates to [`WidgetSettings`].
+#[derive(Debug, Default, Deserialize, specta::Type)]
+#[serde(rename_all = "camelCase", default)]
+pub struct WidgetSettingsPatch {
+    /// If not `None`, update [`WidgetSettings::x`].
+    #[specta(optional, type = i32)]
+    pub x: Option<i32>,
+    /// If not `None`, update [`WidgetSettings::y`].
+    #[specta(optional, type = i32)]
+    pub y: Option<i32>,
+    /// If not `None`, update [`WidgetSettings::width`].
+    #[specta(optional, type = u32)]
+    pub width: Option<u32>,
+    /// If not `None`, update [`WidgetSettings::height`].
+    #[specta(optional, type = u32)]
+    pub height: Option<u32>,
+    /// If not `None`, update [`WidgetSettings::opacity`].
+    #[specta(optional, type = u8)]
+    pub opacity: Option<u8>,
+}
+
 /// Full settings of the Deskulpt application.
 #[serde_as]
 #[derive(Debug, Clone, Default, Deserialize, Serialize, JsonSchema, specta::Type)]
@@ -98,4 +119,29 @@ pub struct Settings {
     /// The mapping from widget IDs to their respective settings.
     #[serde_as(deserialize_as = "MapSkipError<_, _>")]
     pub widgets: BTreeMap<String, WidgetSettings>,
+}
+
+/// A patch for partial updates to [`Settings`].
+#[derive(Debug, Default, Deserialize, specta::Type)]
+#[serde(rename_all = "camelCase", default)]
+pub struct SettingsPatch {
+    /// If not `None`, update [`Settings::theme`].
+    #[specta(optional, type = Theme)]
+    pub theme: Option<Theme>,
+    /// If not `None`, update [`Settings::shortcuts`].
+    ///
+    /// Non-specified shortcuts will remain unchanged. If a shortcut value is
+    /// `None`, it means removing that shortcut. Otherwise, it means updating
+    /// or adding that shortcut.
+    #[specta(optional, type = BTreeMap<ShortcutKey, Option<String>>)]
+    pub shortcuts: Option<BTreeMap<ShortcutKey, Option<String>>>,
+    /// If not `None`, update [`Settings::widgets`].
+    ///
+    /// Non-specified widgets will remain unchanged. If a widget settings patch
+    /// is `None`, it means leaving that widget settings unchanged. Otherwise,
+    /// it means applying the patch to that widget settings. If the widget ID
+    /// does not exist, a new widget settings will be created with default
+    /// values, and then the patch will be applied to it.
+    #[specta(optional, type = BTreeMap<String, Option<WidgetSettingsPatch>>)]
+    pub widgets: Option<BTreeMap<String, Option<WidgetSettingsPatch>>>,
 }

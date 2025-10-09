@@ -1,5 +1,4 @@
-export * from "./useAppSettingsStore";
-export * from "./useExitAppListener";
+export * from "./useSettingsStore";
 export * from "./useInitialRescan";
 export * from "./useUpdateSettingsListener";
 export * from "./useWidgetsStore";
