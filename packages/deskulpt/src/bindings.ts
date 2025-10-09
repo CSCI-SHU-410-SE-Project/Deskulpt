@@ -20,14 +20,6 @@ export type DeskulptWindow =
  */
 "canvas"
 
-/**
- * Event for exiting the application.
- * 
- * This event is emitted from the backend to the manager window when the
- * application needs to be closed for it to persist the states before exiting.
- */
-export type ExitAppEvent = null
-
 export type JsonValue = null | boolean | number | string | JsonValue[] | { [key in string]: JsonValue }
 
 /**
@@ -51,22 +43,9 @@ string[]
  */
 export type RenderWidgetsEvent = 
 /**
- * The list of widgets to be re-rendered.
+ * The list of widget IDs to be re-rendered.
  */
-RenderWidgetsEventInner[]
-
-/**
- * Inner structure for [`RenderWidgetsEvent`].
- */
-export type RenderWidgetsEventInner = { 
-/**
- * The ID of the widget being re-rendered.
- */
-id: string; 
-/**
- * If provided, update the settings of the widget.
- */
-settings?: WidgetSettings }
+string[]
 
 /**
  * Full settings of the Deskulpt application.
@@ -86,27 +65,31 @@ shortcuts: Partial<{ [key in ShortcutKey]: string }>;
 widgets: { [key in string]: WidgetSettings } }
 
 /**
- * Message for updating settings.
+ * A patch for partial updates to [`Settings`].
  */
-export type SettingsUpdate = 
+export type SettingsPatch = { 
 /**
- * Update the theme.
+ * If not `None`, update [`Settings::theme`].
  */
-{ theme: Theme } | 
+theme?: Theme; 
 /**
- * Update a keyboard shortcut.
+ * If not `None`, update [`Settings::shortcuts`].
  * 
- * The first element is the shortcut key, and the second element is the new
- * shortcut value. `None` means to remove the shortcut.
+ * Non-specified shortcuts will remain unchanged. If a shortcut value is
+ * `None`, it means removing that shortcut. Otherwise, it means updating
+ * or adding that shortcut.
  */
-{ shortcut: [ShortcutKey, string | null] } | 
+shortcuts?: Partial<{ [key in ShortcutKey]: string | null }>; 
 /**
- * Update the settings of a widget.
+ * If not `None`, update [`Settings::widgets`].
  * 
- * The first element is the widget ID, and the second element is the new
- * widget settings.
+ * Non-specified widgets will remain unchanged. If a widget settings patch
+ * is `None`, it means leaving that widget settings unchanged. Otherwise,
+ * it means applying the patch to that widget settings. If the widget ID
+ * does not exist, a new widget settings will be created with default
+ * values, and then the patch will be applied to it.
  */
-{ widget: [string, WidgetSettings] }
+widgets?: { [key in string]: WidgetSettingsPatch | null } }
 
 /**
  * Types of keyboard shortcuts in the application.
@@ -138,18 +121,6 @@ export type ShowToastEvent =
 { type: "error"; content: string }
 
 /**
- * Event for switching the app theme.
- * 
- * This event is emitted from the manager window to the canvas window when the
- * theme is switched from the manager side.
- */
-export type SwitchThemeEvent = 
-/**
- * The theme to switch to.
- */
-Theme
-
-/**
  * Light/dark theme of the application.
  */
 export type Theme = "light" | "dark"
@@ -160,23 +131,7 @@ export type Theme = "light" | "dark"
  * This event is emitted between the manager window and the canvas window to
  * each other when widget settings are updated on one side.
  */
-export type UpdateSettingsEvent = { 
-/**
- * The ID of the widget being updated.
- */
-id: string; 
-/**
- * [`WidgetSettings::x`](crate::settings::WidgetSettings::x)
- */
-x?: number; 
-/**
- * [`WidgetSettings::y`](crate::settings::WidgetSettings::y)
- */
-y?: number; 
-/**
- * [`WidgetSettings::opacity`](crate::settings::WidgetSettings::opacity)
- */
-opacity?: number }
+export type UpdateSettingsEvent = Settings
 
 /**
  * Full configuration of a Deskulpt widget.
@@ -219,6 +174,31 @@ height: number;
  */
 opacity: number }
 
+/**
+ * A patch for partial updates to [`WidgetSettings`].
+ */
+export type WidgetSettingsPatch = { 
+/**
+ * If not `None`, update [`WidgetSettings::x`].
+ */
+x?: number; 
+/**
+ * If not `None`, update [`WidgetSettings::y`].
+ */
+y?: number; 
+/**
+ * If not `None`, update [`WidgetSettings::width`].
+ */
+width?: number; 
+/**
+ * If not `None`, update [`WidgetSettings::height`].
+ */
+height?: number; 
+/**
+ * If not `None`, update [`WidgetSettings::opacity`].
+ */
+opacity?: number }
+
 // =============================================================================
 // Events
 // =============================================================================
@@ -240,11 +220,9 @@ function makeEvent<T>(name: string) {
 }
 
 export const events = {
-  exitApp: makeEvent<ExitAppEvent>("exit-app"),
   removeWidgets: makeEvent<RemoveWidgetsEvent>("remove-widgets"),
   renderWidgets: makeEvent<RenderWidgetsEvent>("render-widgets"),
   showToast: makeEvent<ShowToastEvent>("show-toast"),
-  switchTheme: makeEvent<SwitchThemeEvent>("switch-theme"),
   updateSettings: makeEvent<UpdateSettingsEvent>("update-settings"),
 };
 
@@ -377,9 +355,9 @@ export const commands = {
      * - Failed to apply the side effects, if any.
      */
     updateSettings: (
-      update: SettingsUpdate,
+      patch: SettingsPatch,
     ) => invoke<null>("plugin:deskulpt-core|update_settings", {
-      update,
+      patch,
     }),
   },
 };

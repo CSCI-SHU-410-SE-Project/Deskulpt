@@ -6,8 +6,9 @@ import ErrorDisplay from "./ErrorDisplay";
 import { stringifyError } from "../../utils/stringifyError";
 import { LuGripVertical } from "react-icons/lu";
 import { Box } from "@radix-ui/themes";
-import { updateWidgetSettings, useWidgetsStore } from "../hooks";
+import { useSettingsStore, useWidgetsStore } from "../hooks";
 import { css } from "@emotion/react";
+import { commands } from "../../bindings";
 
 const styles = {
   wrapper: css({
@@ -32,11 +33,10 @@ interface WidgetContainerProps {
 const WidgetContainer = memo(({ id }: WidgetContainerProps) => {
   const draggableRef = useRef<HTMLDivElement>(null);
 
-  const {
-    component: Widget,
-    opacity,
-    ...settings
-  } = useWidgetsStore((state) => state.widgets[id]);
+  const { component: Widget } = useWidgetsStore((state) => state[id]);
+  const { opacity, ...settings } = useSettingsStore(
+    (state) => state.widgets[id],
+  );
 
   // Local state to avoid jittery movement during dragging and resizing
   const [x, setX] = useState(settings.x);
@@ -64,7 +64,9 @@ const WidgetContainer = memo(({ id }: WidgetContainerProps) => {
     (_: DraggableEvent, data: DraggableData) => {
       setX(data.x);
       setY(data.y);
-      updateWidgetSettings(id, { x: data.x, y: data.y }, true);
+      commands.core.updateSettings({
+        widgets: { [id]: { x: data.x, y: data.y } },
+      });
     },
     [id],
   );
@@ -73,11 +75,11 @@ const WidgetContainer = memo(({ id }: WidgetContainerProps) => {
     (_, __, ___, delta) => {
       setWidth(width + delta.width);
       setHeight(height + delta.height);
-      updateWidgetSettings(
-        id,
-        { width: width + delta.width, height: height + delta.height },
-        true,
-      );
+      commands.core.updateSettings({
+        widgets: {
+          [id]: { width: width + delta.width, height: height + delta.height },
+        },
+      });
     },
     [id, width, height],
   );

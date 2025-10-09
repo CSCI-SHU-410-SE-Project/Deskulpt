@@ -2,12 +2,12 @@
 
 use std::sync::{RwLock, RwLockReadGuard, RwLockWriteGuard};
 
-use anyhow::Result;
+use anyhow::{bail, Result};
 use tauri::{App, AppHandle, Manager, Runtime};
 use tauri_plugin_global_shortcut::GlobalShortcutExt;
 
 use crate::path::PathExt;
-use crate::settings::{Settings, ShortcutKey, Theme, WidgetSettings};
+use crate::settings::{Settings, SettingsPatch};
 
 /// Managed state for the settings.
 struct SettingsState(RwLock<Settings>);
@@ -43,27 +43,67 @@ pub trait SettingsStateExt<R: Runtime>: Manager<R> + PathExt<R> + GlobalShortcut
         state.0.write().unwrap()
     }
 
-    /// Update the theme.
-    fn update_settings_theme(&self, theme: Theme) {
-        let mut settings = self.get_settings_mut();
-        settings.theme = theme;
-    }
-
-    /// Update a shortcut.
+    /// Apply a patch to the settings.
     ///
-    /// The side effect is that the involved shortcuts will be unregistered or
-    /// registered. If the provided shortcut is `None`, it means removing that
-    /// shortcut.
-    fn update_settings_shortcut(&self, key: ShortcutKey, shortcut: Option<String>) -> Result<()> {
+    /// See [`SettingsPatch`] for more information of how the patch is applied.
+    /// The patch application is best-effort: any part of the patch that fails
+    /// to be applied will be skipped, and the rest will be applied as normal.
+    /// Errors will be accumulated and returned as a single error at the end if
+    /// any occurred.
+    fn apply_settings_patch(&self, patch: SettingsPatch) -> Result<()> {
+        let mut errors = vec![];
         let mut settings = self.get_settings_mut();
-        settings.update_shortcut(self.global_shortcut(), key, shortcut)?;
-        Ok(())
-    }
 
-    /// Update the settings of a widget.
-    fn update_settings_widget(&self, id: String, update: WidgetSettings) {
-        let mut settings = self.get_settings_mut();
-        settings.widgets.insert(id, update);
+        if let Some(theme) = patch.theme {
+            settings.theme = theme;
+        }
+
+        if let Some(shortcuts) = patch.shortcuts {
+            let gs = self.global_shortcut();
+            for (key, shortcut) in shortcuts {
+                if let Err(e) = settings.update_shortcut(&gs, &key, shortcut) {
+                    errors.push(e.context(format!("Failed to update /shortcuts/{key:?}")));
+                }
+            }
+        }
+
+        if let Some(widgets) = patch.widgets {
+            for (id, patch) in widgets {
+                if patch.is_none() {
+                    settings.widgets.remove(&id);
+                    continue;
+                }
+                let patch = patch.unwrap();
+                let widget = settings.widgets.entry(id).or_default();
+
+                if let Some(x) = patch.x {
+                    widget.x = x;
+                }
+                if let Some(y) = patch.y {
+                    widget.y = y;
+                }
+                if let Some(width) = patch.width {
+                    widget.width = width;
+                }
+                if let Some(height) = patch.height {
+                    widget.height = height;
+                }
+                if let Some(opacity) = patch.opacity {
+                    widget.opacity = opacity;
+                }
+            }
+        }
+
+        if errors.is_empty() {
+            return Ok(());
+        }
+
+        let message = errors
+            .into_iter()
+            .map(|e| format!("{e:?}"))
+            .collect::<Vec<_>>()
+            .join("\n\n");
+        bail!("One or more errors occurred while applying the settings patch:\n\n{message}");
     }
 }
 

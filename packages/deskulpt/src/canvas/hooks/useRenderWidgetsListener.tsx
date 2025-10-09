@@ -15,9 +15,9 @@ export function useRenderWidgetsListener() {
 
   useEffect(() => {
     const unlisten = events.renderWidgets.listen(async (event) => {
-      const widgets = useWidgetsStore.getState().widgets;
+      const widgets = useWidgetsStore.getState();
 
-      const promises = event.payload.map(async ({ id, settings }) => {
+      const promises = event.payload.map(async (id) => {
         let apisBlobUrl;
         if (id in widgets) {
           // APIs blob URL can be reused because the contents are dependent only
@@ -47,7 +47,6 @@ export function useRenderWidgetsListener() {
             "Error bundling the widget",
             stringifyError(error),
             apisBlobUrl,
-            settings,
           );
           return;
         }
@@ -72,18 +71,11 @@ export function useRenderWidgetsListener() {
             "Error importing the widget module",
             stringifyError(error),
             apisBlobUrl,
-            settings,
           );
           return;
         }
 
-        updateWidgetRender(
-          id,
-          module.default,
-          moduleBlobUrl,
-          apisBlobUrl,
-          settings,
-        );
+        updateWidgetRender(id, module.default, moduleBlobUrl, apisBlobUrl);
       });
 
       await Promise.all(promises);

@@ -15,9 +15,7 @@ const styles = {
 };
 
 const WidgetsTab = memo(() => {
-  const ids = useWidgetsStore(
-    useShallow((state) => Object.keys(state.widgets)),
-  );
+  const ids = useWidgetsStore(useShallow((state) => Object.keys(state)));
 
   return (
     <Tabs.Root orientation="vertical" defaultValue="tab0" asChild>

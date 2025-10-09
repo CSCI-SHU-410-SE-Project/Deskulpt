@@ -11,9 +11,7 @@ interface GlobalActionsProps {
 
 const GlobalActions = memo(({ length }: GlobalActionsProps) => {
   const refreshAction = useCallback(() => {
-    const event = Object.entries(useWidgetsStore.getState().widgets).map(
-      ([id, { settings }]) => ({ id, settings }),
-    );
+    const event = Object.entries(useWidgetsStore.getState()).map(([id]) => id);
     events.renderWidgets
       .emitTo("canvas", event)
       .then(() => {

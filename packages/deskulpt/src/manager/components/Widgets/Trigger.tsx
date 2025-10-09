@@ -30,7 +30,7 @@ interface TriggerProps {
 }
 
 const Trigger = memo(({ id, value }: TriggerProps) => {
-  const config = useWidgetsStore((state) => state.widgets[id].config);
+  const config = useWidgetsStore((state) => state[id]);
 
   return (
     <Tabs.Trigger value={value} css={styles.trigger}>

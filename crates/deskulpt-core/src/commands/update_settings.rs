@@ -1,27 +1,10 @@
-use serde::Deserialize;
+use deskulpt_common::event::Event;
 use tauri::{command, AppHandle, Runtime};
 
 use super::error::CmdResult;
-use crate::settings::{ShortcutKey, Theme, WidgetSettings};
+use crate::events::UpdateSettingsEvent;
+use crate::settings::SettingsPatch;
 use crate::states::SettingsStateExt;
-
-/// Message for updating settings.
-#[derive(Deserialize, specta::Type)]
-#[serde(rename_all = "camelCase")]
-pub enum SettingsUpdate {
-    /// Update the theme.
-    Theme(Theme),
-    /// Update a keyboard shortcut.
-    ///
-    /// The first element is the shortcut key, and the second element is the new
-    /// shortcut value. `None` means to remove the shortcut.
-    Shortcut(ShortcutKey, Option<String>),
-    /// Update the settings of a widget.
-    ///
-    /// The first element is the widget ID, and the second element is the new
-    /// widget settings.
-    Widget(String, WidgetSettings),
-}
 
 /// Update the settings.
 ///
@@ -36,18 +19,12 @@ pub enum SettingsUpdate {
 #[specta::specta]
 pub async fn update_settings<R: Runtime>(
     app_handle: AppHandle<R>,
-    update: SettingsUpdate,
+    patch: SettingsPatch,
 ) -> CmdResult<()> {
-    match update {
-        SettingsUpdate::Theme(theme) => {
-            app_handle.update_settings_theme(theme);
-        },
-        SettingsUpdate::Shortcut(key, value) => {
-            app_handle.update_settings_shortcut(key, value)?;
-        },
-        SettingsUpdate::Widget(id, settings) => {
-            app_handle.update_settings_widget(id, settings);
-        },
-    }
+    app_handle.apply_settings_patch(patch)?;
+
+    let settings = app_handle.get_settings().clone();
+    UpdateSettingsEvent(settings).emit(&app_handle)?;
+
     Ok(())
 }
