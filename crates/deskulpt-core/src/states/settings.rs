@@ -61,7 +61,7 @@ pub trait SettingsStateExt<R: Runtime>: Manager<R> + PathExt<R> + GlobalShortcut
         if let Some(shortcuts) = patch.shortcuts {
             let gs = self.global_shortcut();
             for (key, shortcut) in shortcuts {
-                if let Err(e) = settings.update_shortcut(&gs, &key, shortcut) {
+                if let Err(e) = settings.update_shortcut(gs, &key, shortcut) {
                     errors.push(e.context(format!("Failed to update /shortcuts/{key:?}")));
                 }
             }
