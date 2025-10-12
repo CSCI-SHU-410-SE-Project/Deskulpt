@@ -2,8 +2,8 @@
 
 <a href="https://csci-shu-410-se-project.github.io/">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://github.com/CSCI-SHU-410-SE-Project/Deskulpt/raw/main/packages/deskulpt/public/deskulpt-wide-dark.svg" />
-    <img alt="Deskulpt" src="https://github.com/CSCI-SHU-410-SE-Project/Deskulpt/raw/main/packages/deskulpt/public/deskulpt-wide.svg" width="300px" />
+    <source media="(prefers-color-scheme: dark)" srcset="https://github.com/deskulpt-apps/Deskulpt/raw/main/packages/deskulpt/public/deskulpt-wide-dark.svg" />
+    <img alt="Deskulpt" src="https://github.com/deskulpt-apps/Deskulpt/raw/main/packages/deskulpt/public/deskulpt-wide.svg" width="300px" />
   </picture>
 </a>
 
@@ -11,7 +11,7 @@
 
 <br />
 
-[![release](https://img.shields.io/github/v/release/CSCI-SHU-410-SE-Project/Deskulpt)](https://github.com/CSCI-SHU-410-SE-Project/Deskulpt/releases/latest) [![ci](https://img.shields.io/github/actions/workflow/status/CSCI-SHU-410-SE-Project/Deskulpt/ci.yaml?label=ci&logo=github)](https://github.com/CSCI-SHU-410-SE-Project/Deskulpt/actions/workflows/ci.yaml) [![hompage](https://img.shields.io/badge/homepage-Deskulpt-blue.svg)](https://csci-shu-410-se-project.github.io/)
+[![release](https://img.shields.io/github/v/release/deskulpt-apps/Deskulpt)](https://github.com/deskulpt-apps/Deskulpt/releases/latest) [![ci](https://img.shields.io/github/actions/workflow/status/deskulpt-apps/Deskulpt/ci.yaml?label=ci&logo=github)](https://github.com/deskulpt-apps/Deskulpt/actions/workflows/ci.yaml) [![hompage](https://img.shields.io/badge/homepage-Deskulpt-blue.svg)](https://csci-shu-410-se-project.github.io/)
 
 </div>
 
@@ -47,7 +47,7 @@ Website: [https://csci-shu-410-se-project.github.io/](https://csci-shu-410-se-pr
 
 ## Download
 
-Download the latest release of Deskulpt [here](https://github.com/CSCI-SHU-410-SE-Project/Deskulpt/releases). See [Quick Start](https://csci-shu-410-se-project.github.io/guide/quick-start.html) for more details.
+Download the latest release of Deskulpt [here](https://github.com/deskulpt-apps/Deskulpt/releases). See [Quick Start](https://csci-shu-410-se-project.github.io/guide/quick-start.html) for more details.
 
 ## Contributing
 

@@ -15,12 +15,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/CSCI-SHU-410-SE-Project/Deskulpt.git"
+    "url": "git+https://github.com/deskulpt-apps/Deskulpt.git"
   },
   "author": "The Deskulpt Development Team",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/CSCI-SHU-410-SE-Project/Deskulpt/issues"
+    "url": "https://github.com/deskulpt-apps/Deskulpt/issues"
   },
   "homepage": "https://csci-shu-410-se-project.github.io/",
   "devDependencies": {

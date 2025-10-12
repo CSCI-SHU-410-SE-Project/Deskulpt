@@ -46,9 +46,9 @@ const AboutTab = memo(() => {
             <Table.Row align="center">
               <Table.RowHeaderCell>Repository</Table.RowHeaderCell>
               <Table.Cell>
-                <CopyLink href="https://github.com/CSCI-SHU-410-SE-Project/Deskulpt">
+                <CopyLink href="https://github.com/deskulpt-apps/Deskulpt">
                   <Flex align="center" gap="1">
-                    <FaGithub /> CSCI-SHU-410-SE-Project/Deskulpt
+                    <FaGithub /> deskulpt-apps/Deskulpt
                   </Flex>
                 </CopyLink>
               </Table.Cell>

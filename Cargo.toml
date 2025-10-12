@@ -7,7 +7,7 @@ authors    = ["The Deskulpt Development Team"]
 edition    = "2021"
 homepage   = "https://csci-shu-410-se-project.github.io/"
 license    = "MIT"
-repository = "https://github.com/CSCI-SHU-410-SE-Project/Deskulpt"
+repository = "https://github.com/deskulpt-apps/Deskulpt"
 version    = "0.0.1"
 
 [workspace.dependencies]
