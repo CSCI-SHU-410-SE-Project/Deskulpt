@@ -1,12 +1,14 @@
 use std::collections::HashMap;
 use std::fs::read_dir;
 
+use deskulpt_common::event::Event;
 use tauri::{command, AppHandle, Runtime};
 
 use super::error::CmdResult;
 use crate::config::WidgetConfig;
+use crate::events::UpdateSettingsEvent;
 use crate::path::PathExt;
-use crate::states::WidgetConfigMapStateExt;
+use crate::states::{SettingsStateExt, WidgetConfigMapStateExt};
 
 /// Rescan the widgets directory and update the widget configuration map.
 ///
@@ -42,6 +44,20 @@ pub async fn rescan_widgets<R: Runtime>(
             let id = entry.file_name().to_string_lossy().to_string();
             new_config_map.insert(id, widget_config);
         }
+    }
+
+    {
+        let mut settings = app_handle.get_settings_mut();
+        settings
+            .widgets
+            .retain(|id, _| new_config_map.contains_key(id));
+        for id in new_config_map.keys() {
+            settings
+                .widgets
+                .entry(id.clone())
+                .or_insert_with(Default::default);
+        }
+        UpdateSettingsEvent(settings.clone()).emit(&app_handle)?;
     }
 
     app_handle.with_widget_config_map_mut(|config_map| {
