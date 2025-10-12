@@ -15,7 +15,7 @@ hero:
       link: /guide/introduction
     - theme: alt
       text: Download
-      link: https://github.com/CSCI-SHU-410-SE-Project/Deskulpt/releases/latest
+      link: https://github.com/deskulpt-apps/Deskulpt/releases/latest
 
 features:
   - title: Fast, Lightweight, Cross-Platform
@@ -32,5 +32,5 @@ features:
 :::warning 🚧 Alpha Software
 Deskulpt is currently in early development stage. Features may be incomplete or unstable and are subject to change.
 
-We welcome early users! If you try it out and have feedback or issues, please [open a GitHub issue](https://github.com/CSCI-SHU-410-SE-Project/Deskulpt/issues/new) to share them with us.
+We welcome early users! If you try it out and have feedback or issues, please [open a GitHub issue](https://github.com/deskulpt-apps/Deskulpt/issues/new) to share them with us.
 :::

@@ -8,7 +8,7 @@ Deskulpt is currently available on the following desktop platforms:
 - MacOS (Catalina 10.15 and later, Intel and Apple Silicon)
 - Linux (X11, tested on Ubuntu)
 
-You can download the latest release of Deskulpt from [Github Releases](https://github.com/CSCI-SHU-410-SE-Project/Deskulpt/releases/latest).
+You can download the latest release of Deskulpt from [Github Releases](https://github.com/deskulpt-apps/Deskulpt/releases/latest).
 
 ## Install
 

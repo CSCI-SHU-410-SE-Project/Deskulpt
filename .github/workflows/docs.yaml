@@ -64,6 +64,6 @@ jobs:
         uses: peaceiris/actions-gh-pages@v4
         with:
           deploy_key: ${{ secrets.GH_PAGES_DEPLOY_KEY }}
-          external_repository: CSCI-SHU-410-SE-Project/CSCI-SHU-410-SE-Project.github.io
+          external_repository: deskulpt-apps/deskulpt-apps.github.io
           publish_branch: main
           publish_dir: docs-dist

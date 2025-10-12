@@ -98,7 +98,7 @@ export default defineConfig({
     socialLinks: [
       {
         icon: "github",
-        link: "https://github.com/CSCI-SHU-410-SE-Project/Deskulpt",
+        link: "https://github.com/deskulpt-apps/Deskulpt",
       },
     ],
     footer: {
