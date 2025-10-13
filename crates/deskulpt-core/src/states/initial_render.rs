@@ -4,7 +4,6 @@ use std::sync::Mutex;
 
 use anyhow::Result;
 use deskulpt_common::event::Event;
-use deskulpt_common::window::DeskulptWindow;
 use tauri::{App, AppHandle, Emitter, Manager, Runtime};
 
 use crate::events::RenderWidgetsEvent;
@@ -54,7 +53,7 @@ pub trait InitialRenderStateExt<R: Runtime>: Manager<R> + Emitter<R> {
         initial_render.ready = true;
 
         if let Some(event) = initial_render.pending.take() {
-            event.emit_to(self, DeskulptWindow::Canvas)?;
+            event.emit(self)?;
         }
         Ok(())
     }
@@ -75,7 +74,7 @@ pub trait InitialRenderStateExt<R: Runtime>: Manager<R> + Emitter<R> {
             initial_render.pending = Some(event);
             return Ok(());
         }
-        event.emit_to(self, DeskulptWindow::Canvas)?;
+        event.emit(self)?;
         Ok(())
     }
 }

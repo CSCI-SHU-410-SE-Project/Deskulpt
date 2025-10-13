@@ -13,7 +13,7 @@ const Header = memo(({ id }: HeaderProps) => {
   const type = useWidgetsStore((state) => state[id].type);
 
   const refreshAction = useCallback(() => {
-    events.renderWidgets.emitTo("canvas", [id]).then(() => {
+    events.renderWidgets.emit([id]).then(() => {
       toast.success("Widget refreshed.");
     });
   }, [id]);

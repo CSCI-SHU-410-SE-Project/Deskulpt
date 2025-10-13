@@ -33,6 +33,7 @@ tauri = { workspace = true, features = [
   "specta",
   "tray-icon",
   "macos-private-api",
+  "unstable",
 ] }
 
 # TODO: Remove these when finalized

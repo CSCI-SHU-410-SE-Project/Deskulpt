@@ -6,9 +6,14 @@
   "permissions": [
     "deskulpt-core:allow-bundle-widget",
     "deskulpt-core:allow-call-plugin",
+    "deskulpt-core:allow-create-widget-webview",
     "deskulpt-core:allow-set-render-ready",
     "deskulpt-core:allow-update-settings",
     "core:event:default",
+    "core:webview:default",
+    "core:webview:allow-webview-close",
+    "core:webview:allow-set-webview-position",
+    "core:webview:allow-set-webview-size",
     "opener:allow-open-url",
     "opener:allow-default-urls"
   ]
