@@ -85,6 +85,54 @@ pub trait WindowExt<R: Runtime>: Manager<R> + SettingsStateExt<R> {
         Ok(())
     }
 
+    fn create_widget_window(
+        &self,
+        id: String,
+        x: i32,
+        y: i32,
+        width: u32,
+        height: u32,
+    ) -> Result<()>
+    where
+        Self: Sized,
+    {
+        let settings = self.get_settings();
+        let init_js = CanvasInitJS::generate(&settings)?;
+
+        #[cfg_attr(not(target_os = "macos"), allow(unused_variables))]
+        let canvas = WebviewWindowBuilder::new(
+            self,
+            format!("widget-{id}"),
+            WebviewUrl::App(format!("src/canvas/widget.html?id={id}").into()),
+        )
+        .inner_size(width.into(), height.into())
+        .position(x.into(), y.into())
+        .title(format!("Deskulpt Widget - {id}"))
+        .maximizable(false)
+        .minimizable(false)
+        .closable(false)
+        .transparent(true)
+        .skip_taskbar(true)
+        .initialization_script(&init_js)
+        .build()?;
+
+        #[cfg(target_os = "macos")]
+        {
+            use objc2::msg_send;
+            use objc2::runtime::{AnyObject, Bool};
+
+            // Disable the window shadow on macOS; there will be shadows left on
+            // movement for transparent and undecorated windows that we are using;
+            // it seems that disabling shadows does not have significant visual impacts
+            unsafe {
+                let ns_window = canvas.ns_window()? as *mut AnyObject;
+                let () = msg_send![ns_window, setHasShadow:Bool::NO];
+            }
+        }
+
+        Ok(())
+    }
+
     /// Open the manager window.
     fn open_manager(&self) -> Result<()> {
         let manager = DeskulptWindow::Manager.webview_window(self)?;

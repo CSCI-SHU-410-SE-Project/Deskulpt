@@ -1,18 +1,14 @@
 {
   "$schema": "../gen/schemas/desktop-schema.json",
-  "identifier": "canvas-capabilities",
-  "description": "Capabilities of the canvas window.",
-  "windows": ["canvas"],
+  "identifier": "widgets-capabilities",
+  "description": "Capabilities of the widget windows.",
+  "windows": ["widget-*"],
   "permissions": [
     "deskulpt-core:allow-bundle-widget",
     "deskulpt-core:allow-call-plugin",
-    "deskulpt-core:allow-create-widget-window",
     "deskulpt-core:allow-set-render-ready",
     "deskulpt-core:allow-update-settings",
     "core:event:default",
-    "core:webview:default",
-    "core:window:default",
-    "core:window:allow-close",
     "opener:allow-open-url",
     "opener:allow-default-urls"
   ]

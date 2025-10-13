@@ -25,6 +25,7 @@ export default defineConfig({
       input: {
         manager: resolve(__dirname, "src/manager/index.html"),
         canvas: resolve(__dirname, "src/canvas/index.html"),
+        widget: resolve(__dirname, "src/canvas/widget.html"),
         // Make the scripts entrypoints so that they are preserved even if not imported
         "gen/jsx-runtime": resolve(__dirname, "src/gen/jsx-runtime.js"),
         "gen/raw-apis": resolve(__dirname, "src/gen/raw-apis.js"),
