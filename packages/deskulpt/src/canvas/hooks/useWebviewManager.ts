@@ -114,14 +114,12 @@ export function useWebviewManager() {
 
   // Update webview positions and sizes when settings change
   useEffect(() => {
-    const updateWebviews = async () => {
-      for (const [id, settings] of Object.entries(settingsStore.widgets)) {
-        await updateWebviewPosition(id, settings.x, settings.y);
-        await updateWebviewSize(id, settings.width, settings.height);
-      }
-    };
-
-    updateWebviews().catch(console.error);
+    for (const [id, settings] of Object.entries(settingsStore.widgets)) {
+      updateWebviewPosition(id, settings.x, settings.y).catch(console.error);
+      updateWebviewSize(id, settings.width, settings.height).catch(
+        console.error,
+      );
+    }
   }, [settingsStore.widgets, updateWebviewPosition, updateWebviewSize]);
 
   return {

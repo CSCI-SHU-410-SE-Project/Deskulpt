@@ -6,7 +6,7 @@ export function useRenderWidgetsListener() {
   const hasInited = useRef(false);
 
   useEffect(() => {
-    const unlisten = events.renderWidgets.listen(async (event) => {
+    const unlisten = events.renderWidgets.listen((event) => {
       // Just ensure widgets exist in store - individual webviews handle their own rendering
       const widgets = useWidgetsStore.getState();
 
