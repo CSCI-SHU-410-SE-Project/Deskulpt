@@ -8,7 +8,7 @@ use super::error::CmdResult;
 use crate::config::WidgetConfig;
 use crate::events::UpdateSettingsEvent;
 use crate::path::PathExt;
-use crate::states::{SettingsStateExt, WidgetConfigMapStateExt};
+use crate::states::{SettingsStateExt, WidgetCatalogStateExt};
 
 /// Rescan the widgets directory and update the widget configuration map.
 ///
@@ -60,8 +60,8 @@ pub async fn rescan_widgets<R: Runtime>(
         UpdateSettingsEvent(settings.clone()).emit(&app_handle)?;
     }
 
-    app_handle.with_widget_config_map_mut(|config_map| {
-        config_map.clone_from(&new_config_map);
+    app_handle.with_widget_catalog_mut(|catalog| {
+        catalog.configs_mut().clone_from(&new_config_map);
     });
     Ok(new_config_map)
 }
