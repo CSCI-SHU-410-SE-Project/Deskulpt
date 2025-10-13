@@ -12,9 +12,9 @@ catalog:
   "@tauri-apps/api": ^2.8.0
   "@tauri-apps/plugin-clipboard-manager": ^2.3.0
   "@tauri-apps/plugin-opener": ^2.5.0
-  "@types/node": ^24.7.0
-  "@types/react": ^19.2.0
-  "@types/react-dom": ^19.2.0
+  "@types/node": ^24.7.2
+  "@types/react": ^19.2.2
+  "@types/react-dom": ^19.2.1
   "@vitejs/plugin-react": ^5.0.4
   re-resizable: ^6.11.2
   react: ^19.2.0
