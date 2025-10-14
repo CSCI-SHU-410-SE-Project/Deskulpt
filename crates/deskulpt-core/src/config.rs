@@ -68,6 +68,12 @@ impl LoadFromFile for PackageJson {
     const FILE_NAME: &'static str = "package.json";
 }
 
+/// Collection of widgets discovered by the application.
+#[derive(Debug, Default, Clone)]
+pub struct WidgetCatalog {
+    pub configs: HashMap<String, WidgetConfig>,
+}
+
 /// Full configuration of a Deskulpt widget.
 #[derive(Debug, Clone, Serialize, specta::Type)]
 #[serde(tag = "type", rename_all = "camelCase")]

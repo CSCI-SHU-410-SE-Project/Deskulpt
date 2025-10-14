@@ -5,7 +5,7 @@ use super::error::{cmderr, CmdResult};
 use crate::bundler::WidgetBundlerBuilder;
 use crate::config::WidgetConfig;
 use crate::path::PathExt;
-use crate::states::WidgetConfigMapStateExt;
+use crate::states::WidgetCatalogStateExt;
 
 /// Bundle a widget.
 ///
@@ -20,8 +20,9 @@ use crate::states::WidgetConfigMapStateExt;
 pub async fn bundle_widget<R: Runtime>(app_handle: AppHandle<R>, id: String) -> CmdResult<String> {
     let widgets_dir = app_handle.widgets_dir()?;
 
-    let mut bundler = app_handle.with_widget_config_map(|config_map| {
-        match config_map
+    let mut bundler = app_handle.with_widget_catalog(|catalog| {
+        match catalog
+            .configs
             .get(&id)
             .ok_or_else(|| cmderr!("Widget (id={}) does not exist", id))?
         {
