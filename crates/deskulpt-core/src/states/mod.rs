@@ -12,4 +12,4 @@ pub use initial_render::InitialRenderStateExt;
 #[doc(hidden)]
 pub use settings::SettingsStateExt;
 #[doc(hidden)]
-pub use widget_catalog::{WidgetCatalog, WidgetCatalogStateExt};
+pub use widget_catalog::WidgetCatalogStateExt;

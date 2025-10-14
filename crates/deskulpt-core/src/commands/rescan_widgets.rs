@@ -61,7 +61,7 @@ pub async fn rescan_widgets<R: Runtime>(
     }
 
     app_handle.with_widget_catalog_mut(|catalog| {
-        catalog.configs_mut().clone_from(&new_config_map);
+        catalog.configs.clone_from(&new_config_map);
     });
     Ok(new_config_map)
 }

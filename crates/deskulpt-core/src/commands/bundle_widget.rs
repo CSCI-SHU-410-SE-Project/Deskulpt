@@ -22,6 +22,7 @@ pub async fn bundle_widget<R: Runtime>(app_handle: AppHandle<R>, id: String) -> 
 
     let mut bundler = app_handle.with_widget_catalog(|catalog| {
         match catalog
+            .configs
             .get(&id)
             .ok_or_else(|| cmderr!("Widget (id={}) does not exist", id))?
         {

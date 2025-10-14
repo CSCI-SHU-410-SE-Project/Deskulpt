@@ -1,44 +1,11 @@
 //! State management for the widget catalog.
 
-use std::collections::HashMap;
 use std::sync::RwLock;
 
 use tauri::{App, AppHandle, Manager, Runtime};
 
-use crate::config::WidgetConfig;
+use crate::config::WidgetCatalog;
 use crate::path::PathExt;
-
-/// Collection of widgets discovered by the application.
-#[derive(Default, Clone)]
-pub struct WidgetCatalog(HashMap<String, WidgetConfig>);
-
-impl WidgetCatalog {
-    /// Create a new empty widget catalog.
-    pub fn new() -> Self {
-        Self(HashMap::new())
-    }
-
-    /// Borrow the underlying configuration map.
-    pub fn configs(&self) -> &HashMap<String, WidgetConfig> {
-        &self.0
-    }
-
-    /// Mutably borrow the underlying configuration map.
-    pub fn configs_mut(&mut self) -> &mut HashMap<String, WidgetConfig> {
-        &mut self.0
-    }
-
-    /// Look up configuration for a widget by ID.
-    pub fn get(&self, id: &str) -> Option<&WidgetConfig> {
-        self.0.get(id)
-    }
-}
-
-impl From<HashMap<String, WidgetConfig>> for WidgetCatalog {
-    fn from(configs: HashMap<String, WidgetConfig>) -> Self {
-        Self(configs)
-    }
-}
 
 /// Managed state for the widget catalog.
 #[derive(Default)]
