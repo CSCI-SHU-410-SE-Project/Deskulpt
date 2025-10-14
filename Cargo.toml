@@ -67,3 +67,6 @@ lto           = "fat"
 opt-level     = "s"
 panic         = "abort"
 strip         = true
+
+[patch.crates-io]
+tray-icon = { path = "vendor/tray-icon" }
