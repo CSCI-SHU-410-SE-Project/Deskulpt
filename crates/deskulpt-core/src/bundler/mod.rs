@@ -6,13 +6,15 @@ use std::path::PathBuf;
 use std::sync::Arc;
 
 use alias::AliasPlugin;
-use anyhow::{anyhow, bail, Result};
+use anyhow::{anyhow, bail, Context, Result};
 use either::Either;
 use rolldown::{
     Bundler, BundlerOptions, BundlerTransformOptions, JsxOptions, OutputFormat, Platform,
     RawMinifyOptions,
 };
 use rolldown_common::Output;
+use serde_json::Value;
+use tokio::{fs, process::Command};
 
 /// Builder for the Deskulpt widget bundler.
 pub struct WidgetBundlerBuilder {
@@ -30,6 +32,7 @@ impl WidgetBundlerBuilder {
 
     /// Build the Deskulpt widget bundler.
     pub fn build(self) -> WidgetBundler {
+        let Self { root, entry } = self;
         const JSX_RUNTIME_URL: &str = "__DESKULPT_BASE_URL__/gen/jsx-runtime.js";
         const RAW_APIS_URL: &str = "__DESKULPT_BASE_URL__/gen/raw-apis.js";
         const REACT_URL: &str = "__DESKULPT_BASE_URL__/gen/react.js";
@@ -37,8 +40,8 @@ impl WidgetBundlerBuilder {
         const APIS_BLOB_URL: &str = "__DESKULPT_APIS_BLOB_URL__";
 
         let bundler_options = BundlerOptions {
-            input: Some(vec![self.entry.into()]),
-            cwd: Some(self.root),
+            input: Some(vec![entry.into()]),
+            cwd: Some(root.clone()),
             format: Some(OutputFormat::Esm),
             platform: Some(Platform::Browser),
             minify: Some(RawMinifyOptions::Bool(true)),
@@ -86,6 +89,7 @@ impl WidgetBundlerBuilder {
 
         WidgetBundler {
             bundler: Bundler::with_plugins(bundler_options, vec![Arc::new(alias_plugin)]),
+            root,
         }
     }
 }
@@ -93,11 +97,60 @@ impl WidgetBundlerBuilder {
 /// The Deskulpt widget bundler.
 pub struct WidgetBundler {
     bundler: Bundler,
+    root: PathBuf,
 }
 
 impl WidgetBundler {
+    async fn ensure_dependencies_installed(&self) -> Result<()> {
+        let package_json_path = self.root.join("package.json");
+
+        if !package_json_path.exists() {
+            return Ok(());
+        }
+
+        let package_json = fs::read(&package_json_path)
+            .await
+            .with_context(|| format!("Failed to read {}", package_json_path.display()))?;
+        let package_json: Value = serde_json::from_slice(&package_json)
+            .with_context(|| format!("Failed to parse {}", package_json_path.display()))?;
+
+        let has_dependencies = package_json
+            .get("dependencies")
+            .and_then(Value::as_object)
+            .map(|deps| !deps.is_empty())
+            .unwrap_or(false);
+
+        if !has_dependencies {
+            return Ok(());
+        }
+
+        let status = Command::new("pnpm")
+            .current_dir(&self.root)
+            .arg("install")
+            .arg("--prod")
+            .status()
+            .await
+            .with_context(|| {
+                format!(
+                    "Failed to execute `pnpm install --prod` in {}",
+                    self.root.display()
+                )
+            })?;
+
+        if !status.success() {
+            bail!(
+                "`pnpm install --prod` in {} exited with status {status}",
+                self.root.display()
+            );
+        }
+
+        Ok(())
+    }
+
     /// Bundle the widget into a single ESM code string.
     pub async fn bundle(&mut self) -> Result<String> {
+        self.ensure_dependencies_installed().await?;
+
         let result = self.bundler.generate().await.map_err(|e| {
             anyhow!(e
                 .into_vec()
