@@ -4,6 +4,9 @@
     html_favicon_url = "https://github.com/deskulpt-apps/Deskulpt/raw/main/packages/deskulpt/public/deskulpt.svg"
 )]
 
+mod logging;
+
+use anyhow::Context;
 use deskulpt_core::path::PathExt;
 use deskulpt_core::states::{
     CanvasImodeStateExt, InitialRenderStateExt, SettingsStateExt, WidgetCatalogStateExt,
@@ -22,6 +25,9 @@ pub fn run() {
         .setup(move |app| {
             app.init_widgets_dir()?;
             app.init_persist_dir()?;
+
+            let logs_dir = app.persist_dir()?.join("logs");
+            logging::init(&logs_dir).context("Failed to initialize Deskulpt logging")?;
 
             app.manage_settings();
             app.manage_initial_render();

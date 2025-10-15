@@ -8,6 +8,7 @@ use std::path::Path;
 use anyhow::{Context, Result};
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
+use tracing::{debug, info, warn};
 
 /// Deserialized `deskulpt.conf.json`.
 #[derive(Debug, Deserialize)]
@@ -96,30 +97,48 @@ impl WidgetConfig {
     /// This returns `None` if the directory is not considered a widget
     /// directory, or if the widget is explicitly marked as ignored.
     pub fn load(dir: &Path) -> Option<Self> {
+        debug!(path = %dir.display(), "Inspecting directory for widget metadata");
         let deskulpt_conf =
             match DeskulptConf::load(dir).context("Failed to load deskulpt.conf.json") {
                 Ok(Some(deskulpt_conf)) => deskulpt_conf,
-                Ok(None) => return None,
+                Ok(None) => {
+                    debug!(path = %dir.display(), "Missing deskulpt.conf.json; skipping directory");
+                    return None;
+                },
                 Err(e) => {
+                    warn!(path = %dir.display(), error = ?e, "Error loading deskulpt.conf.json");
                     return Some(WidgetConfig::Err {
                         error: format!("{e:?}"),
-                    })
+                    });
                 },
             };
 
         // Ignore widgets that are explicitly marked as such
         if deskulpt_conf.ignore {
+            info!(
+                path = %dir.display(),
+                widget_name = %deskulpt_conf.name,
+                "Widget marked as ignored; skipping"
+            );
             return None;
         }
 
         let package_json = match PackageJson::load(dir).context("Failed to load package.json") {
             Ok(package_json) => package_json.unwrap_or_default(),
             Err(e) => {
+                warn!(path = %dir.display(), error = ?e, "Error loading package.json");
                 return Some(WidgetConfig::Err {
                     error: format!("{e:?}"),
-                })
+                });
             },
         };
+
+        debug!(
+            path = %dir.display(),
+            entry = %deskulpt_conf.entry,
+            dependency_count = package_json.dependencies.len(),
+            "Widget configuration loaded"
+        );
 
         Some(WidgetConfig::Ok {
             name: deskulpt_conf.name,
@@ -146,11 +165,13 @@ impl WidgetCatalog {
         let mut catalog = Self::default();
 
         let entries = std::fs::read_dir(dir)?;
+        info!(path = %dir.display(), "Scanning for widgets");
         for entry in entries {
             let entry = entry?;
 
             let path = entry.path();
             if !path.is_dir() {
+                debug!(path = %path.display(), "Skipping non-directory entry");
                 continue; // Non-directory entries are not widgets, skip
             }
 
@@ -159,10 +180,35 @@ impl WidgetCatalog {
                 // directory, the directory names must be unique and we can use
                 // them as widget IDs
                 let id = entry.file_name().to_string_lossy().to_string();
+                match &config {
+                    WidgetConfig::Ok {
+                        name,
+                        entry,
+                        dependencies,
+                    } => {
+                        info!(
+                            widget_id = %id,
+                            widget_name = %name,
+                            entry = %entry,
+                            dependency_count = dependencies.len(),
+                            "Widget detected"
+                        );
+                    },
+                    WidgetConfig::Err { error } => {
+                        warn!(widget_id = %id, error = %error, "Widget configuration error");
+                    },
+                }
                 catalog.0.insert(id, config);
+            } else {
+                debug!(path = %path.display(), "Directory skipped; not a Deskulpt widget");
             }
         }
 
+        info!(
+            path = %dir.display(),
+            widget_count = catalog.0.len(),
+            "Widget scanning completed"
+        );
         Ok(catalog)
     }
 }
