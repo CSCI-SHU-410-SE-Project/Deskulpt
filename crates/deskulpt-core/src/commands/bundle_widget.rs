@@ -28,7 +28,7 @@ pub async fn bundle_widget<R: Runtime>(app_handle: AppHandle<R>, id: String) -> 
         {
             WidgetConfig::Ok { entry, .. } => {
                 let builder = WidgetBundlerBuilder::new(widgets_dir.join(&id), entry.clone());
-                Ok(builder.build())
+                Ok(builder.build().context("Failed to build widget bundler")?)
             },
             WidgetConfig::Err { error } => Err(cmderr!(error.clone())),
         }
