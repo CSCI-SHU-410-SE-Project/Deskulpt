@@ -13,7 +13,7 @@ export async function rescan(initial: boolean = false) {
       return [id, config] as const;
     });
   } else {
-    const currentWidgets = useWidgetsStore.getState().widgets;
+    const currentWidgets = useWidgetsStore.getState();
     widgetsArray = Object.entries(configs).map(([id, config]) => {
       return [id, config] as const;
     });
