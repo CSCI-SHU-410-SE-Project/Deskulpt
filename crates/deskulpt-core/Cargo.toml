@@ -17,6 +17,7 @@ dunce                        = { workspace = true }
 either                       = { workspace = true }
 once_cell                    = { workspace = true }
 open                         = { workspace = true, features = ["shellexecute-on-windows"] }
+rdev                         = { workspace = true }
 rolldown                     = { workspace = true }
 rolldown_common              = { workspace = true }
 schemars                     = { workspace = true }

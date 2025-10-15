@@ -1,4 +1,5 @@
 //! Deskulpt windows.
+
 mod script;
 
 use anyhow::Result;
@@ -74,6 +75,44 @@ pub trait WindowExt<R: Runtime>: Manager<R> + SettingsStateExt<R> {
                 let () = msg_send![ns_window, setHasShadow:Bool::NO];
             }
         }
+
+        let scale_factor = canvas.scale_factor()?;
+        let canvas_cloned = canvas.clone();
+        std::thread::spawn(move || {
+            let mut is_cursor_ignored = true; // Track previous state - canvas starts click-through
+
+            rdev::listen(move |event| {
+                if let rdev::EventType::MouseMove { x, y } = event.event_type {
+                    // Scale mouse coordinates to match canvas coordinate system
+                    let scaled_x = (x / scale_factor) as i32;
+                    let scaled_y = (y / scale_factor) as i32;
+
+                    // Check if mouse is over any widget
+                    let settings = canvas_cloned.app_handle().get_settings();
+                    let mouse_over_widget = settings.widgets.values().any(|widget| {
+                        scaled_x >= widget.x
+                            && scaled_x < widget.x + widget.width as i32
+                            && scaled_y >= widget.y
+                            && scaled_y < widget.y + widget.height as i32
+                    });
+
+                    // Only update cursor events state if it changed to avoid excessive calls
+                    let should_ignore_cursor = !mouse_over_widget;
+                    if should_ignore_cursor != is_cursor_ignored {
+                        is_cursor_ignored = should_ignore_cursor;
+                        if let Err(e) = canvas_cloned.set_ignore_cursor_events(should_ignore_cursor)
+                        {
+                            eprintln!("Failed to set cursor events state: {e}");
+                        } else {
+                            println!("ignore_cursor_events: {should_ignore_cursor}");
+                        }
+                    }
+                }
+            })
+            .unwrap_or_else(|e| {
+                eprintln!("Failed to listen for mouse events: {e:?}");
+            });
+        });
 
         // TODO: Remove when the following issue is fixed:
         // https://github.com/tauri-apps/tauri/issues/9597
