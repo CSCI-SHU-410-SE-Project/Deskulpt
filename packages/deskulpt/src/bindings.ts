@@ -134,6 +134,14 @@ export type Theme = "light" | "dark"
 export type UpdateSettingsEvent = Settings
 
 /**
+ * The widget catalog.
+ * 
+ * This is a collection of all widgets discovered locally, mapped from their
+ * widget IDs to their configurations.
+ */
+export type WidgetCatalog = { [key in string]: WidgetConfig }
+
+/**
  * Full configuration of a Deskulpt widget.
  */
 export type WidgetConfig = 
@@ -331,7 +339,7 @@ export const commands = {
      * - Error traversing the widgets directory.
      * - Error inferring widget ID from the directory entry.
      */
-    rescanWidgets: () => invoke<{ [key in string]: WidgetConfig }>("plugin:deskulpt-core|rescan_widgets"),
+    rescanWidgets: () => invoke<WidgetCatalog>("plugin:deskulpt-core|rescan_widgets"),
 
     /**
      * Wrapper of [`set_render_ready`](InitialRenderStateExt::set_render_ready).

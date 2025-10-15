@@ -53,16 +53,6 @@ export function updateWidgetRenderError(
   });
 }
 
-export function updateWidgetSettings(
-  id: string,
-  settings: Partial<WidgetSettings>,
-) {
-  useWidgetsStore.setState((state) => ({
-    ...state,
-    [id]: { ...state[id], ...settings },
-  }));
-}
-
 export function removeWidgets(ids: string[]) {
   const widgets = useWidgetsStore.getState();
 

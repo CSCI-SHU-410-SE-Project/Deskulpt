@@ -11,7 +11,7 @@ const styles = {
 };
 
 type IntegerInputProps = BoxProps & {
-  value: number;
+  value?: number;
   onValueChange: (value: number) => void;
   min?: number;
   max?: number;
@@ -48,7 +48,7 @@ const IntegerInput = ({
   );
 
   const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
-    let nextValue = value;
+    let nextValue = value ?? snap(0, min, max, step);
 
     switch (event.key) {
       case "ArrowUp":

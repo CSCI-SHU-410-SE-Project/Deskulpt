@@ -3,7 +3,7 @@
   "ignorePatterns": [
     "**/dist/**",
     "crates/deskulpt-core/gen/**",
-    "packages/deskulpt/src/gen/**",
+    "packages/deskulpt/gen/**",
     "packages/deskulpt/src/bindings.ts",
     "**/docs/**"
   ],

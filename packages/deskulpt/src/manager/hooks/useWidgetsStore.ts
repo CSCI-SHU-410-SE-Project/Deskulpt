@@ -1,7 +1,7 @@
 import { create } from "zustand";
-import { WidgetConfig, commands, events } from "../../bindings";
+import { WidgetCatalog, commands, events } from "../../bindings";
 
-export const useWidgetsStore = create<Record<string, WidgetConfig>>(() => ({}));
+export const useWidgetsStore = create<WidgetCatalog>(() => ({}));
 
 export async function rescan(initial: boolean = false) {
   const configs = await commands.core.rescanWidgets();
@@ -13,7 +13,7 @@ export async function rescan(initial: boolean = false) {
       return [id, config] as const;
     });
   } else {
-    const currentWidgets = useWidgetsStore.getState().widgets;
+    const currentWidgets = useWidgetsStore.getState();
     widgetsArray = Object.entries(configs).map(([id, config]) => {
       return [id, config] as const;
     });

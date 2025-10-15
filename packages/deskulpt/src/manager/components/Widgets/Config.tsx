@@ -23,7 +23,7 @@ const Config = memo(({ id }: ConfigProps) => {
   return (
     <ScrollArea asChild>
       <Box height="200px" pr="3" pb="3">
-        {config.type === "ok" ? (
+        {config?.type === "ok" ? (
           <Table.Root size="1" layout="fixed" css={styles.table}>
             <Table.Body>
               <Table.Row align="center">
@@ -46,7 +46,7 @@ const Config = memo(({ id }: ConfigProps) => {
           <Box pl="2" m="0" asChild>
             <pre>
               <Code size="2" variant="ghost">
-                {config.error}
+                {config?.error ?? "Widget not found."}
               </Code>
             </pre>
           </Box>

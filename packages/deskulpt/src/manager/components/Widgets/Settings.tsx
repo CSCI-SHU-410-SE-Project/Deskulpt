@@ -16,7 +16,7 @@ const styles = {
 };
 
 const X = ({ id }: SettingsProps) => {
-  const x = useSettingsStore((state) => state.widgets[id].x);
+  const x = useSettingsStore((state) => state.widgets[id]?.x);
   const onValueChange = useCallback(
     (value: number) =>
       commands.core.updateSettings({ widgets: { [id]: { x: value } } }),
@@ -34,7 +34,7 @@ const X = ({ id }: SettingsProps) => {
 };
 
 const Y = ({ id }: SettingsProps) => {
-  const y = useSettingsStore((state) => state.widgets[id].y);
+  const y = useSettingsStore((state) => state.widgets[id]?.y);
   const onValueChange = useCallback(
     (value: number) =>
       commands.core.updateSettings({ widgets: { [id]: { y: value } } }),
@@ -52,7 +52,7 @@ const Y = ({ id }: SettingsProps) => {
 };
 
 const Width = ({ id }: SettingsProps) => {
-  const width = useSettingsStore((state) => state.widgets[id].width);
+  const width = useSettingsStore((state) => state.widgets[id]?.width);
   const onValueChange = useCallback(
     (value: number) =>
       commands.core.updateSettings({ widgets: { [id]: { width: value } } }),
@@ -70,7 +70,7 @@ const Width = ({ id }: SettingsProps) => {
 };
 
 const Height = ({ id }: SettingsProps) => {
-  const height = useSettingsStore((state) => state.widgets[id].height);
+  const height = useSettingsStore((state) => state.widgets[id]?.height);
   const onValueChange = useCallback(
     (value: number) =>
       commands.core.updateSettings({ widgets: { [id]: { height: value } } }),
@@ -88,7 +88,7 @@ const Height = ({ id }: SettingsProps) => {
 };
 
 const Opacity = ({ id }: SettingsProps) => {
-  const opacity = useSettingsStore((state) => state.widgets[id].opacity);
+  const opacity = useSettingsStore((state) => state.widgets[id]?.opacity);
   const onValueChange = useCallback(
     (value: number) =>
       commands.core.updateSettings({ widgets: { [id]: { opacity: value } } }),
