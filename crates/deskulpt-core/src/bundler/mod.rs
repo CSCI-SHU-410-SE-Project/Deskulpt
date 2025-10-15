@@ -14,7 +14,24 @@ use rolldown::{
 };
 use rolldown_common::Output;
 use serde_json::Value;
-use tokio::{fs, process::Command};
+use tokio::fs;
+use tokio::process::Command;
+
+const BUILTIN_DEPENDENCIES: &[&str] = &[
+    "@deskulpt-test/emotion",
+    "@deskulpt-test/emotion/jsx-runtime",
+    "@deskulpt-test/raw-apis",
+    "@deskulpt-test/react",
+    "@deskulpt-test/ui",
+    "@deskulpt-test/apis",
+];
+
+fn is_builtin_dependency(name: &str) -> bool {
+    BUILTIN_DEPENDENCIES.iter().any(|builtin| {
+        name == *builtin
+            || (name.starts_with(*builtin) && name.as_bytes().get(builtin.len()) == Some(&b'/'))
+    })
+}
 
 /// Builder for the Deskulpt widget bundler.
 pub struct WidgetBundlerBuilder {
@@ -100,56 +117,56 @@ pub struct WidgetBundler {
     root: PathBuf,
 }
 
-impl WidgetBundler {
-    async fn ensure_dependencies_installed(&self) -> Result<()> {
-        let package_json_path = self.root.join("package.json");
+async fn ensure_dependencies_installed(root: PathBuf) -> Result<()> {
+    let package_json_path = root.join("package.json");
 
-        if !package_json_path.exists() {
-            return Ok(());
-        }
-
-        let package_json = fs::read(&package_json_path)
-            .await
-            .with_context(|| format!("Failed to read {}", package_json_path.display()))?;
-        let package_json: Value = serde_json::from_slice(&package_json)
-            .with_context(|| format!("Failed to parse {}", package_json_path.display()))?;
-
-        let has_dependencies = package_json
-            .get("dependencies")
-            .and_then(Value::as_object)
-            .map(|deps| !deps.is_empty())
-            .unwrap_or(false);
-
-        if !has_dependencies {
-            return Ok(());
-        }
-
-        let status = Command::new("pnpm")
-            .current_dir(&self.root)
-            .arg("install")
-            .arg("--prod")
-            .status()
-            .await
-            .with_context(|| {
-                format!(
-                    "Failed to execute `pnpm install --prod` in {}",
-                    self.root.display()
-                )
-            })?;
-
-        if !status.success() {
-            bail!(
-                "`pnpm install --prod` in {} exited with status {status}",
-                self.root.display()
-            );
-        }
-
-        Ok(())
+    if !package_json_path.exists() {
+        return Ok(());
     }
 
+    let package_json = fs::read(&package_json_path)
+        .await
+        .with_context(|| format!("Failed to read {}", package_json_path.display()))?;
+    let package_json: Value = serde_json::from_slice(&package_json)
+        .with_context(|| format!("Failed to parse {}", package_json_path.display()))?;
+
+    let has_dependencies = package_json
+        .get("dependencies")
+        .and_then(Value::as_object)
+        .map(|deps| deps.keys().any(|name| !is_builtin_dependency(name)))
+        .unwrap_or(false);
+
+    if !has_dependencies {
+        return Ok(());
+    }
+
+    let status = Command::new("pnpm")
+        .current_dir(&root)
+        .arg("install")
+        .arg("--prod")
+        .status()
+        .await
+        .with_context(|| {
+            format!(
+                "Failed to execute `pnpm install --prod` in {}",
+                root.display()
+            )
+        })?;
+
+    if !status.success() {
+        bail!(
+            "`pnpm install --prod` in {} exited with status {status}",
+            root.display()
+        );
+    }
+
+    Ok(())
+}
+
+impl WidgetBundler {
     /// Bundle the widget into a single ESM code string.
     pub async fn bundle(&mut self) -> Result<String> {
-        self.ensure_dependencies_installed().await?;
+        ensure_dependencies_installed(self.root.clone()).await?;
 
         let result = self.bundler.generate().await.map_err(|e| {
             anyhow!(e
