@@ -40,7 +40,7 @@ const Trigger = memo(({ id, value }: TriggerProps) => {
           height="6px"
           css={[
             styles.indicator,
-            config.type === "err" && styles.indicatorInvalid,
+            config?.type !== "ok" && styles.indicatorInvalid,
           ]}
         />
         <Text>{id}</Text>

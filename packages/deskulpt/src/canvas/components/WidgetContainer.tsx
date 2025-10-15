@@ -33,32 +33,28 @@ interface WidgetContainerProps {
 const WidgetContainer = memo(({ id }: WidgetContainerProps) => {
   const draggableRef = useRef<HTMLDivElement>(null);
 
-  const { component: Widget } = useWidgetsStore((state) => state[id]);
-  const { opacity, ...settings } = useSettingsStore(
-    (state) => state.widgets[id],
-  );
+  // This non-null assertion is safe because the IDs are obtained from the keys
+  // of the widgets store
+  const { component: Widget } = useWidgetsStore((state) => state[id]!);
+
+  const settings = useSettingsStore((state) => state.widgets[id]);
+  const opacity = settings?.opacity;
 
   // Local state to avoid jittery movement during dragging and resizing
-  const [x, setX] = useState(settings.x);
-  const [y, setY] = useState(settings.y);
-  const [width, setWidth] = useState(settings.width);
-  const [height, setHeight] = useState(settings.height);
+  const [x, setX] = useState(settings?.x);
+  const [y, setY] = useState(settings?.y);
+  const [width, setWidth] = useState(settings?.width);
+  const [height, setHeight] = useState(settings?.height);
 
   useEffect(() => {
+    if (settings === undefined) {
+      return;
+    }
     setX(settings.x);
-  }, [settings.x]);
-
-  useEffect(() => {
     setY(settings.y);
-  }, [settings.y]);
-
-  useEffect(() => {
     setWidth(settings.width);
-  }, [settings.width]);
-
-  useEffect(() => {
     setHeight(settings.height);
-  }, [settings.height]);
+  }, [settings]);
 
   const onDragStop = useCallback(
     (_: DraggableEvent, data: DraggableData) => {
@@ -73,6 +69,9 @@ const WidgetContainer = memo(({ id }: WidgetContainerProps) => {
 
   const onResizeStop: ResizeCallback = useCallback(
     (_, __, ___, delta) => {
+      if (width === undefined || height === undefined) {
+        return;
+      }
       setWidth(width + delta.width);
       setHeight(height + delta.height);
       commands.core.updateSettings({
@@ -83,6 +82,19 @@ const WidgetContainer = memo(({ id }: WidgetContainerProps) => {
     },
     [id, width, height],
   );
+
+  // Do not render anything if the widget is not fully configured; there could
+  // be a gap between widget and settings updates, but they should eventually be
+  // in sync
+  if (
+    x === undefined ||
+    y === undefined ||
+    width === undefined ||
+    height === undefined ||
+    opacity === undefined
+  ) {
+    return null;
+  }
 
   return (
     <Draggable
