@@ -1,7 +1,7 @@
 import { create } from "zustand";
-import { WidgetConfig, commands, events } from "../../bindings";
+import { WidgetCatalog, commands, events } from "../../bindings";
 
-export const useWidgetsStore = create<Record<string, WidgetConfig>>(() => ({}));
+export const useWidgetsStore = create<WidgetCatalog>(() => ({}));
 
 export async function rescan(initial: boolean = false) {
   const configs = await commands.core.rescanWidgets();

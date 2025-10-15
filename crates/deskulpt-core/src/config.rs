@@ -1,6 +1,6 @@
 //! Configuration of Deskulpt widgets.
 
-use std::collections::HashMap;
+use std::collections::{BTreeMap, HashMap};
 use std::fs::File;
 use std::io::BufReader;
 use std::path::Path;
@@ -68,12 +68,6 @@ impl LoadFromFile for PackageJson {
     const FILE_NAME: &'static str = "package.json";
 }
 
-/// Collection of widgets discovered by the application.
-#[derive(Debug, Default, Clone)]
-pub struct WidgetCatalog {
-    pub configs: HashMap<String, WidgetConfig>,
-}
-
 /// Full configuration of a Deskulpt widget.
 #[derive(Debug, Clone, Serialize, specta::Type)]
 #[serde(tag = "type", rename_all = "camelCase")]
@@ -132,5 +126,43 @@ impl WidgetConfig {
             entry: deskulpt_conf.entry,
             dependencies: package_json.dependencies,
         })
+    }
+}
+
+/// The widget catalog.
+///
+/// This is a collection of all widgets discovered locally, mapped from their
+/// widget IDs to their configurations.
+#[derive(Debug, Default, Clone, Serialize, specta::Type)]
+pub struct WidgetCatalog(pub BTreeMap<String, WidgetConfig>);
+
+impl WidgetCatalog {
+    /// Load the widget catalog from the given directory.
+    ///
+    /// This scans all top-level subdirectories and attempts to load them as
+    /// widgets. Non-widget directories are simply ignored. See
+    /// [`WidgetConfig::load`] for more details.
+    pub fn load(dir: &Path) -> Result<Self> {
+        let mut catalog = Self::default();
+
+        let entries = std::fs::read_dir(dir)?;
+        for entry in entries {
+            let entry = entry?;
+
+            let path = entry.path();
+            if !path.is_dir() {
+                continue; // Non-directory entries are not widgets, skip
+            }
+
+            if let Some(config) = WidgetConfig::load(&path) {
+                // Since each widget must be at the top level of the widgets
+                // directory, the directory names must be unique and we can use
+                // them as widget IDs
+                let id = entry.file_name().to_string_lossy().to_string();
+                catalog.0.insert(id, config);
+            }
+        }
+
+        Ok(catalog)
     }
 }
