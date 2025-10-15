@@ -31,7 +31,7 @@ export async function rescan(initial: boolean = false) {
   if (initial) {
     await commands.core.emitOnRenderReady(event);
   } else {
-    await events.renderWidgets.emitTo("canvas", event);
+    await events.renderWidgets.emit(event);
   }
 
   // Sort widgets by their directory name

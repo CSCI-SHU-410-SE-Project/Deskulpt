@@ -1,8 +1,5 @@
 //! Common utilities for Deskulpt windows.
 
-use anyhow::{anyhow, Result};
-use tauri::{Manager, Runtime, WebviewWindow};
-
 /// Deskulpt window enum.
 #[derive(Clone, Debug, specta::Type)]
 #[specta(rename_all = "camelCase")]
@@ -11,19 +8,6 @@ pub enum DeskulptWindow {
     Manager,
     /// The canvas window.
     Canvas,
-}
-
-impl DeskulptWindow {
-    /// Retrieve the webview window instance.
-    pub fn webview_window<R, M>(&self, manager: &M) -> Result<WebviewWindow<R>>
-    where
-        R: Runtime,
-        M: Manager<R> + ?Sized,
-    {
-        manager
-            .get_webview_window(self.as_ref())
-            .ok_or_else(|| anyhow!("Window not found: {self}"))
-    }
 }
 
 impl AsRef<str> for DeskulptWindow {

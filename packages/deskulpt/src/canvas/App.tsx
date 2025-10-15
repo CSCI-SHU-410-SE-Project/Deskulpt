@@ -1,19 +1,19 @@
-import WidgetContainer from "./components/WidgetContainer";
 import { Toaster } from "sonner";
 import { Theme as RadixTheme } from "@radix-ui/themes";
-import { useShallow } from "zustand/shallow";
 import {
   useRemoveWidgetsListener,
   useRenderWidgetsListener,
   useSettingsStore,
   useShowToastListener,
   useUpdateSettingsListener,
-  useWidgetsStore,
+  useWebviewManager,
 } from "./hooks";
 
 const App = () => {
   const theme = useSettingsStore((state) => state.theme);
-  const ids = useWidgetsStore(useShallow((state) => Object.keys(state)));
+
+  // Initialize webview manager
+  useWebviewManager();
 
   useRemoveWidgetsListener();
   useRenderWidgetsListener();
@@ -39,9 +39,19 @@ const App = () => {
           },
         }}
       />
-      {ids.map((id) => (
-        <WidgetContainer key={id} id={id} />
-      ))}
+      {/* Widgets are now rendered in separate webviews managed by useWebviewManager */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          height: "100vh",
+          color: "var(--gray-11)",
+          fontSize: "14px",
+        }}
+      >
+        Canvas running with separate webviews per widget
+      </div>
     </RadixTheme>
   );
 };

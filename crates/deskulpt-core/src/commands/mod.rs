@@ -5,6 +5,8 @@ mod bundle_widget;
 #[doc(hidden)]
 mod call_plugin;
 #[doc(hidden)]
+mod create_widget_webview;
+#[doc(hidden)]
 mod emit_on_render_ready;
 #[doc(hidden)]
 mod exit_app;
@@ -21,6 +23,7 @@ mod error;
 
 pub use bundle_widget::*;
 pub use call_plugin::*;
+pub use create_widget_webview::*;
 pub use emit_on_render_ready::*;
 pub use exit_app::*;
 pub use open_widget::*;

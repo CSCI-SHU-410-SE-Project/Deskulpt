@@ -3,6 +3,7 @@ fn main() {
         .commands(&[
             "bundle_widget",
             "call_plugin",
+            "create_widget_webview",
             "emit_on_render_ready",
             "exit_app",
             "open_widget",

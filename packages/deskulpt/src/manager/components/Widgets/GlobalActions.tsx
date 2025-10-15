@@ -13,7 +13,7 @@ const GlobalActions = memo(({ length }: GlobalActionsProps) => {
   const refreshAction = useCallback(() => {
     const event = Object.entries(useWidgetsStore.getState()).map(([id]) => id);
     events.renderWidgets
-      .emitTo("canvas", event)
+      .emit(event)
       .then(() => {
         toast.success(`Refreshed ${event.length} widgets.`);
       })

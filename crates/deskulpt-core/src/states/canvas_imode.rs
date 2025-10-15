@@ -2,11 +2,11 @@
 
 use std::sync::Mutex;
 
-use anyhow::Result;
+use anyhow::{anyhow, Result};
 use deskulpt_common::event::Event;
 use deskulpt_common::window::DeskulptWindow;
 use tauri::menu::MenuItem;
-use tauri::{App, AppHandle, Emitter, Manager, Runtime, WebviewWindow};
+use tauri::{App, AppHandle, Emitter, Manager, Runtime, Window};
 
 use crate::events::ShowToastEvent;
 
@@ -37,7 +37,7 @@ impl<R: Runtime> CanvasImodeStateInner<R> {
     /// Toggle the interaction mode.
     ///
     /// This will change the mode and update the menu item text if it exists.
-    fn toggle(&mut self, canvas: &WebviewWindow<R>) -> Result<()> {
+    fn toggle(&mut self, canvas: &Window<R>) -> Result<()> {
         // The menu item shows the action that will be performed on click, so it
         // should be the opposite of the mode
         let (new_mode, new_text) = match self.mode {
@@ -92,7 +92,9 @@ pub trait CanvasImodeStateExt<R: Runtime>: Manager<R> + Emitter<R> {
     where
         Self: Sized,
     {
-        let canvas = DeskulptWindow::Canvas.webview_window(self)?;
+        let canvas = self
+            .get_window(DeskulptWindow::Canvas.as_ref())
+            .ok_or_else(|| anyhow!("Canvas not found"))?;
 
         let state = self.state::<CanvasImodeState<R>>();
         let mut state = state.0.lock().unwrap();

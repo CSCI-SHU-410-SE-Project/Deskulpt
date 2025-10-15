@@ -1,11 +1,12 @@
 //! Deskulpt windows.
 mod script;
 
-use anyhow::Result;
+use anyhow::{anyhow, Result};
 use deskulpt_common::window::DeskulptWindow;
 use script::{CanvasInitJS, ManagerInitJS};
 use tauri::{
-    App, AppHandle, Manager, Runtime, WebviewUrl, WebviewWindowBuilder, Window, WindowEvent,
+    App, AppHandle, Manager, PhysicalPosition, PhysicalSize, Position, Runtime, Size,
+    WebviewBuilder, WebviewUrl, WebviewWindowBuilder, Window, WindowEvent,
 };
 
 use crate::states::SettingsStateExt;
@@ -85,9 +86,42 @@ pub trait WindowExt<R: Runtime>: Manager<R> + SettingsStateExt<R> {
         Ok(())
     }
 
+    fn create_widget_webview(
+        &self,
+        id: String,
+        x: i32,
+        y: i32,
+        width: u32,
+        height: u32,
+    ) -> Result<()>
+    where
+        Self: Sized,
+    {
+        let settings = self.get_settings();
+        let init_js = CanvasInitJS::generate(&settings)?;
+
+        let canvas = self
+            .get_window(DeskulptWindow::Canvas.as_ref())
+            .ok_or_else(|| anyhow!("Canvas not found"))?;
+        canvas.add_child(
+            WebviewBuilder::new(
+                format!("widget-{id}"),
+                WebviewUrl::App(format!("src/canvas/widget.html?id={id}").into()),
+            )
+            .transparent(true)
+            .initialization_script(&init_js),
+            Position::Physical(PhysicalPosition { x, y }),
+            Size::Physical(PhysicalSize { width, height }),
+        )?;
+
+        Ok(())
+    }
+
     /// Open the manager window.
     fn open_manager(&self) -> Result<()> {
-        let manager = DeskulptWindow::Manager.webview_window(self)?;
+        let manager = self
+            .get_window(DeskulptWindow::Manager.as_ref())
+            .ok_or_else(|| anyhow!("Manager not found"))?;
         manager.show()?;
         manager.set_focus()?;
         Ok(())
