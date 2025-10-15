@@ -274,6 +274,21 @@ export const commands = {
       payload,
     }),
 
+
+    createWidgetWindow: (
+      id: string,
+      x: number,
+      y: number,
+      width: number,
+      height: number,
+    ) => invoke<null>("plugin:deskulpt-core|create_widget_window", {
+      id,
+      x,
+      y,
+      width,
+      height,
+    }),
+
     /**
      * Wrapper of
      * [`emit_on_render_ready`](InitialRenderStateExt::emit_on_render_ready).
