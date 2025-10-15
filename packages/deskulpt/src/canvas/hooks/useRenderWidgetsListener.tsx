@@ -23,7 +23,7 @@ export function useRenderWidgetsListener() {
           // APIs blob URL can be reused because the contents are dependent only
           // on widget ID; the code blob URL will definitely change on re-render
           // so we revoke it here
-          const widget = widgets[id];
+          const widget = widgets[id]!;
           apisBlobUrl = widget.apisBlobUrl;
           if (widget.moduleBlobUrl !== undefined) {
             URL.revokeObjectURL(widget.moduleBlobUrl);
