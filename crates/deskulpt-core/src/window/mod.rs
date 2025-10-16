@@ -49,6 +49,7 @@ pub trait WindowExt<R: Runtime>: Manager<R> + SettingsStateExt<R> {
             DeskulptWindow::Canvas,
             WebviewUrl::App("src/canvas/index.html".into()),
         )
+        .title("Deskulpt Canvas")
         .maximized(true)
         .transparent(true)
         .decorations(false)
