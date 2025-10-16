@@ -19,12 +19,18 @@ pub trait WidgetCatalogStateExt<R: Runtime>: Manager<R> + PathExt<R> {
     }
 
     /// Get an immutable reference to the widget catalog.
+    ///
+    /// The returned reference is behind a lock guard, which should be dropped
+    /// as soon as possible to minimize critical section.
     fn get_widget_catalog(&self) -> RwLockReadGuard<'_, WidgetCatalog> {
         let state = self.state::<WidgetCatalogState>().inner();
         state.0.read().unwrap()
     }
 
     /// Get a mutable reference to the widget catalog.
+    ///
+    /// The returned reference is behind a lock guard, which should be dropped
+    /// as soon as possible to minimize critical section.
     fn get_widget_catalog_mut(&self) -> RwLockWriteGuard<'_, WidgetCatalog> {
         let state = self.state::<WidgetCatalogState>().inner();
         state.0.write().unwrap()
