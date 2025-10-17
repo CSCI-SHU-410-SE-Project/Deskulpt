@@ -7,16 +7,19 @@ import {
   useSettingsStore,
   useShowToastListener,
   useUpdateSettingsListener,
+  useUpdateWidgetCatalogListener,
   useWidgetsStore,
 } from "./hooks";
 
 const App = () => {
   const theme = useSettingsStore((state) => state.theme);
   const ids = useWidgetsStore(useShallow((state) => Object.keys(state)));
+  console.debug(ids);
 
   useRenderWidgetsListener();
   useShowToastListener();
   useUpdateSettingsListener();
+  useUpdateWidgetCatalogListener();
 
   return (
     <RadixTheme

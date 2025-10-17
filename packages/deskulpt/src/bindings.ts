@@ -129,8 +129,8 @@ export type UpdateSettingsEvent = Settings
 /**
  * Event for updating the widget catalog.
  * 
- * This event is emitted from the backend to the manager window whenever there
- * is a change in the widget catalog.
+ * This event is emitted from the backend to all frontend windows whenever
+ * there is a change in the widget catalog.
  */
 export type UpdateWidgetCatalogEvent = WidgetCatalog
 
@@ -248,16 +248,16 @@ export const commands = {
     /**
      * Bundle widgets.
      * 
-     * TODO(Charlie-XIAO)
-     * 
-     * ### Parameters
-     * 
-     * - `ids`: If provided, only bundle the widgets with the specified IDs that
-     * exist in the widget catalog. If `None`, bundle all widgets in the catalog.
+     * This command bundles the specified widgets that exist in the catalog. If
+     * `ids` is not provided, all widgets in the catalog are bundled. Failure to
+     * bundle an individual widget does not prevent other widgets from being
+     * bundled. Instead, the outcome of each bundling operation is collected and
+     * sent to the canvas window via the [`RenderWidgetsEvent`].
      * 
      * ### Errors
      * 
-     * - TODO(Charlie-XIAO)
+     * - Error accessing the widgets directory.
+     * - Error emitting the [`RenderWidgetsEvent`].
      */
     bundleWidgets: (
       ids: string[] | null,
@@ -339,17 +339,19 @@ export const commands = {
     /**
      * Rescan the widgets directory to discover widgets.
      * 
-     * This command will update the widget catalog with the newly discovered
-     * widgets and emit an event to notify the frontend of the updated catalog. It
-     * also implicitly triggers the bundling of all widgets in the updated catalog,
-     * see the [`bundle_widgets`] command.
+     * This command scans the widgets directory for available widgets and updates
+     * the widget catalog and settings accordingly. It then emits events to notify
+     * the frontend of these changes. Finally, it triggers the bundling of all
+     * widgets in the updated catalog with `bundle_widgets` to ensure they are
+     * ready for use.
      * 
      * ### Errors
      * 
      * - Error accessing the widgets directory.
      * - Error loading the new widget catalog from the widgets directory.
-     * - Error emitting the event to notify the frontend of the updated catalog.
-     * - Error bundling the widgets.
+     * - Error emitting the [`UpdateSettingsEvent`].
+     * - Error emitting the [`UpdateWidgetCatalogEvent`].
+     * - Error bundling all discovered widgets.
      */
     rescanWidgets: () => invoke<null>("plugin:deskulpt-core|rescan_widgets"),
 

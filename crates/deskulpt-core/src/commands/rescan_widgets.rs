@@ -1,5 +1,4 @@
 use deskulpt_common::event::Event;
-use deskulpt_common::window::DeskulptWindow;
 use tauri::{command, AppHandle, Runtime};
 
 use super::error::CmdResult;
@@ -42,7 +41,7 @@ pub async fn rescan_widgets<R: Runtime>(app_handle: AppHandle<R>) -> CmdResult<(
         UpdateSettingsEvent(settings.clone()).emit(&app_handle)?;
     }
 
-    UpdateWidgetCatalogEvent(catalog).emit_to(&app_handle, DeskulptWindow::Manager)?;
+    UpdateWidgetCatalogEvent(catalog).emit(&app_handle)?;
 
     bundle_widgets(app_handle, None).await?;
     Ok(())
