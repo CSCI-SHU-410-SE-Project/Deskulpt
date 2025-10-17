@@ -14,6 +14,22 @@ export function useRenderWidgetsListener() {
     const unlisten = events.renderWidgets.listen(async (event) => {
       const widgets = useWidgetsStore.getState();
 
+      // Remove old widgets that are not in the new payload
+      Object.entries(widgets).forEach(([id, widget]) => {
+        if (id in event.payload) {
+          return;
+        }
+        URL.revokeObjectURL(widget.apisBlobUrl);
+        if (widget.moduleBlobUrl !== undefined) {
+          URL.revokeObjectURL(widget.moduleBlobUrl);
+        }
+        useWidgetsStore.setState((state) => {
+          const newState = { ...state };
+          delete newState[id];
+          return newState;
+        }, true);
+      });
+
       const promises = Object.entries(event.payload).map(async ([id, code]) => {
         let apisBlobUrl;
         if (id in widgets) {
