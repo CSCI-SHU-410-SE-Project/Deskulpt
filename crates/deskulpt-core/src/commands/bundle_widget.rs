@@ -1,9 +1,9 @@
-use anyhow::Context;
+use anyhow::{anyhow, Context};
+use deskulpt_common::outcome::Outcome;
 use tauri::{command, AppHandle, Runtime};
 
-use super::error::{cmderr, CmdResult};
+use super::error::CmdResult;
 use crate::bundler::WidgetBundlerBuilder;
-use crate::config::WidgetConfig;
 use crate::path::PathExt;
 use crate::states::WidgetCatalogStateExt;
 
@@ -24,13 +24,14 @@ pub async fn bundle_widget<R: Runtime>(app_handle: AppHandle<R>, id: String) -> 
         match catalog
             .0
             .get(&id)
-            .ok_or_else(|| cmderr!("Widget (id={}) does not exist", id))?
+            .ok_or_else(|| anyhow!("Widget (id={}) does not exist", id))?
         {
-            WidgetConfig::Ok { entry, .. } => {
-                let builder = WidgetBundlerBuilder::new(widgets_dir.join(&id), entry.clone());
-                Ok(builder.build().context("Failed to build widget bundler")?)
+            Outcome::Ok(config) => {
+                WidgetBundlerBuilder::new(widgets_dir.join(&id), config.entry.clone())
+                    .build()
+                    .context("Failed to create widget bundler")
             },
-            WidgetConfig::Err { error } => Err(cmderr!(error.clone())),
+            Outcome::Err(error) => Err(anyhow!(error.clone())),
         }
     })?;
 
