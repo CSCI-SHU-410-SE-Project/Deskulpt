@@ -8,22 +8,22 @@ use tauri::{command, AppHandle, Runtime};
 
 use super::error::CmdResult;
 use crate::bundler::WidgetBundlerBuilder;
-use crate::events::{RenderWidgetsEvent, UpdateSettingsEvent};
+use crate::events::RenderWidgetsEvent;
 use crate::path::PathExt;
-use crate::states::{SettingsStateExt, WidgetCatalogStateExt};
+use crate::states::WidgetCatalogStateExt;
 
 /// Bundle widgets.
 ///
-/// TODO(Charlie-XIAO)
-///
-/// ### Parameters
-///
-/// - `ids`: If provided, only bundle the widgets with the specified IDs that
-///   exist in the widget catalog. If `None`, bundle all widgets in the catalog.
+/// This command bundles the specified widgets that exist in the catalog. If
+/// `ids` is not provided, all widgets in the catalog are bundled. Failure to
+/// bundle an individual widget does not prevent other widgets from being
+/// bundled. Instead, the outcome of each bundling operation is collected and
+/// sent to the canvas window via the [`RenderWidgetsEvent`].
 ///
 /// ### Errors
 ///
-/// - TODO(Charlie-XIAO)
+/// - Error accessing the widgets directory.
+/// - Error emitting the [`RenderWidgetsEvent`].
 #[command]
 #[specta::specta]
 pub async fn bundle_widgets<R: Runtime>(
@@ -45,6 +45,10 @@ pub async fn bundle_widgets<R: Runtime>(
                 .map(|(id, config)| (id.clone(), config.clone())),
         ),
     });
+
+    if widgets.is_empty() {
+        return Ok(());
+    }
 
     let futs = widgets.into_iter().map(|(id, config)| async move {
         match config {
@@ -71,18 +75,6 @@ pub async fn bundle_widgets<R: Runtime>(
         .await
         .into_iter()
         .collect::<HashMap<_, _>>();
-
-    {
-        let mut settings = app_handle.get_settings_mut();
-        settings.widgets.retain(|id, _| reports.contains_key(id));
-        for id in reports.keys() {
-            settings
-                .widgets
-                .entry(id.clone())
-                .or_insert_with(Default::default);
-        }
-        UpdateSettingsEvent(settings.clone()).emit(&app_handle)?;
-    }
 
     RenderWidgetsEvent(reports).emit_to(&app_handle, DeskulptWindow::Canvas)?;
     Ok(())

@@ -14,7 +14,7 @@ export function useRenderWidgetsListener() {
     const unlisten = events.renderWidgets.listen(async (event) => {
       const widgets = useWidgetsStore.getState();
 
-      // Remove old widgets that are not in the new payload
+      // Remove widgets that are no longer present
       Object.entries(widgets).forEach(([id, widget]) => {
         if (id in event.payload) {
           return;
