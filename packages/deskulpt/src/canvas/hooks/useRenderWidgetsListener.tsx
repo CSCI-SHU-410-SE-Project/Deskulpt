@@ -40,7 +40,7 @@ export function useRenderWidgetsListener() {
 
         let code;
         try {
-          code = await commands.core.bundleWidget(id);
+          code = await commands.core.bundleWidgets([id]);
         } catch (error) {
           updateWidgetRenderError(
             id,

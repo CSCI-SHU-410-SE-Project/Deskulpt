@@ -1,44 +1,34 @@
 use deskulpt_common::event::Event;
+use deskulpt_common::window::DeskulptWindow;
 use tauri::{command, AppHandle, Runtime};
 
 use super::error::CmdResult;
+use crate::commands::bundle_widgets;
 use crate::config::WidgetCatalog;
-use crate::events::UpdateSettingsEvent;
+use crate::events::UpdateWidgetCatalogEvent;
 use crate::path::PathExt;
-use crate::states::{SettingsStateExt, WidgetCatalogStateExt};
+use crate::states::WidgetCatalogStateExt;
 
-/// Rescan the widgets directory and update the widget configuration map.
+/// Rescan the widgets directory to discover widgets.
 ///
-/// This will update the widget configuration map state and return the updated
-/// configuration map as well.
+/// This command will update the widget catalog with the newly discovered
+/// widgets and emit an event to notify the frontend of the updated catalog. It
+/// also implicitly triggers the bundling of all widgets in the updated catalog,
+/// see the [`bundle_widgets`] command.
 ///
 /// ### Errors
 ///
-/// - Failed to access the widgets directory.
-/// - Error traversing the widgets directory.
-/// - Error inferring widget ID from the directory entry.
+/// - Error accessing the widgets directory.
+/// - Error loading the new widget catalog from the widgets directory.
+/// - Error emitting the event to notify the frontend of the updated catalog.
+/// - Error bundling the widgets.
 #[command]
 #[specta::specta]
-pub async fn rescan_widgets<R: Runtime>(app_handle: AppHandle<R>) -> CmdResult<WidgetCatalog> {
-    let widgets_dir = app_handle.widgets_dir()?;
-    let new_catalog = WidgetCatalog::load(widgets_dir)?;
+pub async fn rescan_widgets<R: Runtime>(app_handle: AppHandle<R>) -> CmdResult<()> {
+    let catalog = WidgetCatalog::load(app_handle.widgets_dir()?)?;
+    app_handle.with_widget_catalog_mut(|prev| *prev = catalog.clone());
+    UpdateWidgetCatalogEvent(catalog).emit_to(&app_handle, DeskulptWindow::Manager)?;
 
-    {
-        let mut settings = app_handle.get_settings_mut();
-        settings
-            .widgets
-            .retain(|id, _| new_catalog.0.contains_key(id));
-        for id in new_catalog.0.keys() {
-            settings
-                .widgets
-                .entry(id.clone())
-                .or_insert_with(Default::default);
-        }
-        UpdateSettingsEvent(settings.clone()).emit(&app_handle)?;
-    }
-
-    app_handle.with_widget_catalog_mut(|catalog| {
-        *catalog = new_catalog.clone();
-    });
-    Ok(new_catalog)
+    bundle_widgets(app_handle, None).await?;
+    Ok(())
 }
