@@ -18,19 +18,6 @@ pub enum Theme {
     Dark,
 }
 
-impl Theme {
-    /// Get the background color associated with the theme.
-    ///
-    /// According to https://www.radix-ui.com/colors, the "Slate 1" color in
-    /// dark and light mode respectively.
-    pub fn background_color(&self) -> (u8, u8, u8) {
-        match self {
-            Theme::Light => (252, 252, 253), // #FCFCFD
-            Theme::Dark => (17, 17, 19),     // #111113
-        }
-    }
-}
-
 /// Types of keyboard shortcuts in the application.
 #[derive(
     Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Deserialize, Serialize, JsonSchema, specta::Type,
