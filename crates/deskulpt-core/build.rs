@@ -3,8 +3,6 @@ fn main() {
         .commands(&[
             "bundle_widgets",
             "call_plugin",
-            "emit_on_render_ready",
-            "exit_app",
             "open_widget",
             "rescan_widgets",
             "set_render_ready",

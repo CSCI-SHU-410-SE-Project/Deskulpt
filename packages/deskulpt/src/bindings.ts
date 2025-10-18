@@ -292,33 +292,6 @@ export const commands = {
     }),
 
     /**
-     * Wrapper of
-     * [`emit_on_render_ready`](InitialRenderStateExt::emit_on_render_ready).
-     * 
-     * ### Errors
-     * 
-     * - Failed to emit the [`RenderWidgetsEvent`] to the canvas.
-     */
-    emitOnRenderReady: (
-      event: RenderWidgetsEvent,
-    ) => invoke<null>("plugin:deskulpt-core|emit_on_render_ready", {
-      event,
-    }),
-
-    /**
-     * Exit the application with cleanup.
-     * 
-     * This command never returns an error; in other words it will always exit the
-     * application in the end. Prior to exiting, it will try to dump the settings
-     * for persistence, but failure to do so will not prevent exiting.
-     */
-    exitApp: (
-      settings: Settings,
-    ) => invoke<void>("plugin:deskulpt-core|exit_app", {
-      settings,
-    }),
-
-    /**
      * Open the widgets directory or a specific widget directory.
      * 
      * If the widget ID is provided, a specific widget directory will be opened.

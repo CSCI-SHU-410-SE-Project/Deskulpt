@@ -4,8 +4,6 @@
   "description": "Capabilities of the manager window.",
   "windows": ["manager"],
   "permissions": [
-    "deskulpt-core:allow-emit-on-render-ready",
-    "deskulpt-core:allow-exit-app",
     "deskulpt-core:allow-open-widget",
     "deskulpt-core:allow-rescan-widgets",
     "deskulpt-core:allow-bundle-widgets",
