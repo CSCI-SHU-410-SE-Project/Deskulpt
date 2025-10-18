@@ -1,7 +1,7 @@
 fn main() {
     deskulpt_build::Builder::default()
         .commands(&[
-            "bundle_widget",
+            "bundle_widgets",
             "call_plugin",
             "emit_on_render_ready",
             "exit_app",
@@ -11,10 +11,10 @@ fn main() {
             "update_settings",
         ])
         .events(&[
-            "RemoveWidgetsEvent",
             "RenderWidgetsEvent",
             "ShowToastEvent",
             "UpdateSettingsEvent",
+            "UpdateWidgetCatalogEvent",
         ])
         .build();
 }
