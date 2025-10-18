@@ -18,7 +18,7 @@ use std::time::Duration;
 #[cfg(debug_assertions)]
 use anyhow::Context;
 #[cfg(debug_assertions)]
-use deskulpt_core::events::RenderWidgetsEvent;
+use deskulpt_core::bundle_widgets as bundle_widgets_command;
 use deskulpt_core::path::PathExt;
 use deskulpt_core::states::{
     CanvasImodeStateExt, InitialRenderStateExt, SettingsStateExt, WidgetCatalogStateExt,
@@ -31,6 +31,8 @@ use notify::event::{CreateKind, ModifyKind, RemoveKind};
 use notify::{
     Event, EventKind, RecommendedWatcher, RecursiveMode, Result as NotifyResult, Watcher,
 };
+#[cfg(debug_assertions)]
+use tauri::async_runtime;
 use tauri::image::Image;
 use tauri::{generate_context, include_image, Builder};
 #[cfg(debug_assertions)]
@@ -247,9 +249,11 @@ fn flush_pending<R: Runtime>(app_handle: &AppHandle<R>, pending: &mut HashSet<St
         widget_ids.join(", ")
     );
 
-    let event = RenderWidgetsEvent::new(widget_ids);
-
-    if let Err(err) = app_handle.emit_on_render_ready(event) {
-        eprintln!("[hot-reload] Failed to emit RenderWidgetsEvent: {err:?}");
-    }
+    let bundle_handle = app_handle.clone();
+    let widget_ids_for_bundle = widget_ids;
+    async_runtime::spawn(async move {
+        if let Err(err) = bundle_widgets_command(bundle_handle, Some(widget_ids_for_bundle)).await {
+            eprintln!("[hot-reload] Failed to bundle widgets: {err:?}");
+        }
+    });
 }

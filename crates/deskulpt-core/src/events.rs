@@ -17,19 +17,6 @@ use crate::settings::Settings;
 #[derive(Clone, Serialize, Deserialize, specta::Type, Event)]
 pub struct RenderWidgetsEvent(pub HashMap<String, Outcome<String>>);
 
-impl RenderWidgetsEvent {
-    /// Create a new render widgets event for the given widget IDs.
-    pub fn new(ids: Vec<String>) -> Self {
-        Self(ids)
-    }
-}
-
-impl From<Vec<String>> for RenderWidgetsEvent {
-    fn from(ids: Vec<String>) -> Self {
-        Self::new(ids)
-    }
-}
-
 /// Event for showing a toast notification.
 ///
 /// This event is emitted from the backend to the canvas window when a toast
