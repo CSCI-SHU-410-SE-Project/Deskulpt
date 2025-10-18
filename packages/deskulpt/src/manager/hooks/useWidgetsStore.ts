@@ -41,11 +41,3 @@ export async function rescan(initial: boolean = false) {
 
   return widgetsArray.length;
 }
-
-export function removeWidgets(ids: string[]) {
-  useWidgetsStore.setState((state) =>
-    Object.fromEntries(
-      Object.entries(state).filter(([id]) => !ids.includes(id)),
-    ),
-  );
-}
