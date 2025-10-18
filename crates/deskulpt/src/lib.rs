@@ -186,7 +186,7 @@ fn widget_id_from_path(path: &Path, widgets_dir: &Path, kind: &EventKind) -> Opt
     let matches_extension = path
         .extension()
         .and_then(|ext| ext.to_str())
-        .map(|ext| matches_ignore_ascii_case(ext))
+        .map(matches_ignore_ascii_case)
         .unwrap_or(false);
 
     let directory_event = is_top_level
