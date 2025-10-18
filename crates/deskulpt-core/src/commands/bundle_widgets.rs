@@ -32,19 +32,20 @@ pub async fn bundle_widgets<R: Runtime>(
 ) -> CmdResult<()> {
     let widgets_dir = app_handle.widgets_dir()?;
 
-    let mut widgets = vec![];
-    app_handle.with_widget_catalog(|catalog| match ids {
-        Some(ids) => widgets.extend(
-            ids.into_iter()
-                .filter_map(|id| catalog.0.get(&id).cloned().map(|config| (id, config))),
-        ),
-        None => widgets.extend(
-            catalog
+    let widgets: Vec<_> = {
+        let catalog = app_handle.get_widget_catalog();
+        match ids {
+            Some(ids) => ids
+                .into_iter()
+                .filter_map(|id| catalog.0.get(&id).cloned().map(|config| (id, config)))
+                .collect(),
+            None => catalog
                 .0
                 .iter()
-                .map(|(id, config)| (id.clone(), config.clone())),
-        ),
-    });
+                .map(|(id, config)| (id.clone(), config.clone()))
+                .collect(),
+        }
+    };
 
     if widgets.is_empty() {
         return Ok(());
