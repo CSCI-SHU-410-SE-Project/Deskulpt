@@ -23,6 +23,14 @@ export type DeskulptWindow =
 export type JsonValue = null | boolean | number | string | JsonValue[] | { [key in string]: JsonValue }
 
 /**
+ * A result-like binary outcome.
+ * 
+ * This represents the outcome of an operation that can either succeed with a
+ * value of type `T` or fail with an error message.
+ */
+export type Outcome<T> = { type: "ok"; content: T } | { type: "err"; content: string }
+
+/**
  * Event for removing widgets.
  * 
  * This event is emitted from the manager window to the canvas window when
@@ -139,20 +147,24 @@ export type UpdateSettingsEvent = Settings
  * This is a collection of all widgets discovered locally, mapped from their
  * widget IDs to their configurations.
  */
-export type WidgetCatalog = { [key in string]: WidgetConfig }
+export type WidgetCatalog = { [key in string]: Outcome<WidgetConfig> }
 
 /**
  * Full configuration of a Deskulpt widget.
  */
-export type WidgetConfig = 
+export type WidgetConfig = { 
 /**
- * Valid configuration of a widget.
+ * The name of the widget.
  */
-{ type: "ok"; name: string; entry: string; dependencies: { [key in string]: string } } | 
+name: string; 
 /**
- * Error information if a widget failed to load.
+ * The entry point of the widget.
  */
-{ type: "err"; error: string }
+entry: string; 
+/**
+ * The dependencies of the widget.
+ */
+dependencies: { [key in string]: string } }
 
 /**
  * Per-widget settings.
