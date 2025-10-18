@@ -25,6 +25,7 @@ pub trait WindowExt<R: Runtime>: Manager<R> + SettingsStateExt<R> {
             WebviewUrl::App("src/manager/index.html".into()),
         )
         .title("Deskulpt Manager")
+        .background_color(settings.theme.background_color().into())
         .inner_size(800.0, 500.0)
         .center()
         .resizable(false)
