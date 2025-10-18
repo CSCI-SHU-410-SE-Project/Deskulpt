@@ -37,8 +37,6 @@ pub async fn rescan_widgets<R: Runtime>(app_handle: AppHandle<R>) -> CmdResult<W
         UpdateSettingsEvent(settings.clone()).emit(&app_handle)?;
     }
 
-    app_handle.with_widget_catalog_mut(|catalog| {
-        *catalog = new_catalog.clone();
-    });
+    *app_handle.get_widget_catalog_mut() = new_catalog.clone();
     Ok(new_catalog)
 }

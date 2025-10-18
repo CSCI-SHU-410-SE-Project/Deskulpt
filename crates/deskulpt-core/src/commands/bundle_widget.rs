@@ -20,20 +20,19 @@ use crate::states::WidgetCatalogStateExt;
 pub async fn bundle_widget<R: Runtime>(app_handle: AppHandle<R>, id: String) -> CmdResult<String> {
     let widgets_dir = app_handle.widgets_dir()?;
 
-    let mut bundler = app_handle.with_widget_catalog(|catalog| {
-        match catalog
-            .0
-            .get(&id)
-            .ok_or_else(|| anyhow!("Widget (id={}) does not exist", id))?
-        {
+    let mut bundler = app_handle
+        .get_widget_catalog()
+        .0
+        .get(&id)
+        .ok_or_else(|| anyhow!("Widget (id={}) does not exist", id))
+        .and_then(|config| match config {
             Outcome::Ok(config) => {
                 WidgetBundlerBuilder::new(widgets_dir.join(&id), config.entry.clone())
                     .build()
                     .context("Failed to create widget bundler")
             },
             Outcome::Err(error) => Err(anyhow!(error.clone())),
-        }
-    })?;
+        })?;
 
     let code = bundler
         .bundle()
